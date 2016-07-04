@@ -202,6 +202,125 @@
             
             
               
+                <a class="post-title-link" href="/2016/01/05/java/spring/spring-transactional-aop/" itemprop="url">
+                  【spring】自我调用中transaction的常见问题
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-05T20:25:08+08:00" content="2016-01-05">
+              2016-01-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/05/java/spring/spring-transactional-aop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><hr>
+<p>最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。<br>既然如此只好debug一下，接着很快便知道了。</p>
+<h2 id="代码大概是这样的"><a href="#代码大概是这样的" class="headerlink" title="代码大概是这样的"></a>代码大概是这样的</h2><hr>
+<p><a href="https://github.com/niko2014/blog-demo/tree/master/java/starter-jpa-transaction-self-invoke" target="_blank" rel="external">示例代码</a>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodMain() throws Exception &#123;</div><div class="line">        int status = 5;</div><div class="line">        methodA(status);</div><div class="line">        try &#123;</div><div class="line">            methodB(status);        // 位置A</div><div class="line">//            memberOrderCopyService.methodB(status);     // 位置B</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        methodC(status);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodA(Integer status) &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(1L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)</div><div class="line">    public void methodB(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(2L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">        th();</div><div class="line">    &#125;</div><div class="line">    public void methodC(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(3L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    private void th() throws Exception &#123;</div><div class="line">        throw new Exception(&quot;test&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>如上，methodB()中有一个持久化的操作，在那之后有可能会抛异常(th()方法)。<br>实习生的想法是，methodB()加一个注解@Transactional(rollbackFor)，想让methodB执行失败时回滚事务。<br>然而，这种是对spring aop不了解导致的错误。</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><hr>
+<p>我对实习生说了这个错误之后，他却坚持这样是有效的。。没办法，只好以理服人。断点debug，翻源码。</p>
+<p><img src="/images/spring-tx-aop/error_debug_01.png" alt=""></p>
+<p>如上图，可看到methodB()的调用栈，发现methodMaster()是经过拦截器后调用的（Cglib生成代理对象的情况下，AOP拦截和回调可在<code>DynamicAdvisedInterceptor.intercept()</code>方法中找到，如下）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Override</div><div class="line">public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line">    try &#123;</div><div class="line">        if (this.advised.exposeProxy) &#123;</div><div class="line">            // Make invocation available if necessary.</div><div class="line">            oldProxy = AopContext.setCurrentProxy(proxy);</div><div class="line">            setProxyContext = true;</div><div class="line">        &#125;</div><div class="line">        // May be null. Get as late as possible to minimize the time we</div><div class="line">        // &quot;own&quot; the target, in case it comes from a pool...</div><div class="line">        target = getTarget();</div><div class="line">        if (target != null) &#123;</div><div class="line">            targetClass = target.getClass();</div><div class="line">        &#125;</div><div class="line">        List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line">        Object retVal;</div><div class="line">        // Check whether we only have one InvokerInterceptor: that is,</div><div class="line">        // no real advice, but just reflective invocation of the target.</div><div class="line">        if (chain.isEmpty() &amp;&amp; Modifier.isPublic(method.getModifiers())) &#123;</div><div class="line">            // We can skip creating a MethodInvocation: just invoke the target directly.</div><div class="line">            // Note that the final invoker must be an InvokerInterceptor, so we know</div><div class="line">            // it does nothing but a reflective operation on the target, and no hot</div><div class="line">            // swapping or fancy proxying.</div><div class="line">            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</div><div class="line">            retVal = methodProxy.invoke(target, argsToUse);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // We need to create a method invocation...</div><div class="line">            retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();</div><div class="line">        &#125;</div><div class="line">        retVal = processReturnType(proxy, target, method, retVal);</div><div class="line">        return retVal;</div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        if (target != null) &#123;</div><div class="line">            releaseTarget(target);</div><div class="line">        &#125;</div><div class="line">        if (setProxyContext) &#123;</div><div class="line">            // Restore old proxy.</div><div class="line">            AopContext.setCurrentProxy(oldProxy);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在在来看methodB()：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_self_invoke.png" alt=""></p>
+<p>很明显，methodB是在methodMaster()中调用的，<code>TransactionInterceptor</code>并没有拦截，因此@Transactional是无效的。</p>
+<p>现在来对比一下，切换启用位置B代码（使用<code>memberOrderCopyService.methodB(status)</code>）的执行情况：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_of_copy_service.png" alt=""></p>
+<p>从上图可知，此时memberOrderCopyService.methodB()和原先的memberOrderService.methodMaster()都经过了TransactionInterceptor，然后通过代理invoke，这种是正确的，当有异常出现，事务也会正常回滚。</p>
+<p>其实，这是一个简单的问题，通过推理也可以猜到，而且如果内部每个方法都用拦截器，会是一个很大的性能问题。</p>
+<div style="display:none"><br>    FastClassBySpringCGLIB<br>    EnhancerBySpringCGLIB<br>    其实如果用Aspect也可以实现类似Transactional的功能，<br>    下次有空写一个<code>Aspect 和 Transactional</code>的对比。<br></div>
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/12/30/books/self_ctrl/self_ctrl_6/" itemprop="url">
                   【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
                 </a>
@@ -1105,6 +1224,125 @@
             
             
               
+                <a class="post-title-link" href="/2015/11/29/linux/vim_plugins/" itemprop="url">
+                  vim 插件收集
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
+              2015-11-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/11/29/linux/vim_plugins/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/vim_plugins/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
+<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
+<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
+<p>使用指南：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
+<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
+<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
+<p>其他功能都可以在文档中找到。</p>
+<p>常用功能：</p>
+<ul>
+<li>gt/gT<br>上/下切换tab</li>
+</ul>
+<blockquote>
+<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
+</blockquote>
+<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
+<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
+<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
+<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
+<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
+<p>Vundle // TODO and pathogen</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
                   github 上的配色项目 - solarized
                 </a>
@@ -1190,125 +1428,6 @@ git clone git://github.com/altercation/vim-colors-solarized.git
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
 <h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
 <p>// TODO</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/29/linux/vim_plugins/" itemprop="url">
-                  vim 插件收集
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/vim_plugins/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/vim_plugins/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
-<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
-<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
-<p>使用指南：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
-<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
-<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
-<p>其他功能都可以在文档中找到。</p>
-<p>常用功能：</p>
-<ul>
-<li>gt/gT<br>上/下切换tab</li>
-</ul>
-<blockquote>
-<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
-</blockquote>
-<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
-<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
-<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
-<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
-<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
-<p>Vundle // TODO and pathogen</p>
 
             
           </span>
@@ -1471,147 +1590,11 @@ app.description=${app.name} is a Spring Boot application
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/10/30/git/git-stash/" itemprop="url">
-                  git stash 使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-10-30T00:00:00+08:00" content="2015-10-30">
-              2015-10-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/10/30/git/git-stash/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/30/git/git-stash/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="git-stash-干嘛滴"><a href="#git-stash-干嘛滴" class="headerlink" title="git stash 干嘛滴"></a>git stash 干嘛滴</h1><p>假如你正在开发feature-01，但是依赖的一个模块代码修改了，你必须pull代码，然而你又不想commit，这时可以使用<code>git stash</code>来保存当前未commit的代码更改。</p>
-<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p>假设仓库已经有stash-01.txt空文件，vim stash-01.txt，你加了一行文本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">I am developing feature-01</div></pre></td></tr></table></figure>
-<p>这时同学A说，你必须pull代码，然后你微笑着用<code>git stash</code>保存当前未commit的代码：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 80ccebf add stash file<br>HEAD is now at 80ccebf add stash file</p>
-</blockquote>
-<p>之后<code>git status</code>再次确认了当前状态是干净的：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch develop</div><div class="line">Your branch is up-to-date with &apos;origin/develop&apos;.</div><div class="line">nothing to commit, working directory clean</div></pre></td></tr></table></figure>
-<p>这时候可以放心的pull了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (2/2), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   80ccebf..d2b1d0b  develop    -&gt; origin/develop</div><div class="line">Updating 80ccebf..d2b1d0b</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
-<p>这个pull操作可能修改了多个文件，很可能涉及到你刚才stash的文件，这时会发生什么呢？我们接着看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash pop</div><div class="line">Auto-merging git-stash/stash-01.txt</div><div class="line">CONFLICT (content): Merge conflict in git-stash/stash-01.txt</div></pre></td></tr></table></figure>
-<p>Ohhh，冲突了，这是当然的啦。就算是commit之后再pull也是会冲突，只要merge一下就好了。</p>
-<p><img src="/images/git/git-stash-pop-merge.png" alt=""></p>
-<p>这时你检查了一下，发现其实已经完成feature-01了，所以commit and push了。</p>
-<p>之后，你开始了feature-02的开发，同样你加了一行：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">common lib modified</div><div class="line">I am developing feature-01</div><div class="line">I am developing feature-02</div></pre></td></tr></table></figure>
-<p>这时，同学A又让你pull代码，所以你又再次微笑着：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 425394b feature-01 done<br>HEAD is now at 425394b feature-01 done</p>
-<p>$ git pull</p>
-<p>$ git stash pop</p>
-<p>$ git merge</p>
-</blockquote>
-<p>这时候你被打断，没有commit feature-02，后来继续开发feature-03了，接着第三次pull来了：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 7ed8d8d 2th, common lib2 modified<br>HEAD is now at 7ed8d8d 2th, common lib2 modified</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (3/3), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   7ed8d8d..a73e880  develop    -&gt; origin/develop</div><div class="line">Updating 7ed8d8d..a73e880</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
-<p><img src="/images/git/git-stash-merge-not-commited-2nd.png" alt=""></p>
-<p>上图， 可以发现，刚才未提交的merge结果（同学A竟然把2nd写错了⊙﹏⊙），相同的位置现在需要重新merge，这时赶紧commit &amp; push。</p>
-<pre><code>$ git commit -m &quot;Add: feature-02 and 03 done&quot;
-</code></pre><p>如果刚才不是同一个文件，可以stash多次，这个堆栈可以这样查看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash list</div><div class="line">stash@&#123;0&#125;: WIP on develop: 7ed8d8d 2th, common lib2 modified</div><div class="line">stash@&#123;1&#125;: WIP on develop: 425394b feature-01 done</div><div class="line">stash@&#123;2&#125;: WIP on develop: 80ccebf add stash file</div></pre></td></tr></table></figure>
-<p>发现pop出来的stash还存在着，还可以切回去某一次stash：</p>
-<pre><code>$ git stash apply stash@{0}
-</code></pre><p>当然，你可能面临冲突，谨慎使用，看场景～～</p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1649,21 +1632,21 @@ app.description=${app.name} is a Spring Boot application
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-count">31</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">117</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

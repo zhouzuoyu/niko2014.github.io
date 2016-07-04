@@ -1,0 +1,775 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="elasticsearch,ELK,logstash,kibana," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="简介作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。
+版本兼容以下版本亲测兼容：
+
+Logstash 2.3.1
+
+Elasticsearch 2.3.x
+
+Kibana 4.5.0
+
+
+
+Compatible with Elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
+<meta property="og:url" content="http://niko2014.github.io/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="简介作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。
+版本兼容以下版本亲测兼容：
+
+Logstash 2.3.1
+
+Elasticsearch 2.3.x
+
+Kibana 4.5.0
+
+
+
+Compatible with Elasticsearch">
+<meta property="og:image" content="http://niko2014.github.io/images/dtai/kibana_01.png">
+<meta property="og:updated_time" content="2016-07-04T02:24:14.360Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
+<meta name="twitter:description" content="简介作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。
+版本兼容以下版本亲测兼容：
+
+Logstash 2.3.1
+
+Elasticsearch 2.3.x
+
+Kibana 4.5.0
+
+
+
+Compatible with Elasticsearch">
+<meta name="twitter:image" content="http://niko2014.github.io/images/dtai/kibana_01.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> 使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-28T00:00:00+08:00" content="2016-04-28">
+              2016-04-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/data-science/" itemprop="url" rel="index">
+                    <span itemprop="name">data science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。<br>但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。</p>
+<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><p>以下版本亲测兼容：</p>
+<ul>
+<li><p>Logstash 2.3.1</p>
+</li>
+<li><p>Elasticsearch 2.3.x</p>
+</li>
+<li><p>Kibana 4.5.0</p>
+</li>
+</ul>
+<blockquote>
+<p>Compatible with Elasticsearch 2.3.x. Kibana can also be installed from our repositories using apt or yum. See Repositories in the Guide.</p>
+</blockquote>
+<h1 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h1><hr>
+<p>主要作用：负责日志检索和分析。</p>
+<pre><code>tar xvf elasticsearch-2.3.2.tar.gz -C /foo/path
+bin/elasticsearch
+</code></pre><p>默认端口是:</p>
+<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><hr>
+<p>主要作用：负责日志的收集，处理和储存。</p>
+<p>使用：</p>
+<pre><code>tar zxvf logstash-2.3.1.tar.gz
+bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
+`-e`代表直接从命令行输入配置文件, input选择了标准输入, output选择了标准输出。
+</code></pre><p>我们要做的是把nginx日志输出存储到Elasticsearch，使用<code>-f</code>传入预先写好的配置：</p>
+<pre><code>bin/logstash -f logstash-nginx.conf
+</code></pre><p><code>logstash-nginx.conf</code>是我们需要编写的配置文件，用以指定nginx日志的位置和格式，以及es的接口位置。</p>
+<h2 id="编写-logstash-nginx-conf"><a href="#编写-logstash-nginx-conf" class="headerlink" title="编写 logstash-nginx.conf"></a>编写 logstash-nginx.conf</h2><p>更多关于 <code>logstash 配置文件</code> 的编写， 请参考<a href="https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html" target="_blank" rel="external">官方文档</a></p>
+<p>假设nginx的日志格式为:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</div><div class="line">                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div></pre></td></tr></table></figure>
+<p>新建 <code>logstash-nginx.conf</code> 文件，写入:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#</div><div class="line">input &#123;</div><div class="line">    file &#123;</div><div class="line">        path =&gt; [ &quot;/home/niko/mount/hsb_D/niko/temp_trash/logs/foo.com.access_20160617.log&quot; ]</div><div class="line">        type =&gt; &quot;nginx-access&quot;</div><div class="line">        start_position =&gt; &quot;beginning&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">filter &#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;&quot;message&quot; =&gt; &quot;%&#123;IPORHOST:source_ip&#125; - %&#123;USERNAME:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] %&#123;QS:request&#125; %&#123;INT:status&#125; %&#123;INT:body_bytes_sent&#125; %&#123;QS:http_referer&#125; %&#123;QS:http_user_agent&#125;&quot;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123; hosts =&gt; [&quot;localhost:9200&quot;] &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>启动后，等logstash处理完日志文件并写入es，可以查看es的索引:</p>
+<p><a href="http://localhost:9200/_cat/indices" target="_blank" rel="external">http://localhost:9200/_cat/indices</a></p>
+<p>可以看到以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">yellow open .kibana             1 1 1 0  3.1kb  3.1kb</div><div class="line">yellow open logstash-2016.04.28 5 1 4 0 12.3kb 12.3kb</div></pre></td></tr></table></figure>
+<p>grok 使用请看<a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="external"> grok 插件文档 </a>。</p>
+<p>以上grok解析nginx日志文件到es的配置，当然还可以从其他输入源（不止文件）获取数据，输出到不同位置（redis等其他中间件）。</p>
+<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><hr>
+<p>主要作用：负责日志的可视化。</p>
+<ul>
+<li><p>使用：</p>
+<p>  tar xf kibana-4.5.0-linux-x64.tar.gz -C /foo/path<br>  bin/kibana</p>
+</li>
+<li><p>visit <a href="localhost:5601" target="_blank" rel="external">localhost:5601</a></p>
+</li>
+<li><p>配置index pattern:</p>
+</li>
+<li><p>点击<code>Settings</code>,  在<code>Indices</code>tab, 创建一个<code>index pattern</code>，选择<code>logstash-*</code></p>
+</li>
+<li><p>点击<code>visualization</code>, <code>Create a new visualization</code> 这里选择<code>Line Chart</code>类型图</p>
+</li>
+<li><p>然后选择X和Y坐标，Y有常见的聚合属性，X是nginx日志行的几个字段，完成后点击生成， 如下：</p>
+</li>
+</ul>
+<p><img src="/images/dtai/kibana_01.png" alt=""></p>
+<p>以上只是一个示例，kibana 的功能远强大于此，根据自己的需求去定制可视化吧。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/elastic/examples/tree/master/ELK_NGINX" target="_blank" rel="external">https://github.com/elastic/examples/tree/master/ELK_NGINX</a><br>【2】<a href="http://www.icyfire.me/2014/11/13/logstash-es-kibana.html" target="_blank" rel="external">http://www.icyfire.me/2014/11/13/logstash-es-kibana.html</a><br>【3】<a href="http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html</a><br>【4】<a href="http://www.wklken.me/posts/2015/05/08/elk-data-collect.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/05/08/elk-data-collect.html</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/elasticsearch/" rel="tag">#elasticsearch</a>
+          
+            <a href="/tags/ELK/" rel="tag">#ELK</a>
+          
+            <a href="/tags/logstash/" rel="tag">#logstash</a>
+          
+            <a href="/tags/kibana/" rel="tag">#kibana</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/04/linux/android/honor6_root_rom/" rel="next" title="荣耀6刷入CM11">
+                <i class="fa fa-chevron-left"></i> 荣耀6刷入CM11
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/"
+                   data-title="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志" data-url="http://niko2014.github.io/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">117</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#版本兼容"><span class="nav-number">1.1.</span> <span class="nav-text">版本兼容</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Elasticsearch"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Logstash"><span class="nav-number">3.</span> <span class="nav-text">Logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编写-logstash-nginx-conf"><span class="nav-number">3.1.</span> <span class="nav-text">编写 logstash-nginx.conf</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#kibana"><span class="nav-number">4.</span> <span class="nav-text">kibana</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

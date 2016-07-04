@@ -202,6 +202,162 @@
             
             
               
+                <a class="post-title-link" href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="url">
+                  使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-28T00:00:00+08:00" content="2016-04-28">
+              2016-04-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/data-science/" itemprop="url" rel="index">
+                    <span itemprop="name">data science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。<br>但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。</p>
+<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><p>以下版本亲测兼容：</p>
+<ul>
+<li><p>Logstash 2.3.1</p>
+</li>
+<li><p>Elasticsearch 2.3.x</p>
+</li>
+<li><p>Kibana 4.5.0</p>
+</li>
+</ul>
+<blockquote>
+<p>Compatible with Elasticsearch 2.3.x. Kibana can also be installed from our repositories using apt or yum. See Repositories in the Guide.</p>
+</blockquote>
+<h1 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h1><hr>
+<p>主要作用：负责日志检索和分析。</p>
+<pre><code>tar xvf elasticsearch-2.3.2.tar.gz -C /foo/path
+bin/elasticsearch
+</code></pre><p>默认端口是:</p>
+<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><hr>
+<p>主要作用：负责日志的收集，处理和储存。</p>
+<p>使用：</p>
+<pre><code>tar zxvf logstash-2.3.1.tar.gz
+bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
+`-e`代表直接从命令行输入配置文件, input选择了标准输入, output选择了标准输出。
+</code></pre><p>我们要做的是把nginx日志输出存储到Elasticsearch，使用<code>-f</code>传入预先写好的配置：</p>
+<pre><code>bin/logstash -f logstash-nginx.conf
+</code></pre><p><code>logstash-nginx.conf</code>是我们需要编写的配置文件，用以指定nginx日志的位置和格式，以及es的接口位置。</p>
+<h2 id="编写-logstash-nginx-conf"><a href="#编写-logstash-nginx-conf" class="headerlink" title="编写 logstash-nginx.conf"></a>编写 logstash-nginx.conf</h2><p>更多关于 <code>logstash 配置文件</code> 的编写， 请参考<a href="https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html" target="_blank" rel="external">官方文档</a></p>
+<p>假设nginx的日志格式为:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</div><div class="line">                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div></pre></td></tr></table></figure>
+<p>新建 <code>logstash-nginx.conf</code> 文件，写入:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#</div><div class="line">input &#123;</div><div class="line">    file &#123;</div><div class="line">        path =&gt; [ &quot;/home/niko/mount/hsb_D/niko/temp_trash/logs/foo.com.access_20160617.log&quot; ]</div><div class="line">        type =&gt; &quot;nginx-access&quot;</div><div class="line">        start_position =&gt; &quot;beginning&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">filter &#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;&quot;message&quot; =&gt; &quot;%&#123;IPORHOST:source_ip&#125; - %&#123;USERNAME:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] %&#123;QS:request&#125; %&#123;INT:status&#125; %&#123;INT:body_bytes_sent&#125; %&#123;QS:http_referer&#125; %&#123;QS:http_user_agent&#125;&quot;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123; hosts =&gt; [&quot;localhost:9200&quot;] &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>启动后，等logstash处理完日志文件并写入es，可以查看es的索引:</p>
+<p><a href="http://localhost:9200/_cat/indices" target="_blank" rel="external">http://localhost:9200/_cat/indices</a></p>
+<p>可以看到以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">yellow open .kibana             1 1 1 0  3.1kb  3.1kb</div><div class="line">yellow open logstash-2016.04.28 5 1 4 0 12.3kb 12.3kb</div></pre></td></tr></table></figure>
+<p>grok 使用请看<a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="external"> grok 插件文档 </a>。</p>
+<p>以上grok解析nginx日志文件到es的配置，当然还可以从其他输入源（不止文件）获取数据，输出到不同位置（redis等其他中间件）。</p>
+<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><hr>
+<p>主要作用：负责日志的可视化。</p>
+<ul>
+<li><p>使用：</p>
+<p>  tar xf kibana-4.5.0-linux-x64.tar.gz -C /foo/path<br>  bin/kibana</p>
+</li>
+<li><p>visit <a href="localhost:5601" target="_blank" rel="external">localhost:5601</a></p>
+</li>
+<li><p>配置index pattern:</p>
+</li>
+<li><p>点击<code>Settings</code>,  在<code>Indices</code>tab, 创建一个<code>index pattern</code>，选择<code>logstash-*</code></p>
+</li>
+<li><p>点击<code>visualization</code>, <code>Create a new visualization</code> 这里选择<code>Line Chart</code>类型图</p>
+</li>
+<li><p>然后选择X和Y坐标，Y有常见的聚合属性，X是nginx日志行的几个字段，完成后点击生成， 如下：</p>
+</li>
+</ul>
+<p><img src="/images/dtai/kibana_01.png" alt=""></p>
+<p>以上只是一个示例，kibana 的功能远强大于此，根据自己的需求去定制可视化吧。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/elastic/examples/tree/master/ELK_NGINX" target="_blank" rel="external">https://github.com/elastic/examples/tree/master/ELK_NGINX</a><br>【2】<a href="http://www.icyfire.me/2014/11/13/logstash-es-kibana.html" target="_blank" rel="external">http://www.icyfire.me/2014/11/13/logstash-es-kibana.html</a><br>【3】<a href="http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html</a><br>【4】<a href="http://www.wklken.me/posts/2015/05/08/elk-data-collect.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/05/08/elk-data-collect.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/04/04/linux/android/honor6_root_rom/" itemprop="url">
                   荣耀6刷入CM11
                 </a>
@@ -1220,130 +1376,11 @@ cd synergy-1.7.5-stable
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/05/java/spring/spring-transactional-aop/" itemprop="url">
-                  【spring】自我调用中transaction的常见问题
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-05T20:25:08+08:00" content="2016-01-05">
-              2016-01-05
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/05/java/spring/spring-transactional-aop/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><hr>
-<p>最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。<br>既然如此只好debug一下，接着很快便知道了。</p>
-<h2 id="代码大概是这样的"><a href="#代码大概是这样的" class="headerlink" title="代码大概是这样的"></a>代码大概是这样的</h2><hr>
-<p><a href="https://github.com/niko2014/blog-demo/tree/master/java/starter-jpa-transaction-self-invoke" target="_blank" rel="external">示例代码</a>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodMain() throws Exception &#123;</div><div class="line">        int status = 5;</div><div class="line">        methodA(status);</div><div class="line">        try &#123;</div><div class="line">            methodB(status);        // 位置A</div><div class="line">//            memberOrderCopyService.methodB(status);     // 位置B</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        methodC(status);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodA(Integer status) &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(1L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)</div><div class="line">    public void methodB(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(2L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">        th();</div><div class="line">    &#125;</div><div class="line">    public void methodC(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(3L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    private void th() throws Exception &#123;</div><div class="line">        throw new Exception(&quot;test&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>如上，methodB()中有一个持久化的操作，在那之后有可能会抛异常(th()方法)。<br>实习生的想法是，methodB()加一个注解@Transactional(rollbackFor)，想让methodB执行失败时回滚事务。<br>然而，这种是对spring aop不了解导致的错误。</p>
-<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><hr>
-<p>我对实习生说了这个错误之后，他却坚持这样是有效的。。没办法，只好以理服人。断点debug，翻源码。</p>
-<p><img src="/images/spring-tx-aop/error_debug_01.png" alt=""></p>
-<p>如上图，可看到methodB()的调用栈，发现methodMaster()是经过拦截器后调用的（Cglib生成代理对象的情况下，AOP拦截和回调可在<code>DynamicAdvisedInterceptor.intercept()</code>方法中找到，如下）。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Override</div><div class="line">public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line">    try &#123;</div><div class="line">        if (this.advised.exposeProxy) &#123;</div><div class="line">            // Make invocation available if necessary.</div><div class="line">            oldProxy = AopContext.setCurrentProxy(proxy);</div><div class="line">            setProxyContext = true;</div><div class="line">        &#125;</div><div class="line">        // May be null. Get as late as possible to minimize the time we</div><div class="line">        // &quot;own&quot; the target, in case it comes from a pool...</div><div class="line">        target = getTarget();</div><div class="line">        if (target != null) &#123;</div><div class="line">            targetClass = target.getClass();</div><div class="line">        &#125;</div><div class="line">        List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line">        Object retVal;</div><div class="line">        // Check whether we only have one InvokerInterceptor: that is,</div><div class="line">        // no real advice, but just reflective invocation of the target.</div><div class="line">        if (chain.isEmpty() &amp;&amp; Modifier.isPublic(method.getModifiers())) &#123;</div><div class="line">            // We can skip creating a MethodInvocation: just invoke the target directly.</div><div class="line">            // Note that the final invoker must be an InvokerInterceptor, so we know</div><div class="line">            // it does nothing but a reflective operation on the target, and no hot</div><div class="line">            // swapping or fancy proxying.</div><div class="line">            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</div><div class="line">            retVal = methodProxy.invoke(target, argsToUse);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // We need to create a method invocation...</div><div class="line">            retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();</div><div class="line">        &#125;</div><div class="line">        retVal = processReturnType(proxy, target, method, retVal);</div><div class="line">        return retVal;</div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        if (target != null) &#123;</div><div class="line">            releaseTarget(target);</div><div class="line">        &#125;</div><div class="line">        if (setProxyContext) &#123;</div><div class="line">            // Restore old proxy.</div><div class="line">            AopContext.setCurrentProxy(oldProxy);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>现在在来看methodB()：</p>
-<p><img src="/images/spring-tx-aop/error_debug_03_self_invoke.png" alt=""></p>
-<p>很明显，methodB是在methodMaster()中调用的，<code>TransactionInterceptor</code>并没有拦截，因此@Transactional是无效的。</p>
-<p>现在来对比一下，切换启用位置B代码（使用<code>memberOrderCopyService.methodB(status)</code>）的执行情况：</p>
-<p><img src="/images/spring-tx-aop/error_debug_03_of_copy_service.png" alt=""></p>
-<p>从上图可知，此时memberOrderCopyService.methodB()和原先的memberOrderService.methodMaster()都经过了TransactionInterceptor，然后通过代理invoke，这种是正确的，当有异常出现，事务也会正常回滚。</p>
-<p>其实，这是一个简单的问题，通过推理也可以猜到，而且如果内部每个方法都用拦截器，会是一个很大的性能问题。</p>
-<div style="display:none"><br>    FastClassBySpringCGLIB<br>    EnhancerBySpringCGLIB<br>    其实如果用Aspect也可以实现类似Transactional的功能，<br>    下次有空写一个<code>Aspect 和 Transactional</code>的对比。<br></div>
-
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1381,21 +1418,21 @@ cd synergy-1.7.5-stable
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-count">31</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">117</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
