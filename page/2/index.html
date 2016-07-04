@@ -202,6 +202,123 @@
             
             
               
+                <a class="post-title-link" href="/2016/01/12/java/spring/spring_transaction_manager/" itemprop="url">
+                  【spring】事务提交后进行某些操作
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-12T13:03:30+08:00" content="2016-01-12">
+              2016-01-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/12/java/spring/spring_transaction_manager/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/12/java/spring/spring_transaction_manager/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>在工作中，我们经常会有这样的需求。当修改了某些东西后，需要通知其他服务模块或系统进行某些处理。<br>这个如果硬编码的话，是一种很不优雅的方法：<br>首先，它的灵活性很差，当需求变更时，无可避免的要修改业务操作的代码，容易出bug，不符合<code>开关</code>原则（虽然不是讨论设计模式）。<br>其次，主业务操作（数据修改）部分和后续的通知处理应该是隔离的，后续的通知是否成功，对业务操作都不应有影响，或者在功能和时间上尽可能不影响主业务操作。</p>
+<p>那么如果不用硬编码，事件（消息）驱动的方式是常用的一种方法，这样我们就可以把后续通知的相关处理和主业务操作解耦开来，就算要进行拓展也是很安全和方便的。</p>
+<h2 id="spring-的-TransactionSynchronizationManager"><a href="#spring-的-TransactionSynchronizationManager" class="headerlink" title="spring 的 TransactionSynchronizationManager"></a>spring 的 TransactionSynchronizationManager</h2><p>在spring中，TransactionSynchronizationManager有一个事务提交后的回调支持，我们可以视线注册需要在事务commit后才进行的某些操作，如<code>afterCommit()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 这里是上下文</div><div class="line">TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() &#123;</div><div class="line">        @Override</div><div class="line">        public void suspend() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void resume() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void flush() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCommit(boolean readOnly) &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCompletion() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCommit() &#123;</div><div class="line">            log.info(&apos;afterCommit()&apos;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCompletion(int status) &#123;</div><div class="line">        &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>因为TransactionSynchronization是interface，所以TransactionSynchronization的实现是一个匿名内部类，相当于一个闭包，可以访问上下文的变量等，方便我们进行某些操作。</p>
+<h2 id="运行细节-源码"><a href="#运行细节-源码" class="headerlink" title="运行细节 ( 源码 )"></a>运行细节 ( 源码 )</h2><p>接下来看一下TransactionSynchronizationManager的实现，它的成员中，有个ThreadLocal副本，保存了不同线程已注册的同步操作：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static final ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations =</div><div class="line">			new NamedThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt;(&quot;Transaction synchronizations&quot;);</div></pre></td></tr></table></figure>
+<p>在spring运行过程中，事务相关的操作会通过TransactionInterceptor执行invocation：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	public Object invoke(final MethodInvocation invocation) throws Throwable &#123;</div><div class="line">		// Work out the target class: may be &#123;@code null&#125;.</div><div class="line">		// The TransactionAttributeSource should be passed the target class</div><div class="line">		// as well as the method, which may be from an interface.</div><div class="line">		Class&lt;?&gt; targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);</div><div class="line"></div><div class="line">		// Adapt to TransactionAspectSupport&apos;s invokeWithinTransaction...</div><div class="line">		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() &#123;</div><div class="line">			@Override</div><div class="line">			public Object proceedWithInvocation() throws Throwable &#123;</div><div class="line">				return invocation.proceed();</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">    protected Object invokeWithinTransaction(Method method, Class&lt;?&gt; targetClass, final InvocationCallback invocation)</div><div class="line">			throws Throwable &#123;</div><div class="line">            ...</div><div class="line">            ...</div><div class="line">			commitTransactionAfterReturning(txInfo);</div><div class="line">			return retVal;</div><div class="line">		&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>invokeWithinTransaction()是父类TransactionAspectSupport的方法，并会调用commitTransactionAfterReturning(TransactionInfo txInfo))来提交事务：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionInterceptor.java</div><div class="line"></div><div class="line">   protected void commitTransactionAfterReturning(TransactionInfo txInfo) &#123;</div><div class="line">	if (txInfo != null &amp;&amp; txInfo.hasTransaction()) &#123;</div><div class="line">		if (logger.isTraceEnabled()) &#123;</div><div class="line">			logger.trace(&quot;Completing transaction for [&quot; + txInfo.getJoinpointIdentification() + &quot;]&quot;);</div><div class="line">		&#125;</div><div class="line">		txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// AbstractPlatformTransactionManager.java</div><div class="line"></div><div class="line">@Override</div><div class="line">public final void commit(TransactionStatus status) throws TransactionException &#123;</div><div class="line">    ...</div><div class="line">	processCommit(defStatus);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>processCommit()这个方法中很详细的介绍了提交事务的处理细节，包括beforeCommit() / beforeCompletion() / afterCommit() / afterCompletion()在事务提交时的调用和发生异常时的处理方法，还可以看到如isNewTransaction、globalRollbackOnly等对事务处理的影响。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private void processCommit(DefaultTransactionStatus status) throws TransactionException &#123;</div><div class="line">    try &#123;</div><div class="line">        boolean beforeCompletionInvoked = false;</div><div class="line">        try &#123;</div><div class="line">            prepareForCommit(status);</div><div class="line">            triggerBeforeCommit(status);</div><div class="line">            triggerBeforeCompletion(status);</div><div class="line">            beforeCompletionInvoked = true;</div><div class="line">            boolean globalRollbackOnly = false;</div><div class="line">            if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) &#123;</div><div class="line">                globalRollbackOnly = status.isGlobalRollbackOnly();</div><div class="line">            &#125;</div><div class="line">            if (status.hasSavepoint()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Releasing transaction savepoint&quot;);</div><div class="line">                &#125;</div><div class="line">                status.releaseHeldSavepoint();</div><div class="line">            &#125;</div><div class="line">            else if (status.isNewTransaction()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Initiating transaction commit&quot;);</div><div class="line">                &#125;</div><div class="line">                doCommit(status);</div><div class="line">            &#125;</div><div class="line">            // Throw UnexpectedRollbackException if we have a global rollback-only</div><div class="line">            // marker but still didn&apos;t get a corresponding exception from commit.</div><div class="line">            if (globalRollbackOnly) &#123;</div><div class="line">                throw new UnexpectedRollbackException(</div><div class="line">                        &quot;Transaction silently rolled back because it has been marked as rollback-only&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        catch (UnexpectedRollbackException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_ROLLED_BACK);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (TransactionException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            if (isRollbackOnCommitFailure()) &#123;</div><div class="line">                doRollbackOnCommitException(status, ex);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                triggerAfterCompletion(status, TransactionSynchronization.STATUS_UNKNOWN);</div><div class="line">            &#125;</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (RuntimeException ex) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, ex);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (Error err) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, err);</div><div class="line">            throw err;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // Trigger afterCommit callbacks, with an exception thrown there</div><div class="line">        // propagated to callers but the transaction still considered as committed.</div><div class="line">        try &#123;</div><div class="line">            triggerAfterCommit(status);</div><div class="line">        &#125;</div><div class="line">        finally &#123;</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_COMMITTED);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        cleanupAfterCompletion(status);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到triggerAfterCommit()在doCommit(status)，不管是否抛出异常都会执行afterCompletion()，这个细节在平时开发也要留意，做好异常的处理。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   private void triggerAfterCommit(DefaultTransactionStatus status) &#123;</div><div class="line">	if (status.isNewSynchronization()) &#123;</div><div class="line">		if (status.isDebug()) &#123;</div><div class="line">			logger.trace(&quot;Triggering afterCommit synchronization&quot;);</div><div class="line">		&#125;</div><div class="line">		TransactionSynchronizationUtils.triggerAfterCommit();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>终于，前面我们注册在TransactionSynchronizationManager的TransactionSynchronization，在这里被get出来执行，如果注册了多个通知操作，会被按顺序执行，因为这个Set的实现是LinkedHashSet。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionSynchronizationUtils</div><div class="line">   public static void triggerAfterCommit() &#123;</div><div class="line">	invokeAfterCommit(TransactionSynchronizationManager.getSynchronizations());</div><div class="line">&#125;</div><div class="line"></div><div class="line">   public static void invokeAfterCommit(List&lt;TransactionSynchronization&gt; synchronizations) &#123;</div><div class="line">	if (synchronizations != null) &#123;</div><div class="line">		for (TransactionSynchronization synchronization : synchronizations) &#123;</div><div class="line">			synchronization.afterCommit();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>至今为止，以上讨论的是弱一致性的业务场景，一致性要求比较高的，需要分布式事务或者其他的手段来实现。<br>而且需要注意的，afterCommit()中的操作是同步的，和业务操作在同一个响应时间内的，所以，尽量不要做一些耗时的操作。<br>afterCommit()中，除了直接发送消息到队列，也可以使用本地队列来优化，用来存储和异步发送消息，这样会快很多。</p>
+<p>``</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/01/05/java/spring/spring-transactional-aop/" itemprop="url">
                   【spring】自我调用中transaction的常见问题
                 </a>
@@ -1224,125 +1341,6 @@
             
             
               
-                <a class="post-title-link" href="/2015/11/29/linux/vim_plugins/" itemprop="url">
-                  vim 插件收集
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/vim_plugins/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/vim_plugins/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
-<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
-<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
-<p>使用指南：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
-<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
-<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
-<p>其他功能都可以在文档中找到。</p>
-<p>常用功能：</p>
-<ul>
-<li>gt/gT<br>上/下切换tab</li>
-</ul>
-<blockquote>
-<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
-</blockquote>
-<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
-<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
-<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
-<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
-<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
-<p>Vundle // TODO and pathogen</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
                   github 上的配色项目 - solarized
                 </a>
@@ -1465,8 +1463,8 @@ git clone git://github.com/altercation/vim-colors-solarized.git
             
             
               
-                <a class="post-title-link" href="/2015/11/01/java/spring/spring-boot_config_order/" itemprop="url">
-                  spring配置加载顺序
+                <a class="post-title-link" href="/2015/11/29/linux/vim_plugins/" itemprop="url">
+                  vim 插件收集
                 </a>
               
             
@@ -1476,8 +1474,8 @@ git clone git://github.com/altercation/vim-colors-solarized.git
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-01T00:00:00+08:00" content="2015-11-01">
-              2015-11-01
+            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
+              2015-11-29
             </time>
           </span>
 
@@ -1486,8 +1484,8 @@ git clone git://github.com/altercation/vim-colors-solarized.git
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
                   </a>
                 </span>
 
@@ -1502,8 +1500,8 @@ git clone git://github.com/altercation/vim-colors-solarized.git
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/01/java/spring/spring-boot_config_order/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/01/java/spring/spring-boot_config_order/" itemprop="commentsCount"></span>
+                <a href="/2015/11/29/linux/vim_plugins/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/vim_plugins/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -1525,50 +1523,28 @@ git clone git://github.com/altercation/vim-colors-solarized.git
         
           <span itemprop="articleBody">
             
-              <h1 id="spring的配置加载顺序"><a href="#spring的配置加载顺序" class="headerlink" title="spring的配置加载顺序"></a>spring的配置加载顺序</h1><p>Spring使用了特定的配置属性加载顺序，为了让后者可以覆写前者的配置，而前者提供一些默认的约定配置。具体的加载顺序是：</p>
+              <p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
+<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
+<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
+<p>使用指南：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
+<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
+<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
+<p>其他功能都可以在文档中找到。</p>
+<p>常用功能：</p>
 <ul>
-<li>Command line arguments.</li>
-<li>Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)</li>
-<li>JNDI attributes from java:comp/env.</li>
-<li>Java System properties (System.getProperties()).</li>
-<li>OS environment variables.</li>
-<li><p>A RandomValuePropertySource that only has properties in <code>random.*.</code></p>
-</li>
-<li><p>Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)</p>
-</li>
-<li>Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)</li>
-<li>Application properties outside of your packaged jar (application.properties and YAML variants).</li>
-<li>Application properties packaged inside your jar (application.properties and YAML variants).</li>
-<li>@PropertySource annotations on your @Configuration classes.</li>
-<li>Default properties (specified using SpringApplication.setDefaultProperties).</li>
+<li>gt/gT<br>上/下切换tab</li>
 </ul>
-<h1 id="配置覆写测试和验证"><a href="#配置覆写测试和验证" class="headerlink" title="配置覆写测试和验证"></a>配置覆写测试和验证</h1><p>使用starter-web来测试：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Controller</div><div class="line">@EnableAutoConfiguration</div><div class="line">public class SampleController &#123;</div><div class="line"></div><div class="line">    @Value(&quot;$&#123;myname&#125;&quot;)</div><div class="line">    String myName;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    String home() &#123;</div><div class="line">        return &quot;Hello, &quot; + myName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line">        SpringApplication.run(SampleController.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>测试用命令行传入：</p>
-<pre><code>java -jar target/app.jar --myname=&quot;niko&quot;
-</code></pre><p>测试shell环境变量</p>
-<pre><code>export SPRING_APPLICATION_JSON=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
-java -jar target/app.jar
-</code></pre><p>测试使用系统变量</p>
-<pre><code>java -jar target/app.jar -Dspring.application.json=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
-</code></pre><p>测试<code>application.properties</code>和<code>application-dev.properties</code>：<br>application.properties：</p>
-<pre><code>spring.profiles.active=dev
-myname=application.properties
-</code></pre><p>application-dev.properties：</p>
-<pre><code>myname=application-dev.properties
-</code></pre><h1 id="其他细节"><a href="#其他细节" class="headerlink" title="其他细节"></a>其他细节</h1><h2 id="application-properties-的查找顺序"><a href="#application-properties-的查找顺序" class="headerlink" title="application.properties 的查找顺序"></a>application.properties 的查找顺序</h2><p>Spring会加载配置文件<code>application.properties</code>从以下位置：</p>
-<ul>
-<li>A <code>/config</code> subdirectory of the current directory.</li>
-<li>The current directory</li>
-<li>A classpath <code>/config</code> package</li>
-<li>The classpath root</li>
-</ul>
-<p>如果你不喜欢<code>application</code>这个name，可以传入<code>--spring.config.name=othername</code>来设置，或者是使用<code>--spring.config.location=classpath:/default.properties,classpath:/override.properties</code>。<br>值得注意的是，<code>spring.config.location</code>声明的加载优先级是从低到高，即是会先加载<code>classpath:/override.properties</code>。</p>
-<h2 id="占位符使用"><a href="#占位符使用" class="headerlink" title="占位符使用"></a>占位符使用</h2><p><code>application.properties</code></p>
-<pre><code>app.name=MyApp
-app.description=${app.name} is a Spring Boot application
-</code></pre><p>这个就算是<code>app.name</code>的声明顺序倒过来也是okay的。</p>
-<p>&gt;</p>
+<blockquote>
+<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
+</blockquote>
+<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
+<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
+<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
+<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
+<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
+<p>Vundle // TODO and pathogen</p>
 
             
           </span>
@@ -1632,7 +1608,7 @@ app.description=${app.name} is a Spring Boot application
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-count">32</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

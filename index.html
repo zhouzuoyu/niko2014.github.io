@@ -942,6 +942,134 @@ vim /etc/polipo/config
             
             
               
+                <a class="post-title-link" href="/2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/" itemprop="url">
+                  ubuntu安装nvidia显卡驱动
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-02-01T15:03:30+08:00" content="2016-02-01">
+              2016-02-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近换硬盘重装了ubuntu, 但在用xmind和窗口切换时, 老是卡死(鼠标/键盘动不了, 但能ssh进去) , 想了一下, 应该是显卡驱动没装的原因, 由于自己的ubuntu关闭了所有动画和特效, 一直没有去装N卡驱动, 于是安装验证了一下是否这个原因导致的～</p>
+<h1 id="安装前"><a href="#安装前" class="headerlink" title="安装前"></a>安装前</h1><p>安装前我们要先查看当前的显卡型号:</p>
+<pre><code>lspci | grep VGA
+01:00.0 VGA compatible controller: NVIDIA Corporation GF119 [GeForce GT 705] (rev a1)
+</code></pre><p>可以发现这个显卡是<code>GT 705</code>(这个台式机显卡渣渣啊), 这个在接下来找驱动会用到.</p>
+<blockquote>
+<p>若要查看更多设备信息, 可以使用 <code>lspci -v</code></p>
+</blockquote>
+<h1 id="option-1-使用管理器安装"><a href="#option-1-使用管理器安装" class="headerlink" title="option 1: 使用管理器安装:"></a>option 1: 使用管理器安装:</h1><p>如果嫌麻烦的, 可以在<code>software &amp; update</code>管理器中选择显卡驱动安装.</p>
+<p><img src="/images/linux/nvidia_manager_install.png" alt=""></p>
+<p>我的是第二种方式安装的</p>
+<h1 id="option-2-手动安装"><a href="#option-2-手动安装" class="headerlink" title="option 2: 手动安装:"></a>option 2: 手动安装:</h1><p>首先到[Nvidia官方网站]（<a href="http://www.geforce.cn/drivers）下载显卡对应的驱动，" target="_blank" rel="external">http://www.geforce.cn/drivers）下载显卡对应的驱动，</a> 需要对应自己的显卡和系统平台选择下载，比如我的是<code>NVIDIA-Linux-x86_64-352.79.run</code>。</p>
+<p>接着删除已有nvidia的包:</p>
+<pre><code>sudo apt-get --purge remove nvidia-*
+sudo apt-get install ubuntu-desktop
+echo &apos;nouveau&apos; | sudo tee -a /etc/modules
+</code></pre><p>重启， 并进入tty1（按ctrl+alt+F1）：</p>
+<pre><code>sudo service lightdm stop
+cd  /directory/of/NVIDIA.run.file
+sudo sh ./NVIDIA-Linux-x86_64-352.79.run
+</code></pre><p>执行完后，<code>sudo reboot</code>。<br>重启后， 可以在程序搜索中找到nvidia manager。</p>
+<p>查看当前驱动：</p>
+<p>在所有应用中搜索<code>nvidia</code>，可以发现<code>nvidia x server settings</code>的程序：</p>
+<p><img src="/images/linux/nvidia-config-01.png" alt=""></p>
+<p>也可以在<code>software &amp; update</code>管理器中查看安装情况。</p>
+<p>或者：</p>
+<pre><code>prime-select query
+</code></pre><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>最后，装了N卡驱动后，ubuntu的unity崩溃真的少了很多，xmind的卡死也没有再出现过。</p>
+<h1 id="参考引用"><a href="#参考引用" class="headerlink" title="参考引用"></a>参考引用</h1><hr>
+<p>【1】<a href="http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html" target="_blank" rel="external">http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html</a><br>【2】<a href="http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14" target="_blank" rel="external">http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14</a></p>
+<p>#</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/01/30/linux/tools/terminator/" itemprop="url">
                   terminator 使用
                 </a>
@@ -1259,123 +1387,6 @@ cd synergy-1.7.5-stable
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/12/java/spring/spring_transaction_manager/" itemprop="url">
-                  【spring】事务提交后进行某些操作
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-12T13:03:30+08:00" content="2016-01-12">
-              2016-01-12
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/12/java/spring/spring_transaction_manager/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/12/java/spring/spring_transaction_manager/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>在工作中，我们经常会有这样的需求。当修改了某些东西后，需要通知其他服务模块或系统进行某些处理。<br>这个如果硬编码的话，是一种很不优雅的方法：<br>首先，它的灵活性很差，当需求变更时，无可避免的要修改业务操作的代码，容易出bug，不符合<code>开关</code>原则（虽然不是讨论设计模式）。<br>其次，主业务操作（数据修改）部分和后续的通知处理应该是隔离的，后续的通知是否成功，对业务操作都不应有影响，或者在功能和时间上尽可能不影响主业务操作。</p>
-<p>那么如果不用硬编码，事件（消息）驱动的方式是常用的一种方法，这样我们就可以把后续通知的相关处理和主业务操作解耦开来，就算要进行拓展也是很安全和方便的。</p>
-<h2 id="spring-的-TransactionSynchronizationManager"><a href="#spring-的-TransactionSynchronizationManager" class="headerlink" title="spring 的 TransactionSynchronizationManager"></a>spring 的 TransactionSynchronizationManager</h2><p>在spring中，TransactionSynchronizationManager有一个事务提交后的回调支持，我们可以视线注册需要在事务commit后才进行的某些操作，如<code>afterCommit()</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 这里是上下文</div><div class="line">TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() &#123;</div><div class="line">        @Override</div><div class="line">        public void suspend() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void resume() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void flush() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCommit(boolean readOnly) &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCompletion() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCommit() &#123;</div><div class="line">            log.info(&apos;afterCommit()&apos;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCompletion(int status) &#123;</div><div class="line">        &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>因为TransactionSynchronization是interface，所以TransactionSynchronization的实现是一个匿名内部类，相当于一个闭包，可以访问上下文的变量等，方便我们进行某些操作。</p>
-<h2 id="运行细节-源码"><a href="#运行细节-源码" class="headerlink" title="运行细节 ( 源码 )"></a>运行细节 ( 源码 )</h2><p>接下来看一下TransactionSynchronizationManager的实现，它的成员中，有个ThreadLocal副本，保存了不同线程已注册的同步操作：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static final ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations =</div><div class="line">			new NamedThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt;(&quot;Transaction synchronizations&quot;);</div></pre></td></tr></table></figure>
-<p>在spring运行过程中，事务相关的操作会通过TransactionInterceptor执行invocation：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	public Object invoke(final MethodInvocation invocation) throws Throwable &#123;</div><div class="line">		// Work out the target class: may be &#123;@code null&#125;.</div><div class="line">		// The TransactionAttributeSource should be passed the target class</div><div class="line">		// as well as the method, which may be from an interface.</div><div class="line">		Class&lt;?&gt; targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);</div><div class="line"></div><div class="line">		// Adapt to TransactionAspectSupport&apos;s invokeWithinTransaction...</div><div class="line">		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() &#123;</div><div class="line">			@Override</div><div class="line">			public Object proceedWithInvocation() throws Throwable &#123;</div><div class="line">				return invocation.proceed();</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">    protected Object invokeWithinTransaction(Method method, Class&lt;?&gt; targetClass, final InvocationCallback invocation)</div><div class="line">			throws Throwable &#123;</div><div class="line">            ...</div><div class="line">            ...</div><div class="line">			commitTransactionAfterReturning(txInfo);</div><div class="line">			return retVal;</div><div class="line">		&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>invokeWithinTransaction()是父类TransactionAspectSupport的方法，并会调用commitTransactionAfterReturning(TransactionInfo txInfo))来提交事务：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionInterceptor.java</div><div class="line"></div><div class="line">   protected void commitTransactionAfterReturning(TransactionInfo txInfo) &#123;</div><div class="line">	if (txInfo != null &amp;&amp; txInfo.hasTransaction()) &#123;</div><div class="line">		if (logger.isTraceEnabled()) &#123;</div><div class="line">			logger.trace(&quot;Completing transaction for [&quot; + txInfo.getJoinpointIdentification() + &quot;]&quot;);</div><div class="line">		&#125;</div><div class="line">		txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// AbstractPlatformTransactionManager.java</div><div class="line"></div><div class="line">@Override</div><div class="line">public final void commit(TransactionStatus status) throws TransactionException &#123;</div><div class="line">    ...</div><div class="line">	processCommit(defStatus);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>processCommit()这个方法中很详细的介绍了提交事务的处理细节，包括beforeCommit() / beforeCompletion() / afterCommit() / afterCompletion()在事务提交时的调用和发生异常时的处理方法，还可以看到如isNewTransaction、globalRollbackOnly等对事务处理的影响。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private void processCommit(DefaultTransactionStatus status) throws TransactionException &#123;</div><div class="line">    try &#123;</div><div class="line">        boolean beforeCompletionInvoked = false;</div><div class="line">        try &#123;</div><div class="line">            prepareForCommit(status);</div><div class="line">            triggerBeforeCommit(status);</div><div class="line">            triggerBeforeCompletion(status);</div><div class="line">            beforeCompletionInvoked = true;</div><div class="line">            boolean globalRollbackOnly = false;</div><div class="line">            if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) &#123;</div><div class="line">                globalRollbackOnly = status.isGlobalRollbackOnly();</div><div class="line">            &#125;</div><div class="line">            if (status.hasSavepoint()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Releasing transaction savepoint&quot;);</div><div class="line">                &#125;</div><div class="line">                status.releaseHeldSavepoint();</div><div class="line">            &#125;</div><div class="line">            else if (status.isNewTransaction()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Initiating transaction commit&quot;);</div><div class="line">                &#125;</div><div class="line">                doCommit(status);</div><div class="line">            &#125;</div><div class="line">            // Throw UnexpectedRollbackException if we have a global rollback-only</div><div class="line">            // marker but still didn&apos;t get a corresponding exception from commit.</div><div class="line">            if (globalRollbackOnly) &#123;</div><div class="line">                throw new UnexpectedRollbackException(</div><div class="line">                        &quot;Transaction silently rolled back because it has been marked as rollback-only&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        catch (UnexpectedRollbackException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_ROLLED_BACK);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (TransactionException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            if (isRollbackOnCommitFailure()) &#123;</div><div class="line">                doRollbackOnCommitException(status, ex);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                triggerAfterCompletion(status, TransactionSynchronization.STATUS_UNKNOWN);</div><div class="line">            &#125;</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (RuntimeException ex) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, ex);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (Error err) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, err);</div><div class="line">            throw err;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // Trigger afterCommit callbacks, with an exception thrown there</div><div class="line">        // propagated to callers but the transaction still considered as committed.</div><div class="line">        try &#123;</div><div class="line">            triggerAfterCommit(status);</div><div class="line">        &#125;</div><div class="line">        finally &#123;</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_COMMITTED);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        cleanupAfterCompletion(status);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>可以看到triggerAfterCommit()在doCommit(status)，不管是否抛出异常都会执行afterCompletion()，这个细节在平时开发也要留意，做好异常的处理。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   private void triggerAfterCommit(DefaultTransactionStatus status) &#123;</div><div class="line">	if (status.isNewSynchronization()) &#123;</div><div class="line">		if (status.isDebug()) &#123;</div><div class="line">			logger.trace(&quot;Triggering afterCommit synchronization&quot;);</div><div class="line">		&#125;</div><div class="line">		TransactionSynchronizationUtils.triggerAfterCommit();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>终于，前面我们注册在TransactionSynchronizationManager的TransactionSynchronization，在这里被get出来执行，如果注册了多个通知操作，会被按顺序执行，因为这个Set的实现是LinkedHashSet。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionSynchronizationUtils</div><div class="line">   public static void triggerAfterCommit() &#123;</div><div class="line">	invokeAfterCommit(TransactionSynchronizationManager.getSynchronizations());</div><div class="line">&#125;</div><div class="line"></div><div class="line">   public static void invokeAfterCommit(List&lt;TransactionSynchronization&gt; synchronizations) &#123;</div><div class="line">	if (synchronizations != null) &#123;</div><div class="line">		for (TransactionSynchronization synchronization : synchronizations) &#123;</div><div class="line">			synchronization.afterCommit();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>至今为止，以上讨论的是弱一致性的业务场景，一致性要求比较高的，需要分布式事务或者其他的手段来实现。<br>而且需要注意的，afterCommit()中的操作是同步的，和业务操作在同一个响应时间内的，所以，尽量不要做一些耗时的操作。<br>afterCommit()中，除了直接发送消息到队列，也可以使用本地队列来优化，用来存储和异步发送消息，这样会快很多。</p>
-<p>``</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1418,7 +1429,7 @@ cd synergy-1.7.5-stable
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-count">32</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
