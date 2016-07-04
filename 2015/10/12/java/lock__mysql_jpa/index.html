@@ -1,0 +1,716 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="mysql,jpa," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="今天今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。
+MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）
+首先回顾一下大学的基础知识：数据库的锁，是事务在某个数据对象（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="锁之MySQL和JPA">
+<meta property="og:url" content="http://niko2014.github.io/2015/10/12/java/lock__mysql_jpa/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="今天今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。
+MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）
+首先回顾一下大学的基础知识：数据库的锁，是事务在某个数据对象（">
+<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_02.png">
+<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_04.png">
+<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_03.png">
+<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_01.png">
+<meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="锁之MySQL和JPA">
+<meta name="twitter:description" content="今天今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。
+MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）
+首先回顾一下大学的基础知识：数据库的锁，是事务在某个数据对象（">
+<meta name="twitter:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_02.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> 锁之MySQL和JPA | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                锁之MySQL和JPA
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-10-12T13:03:30+08:00" content="2015-10-12">
+              2015-10-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/12/java/lock__mysql_jpa/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/12/java/lock__mysql_jpa/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="今天"><a href="#今天" class="headerlink" title="今天"></a>今天</h2><p>今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，<br>当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。</p>
+<h2 id="MySQL-行级锁"><a href="#MySQL-行级锁" class="headerlink" title="MySQL 行级锁"></a>MySQL 行级锁</h2><p>行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。<br>（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）</p>
+<p>首先回顾一下大学的基础知识：<br>数据库的锁，是事务在某个数据对象（如表、行等）进行操作前，对数据库发起请求，对其加锁，<br>使其不被其他事务所修改。<br>基本的锁有两种：读锁和写锁。<br>写锁，也称排它锁（ExclusiveLock，也称X锁），若事务对数据D加了X锁，则其他事务不能读取和修改D。<br>读锁，也称共享锁（ShareLock，也称S锁），若事务对数据D加了S锁，则其他事务只能对D加S锁，不能修改D。</p>
+<h3 id="S-LOCK-在MySQL："><a href="#S-LOCK-在MySQL：" class="headerlink" title="S LOCK 在MySQL："></a>S LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_02.png" alt=""><br><img src="/images/mysql_x_lock_demo_04.png" alt=""><br>从上面的测试中可以发现，事务1（窗口1）加了S锁后，事务2不能加X锁和进行修改。<br>如果S锁一段时间后仍未释放就会超时，如下图：<br><img src="/images/mysql_x_lock_demo_03.png" alt=""></p>
+<h3 id="X-LOCK-在MySQL："><a href="#X-LOCK-在MySQL：" class="headerlink" title="X LOCK 在MySQL："></a>X LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_01.png" alt=""></p>
+<p>从上面的测试中可以发现，事务1加了X锁之后，事务2不能加S锁，但只要去掉<br><code>LOCK IN SHARE MODE</code>就可以查询了。</p>
+<p>其他的场景，可用以上SQL测试验证一下。<br>（注意：当用到索引时，MySql才会使用row-lock，否则table-lock。）</p>
+<h2 id="JPA-规范"><a href="#JPA-规范" class="headerlink" title="JPA 规范"></a>JPA 规范</h2><hr>
+<p>看完了锁在MySQL的实现，那在Java中如何使用呢？这里以spring+JPA为例（为了方便，使用了starter-jpa）：</p>
+<h3 id="JPA-锁相关规范"><a href="#JPA-锁相关规范" class="headerlink" title="JPA 锁相关规范"></a>JPA 锁相关规范</h3><p>在spring-data-jpa中，<code>@Lock + LockModeType</code> 可以为某个数据操作进行锁控制，比如用X锁：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Lock(LockModeType.PESSIMISTIC_WRITE)</div><div class="line">List&lt;MemberOrder&gt; findByOrderNo(String orderNo);</div></pre></td></tr></table></figure>
+<p>可以跑一下测试：</p>
+<ol>
+<li>使用上面的窗口二先加S锁，不commit。</li>
+<li>然后调用findByOrderNo()查询。</li>
+<li>可以发现，程序抛出LockAcquisitionException异常，不能获取锁，等待超时，如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Caused by: org.hibernate.exception.LockAcquisitionException: could not extract ResultSet</div><div class="line">        at org.hibernate.dialect.MySQLDialect$1.convert(MySQLDialect.java:451)</div><div class="line">        ...</div><div class="line">Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</div><div class="line">        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</div><div class="line">        at java.lang.reflect.Constructor.newInstance(Constructor.java:422)</div><div class="line">        at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)</div><div class="line">        at com.mysql.jdbc.Util.getInstance(Util.java:387)</div><div class="line">        at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:946)</div><div class="line">        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3878)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRowFast(MysqlIO.java:2090)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRow(MysqlIO.java:1964)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readSingleRowSet(MysqlIO.java:3306)</div><div class="line">        atannotation com.mysql.jdbc.MysqlIO.getResultSet(MysqlIO.java:463)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readResultsForQueryOrUpdate(MysqlIO.java:3040)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readAllResults(MysqlIO.java:2288)</div><div class="line">        at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2681)</div><div class="line">        at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2551)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeQuery(PreparedStatement.java:1962)</div><div class="line">        at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.extract(ResultSetReturnImpl.java:82)</div><div class="line">        ... 64 more</div></pre></td></tr></table></figure>
+<p>现在来看Lock和LockModeType，Lock是spring-data的annotation，<br>LockModeType属于JPA规范，可作为EntityManager的方法参数传入或者使用Query.setLockMode()或TypedQuery.setLockMode()进行设置。<br>当然使用spring-data的话，直接使用@Lock即可，如果对细节感兴趣，可以去看spring-data的源码。<br>LockModeType是一个enum，它包括：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">READ：同OPTIMISTIC</div><div class="line">WRITE：同OPTIMISTIC_FORCE_INCREMENT</div><div class="line">OPTIMISTIC：乐观锁</div><div class="line">OPTIMISTIC_FORCE_INCREMENT：乐观锁，带版本更新</div><div class="line">PESSIMISTIC_READ：悲观读 （MySQL对应： `lock in share mode`）</div><div class="line">PESSIMISTIC_WRITE：悲观写 （MySQL对应： `for update`）</div><div class="line">PESSIMISTIC_FORCE_INCREMENT：悲观写，带版本更新</div></pre></td></tr></table></figure>
+<p>上面涉及到了悲观锁和乐观锁：<br>所谓悲观锁，就是对数据被其他事务修改的概率保持悲观态度，<br>因此在处理过程中，都将数据锁定。<br>而乐观锁，反过来即是保持乐观态度，认为数据被其他事务修改的概率是较低的，所以在真正提交更新的时候，<br>才去检测数据是否冲突，实现方式可以是版本号或者时间戳，这里不再赘述。</p>
+<p>悲观锁能严格保证数据的正确性，但凡事有利必有弊，很多事情我们都需要去平衡。<br>如果一个并发冲突的概率不高，而使用悲观锁，会对数据库性能开销影响比较大。<br>除此之外，良好的设计也可有效地避免一些并发问题。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
+<p>【1】 <a href="https://spring.io/guides/gs/accessing-data-jpa/" target="_blank" rel="external">https://spring.io/guides/gs/accessing-data-jpa/</a><br>【2】 <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html" target="_blank" rel="external">http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html</a><br>【3】 <a href="https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag">#mysql</a>
+          
+            <a href="/tags/jpa/" rel="tag">#jpa</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/01/java/j8/java8_null_check/" rel="next" title="使用 Java 8 函数接口避免 Null Check">
+                <i class="fa fa-chevron-left"></i> 使用 Java 8 函数接口避免 Null Check
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/26/java/spring/spring-boot/" rel="prev" title="spring-boot 简介">
+                spring-boot 简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/10/12/java/lock__mysql_jpa/"
+                   data-title="锁之MySQL和JPA" data-url="http://niko2014.github.io/2015/10/12/java/lock__mysql_jpa/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#今天"><span class="nav-number">1.</span> <span class="nav-text">今天</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-行级锁"><span class="nav-number">2.</span> <span class="nav-text">MySQL 行级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#S-LOCK-在MySQL："><span class="nav-number">2.1.</span> <span class="nav-text">S LOCK 在MySQL：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#X-LOCK-在MySQL："><span class="nav-number">2.2.</span> <span class="nav-text">X LOCK 在MySQL：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JPA-规范"><span class="nav-number">3.</span> <span class="nav-text">JPA 规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JPA-锁相关规范"><span class="nav-number">3.1.</span> <span class="nav-text">JPA 锁相关规范</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

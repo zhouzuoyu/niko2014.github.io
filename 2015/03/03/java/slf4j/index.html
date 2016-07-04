@@ -1,0 +1,723 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="log,slf4j," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="简介Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。
+可能你还是要问， 为什么要使用slf4j呢？举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="slf4j 绑定机制浅析">
+<meta property="og:url" content="http://niko2014.github.io/2015/03/03/java/slf4j/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="简介Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。
+可能你还是要问， 为什么要使用slf4j呢？举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。">
+<meta property="og:image" content="http://niko2014.github.io/images/slf4j-concrete-bindings.png">
+<meta property="og:image" content="http://niko2014.github.io/images/logback-jar.png">
+<meta property="og:image" content="http://niko2014.github.io/images/slf4j-log4j.png">
+<meta property="og:image" content="http://niko2014.github.io/images/slf4j_LoggerFactory_bind_called.png">
+<meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="slf4j 绑定机制浅析">
+<meta name="twitter:description" content="简介Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。
+可能你还是要问， 为什么要使用slf4j呢？举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。">
+<meta name="twitter:image" content="http://niko2014.github.io/images/slf4j-concrete-bindings.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> slf4j 绑定机制浅析 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                slf4j 绑定机制浅析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-03-03T00:00:00+08:00" content="2015-03-03">
+              2015-03-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/03/03/java/slf4j/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/03/java/slf4j/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。</p>
+<p>可能你还是要问， 为什么要使用slf4j呢？<br>举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。<br>现在你想换成logback或其他的日志实现，你就需要修改100个地方。<br>而如果使用slf4j来写入日志，因为多了一层绑定的过程，你只要切换你的依赖即可。</p>
+<p>使用slf4j很简单，只要加入slf4j-api-xxx.jar、第三方日志实现及其binding包的依赖即可。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;!-- slf4j api --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;slf4j.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback binding --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback impl --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<p>接下来， 你就可以“hello world”啦！</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import org.slf4j.Logger;</div><div class="line">import org.slf4j.LoggerFactory;</div><div class="line"></div><div class="line">public class HelloWorld &#123;</div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    Logger logger = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line">    logger.info(&quot;Hello World&quot;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>根据slf4j的介绍，</p>
+<blockquote>
+<p>each SLF4J binding is hardwired at compile time to use one and only one specific logging framework</p>
+</blockquote>
+<p>它是静态绑定的， 接下来，让我们一起来揭开绑定的神秘面纱吧。</p>
+<h2 id="绑定原理"><a href="#绑定原理" class="headerlink" title="绑定原理"></a>绑定原理</h2><p>这是官网的一张图, 这里展示了常见的一些log实现和绑定：</p>
+<p><img src="/images/slf4j-concrete-bindings.png" alt=""></p>
+<p>前面说过， slf4j是在静态绑定， 为什么这么说呢？ 答案就在绑定实现的包中， 如下：</p>
+<p>logback-classic.jar<br><img src="/images/logback-jar.png" alt=""></p>
+<p>slf4j-log4j.jar<br><img src="/images/slf4j-log4j.png" alt=""></p>
+<p>如上图，可以发现都有<code>org.slf4j.impl.StaticLoggerBinder</code>,<br>再看LoggerFactory.getLogger()时，即<code>org.slf4j.LoggerFactory.getILoggerFactory</code>的调用hierarchy：</p>
+<p><img src="/images/slf4j_LoggerFactory_bind_called.png" alt=""></p>
+<p>其中bind()内部是我们想要的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">private final static void bind() &#123;</div><div class="line">  try &#123;</div><div class="line">    Set staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();</div><div class="line">    reportMultipleBindingAmbiguity(staticLoggerBinderPathSet);</div><div class="line">    // the next line does the binding</div><div class="line">    StaticLoggerBinder.getSingleton();</div><div class="line">    INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;</div><div class="line">    reportActualBinding(staticLoggerBinderPathSet);</div><div class="line">    emitSubstituteLoggerWarning();</div><div class="line">  &#125; catch (NoClassDefFoundError ncde) &#123;</div><div class="line">    String msg = ncde.getMessage();</div><div class="line">    if (messageContainsOrgSlf4jImplStaticLoggerBinder(msg)) &#123;</div><div class="line">      INITIALIZATION_STATE = NOP_FALLBACK_INITIALIZATION;</div><div class="line">      Util.report(&quot;Failed to load class \&quot;org.slf4j.impl.StaticLoggerBinder\&quot;.&quot;);</div><div class="line">      Util.report(&quot;Defaulting to no-operation (NOP) logger implementation&quot;);</div><div class="line">      Util.report(&quot;See &quot; + NO_STATICLOGGERBINDER_URL</div><div class="line">              + &quot; for further details.&quot;);</div><div class="line">    &#125; else &#123;</div><div class="line">      failedBinding(ncde);</div><div class="line">      throw ncde;</div><div class="line">    &#125;</div><div class="line">  &#125; catch (java.lang.NoSuchMethodError nsme) &#123;</div><div class="line">    String msg = nsme.getMessage();</div><div class="line">    if (msg != null &amp;&amp; msg.indexOf(&quot;org.slf4j.impl.StaticLoggerBinder.getSingleton()&quot;) != -1) &#123;</div><div class="line">      INITIALIZATION_STATE = FAILED_INITIALIZATION;</div><div class="line">      Util.report(&quot;slf4j-api 1.6.x (or later) is incompatible with this binding.&quot;);</div><div class="line">      Util.report(&quot;Your binding is version 1.5.5 or earlier.&quot;);</div><div class="line">      Util.report(&quot;Upgrade your binding to version 1.6.x.&quot;);</div><div class="line">    &#125;</div><div class="line">    throw nsme;</div><div class="line">  &#125; catch (Exception e) &#123;</div><div class="line">    failedBinding(e);</div><div class="line">    throw new IllegalStateException(&quot;Unexpected initialization failure&quot;, e);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如代码，绑定方法bind()，首先通过<code>findPossibleStaticLoggerBinderPathSet()：staticLoggerBinderPathSet</code>来获取classpath中可能的binder paths, 如下：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Enumeration&lt;URL&gt; ClassLoader.getSystemResources(String STATIC_LOGGER_BINDER_PATH)</div></pre></td></tr></table></figure></p>
+<p>其中STATIC_LOGGER_BINDER_PATH = “org/slf4j/impl/StaticLoggerBinder.class”。</p>
+<h3 id="多个绑定存在的情况"><a href="#多个绑定存在的情况" class="headerlink" title="多个绑定存在的情况"></a>多个绑定存在的情况</h3><p>当发生多个绑定同时存在时，官方的说明是这样的：</p>
+<blockquote>
+<p>The warning emitted by SLF4J is just that, a warning. Even when multiple bindings are present, SLF4J will pick one logging framework/implementation and bind with it. The way SLF4J picks a binding is determined by the JVM and for all practical purposes should be considered random.</p>
+</blockquote>
+<p>实际运行结果并结合以上代码，当返回的URL有多个时，reportMultipleBindingAmbiguity()会打印出警告：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class path contains multiple SLF4J bindings.</div><div class="line">Found binding in [jar:file:/home/niko/.m2/repository/.../logback-classic-1.1.3.jar!/org/slf4j/impl/StaticLoggerBinder.class[]</div><div class="line">Found binding in [...]</div></pre></td></tr></table></figure>
+<p>然后reportActualBinding()再打印出真正被加载的<code>StaticLoggerBinder</code>的class name，比如：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]</div></pre></td></tr></table></figure></p>
+<p>为了避免这种问题，可以使用maven的全局排除依赖来保证只会出现某一个实现。</p>
+<blockquote>
+<p>more info -&gt; <a href="http://www.slf4j.org/codes.html" target="_blank" rel="external">http://www.slf4j.org/codes.html</a></p>
+</blockquote>
+<h2 id="MDC-Mapped-Diagnostic-Context"><a href="#MDC-Mapped-Diagnostic-Context" class="headerlink" title="MDC (Mapped Diagnostic Context )"></a>MDC (Mapped Diagnostic Context )</h2><p>这个功能只有log4j和logback支持。<br>具体内容请查看log4j和logback部分。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/log/" rel="tag">#log</a>
+          
+            <a href="/tags/slf4j/" rel="tag">#slf4j</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/01/02/java/maven/maven_aggregate/" rel="next" title="maven 模块聚合与继承">
+                <i class="fa fa-chevron-left"></i> maven 模块聚合与继承
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/03/30/python/python_scrapy_get_started/" rel="prev" title="python scrapy 爬虫初体验">
+                python scrapy 爬虫初体验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/03/03/java/slf4j/"
+                   data-title="slf4j 绑定机制浅析" data-url="http://niko2014.github.io/2015/03/03/java/slf4j/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绑定原理"><span class="nav-number">2.</span> <span class="nav-text">绑定原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多个绑定存在的情况"><span class="nav-number">2.1.</span> <span class="nav-text">多个绑定存在的情况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MDC-Mapped-Diagnostic-Context"><span class="nav-number">3.</span> <span class="nav-text">MDC (Mapped Diagnostic Context )</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

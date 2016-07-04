@@ -1,0 +1,931 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="git,gitflow," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="这个清单是基于常用 Git 命令清单 - 阮一峰的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。
+常用 Git 命令清单
+我每天使用 Git ，但是很多命令记不住。　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。
+
+
+
+下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。Workspace：工作区Ind">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git 常用命令清单">
+<meta property="og:url" content="http://niko2014.github.io/2015/12/26/git/git_cmd/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="这个清单是基于常用 Git 命令清单 - 阮一峰的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。
+常用 Git 命令清单
+我每天使用 Git ，但是很多命令记不住。　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。
+
+
+
+下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。Workspace：工作区Ind">
+<meta property="og:image" content="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png">
+<meta property="og:updated_time" content="2016-06-28T08:17:42.141Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git 常用命令清单">
+<meta name="twitter:description" content="这个清单是基于常用 Git 命令清单 - 阮一峰的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。
+常用 Git 命令清单
+我每天使用 Git ，但是很多命令记不住。　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。
+
+
+
+下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。Workspace：工作区Ind">
+<meta name="twitter:image" content="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> git 常用命令清单 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                git 常用命令清单
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-26T00:00:00+08:00" content="2015-12-26">
+              2015-12-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/26/git/git_cmd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/26/git/git_cmd/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>这个清单是基于<a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单 - 阮一峰</a>的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。</p>
+<h1 id="常用-Git-命令清单"><a href="#常用-Git-命令清单" class="headerlink" title="常用 Git 命令清单"></a>常用 Git 命令清单</h1><blockquote>
+<p>我每天使用 Git ，但是很多命令记不住。<br>　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。</p>
+</blockquote>
+<p><img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png" alt=""></p>
+<blockquote>
+<p>下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。<br>Workspace：工作区<br>Index / Stage：暂存区<br>Repository：仓库区（或本地仓库）<br>Remote：远程仓库</p>
+</blockquote>
+<h1 id="安装配置-niko"><a href="#安装配置-niko" class="headerlink" title="安装配置 - niko"></a>安装配置 - niko</h1><h2 id="ssh-key-简要流程"><a href="#ssh-key-简要流程" class="headerlink" title="ssh key 简要流程"></a>ssh key 简要流程</h2><ol>
+<li>ssh-keygen -t rsa -C “foo@gmail.com”，选择生成位置（~/.ssh/foo_rsa）。</li>
+<li><p>ssh-agent -s<br>若提示 <code>Could not open a connection to your authentication agent.</code>, 使用：</p>
+<p> eval <code>ssh-agent -s</code></p>
+</li>
+<li><p>ssh-add ~/.ssh/foo_rsa</p>
+</li>
+<li>clip &lt; ~/.ssh/foo_rsa.pub</li>
+<li>添加到远程服务器的ssh_keys；</li>
+<li>git clone …</li>
+</ol>
+<h3 id="设置ssh配置"><a href="#设置ssh配置" class="headerlink" title="设置ssh配置"></a>设置ssh配置</h3><p>vim ~/.ssh/config</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Host dev</div><div class="line">    HostName dev.example.com</div><div class="line">    Port 22000</div><div class="line">    User fooey&lt;/p&gt;</div><div class="line">Host github.com</div><div class="line">    IdentityFile ~/.ssh/github.key</div></pre></td></tr></table></figure>
+<div style="display:none"><br><a href="http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/" target="_blank" rel="external">http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/</a><br></div>
+
+<h1 id="一、新建代码库"><a href="#一、新建代码库" class="headerlink" title="一、新建代码库"></a>一、新建代码库</h1><ul>
+<li><p>在当前目录新建一个Git代码库<br>$ git init</p>
+</li>
+<li><p>新建一个目录，将其初始化为Git代码库<br>$ git init [project-name]</p>
+</li>
+<li><p>下载一个项目和它的整个代码历史<br>$ git clone [url]</p>
+</li>
+</ul>
+<h1 id="二、git-配置"><a href="#二、git-配置" class="headerlink" title="二、git 配置"></a>二、git 配置</h1><p>　　Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。</p>
+<ul>
+<li><p>显示当前的Git配置<br>$ git config –list</p>
+</li>
+<li><p>编辑Git配置文件<br>$ git config -e [–global]</p>
+</li>
+<li><p>设置提交代码时的用户信息<br>$ git config [–global] user.name “[name]”<br>$ git config [–global] user.email “[email address]”</p>
+</li>
+<li><p>push pull 策略</p>
+</li>
+</ul>
+<p>ref ： <a href="http://blog.angular.in/git-pushmo-ren-fen-zhi/" target="_blank" rel="external">http://blog.angular.in/git-pushmo-ren-fen-zhi/</a></p>
+<p><code>push.default</code> 未设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">warning: push.default is unset; its implicit value is changing in</div><div class="line">Git 2.0 from &apos;matching&apos; to &apos;simple&apos;. To squelch this message</div><div class="line">and maintain the current behavior after the default changes, use:</div><div class="line"></div><div class="line">  git config --global push.default matching</div><div class="line"></div><div class="line">To squelch this message and adopt the new behavior now, use:</div><div class="line"></div><div class="line">  git config --global push.default simple</div><div class="line"></div><div class="line">When push.default is set to &apos;matching&apos;, git will push local branches</div><div class="line">to the remote branches that already exist with the same name.</div><div class="line"></div><div class="line">In Git 2.0, Git will default to the more conservative &apos;simple&apos;</div><div class="line">behavior, which only pushes the current branch to the corresponding</div><div class="line">remote branch that &apos;git pull&apos; uses to update the current branch.</div><div class="line"></div><div class="line">See &apos;git help config&apos; and search for &apos;push.default&apos; for further information.</div><div class="line">(the &apos;simple&apos; mode was introduced in Git 1.7.11. Use the similar mode</div><div class="line">&apos;current&apos; instead of &apos;simple&apos; if you sometimes use older versions of Git)</div></pre></td></tr></table></figure>
+<p>git config –global push.default ‘option’</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">option：</div><div class="line"></div><div class="line">nothing - push操作无效，除非显式指定远程分支，例如git push origin develop（我觉得。。。可以给那些不愿学git的同事配上此项）。</div><div class="line"></div><div class="line">current - push当前分支到远程同名分支，如果远程同名分支不存在则自动创建同名分支。</div><div class="line"></div><div class="line">upstream - push当前分支到它的upstream分支上（这一项其实用于经常从本地分支push/pull到同一远程仓库的情景，这种模式叫做central workflow）。</div><div class="line"></div><div class="line">simple - simple和upstream是相似的，只有一点不同，simple必须保证本地分支和它的远程 upstream分支同名，否则会拒绝push操作。</div><div class="line"></div><div class="line">matching - push所有本地和远程两端都存在的同名分支。</div></pre></td></tr></table></figure>
+<h1 id="三、增加-删除文件"><a href="#三、增加-删除文件" class="headerlink" title="三、增加/删除文件"></a>三、增加/删除文件</h1><ul>
+<li><p>添加指定文件到暂存区<br>$ git add [file1] [file2] …</p>
+</li>
+<li><p>添加指定目录到暂存区，包括子目录<br>$ git add [dir]</p>
+</li>
+<li><p>添加当前目录的所有文件到暂存区<br>git add .<br>git add –all (对删除文件有效)</p>
+</li>
+<li><p>删除工作区文件，并且将这次删除放入暂存区<br>git rm [file1] [file2] …</p>
+</li>
+<li><p>停止追踪指定文件，但该文件会保留在工作区<br>git rm <code>--cached</code> [file]</p>
+</li>
+<li><p>取消放入暂存区<br>use “git reset HEAD <file>…” to unstage</file></p>
+</li>
+<li><p>改名文件，并且将这个改名放入暂存区<br>git mv [file-original] [file-renamed]</p>
+</li>
+<li><p>取消改名<br>git mv [file-renamed] [file-original]</p>
+</li>
+</ul>
+<h1 id="四、代码提交"><a href="#四、代码提交" class="headerlink" title="四、代码提交"></a>四、代码提交</h1><hr>
+<ul>
+<li><p>提交暂存区到仓库区<br>git commit -m [message]</p>
+</li>
+<li><p>提交暂存区的指定文件到仓库区<br>git commit [file1] [file2] … -m [message]</p>
+</li>
+<li><p>提交工作区自上次commit之后的变化，直接到仓库区<br>git commit -a</p>
+</li>
+<li><p>提交时显示所有diff信息<br>git commit -v</p>
+</li>
+<li><p>使用一次新的commit，替代上一次提交</p>
+</li>
+<li>重做上一次commit，并包括指定文件的新变化</li>
+<li>如果代码没有任何新变化，则用来改写上一次commit的提交信息<br>$ git commit <code>--amend</code> -m [message]<br>$ git commit –amend   …</li>
+</ul>
+<h1 id="五、分支"><a href="#五、分支" class="headerlink" title="五、分支"></a>五、分支</h1><ul>
+<li><p>列出所有本地分支<br>$ git branch</p>
+</li>
+<li><p>列出所有远程分支<br>$ git branch -r</p>
+</li>
+<li><p>列出所有本地分支和远程分支<br>$ git branch -a</p>
+</li>
+<li><p>新建一个分支，但依然停留在当前分支<br>$ git branch [branch-name]</p>
+</li>
+<li><p>新建一个分支，并切换到该分支<br>$ git checkout -b [branch]</p>
+</li>
+<li><p>新建一个分支，指向指定commit<br>$ git branch [branch] [commit]</p>
+</li>
+<li><p>新建一个分支，与指定的远程分支建立追踪关系<br>$ git branch –track [branch] [remote-branch]</p>
+</li>
+<li><p>切换到指定分支，并更新工作区<br>$ git checkout [branch-name]</p>
+</li>
+<li><p>建立追踪关系，在现有分支与指定的远程分支之间<br>$ git branch –set-upstream [branch] [remote-branch]</p>
+</li>
+<li><p>合并指定分支到当前分支<br>$ git merge [branch]</p>
+</li>
+<li><p>选择一个commit，合并进当前分支<br>$ git <code>cherry-pick</code> [commit]</p>
+</li>
+<li><p>终止(abort) merge 操作：<br>$ git reset –hard HEAD<br><a href="http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge" target="_blank" rel="external">http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge</a></p>
+</li>
+<li><p>删除分支<br>$ git branch -d [branch-name]</p>
+</li>
+<li><p>删除远程分支<br>git push origin –delete <branchname><br>git push origin –delete<br>git branch -dr</branchname></p>
+</li>
+</ul>
+<h1 id="六、标签"><a href="#六、标签" class="headerlink" title="六、标签"></a>六、标签</h1><ul>
+<li><p>列出所有tag<br>$ git tag</p>
+</li>
+<li><p>新建一个tag在当前commit<br>git tag [tag]<br>注释：<br>git tag -a v1.4 -m ‘my version 1.4’</p>
+</li>
+<li><p>新建一个tag在指定commit<br>$ git tag [tag] [commit]</p>
+</li>
+<li><p>查看tag信息<br>$ git show [tag]</p>
+</li>
+<li><p>提交指定tag<br>$ git push [remote] [tag]</p>
+</li>
+<li><p>提交所有tag<br>$ git push [remote] –tags</p>
+</li>
+<li><p>新建一个分支，指向某个tag<br>$ git checkout -b [branch] [tag]</p>
+</li>
+</ul>
+<h1 id="七、查看信息"><a href="#七、查看信息" class="headerlink" title="七、查看信息"></a>七、查看信息</h1><ul>
+<li><p>显示有变更的文件<br>$ git status</p>
+</li>
+<li><p>GUI 审查代码<br>git difftool</p>
+</li>
+<li><p>显示当前分支的版本历史<br>$ git log</p>
+</li>
+<li><p>显示commit历史，以及每次commit发生变更的文件<br>$ git log –stat</p>
+</li>
+<li><p>显示某个文件的版本历史，包括文件改名<br>$ git log –follow [file]<br>$ git whatchanged [file]</p>
+</li>
+<li><p>显示指定文件相关的每一次diff<br>$ git log -p [file]</p>
+</li>
+<li><p>华丽的分支log<br>$ git log –graph –decorate –pretty=oneline –abbrev-commit develop  origin/develop  temp-branch</p>
+</li>
+<li><p>显示指定文件是什么人在什么时间修改过<br><code>git blame</code> [file]</p>
+</li>
+<li><p>显示暂存区和工作区的差异<br>git diff</p>
+</li>
+<li><p>显示暂存区和上一个commit的差异<br>$ git diff <code>--cached</code> []</p>
+</li>
+<li><p>显示工作区与当前分支最新commit之间的差异<br>$ git diff <code>HEAD</code></p>
+</li>
+<li><p>显示两次提交之间的差异<br>$ git diff [first-branch]…[second-branch]</p>
+</li>
+<li><p>显示某次提交的元数据和内容变化<br>$ git show [commit]</p>
+</li>
+<li><p>显示某次提交发生变化的文件<br>$ git show <code>--name-only</code> [commit]</p>
+</li>
+<li><p>显示某次提交时，某个文件的内容<br>$ git show [commit]:[filename]</p>
+</li>
+<li><p>显示当前分支的最近几次提交<br>git reflog</p>
+<blockquote>
+<p>Reference logs, or “reflogs”, record when the tips of branches and other references were updated in the local repository. Reflogs are useful in various Git commands, to specify the old value of a reference.</p>
+</blockquote>
+</li>
+</ul>
+<p>reflog可以看到被删除的记录(如)，而git log不能。</p>
+<h1 id="八、远程同步"><a href="#八、远程同步" class="headerlink" title="八、远程同步"></a>八、远程同步</h1><hr>
+<ul>
+<li>下载远程仓库的所有变动<br>$ git fetch [remote]</li>
+</ul>
+<blockquote>
+<p>Download objects and refs from another repository<br>用”git fetch”” 来执行”git pull”前半部分的工作， 但是这条命令并不会把抓下来的修改合并到当前分支里。</p>
+</blockquote>
+<ul>
+<li><p>显示所有远程仓库<br>$ git remote -v</p>
+</li>
+<li><p>显示某个远程仓库的信息<br>$ git remote show [remote]</p>
+</li>
+<li><p>增加一个新的远程仓库，并命名<br>$ git remote add [shortname] [url]</p>
+</li>
+<li><p>取回远程仓库的变化，并与本地分支合并<br>$ git pull [remote] [branch]</p>
+</li>
+<li><p>上传本地指定分支到远程仓库<br>$ git push [remote] [branch]</p>
+</li>
+<li><p>推送本地指定的分支名到远程仓库 - niko<br>$ git push origin develop:develop_remote<br>$ git push <remote> <local branch="" name="">:<remote branch="" to="" push="" into=""></remote></local></remote></p>
+</li>
+<li><p>强行推送当前分支到远程仓库，即使有冲突<br>$ git push [remote] –force</p>
+</li>
+<li><p>推送所有分支到远程仓库<br>$ git push [remote] –all</p>
+</li>
+<li><p>with rebase<br>git pull –rebase</p>
+</li>
+</ul>
+<h1 id="九、撤销"><a href="#九、撤销" class="headerlink" title="九、撤销"></a>九、撤销</h1><ul>
+<li><p>恢复暂存区的指定文件到工作区<br>$ git checkout [file]</p>
+</li>
+<li><p>恢复某个commit的指定文件到工作区<br>$ git checkout [commit] [file]</p>
+</li>
+<li><p>恢复上一个commit的所有文件到工作区<br>$ git checkout .</p>
+</li>
+<li><p>取消commit<br>$ git reset –soft HEAD~</p>
+</li>
+<li><p>重置暂存区的指定文件，与上一次commit保持一致，但工作区不变<br>$ git reset [file]<br>REF: <a href="http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit" target="_blank" rel="external">http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit</a></p>
+</li>
+<li><p>重置暂存区与工作区，与上一次commit保持一致<br>$ git <code>reset --hard</code></p>
+</li>
+<li><p>重置当前分支的指针为指定commit，同时重置暂存区，但工作区不变<br>$ git reset [commit]</p>
+</li>
+<li><p>重置当前分支的HEAD为指定commit，同时重置暂存区和工作区，与指定commit一致<br>$ git reset <code>--hard</code> [commit]</p>
+</li>
+<li><p>重置当前HEAD为指定commit，但保持暂存区和工作区不变<br>$ git reset <code>--keep</code> [commit]</p>
+</li>
+<li><p>undo reset<br>git reflog<br>git reset HEAD@{1}<br><a href="http://stackoverflow.com/questions/2510276/undoing-git-reset" target="_blank" rel="external">undo reset</a></p>
+</li>
+<li><p>新建一个commit，用来撤销指定commit</p>
+</li>
+<li><p>后者的所有变化都将被前者抵消，并且应用到当前分支<br>$ git <code>revert [commit]</code></p>
+</li>
+<li><p>恢复删除的分支<br>// TODO<br><a href="http://stackoverflow.com/questions/16793637/recover-deleted-branch-git" target="_blank" rel="external">http://stackoverflow.com/questions/16793637/recover-deleted-branch-git</a><br><a href="https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html" target="_blank" rel="external">https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html</a></p>
+</li>
+<li><p>TODO rebase<br>If you prefer to skip this patch,<br><a href="https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/" target="_blank" rel="external">https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/</a></p>
+</li>
+</ul>
+<h1 id="十、其他"><a href="#十、其他" class="headerlink" title="十、其他"></a>十、其他</h1><ul>
+<li><p>生成一个可供发布的压缩包<br>git archive<br>via：ruanyifeng.com</p>
+</li>
+<li><p>git rebase<br>使分支历史看起来像没有经过合并一样。</p>
+</li>
+<li><p>分支上一次合并的信息 - niko<br>git show –summary <code>git merge-base A B</code></p>
+</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/git/" rel="tag">#git</a>
+          
+            <a href="/tags/gitflow/" rel="tag">#gitflow</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/23/books/self_ctrl/self_ctrl_5/" rel="next" title="【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？">
+                <i class="fa fa-chevron-left"></i> 【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/" rel="prev" title="【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？">
+                【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/12/26/git/git_cmd/"
+                   data-title="git 常用命令清单" data-url="http://niko2014.github.io/2015/12/26/git/git_cmd/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#常用-Git-命令清单"><span class="nav-number">1.</span> <span class="nav-text">常用 Git 命令清单</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装配置-niko"><span class="nav-number">2.</span> <span class="nav-text">安装配置 - niko</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh-key-简要流程"><span class="nav-number">2.1.</span> <span class="nav-text">ssh key 简要流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置ssh配置"><span class="nav-number">2.1.1.</span> <span class="nav-text">设置ssh配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一、新建代码库"><span class="nav-number">3.</span> <span class="nav-text">一、新建代码库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、git-配置"><span class="nav-number">4.</span> <span class="nav-text">二、git 配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、增加-删除文件"><span class="nav-number">5.</span> <span class="nav-text">三、增加/删除文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、代码提交"><span class="nav-number">6.</span> <span class="nav-text">四、代码提交</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#五、分支"><span class="nav-number">7.</span> <span class="nav-text">五、分支</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#六、标签"><span class="nav-number">8.</span> <span class="nav-text">六、标签</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#七、查看信息"><span class="nav-number">9.</span> <span class="nav-text">七、查看信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#八、远程同步"><span class="nav-number">10.</span> <span class="nav-text">八、远程同步</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#九、撤销"><span class="nav-number">11.</span> <span class="nav-text">九、撤销</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#十、其他"><span class="nav-number">12.</span> <span class="nav-text">十、其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">13.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

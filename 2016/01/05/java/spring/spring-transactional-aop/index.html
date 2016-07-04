@@ -1,0 +1,714 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="spring," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="起因
+最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。既然如此只好debug一下，接着很快便知道了。
+代码大概是这样的
+示例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【spring】自我调用中transaction的常见问题">
+<meta property="og:url" content="http://niko2014.github.io/2016/01/05/java/spring/spring-transactional-aop/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="起因
+最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。既然如此只好debug一下，接着很快便知道了。
+代码大概是这样的
+示例">
+<meta property="og:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_01.png">
+<meta property="og:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_03_self_invoke.png">
+<meta property="og:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_03_of_copy_service.png">
+<meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【spring】自我调用中transaction的常见问题">
+<meta name="twitter:description" content="起因
+最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。既然如此只好debug一下，接着很快便知道了。
+代码大概是这样的
+示例">
+<meta name="twitter:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_01.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> 【spring】自我调用中transaction的常见问题 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                【spring】自我调用中transaction的常见问题
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-05T20:25:08+08:00" content="2016-01-05">
+              2016-01-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/05/java/spring/spring-transactional-aop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><hr>
+<p>最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。<br>既然如此只好debug一下，接着很快便知道了。</p>
+<h2 id="代码大概是这样的"><a href="#代码大概是这样的" class="headerlink" title="代码大概是这样的"></a>代码大概是这样的</h2><hr>
+<p><a href="https://github.com/niko2014/blog-demo/tree/master/java/starter-jpa-transaction-self-invoke" target="_blank" rel="external">示例代码</a>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodMain() throws Exception &#123;</div><div class="line">        int status = 5;</div><div class="line">        methodA(status);</div><div class="line">        try &#123;</div><div class="line">            methodB(status);        // 位置A</div><div class="line">//            memberOrderCopyService.methodB(status);     // 位置B</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        methodC(status);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodA(Integer status) &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(1L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)</div><div class="line">    public void methodB(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(2L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">        th();</div><div class="line">    &#125;</div><div class="line">    public void methodC(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(3L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    private void th() throws Exception &#123;</div><div class="line">        throw new Exception(&quot;test&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>如上，methodB()中有一个持久化的操作，在那之后有可能会抛异常(th()方法)。<br>实习生的想法是，methodB()加一个注解@Transactional(rollbackFor)，想让methodB执行失败时回滚事务。<br>然而，这种是对spring aop不了解导致的错误。</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><hr>
+<p>我对实习生说了这个错误之后，他却坚持这样是有效的。。没办法，只好以理服人。断点debug，翻源码。</p>
+<p><img src="/images/spring-tx-aop/error_debug_01.png" alt=""></p>
+<p>如上图，可看到methodB()的调用栈，发现methodMaster()是经过拦截器后调用的（Cglib生成代理对象的情况下，AOP拦截和回调可在<code>DynamicAdvisedInterceptor.intercept()</code>方法中找到，如下）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Override</div><div class="line">public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line">    try &#123;</div><div class="line">        if (this.advised.exposeProxy) &#123;</div><div class="line">            // Make invocation available if necessary.</div><div class="line">            oldProxy = AopContext.setCurrentProxy(proxy);</div><div class="line">            setProxyContext = true;</div><div class="line">        &#125;</div><div class="line">        // May be null. Get as late as possible to minimize the time we</div><div class="line">        // &quot;own&quot; the target, in case it comes from a pool...</div><div class="line">        target = getTarget();</div><div class="line">        if (target != null) &#123;</div><div class="line">            targetClass = target.getClass();</div><div class="line">        &#125;</div><div class="line">        List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line">        Object retVal;</div><div class="line">        // Check whether we only have one InvokerInterceptor: that is,</div><div class="line">        // no real advice, but just reflective invocation of the target.</div><div class="line">        if (chain.isEmpty() &amp;&amp; Modifier.isPublic(method.getModifiers())) &#123;</div><div class="line">            // We can skip creating a MethodInvocation: just invoke the target directly.</div><div class="line">            // Note that the final invoker must be an InvokerInterceptor, so we know</div><div class="line">            // it does nothing but a reflective operation on the target, and no hot</div><div class="line">            // swapping or fancy proxying.</div><div class="line">            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</div><div class="line">            retVal = methodProxy.invoke(target, argsToUse);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // We need to create a method invocation...</div><div class="line">            retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();</div><div class="line">        &#125;</div><div class="line">        retVal = processReturnType(proxy, target, method, retVal);</div><div class="line">        return retVal;</div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        if (target != null) &#123;</div><div class="line">            releaseTarget(target);</div><div class="line">        &#125;</div><div class="line">        if (setProxyContext) &#123;</div><div class="line">            // Restore old proxy.</div><div class="line">            AopContext.setCurrentProxy(oldProxy);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在在来看methodB()：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_self_invoke.png" alt=""></p>
+<p>很明显，methodB是在methodMaster()中调用的，<code>TransactionInterceptor</code>并没有拦截，因此@Transactional是无效的。</p>
+<p>现在来对比一下，切换启用位置B代码（使用<code>memberOrderCopyService.methodB(status)</code>）的执行情况：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_of_copy_service.png" alt=""></p>
+<p>从上图可知，此时memberOrderCopyService.methodB()和原先的memberOrderService.methodMaster()都经过了TransactionInterceptor，然后通过代理invoke，这种是正确的，当有异常出现，事务也会正常回滚。</p>
+<p>其实，这是一个简单的问题，通过推理也可以猜到，而且如果内部每个方法都用拦截器，会是一个很大的性能问题。</p>
+<div style="display:none"><br>    FastClassBySpringCGLIB<br>    EnhancerBySpringCGLIB<br>    其实如果用Aspect也可以实现类似Transactional的功能，<br>    下次有空写一个<code>Aspect 和 Transactional</code>的对比。<br></div>
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spring/" rel="tag">#spring</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/" rel="next" title="【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？">
+                <i class="fa fa-chevron-left"></i> 【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/12/java/spring/spring_transaction_manager/" rel="prev" title="【spring】事务提交后进行某些操作">
+                【spring】事务提交后进行某些操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/"
+                   data-title="【spring】自我调用中transaction的常见问题" data-url="http://niko2014.github.io/2016/01/05/java/spring/spring-transactional-aop/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#起因"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码大概是这样的"><span class="nav-number">2.</span> <span class="nav-text">代码大概是这样的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释"><span class="nav-number">3.</span> <span class="nav-text">解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

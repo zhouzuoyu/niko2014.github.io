@@ -1,0 +1,759 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="aop,spring," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="aop 简介aop，全称：aspect-oriented programming，即是面向切面编程。aop和Ioc并称为spring的两大特性，但aop有什么用呢？
+场景一：
+
+对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util的被调用。假如我们需要在每次数据库操作之前或之后使用某个util记录日志，使用直接调用的话，要是有1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring aop 简介 & JDK 动态代理">
+<meta property="og:url" content="http://niko2014.github.io/2015/05/01/java/spring/spring-aop/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="aop 简介aop，全称：aspect-oriented programming，即是面向切面编程。aop和Ioc并称为spring的两大特性，但aop有什么用呢？
+场景一：
+
+对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util的被调用。假如我们需要在每次数据库操作之前或之后使用某个util记录日志，使用直接调用的话，要是有1">
+<meta property="og:image" content="http://niko2014.github.io/images/spring-pointcut.png">
+<meta property="og:image" content="http://niko2014.github.io/images/aop-gif.gif">
+<meta property="og:image" content="http://niko2014.github.io/images/ProxyCreatorSupport-hierarchy.png">
+<meta property="og:image" content="http://niko2014.github.io/images/JdkDynamicAopProxy.png">
+<meta property="og:image" content="http://niko2014.github.io/images/AdvisorAdapter-hierarchy.png">
+<meta property="og:image" content="http://niko2014.github.io/images/AdviceInterceptor.png">
+<meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring aop 简介 & JDK 动态代理">
+<meta name="twitter:description" content="aop 简介aop，全称：aspect-oriented programming，即是面向切面编程。aop和Ioc并称为spring的两大特性，但aop有什么用呢？
+场景一：
+
+对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util的被调用。假如我们需要在每次数据库操作之前或之后使用某个util记录日志，使用直接调用的话，要是有1">
+<meta name="twitter:image" content="http://niko2014.github.io/images/spring-pointcut.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> spring aop 简介 & JDK 动态代理 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring aop 简介 & JDK 动态代理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-05-01T00:00:00+08:00" content="2015-05-01">
+              2015-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/05/01/java/spring/spring-aop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/05/01/java/spring/spring-aop/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="aop-简介"><a href="#aop-简介" class="headerlink" title="aop 简介"></a>aop 简介</h2><p>aop，全称：aspect-oriented programming，即是面向切面编程。<br>aop和Ioc并称为spring的两大特性，但aop有什么用呢？</p>
+<p>场景一：</p>
+<blockquote>
+<p>对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util的被调用。<br>假如我们需要在每次数据库操作之前或之后使用某个util记录日志，使用直接调用的话，要是有100个操作，你就需要在这100个操作前后调用log util。<br>又有可能，后来你不需要这个util了，你又需要在100个地方取消它。是不是很痛苦呢～～<br>当然，可以通过面向对象和设计模式的方法来解决一部分问题，但仍显得不够优雅和敏捷。</p>
+</blockquote>
+<p>当然应用场景还不仅这些，还有如session管理，验证，事务，权限等等方面都有类似的问题。</p>
+<p>为了解决这些痛点，于是便有了AOP。那AOP是如何解决这个问题的呢？首先了解基本概念。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><hr>
+<p><img src="/images/spring-pointcut.png" alt=""></p>
+<p><img src="/images/aop-gif.gif" alt=""></p>
+<p>以上两张图，很好的展示了AOP的工作方式，以及为什么叫切面编程。<br>这里主要涉及到几个概念：</p>
+<h4 id="Advice（通知）："><a href="#Advice（通知）：" class="headerlink" title="Advice（通知）："></a>Advice（通知）：</h4><p>如图，主要描述要增强的行为，如场景一中的log行为，但不仅如此，Advice还分BeforeAdvice、AfterAdvice、ThrowsAdvice等类型。</p>
+<h4 id="Pointcut（切点）："><a href="#Pointcut（切点）：" class="headerlink" title="Pointcut（切点）："></a>Pointcut（切点）：</h4><p>这个描述了Advice或切面要嵌入的位置，比如场景一中的数据库操作，其实就是一个Pointcut。</p>
+<p>现在，有了Advice和Pointcut，总感觉差点什么。没错，需要一个配置器（通知器），把两者关联起来。因此定义为：</p>
+<h4 id="Advisor（通知器）："><a href="#Advisor（通知器）：" class="headerlink" title="Advisor（通知器）："></a>Advisor（通知器）：</h4><p>通知器建立了Advice和Pointcut的关联，因此我们终于可以知道在某个切点要用哪个通知了。</p>
+<hr>
+<p>因此，场景一的AOP解决方案，以Spring Aspect（注解版）为例：</p>
+<p>1, 使用spring注解，如下代码， 定义Advice，下面我们使用<code>@Before</code>注解，被标注的方法相当与一个Advice。<br>2, <code>@Before</code>注解中有个参数，这个参数定义了切点的描述，这里可以使用一些通配符来简化配置。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Aspect</div><div class="line">@Component</div><div class="line">public class LogAspect &#123;</div><div class="line"></div><div class="line">    @Before(&quot;execution(* foo.FooDao.op(..))&quot;)</div><div class="line">    public void log(JoinPoint joinPoint) &#123;</div><div class="line">        LOG.info(&quot;before ...&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用注解，好处就是省去了Advisor的配置，偷个懒～～  当然在<code>applicationContext.xml</code>中要启用<code>&lt;aop:aspectj-autoproxy/&gt;</code>和<code>&lt;context:component-scan</code>才行。<br><a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html" target="_blank" rel="external">XML 声明文档传送门</a></p>
+<p>看完这个，你一定对spring aop的实现很好奇，接下来就简单看一下spring aop的工作flow吧。</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><hr>
+<p>也许你已经猜到，要实现AOP，必须使用反射和动态代理。没错，Java的这个特性可以实现AOP。<br>spring环境下，再结合Ioc的统一对象管理，功能无比强大啊。<br>接下来我们就一起结合源码看一下aop是怎么工作的。</p>
+<h3 id="生成-aop-proxy"><a href="#生成-aop-proxy" class="headerlink" title="生成 aop proxy"></a>生成 aop proxy</h3><hr>
+<p>这里Ioc部分不介绍了（请参阅另一博文<code>spring Ioc</code>），直接以aop proxy生成为入口。<br>以下是主要的类，接下来让我们慢慢体会这样设计的原因：</p>
+<p><img src="/images/ProxyCreatorSupport-hierarchy.png" alt=""></p>
+<p>具体的aop代理对象的生成，分别是由AspectJProxyFactory、ProxyFactoryBean和ProxyFactory来完成的。</p>
+<p>以ProxyFactoryBean.getObject()为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object getObject() throws BeansException &#123;</div><div class="line">    initializeAdvisorChain();</div><div class="line">    if (isSingleton()) &#123;</div><div class="line">        return getSingletonInstance();</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        ...</div><div class="line">        return newPrototypeInstance();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>initializeAdvisorChain()代码比较长，主要流程是 : 根据内置成员<code>interceptorNames : String[]</code>生成bean，然后namedBeanToAdvisor()转换成Advisor，<br>再调用父类AdvisedSupport.addAdvisor(Advisor)增加到通知器链<code>LinkedList&lt;Advisor&gt;</code>中，后面也会对这部分进行更详细介绍。</p>
+<p>结合上面的class hierarchy图，可知AdvisedSupport主要封装了对通知和通知器的相关操作（从命名也可以知道），这些操作对不同的代理对象应该是一致的，<br>而代理对象的生成，是交给子类去实现的，<code>ProxyCreatorSupport</code>则协助子类进行proxy的生成。</p>
+<p>而生成的proxy, 可以是singleton或者prototype，这个功能都是由AopProxy完成的。<br>而这个AopProxy是由AopProxyFactory创建，这部分代码在ProxyCreatorSupport中：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// ProxyCreatorSupport.java</div><div class="line">protected final synchronized AopProxy createAopProxy() &#123;</div><div class="line">    if (!this.active) &#123;</div><div class="line">        activate();</div><div class="line">    &#125;</div><div class="line">    return getAopProxyFactory().createAopProxy(this);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中getAopProxyFactory()，即this.aopProxyFactory，是spring封装的DefaultAopProxyFactory：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public ProxyCreatorSupport() &#123;</div><div class="line">    this.aopProxyFactory = new DefaultAopProxyFactory();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>DefaultAopProxyFactory createAopProxy()会根据target class是否接口来选择不同的生成方式(下图)。<br>如果是接口，则使用jdk动态代理；否则使用cglib，如下所示：<br>所以，上面提到的AopProxy是一个接口，它有两个实现：CglibAopProxy和JdkDynamicAopProxy。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException &#123;</div><div class="line">    if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) &#123;</div><div class="line">        Class targetClass = config.getTargetClass();</div><div class="line">        if (targetClass == null) &#123;</div><div class="line">            throw new AopConfigException(&quot;TargetSource cannot determine target class: &quot; +</div><div class="line">                    &quot;Either an interface or a target is required for proxy creation.&quot;);</div><div class="line">        &#125;</div><div class="line">        if (targetClass.isInterface()) &#123;</div><div class="line">            return new JdkDynamicAopProxy(config);</div><div class="line">        &#125;</div><div class="line">        return CglibProxyFactory.createCglibProxy(config);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        return new JdkDynamicAopProxy(config);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>jdk和cglib的生成方式这里略过，感兴趣的话查看<code>new JdkDynamicAopProxy(AdvisedSupport)</code>和<code>CglibProxyFactory.createCglibProxy(config)</code>即可。</p>
+<h3 id="拦截器调用"><a href="#拦截器调用" class="headerlink" title="拦截器调用"></a>拦截器调用</h3><hr>
+<p>生成代理完成时，相关的拦截器已经配置完成了，现在只需在代理对象调用时回调这些拦截器即可，Jdk和cglib的代理和回调有些不同。</p>
+<p>这里以大家熟悉的jdk dynamic proxy为例，如下图，JdkDynamicAopProxy实现了InvocationHandler：</p>
+<p><img src="/images/JdkDynamicAopProxy.png" alt=""></p>
+<p>invoke()的源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</div><div class="line">    MethodInvocation invocation;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line"></div><div class="line">    TargetSource targetSource = this.advised.targetSource;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line"></div><div class="line">    ...</div><div class="line">    // Get the interception chain for this method.</div><div class="line">    List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line"></div><div class="line">    // Check whether we have any advice. If we don&apos;t, we can fallback on direct</div><div class="line">    // reflective invocation of the target, and avoid creating a MethodInvocation.</div><div class="line">    if (chain.isEmpty()) &#123;</div><div class="line">        // We can skip creating a MethodInvocation: just invoke the target directly</div><div class="line">        // Note that the final invoker must be an InvokerInterceptor so we know it does</div><div class="line">        // nothing but a reflective operation on the target, and no hot swapping or fancy proxying.</div><div class="line">        retVal = AopUtils.invokeJoinpointUsingReflection(target, method, args);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        // We need to create a method invocation...</div><div class="line">        invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);</div><div class="line">        // Proceed to the joinpoint through the interceptor chain.</div><div class="line">        retVal = invocation.proceed();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如上可知，<code>chain</code>是通过<code>AdvisedSupport</code>（this.advised）的getInterceptorsAndDynamicInterceptionAdvice()获取的。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public List&lt;Object&gt; getInterceptorsAndDynamicInterceptionAdvice(Method method, Class targetClass) &#123;</div><div class="line">    MethodCacheKey cacheKey = new MethodCacheKey(method);</div><div class="line">    List&lt;Object&gt; cached = this.methodCache.get(cacheKey);</div><div class="line">    if (cached == null) &#123;</div><div class="line">        cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(</div><div class="line">                this, method, targetClass);</div><div class="line">        this.methodCache.put(cacheKey, cached);</div><div class="line">    &#125;</div><div class="line">    return cached;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，this.advisorChainFactory是一个叫DefaultAdvisorChainFactory的工厂，主要实现了拦截器链的获取。<br>而且，会注册到<code>AdvisorAdapterRegistry</code>接口的实现<code>DefaultAdvisorAdapterRegistry</code>中。<br>DefaultAdvisorAdapterRegistry的构造器如下所示，可以看到，这里注册了一些常见的AdviceAdapter：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public DefaultAdvisorAdapterRegistry() &#123;</div><div class="line">    registerAdvisorAdapter(new MethodBeforeAdviceAdapter());</div><div class="line">    registerAdvisorAdapter(new AfterReturningAdviceAdapter());</div><div class="line">    registerAdvisorAdapter(new ThrowsAdviceAdapter());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="/images/AdvisorAdapter-hierarchy.png" alt=""></p>
+<p>上面这些adapters，主要有两个作用，以<code>AfterReturningAdviceAdapter</code>为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class AfterReturningAdviceAdapter implements AdvisorAdapter, Serializable &#123;</div><div class="line"></div><div class="line">    public boolean supportsAdvice(Advice advice) &#123;</div><div class="line">        return (advice instanceof AfterReturningAdvice);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public MethodInterceptor getInterceptor(Advisor advisor) &#123;</div><div class="line">        AfterReturningAdvice advice = (AfterReturningAdvice) advisor.getAdvice();</div><div class="line">        return new AfterReturningAdviceInterceptor(advice);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>作用之一是判断某个Advice属于什么类型;还有就是返回相对应的AdviceInterceptor。</p>
+<p>advice的实现其实也是拦截器(实现了MethodInterceptor)，如下所示：</p>
+<p><img src="/images/AdviceInterceptor.png" alt=""></p>
+<p>和上面保持一致，以AfterReturingInterceptor为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object invoke(MethodInvocation mi) throws Throwable &#123;</div><div class="line">    Object retVal = mi.proceed();</div><div class="line">    this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());</div><div class="line">    return retVal;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>回到<code>JdkDynamicAopProxy.invoke()</code>，其中的ReflectiveMethodInvocation.proceed()就是链调用主要入口, 如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">public Object proceed() throws Throwable &#123;</div><div class="line">    //  We start with an index of -1 and increment early.</div><div class="line">    if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) &#123;</div><div class="line">        return invokeJoinpoint();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Object interceptorOrInterceptionAdvice =</div><div class="line">            this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);</div><div class="line">    if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) &#123;</div><div class="line">        // Evaluate dynamic method matcher here: static part will already have</div><div class="line">        // been evaluated and found to match.</div><div class="line">        InterceptorAndDynamicMethodMatcher dm =</div><div class="line">                (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;</div><div class="line">        if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) &#123;</div><div class="line">            return dm.interceptor.invoke(this);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // Dynamic matching failed.</div><div class="line">            // Skip this interceptor and invoke the next in the chain.</div><div class="line">            return proceed();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        // It&apos;s an interceptor, so we just invoke it: The pointcut will have</div><div class="line">        // been evaluated statically before this object was constructed.</div><div class="line">        return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面主要是遍历每个 interceptorOrInterceptionAdvice，并调用相应的拦截器，这样串起来，整个流程就清晰了。<br>其中InterceptorAndDynamicMethodMatcher组合MethodInterceptor和MethodMatcher，使其作为通知链的一个element使用，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class InterceptorAndDynamicMethodMatcher &#123;</div><div class="line"></div><div class="line">    final MethodInterceptor interceptor;</div><div class="line"></div><div class="line">    final MethodMatcher methodMatcher;</div><div class="line"></div><div class="line">    public InterceptorAndDynamicMethodMatcher(MethodInterceptor interceptor, MethodMatcher methodMatcher) &#123;</div><div class="line">        this.interceptor = interceptor;</div><div class="line">        this.methodMatcher = methodMatcher;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上就是ProxyFactoryBean调用的主要流程，只是一个大概的流程，看源码的话，spring会有许多细节验证和处理。不过阅读时，一定要抓住重要的主线，还有熟悉常见的设计模式，这会让你有个全景的认识和理解。</p>
+<h2 id="DIY-属于自己的AOP"><a href="#DIY-属于自己的AOP" class="headerlink" title="DIY 属于自己的AOP"></a>DIY 属于自己的AOP</h2><p>// TODO still in drafts 。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/aop/" rel="tag">#aop</a>
+          
+            <a href="/tags/spring/" rel="tag">#spring</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/03/30/python/python_scrapy_get_started/" rel="next" title="python scrapy 爬虫初体验">
+                <i class="fa fa-chevron-left"></i> python scrapy 爬虫初体验
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/05/30/java/log_why_use_isDebug/" rel="prev" title="log 为什么使用isDebugEnable()和isTraceEnabled()">
+                log 为什么使用isDebugEnable()和isTraceEnabled() <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/05/01/java/spring/spring-aop/"
+                   data-title="spring aop 简介 & JDK 动态代理" data-url="http://niko2014.github.io/2015/05/01/java/spring/spring-aop/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#aop-简介"><span class="nav-number">1.</span> <span class="nav-text">aop 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本概念"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Advice（通知）："><span class="nav-number">1.1.1.</span> <span class="nav-text">Advice（通知）：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pointcut（切点）："><span class="nav-number">1.1.2.</span> <span class="nav-text">Pointcut（切点）：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Advisor（通知器）："><span class="nav-number">1.1.3.</span> <span class="nav-text">Advisor（通知器）：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现过程"><span class="nav-number">2.</span> <span class="nav-text">实现过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成-aop-proxy"><span class="nav-number">2.1.</span> <span class="nav-text">生成 aop proxy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拦截器调用"><span class="nav-number">2.2.</span> <span class="nav-text">拦截器调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DIY-属于自己的AOP"><span class="nav-number">3.</span> <span class="nav-text">DIY 属于自己的AOP</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
