@@ -36,7 +36,7 @@
 
 
 
-  <meta name="keywords" content="linux,vim," />
+  <meta name="keywords" content="java,cs,concurrent," />
 
 
 
@@ -45,136 +45,19 @@
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
 
 
-<meta name="description" content="基本模式
-命令模式
-
-进入vim后, 默认就是命令模式.
-
-input模式
-
-命令模式下, 输入i进入input模式, esc返回命令模式.
-文本操作
-文本选择
-
-
-
-快捷键
-说明
-
-
-
-
-V
-selects entire lines
-
-
-v
-selects range of text
-
-
-ctrl-v
-列选择
-
-
-gv
-重新选择上次选择的区块
-
-
-
-选择 / 复制 / 粘贴 ...
-
-
-
-快捷键">
+<meta name="description" content="CASCAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.
+CAS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vim 大法好 - 命令指南">
-<meta property="og:url" content="http://niko2014.github.io/2015/07/01/linux/tools/vim_cmd/index.html">
+<meta property="og:title" content="Java 并发之 CAS">
+<meta property="og:url" content="http://niko2014.github.io/2016/04/05/java/concurrent/CAS_ABA_Java/index.html">
 <meta property="og:site_name" content="niko">
-<meta property="og:description" content="基本模式
-命令模式
-
-进入vim后, 默认就是命令模式.
-
-input模式
-
-命令模式下, 输入i进入input模式, esc返回命令模式.
-文本操作
-文本选择
-
-
-
-快捷键
-说明
-
-
-
-
-V
-selects entire lines
-
-
-v
-selects range of text
-
-
-ctrl-v
-列选择
-
-
-gv
-重新选择上次选择的区块
-
-
-
-选择 / 复制 / 粘贴 ...
-
-
-
-快捷键">
-<meta property="og:updated_time" content="2016-07-25T00:10:45.984Z">
+<meta property="og:description" content="CASCAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.
+CAS">
+<meta property="og:updated_time" content="2016-07-29T06:54:34.734Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="vim 大法好 - 命令指南">
-<meta name="twitter:description" content="基本模式
-命令模式
-
-进入vim后, 默认就是命令模式.
-
-input模式
-
-命令模式下, 输入i进入input模式, esc返回命令模式.
-文本操作
-文本选择
-
-
-
-快捷键
-说明
-
-
-
-
-V
-selects entire lines
-
-
-v
-selects range of text
-
-
-ctrl-v
-列选择
-
-
-gv
-重新选择上次选择的区块
-
-
-
-选择 / 复制 / 粘贴 ...
-
-
-
-快捷键">
+<meta name="twitter:title" content="Java 并发之 CAS">
+<meta name="twitter:description" content="CASCAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.
+CAS">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -186,7 +69,7 @@ gv
 
 
 
-  <title> vim 大法好 - 命令指南 | niko </title>
+  <title> Java 并发之 CAS | niko </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -321,7 +204,7 @@ gv
             
             
               
-                vim 大法好 - 命令指南
+                Java 并发之 CAS
               
             
           </h1>
@@ -330,8 +213,8 @@ gv
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-07-01T00:00:00+08:00" content="2015-07-01">
-              2015-07-01
+            <time itemprop="dateCreated" datetime="2016-04-05T00:00:00+08:00" content="2016-04-05">
+              2016-04-05
             </time>
           </span>
 
@@ -340,8 +223,8 @@ gv
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
                   </a>
                 </span>
 
@@ -356,8 +239,8 @@ gv
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/07/01/linux/tools/vim_cmd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/01/linux/tools/vim_cmd/" itemprop="commentsCount"></span>
+                <a href="/2016/04/05/java/concurrent/CAS_ABA_Java/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -376,368 +259,25 @@ gv
       
 
       
-        <span itemprop="articleBody"><h1 id="基本模式"><a href="#基本模式" class="headerlink" title="基本模式"></a>基本模式</h1><ul>
-<li>命令模式</li>
-</ul>
-<p>进入vim后, 默认就是命令模式.</p>
-<ul>
-<li><code>input</code>模式</li>
-</ul>
-<p>命令模式下, 输入<code>i</code>进入input模式, <code>esc</code>返回命令模式.</p>
-<h1 id="文本操作"><a href="#文本操作" class="headerlink" title="文本操作"></a>文本操作</h1><hr>
-<p><code>文本选择</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>V</td>
-<td>selects entire lines</td>
-</tr>
-<tr>
-<td>v</td>
-<td>selects range of text</td>
-</tr>
-<tr>
-<td>ctrl-v</td>
-<td>列选择</td>
-</tr>
-<tr>
-<td>gv</td>
-<td>重新选择上次选择的区块</td>
-</tr>
-</tbody>
-</table>
-<p><code>选择 / 复制 / 粘贴 ...</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>v(V for lines) -&gt; y  (yank)</td>
-<td>选择-&gt;复制</td>
-</tr>
-<tr>
-<td>p</td>
-<td>粘贴</td>
-</tr>
-<tr>
-<td>v -&gt; d  (delete)</td>
-<td></td>
-</tr>
-<tr>
-<td>ctrl + shift + v</td>
-<td>paster from clipboard in <code>input</code> mode</td>
-</tr>
-<tr>
-<td>ctrl + ;</td>
-<td>弹出clipboard菜单, 选择一个粘贴 (<code>input</code> mode)</td>
-</tr>
-</tbody>
-</table>
-<p><code>输入</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>u</td>
-<td>undo</td>
-</tr>
-<tr>
-<td>ctrl + r</td>
-<td>redo</td>
-</tr>
-<tr>
-<td>ctrl-p or ctrl-n</td>
-<td>使用当前session中的pattern来自动完成</td>
-</tr>
-<tr>
-<td>a</td>
-<td>在光标后开始编辑</td>
-</tr>
-<tr>
-<td>o</td>
-<td>当前行后面插入一个新行</td>
-</tr>
-<tr>
-<td>O</td>
-<td>当前行前面插入一个新行</td>
-</tr>
-<tr>
-<td>cw</td>
-<td>选择一个词</td>
-</tr>
-<tr>
-<td>v + gU</td>
-<td>(变大写)</td>
-</tr>
-<tr>
-<td>v + gu</td>
-<td>gu (变小写)</td>
-</tr>
-<tr>
-<td>ye</td>
-<td>复制当前光标到单词结尾的部分</td>
-</tr>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><code>缩进</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>v or V</td>
-<td>区块缩进前需要选择文本</td>
-</tr>
-<tr>
-<td>5&gt;</td>
-<td>表示右缩进5个tab</td>
-</tr>
-<tr>
-<td><code>4&lt;</code></td>
-<td>同理, 左向4个tab</td>
-</tr>
-</tbody>
-</table>
-<p><code>浏览 / 移动</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ctrl + e</td>
-<td>向下滚屏，保持光标</td>
-</tr>
-<tr>
-<td>ctrl + y</td>
-<td>向上滚屏, 保持光标</td>
-</tr>
-<tr>
-<td>ctrl + d</td>
-<td>向下, 不保持光标</td>
-</tr>
-<tr>
-<td>ctrl + u</td>
-<td>向上, 不保持光标</td>
-</tr>
-<tr>
-<td>0 或 ^</td>
-<td>跳至行头</td>
-</tr>
-<tr>
-<td>$</td>
-<td>跳至行尾</td>
-</tr>
-<tr>
-<td>G</td>
-<td>移至档尾（最后一行的第一个非空白字元处）</td>
-</tr>
-<tr>
-<td>gg</td>
-<td>移至档首（第一行之第一个非空白字元处）</td>
-</tr>
-<tr>
-<td>ctrl+f</td>
-<td>下翻页</td>
-</tr>
-<tr>
-<td>ctrl+b</td>
-<td>上翻页</td>
-</tr>
-<tr>
-<td>w</td>
-<td>移至次一个字（word）字首。当然是指英文单字。</td>
-</tr>
-<tr>
-<td>W</td>
-<td>同上，但会忽略一些标点符号。</td>
-</tr>
-<tr>
-<td>)</td>
-<td>移至下一个句子（sentence）首。</td>
-</tr>
-<tr>
-<td>(</td>
-<td>移至上一个句子（sentence）首。</td>
-</tr>
-<tr>
-<td>}</td>
-<td>移至下一个段落（paragraph）首。</td>
-</tr>
-<tr>
-<td>{</td>
-<td>移至上一个段落（paragraph）首。</td>
-</tr>
-</tbody>
-</table>
-<p><code>查找 / 替换</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>/ + your-search-string</td>
-<td>搜索, 可以使用正则, 注意转义</td>
-</tr>
-<tr>
-<td>ggn</td>
-<td></td>
-</tr>
-<tr>
-<td>GN</td>
-<td>最后一个</td>
-</tr>
-<tr>
-<td>/ + ↑或↓</td>
-<td>搜索历史</td>
-</tr>
-<tr>
-<td>:%s/源字符串/目的字符串/g</td>
-<td>全局替换， <code>%</code>表示所有行</td>
-</tr>
-<tr>
-<td>:4s/源字符串/目的字符串/g</td>
-<td>替换从第4行</td>
-</tr>
-<tr>
-<td>:1,4s/源字符串/目的字符串/g</td>
-<td>替换从第1行到第4行</td>
-</tr>
-</tbody>
-</table>
-<h1 id="多窗口"><a href="#多窗口" class="headerlink" title="多窗口"></a>多窗口</h1><hr>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>:sp file_path(able to use tab)</td>
-<td>新增窗口打开</td>
-</tr>
-<tr>
-<td>:vsp file_path</td>
-<td>新增窗口垂直打开</td>
-</tr>
-<tr>
-<td>:sv</td>
-<td>复制分割当前窗口</td>
-</tr>
-<tr>
-<td>ctrl + w, s</td>
-<td>复制分割当前窗口</td>
-</tr>
-<tr>
-<td>ctrl + w, v</td>
-<td>垂直, 复制分割当前窗口</td>
-</tr>
-<tr>
-<td>ctrl w + up/down</td>
-<td>切换窗口</td>
-</tr>
-<tr>
-<td>ctrl w, w</td>
-<td>循环切换窗口</td>
-</tr>
-<tr>
-<td>ctrl w, h/j/k/l</td>
-<td>按方向切换窗口</td>
-</tr>
-<tr>
-<td>ctrl w, H/J/K/L</td>
-<td>按方向移动窗口</td>
-</tr>
-<tr>
-<td>ctrl w , q 或 c</td>
-<td>关闭窗口</td>
-</tr>
-</tbody>
-</table>
-<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>:sp file_path(able to use tab)</td>
-<td>新增窗口打开</td>
-</tr>
-<tr>
-<td>:set noautoindent</td>
-<td></td>
-</tr>
-<tr>
-<td>:set number</td>
-<td></td>
-</tr>
-<tr>
-<td>:set number!</td>
-<td>切换</td>
-</tr>
-<tr>
-<td>:set number&amp;</td>
-<td>Set option to default value</td>
-</tr>
-<tr>
-<td>:set number?</td>
-<td>Show value of option</td>
-</tr>
-<tr>
-<td>…</td>
-<td>…</td>
-</tr>
-</tbody>
-</table>
-<p>更多请参看另一博客，将会记录常见的配置及相关命令。</p>
-<h2 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h2><p>1.<br><code>:!command</code><br>如：</p>
-<pre><code>:!ls -al
-</code></pre><p>执行一个命令, 但不退出vim.</p>
-<p>2.<br><code>:r !command</code><br>将shell命令command的结果插入到当前行的下一行</p>
-<p>这个命令比较常用, 比如输入当前目录:</p>
-<pre><code>:r !pwd
-</code></pre><p>3.<br><code>:起始行号,结束行号 !command</code><br>将起始行号和结束行号指定的范围中的内容输入到shell命令command处理，并将处理结果替换起始行号和结束行号指定的范围中的内容</p>
-<p>4.<br><code>:起始行号,结束行号 w !command</code><br>将起始行号和结束行号所指定的范围的内容作为命令command的输入。不会改变当前编辑的文件的内容</p>
-<h2 id="编辑root权限的文件"><a href="#编辑root权限的文件" class="headerlink" title="编辑root权限的文件"></a>编辑root权限的文件</h2><p>这个功能也经常用到, 比如编辑某个root的文件(readonly)时, 忘记了sudo, 当改了很多内容才发现, 怎么办呢 ?</p>
-<pre><code>:w !sudo tee %
-</code></pre><p>若是sudo不能解决的, 先写到临时文件:</p>
-<pre><code>:w! ~/tempfile.ext
-</code></pre><h2 id="其他-待续…"><a href="#其他-待续…" class="headerlink" title="其他, 待续…"></a>其他, 待续…</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>[1] <a href="http://vimgifs.com/" target="_blank" rel="external">http://vimgifs.com/</a><br>[2] <a href="http://vimcasts.org/episodes/working-with-windows/" target="_blank" rel="external">http://vimcasts.org/episodes/working-with-windows/</a><br>[3] <a href="http://blog.csdn.net/topgun_chenlingyun/article/details/8013115" target="_blank" rel="external">http://blog.csdn.net/topgun_chenlingyun/article/details/8013115</a><br>[4] <a href="http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions" target="_blank" rel="external">http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions</a></p>
+        <span itemprop="articleBody"><h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
+<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
+<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
+<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
+<ol>
+<li>一个进程P1读取值的时候是A</li>
+<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
+<li>另一个进程P2把A改成了B, 然后又改回了A</li>
+<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
+</ol>
+<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
 </span>
       
     </div>
@@ -746,9 +286,11 @@ gv
       
         <div class="post-tags">
           
-            <a href="/tags/linux/" rel="tag">#linux</a>
+            <a href="/tags/java/" rel="tag">#java</a>
           
-            <a href="/tags/vim/" rel="tag">#vim</a>
+            <a href="/tags/cs/" rel="tag">#cs</a>
+          
+            <a href="/tags/concurrent/" rel="tag">#concurrent</a>
           
         </div>
       
@@ -757,16 +299,16 @@ gv
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/05/30/java/log_why_use_isDebug/" rel="next" title="log 为什么使用isDebugEnable()和isTraceEnabled()">
-                <i class="fa fa-chevron-left"></i> log 为什么使用isDebugEnable()和isTraceEnabled()
+              <a href="/2016/04/04/linux/android/honor6_root_rom/" rel="next" title="荣耀6刷入CM11">
+                <i class="fa fa-chevron-left"></i> 荣耀6刷入CM11
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/07/18/linux/monit/" rel="prev" title="monit 监控">
-                monit 监控 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" rel="prev" title="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
+                使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -792,8 +334,8 @@ gv
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/07/01/linux/tools/vim_cmd/"
-                   data-title="vim 大法好 - 命令指南" data-url="http://niko2014.github.io/2015/07/01/linux/tools/vim_cmd/">
+              <div class="ds-thread" data-thread-key="2016/04/05/java/concurrent/CAS_ABA_Java/"
+                   data-title="Java 并发之 CAS" data-url="http://niko2014.github.io/2016/04/05/java/concurrent/CAS_ABA_Java/">
               </div>
             
           </div>
@@ -878,7 +420,7 @@ gv
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本模式"><span class="nav-number">1.</span> <span class="nav-text">基本模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文本操作"><span class="nav-number">2.</span> <span class="nav-text">文本操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多窗口"><span class="nav-number">3.</span> <span class="nav-text">多窗口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常用命令"><span class="nav-number">4.</span> <span class="nav-text">常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#执行shell命令"><span class="nav-number">4.1.</span> <span class="nav-text">执行shell命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑root权限的文件"><span class="nav-number">4.2.</span> <span class="nav-text">编辑root权限的文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他-待续…"><span class="nav-number">4.3.</span> <span class="nav-text">其他, 待续…</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CAS"><span class="nav-number">1.</span> <span class="nav-text">CAS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#以AtomicInteger为例"><span class="nav-number">1.1.</span> <span class="nav-text">以AtomicInteger为例:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABA-问题"><span class="nav-number">2.</span> <span class="nav-text">ABA 问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>

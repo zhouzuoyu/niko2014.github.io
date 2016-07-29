@@ -1,0 +1,1658 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+    
+    <entry>
+      <title><![CDATA[使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志]]></title>
+      <url>http://niko2014.github.io/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/</url>
+      <content type="html"><![CDATA[<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。<br>但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。</p>
+<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><p>以下版本亲测兼容：</p>
+<ul>
+<li><p>Logstash 2.3.1</p>
+</li>
+<li><p>Elasticsearch 2.3.x</p>
+</li>
+<li><p>Kibana 4.5.0</p>
+</li>
+</ul>
+<blockquote>
+<p>Compatible with Elasticsearch 2.3.x. Kibana can also be installed from our repositories using apt or yum. See Repositories in the Guide.</p>
+</blockquote>
+<h1 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h1><hr>
+<p>主要作用：负责日志检索和分析。</p>
+<pre><code>tar xvf elasticsearch-2.3.2.tar.gz -C /foo/path
+bin/elasticsearch
+</code></pre><p>默认端口是:</p>
+<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><hr>
+<p>主要作用：负责日志的收集，处理和储存。</p>
+<p>使用：</p>
+<pre><code>tar zxvf logstash-2.3.1.tar.gz
+bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
+`-e`代表直接从命令行输入配置文件, input选择了标准输入, output选择了标准输出。
+</code></pre><p>我们要做的是把nginx日志输出存储到Elasticsearch，使用<code>-f</code>传入预先写好的配置：</p>
+<pre><code>bin/logstash -f logstash-nginx.conf
+</code></pre><p><code>logstash-nginx.conf</code>是我们需要编写的配置文件，用以指定nginx日志的位置和格式，以及es的接口位置。</p>
+<h2 id="编写-logstash-nginx-conf"><a href="#编写-logstash-nginx-conf" class="headerlink" title="编写 logstash-nginx.conf"></a>编写 logstash-nginx.conf</h2><p>更多关于 <code>logstash 配置文件</code> 的编写， 请参考<a href="https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html" target="_blank" rel="external">官方文档</a></p>
+<p>假设nginx的日志格式为:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</div><div class="line">                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div></pre></td></tr></table></figure>
+<p>新建 <code>logstash-nginx.conf</code> 文件，写入:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#</div><div class="line">input &#123;</div><div class="line">    file &#123;</div><div class="line">        path =&gt; [ &quot;/home/niko/mount/hsb_D/niko/temp_trash/logs/foo.com.access_20160617.log&quot; ]</div><div class="line">        type =&gt; &quot;nginx-access&quot;</div><div class="line">        start_position =&gt; &quot;beginning&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">filter &#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;&quot;message&quot; =&gt; &quot;%&#123;IPORHOST:source_ip&#125; - %&#123;USERNAME:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] %&#123;QS:request&#125; %&#123;INT:status&#125; %&#123;INT:body_bytes_sent&#125; %&#123;QS:http_referer&#125; %&#123;QS:http_user_agent&#125;&quot;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123; hosts =&gt; [&quot;localhost:9200&quot;] &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>启动后，等logstash处理完日志文件并写入es，可以查看es的索引:</p>
+<p><a href="http://localhost:9200/_cat/indices" target="_blank" rel="external">http://localhost:9200/_cat/indices</a></p>
+<p>可以看到以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">yellow open .kibana             1 1 1 0  3.1kb  3.1kb</div><div class="line">yellow open logstash-2016.04.28 5 1 4 0 12.3kb 12.3kb</div></pre></td></tr></table></figure>
+<p>grok 使用请看<a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="external"> grok 插件文档 </a>。</p>
+<p>以上grok解析nginx日志文件到es的配置，当然还可以从其他输入源（不止文件）获取数据，输出到不同位置（redis等其他中间件）。</p>
+<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><hr>
+<p>主要作用：负责日志的可视化。</p>
+<ul>
+<li><p>使用：</p>
+<p>  tar xf kibana-4.5.0-linux-x64.tar.gz -C /foo/path<br>  bin/kibana</p>
+</li>
+<li><p>visit <a href="localhost:5601" target="_blank" rel="external">localhost:5601</a></p>
+</li>
+<li><p>配置index pattern:</p>
+</li>
+<li><p>点击<code>Settings</code>,  在<code>Indices</code>tab, 创建一个<code>index pattern</code>，选择<code>logstash-*</code></p>
+</li>
+<li><p>点击<code>visualization</code>, <code>Create a new visualization</code> 这里选择<code>Line Chart</code>类型图</p>
+</li>
+<li><p>然后选择X和Y坐标，Y有常见的聚合属性，X是nginx日志行的几个字段，完成后点击生成， 如下：</p>
+</li>
+</ul>
+<p><img src="/images/dtai/kibana_01.png" alt=""></p>
+<p>以上只是一个示例，kibana 的功能远强大于此，根据自己的需求去定制可视化吧。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/elastic/examples/tree/master/ELK_NGINX" target="_blank" rel="external">https://github.com/elastic/examples/tree/master/ELK_NGINX</a><br>【2】<a href="http://www.icyfire.me/2014/11/13/logstash-es-kibana.html" target="_blank" rel="external">http://www.icyfire.me/2014/11/13/logstash-es-kibana.html</a><br>【3】<a href="http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html</a><br>【4】<a href="http://www.wklken.me/posts/2015/05/08/elk-data-collect.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/05/08/elk-data-collect.html</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Java 并发之 CAS]]></title>
+      <url>http://niko2014.github.io/2016/04/05/java/concurrent/CAS_ABA_Java/</url>
+      <content type="html"><![CDATA[<h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
+<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
+<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
+<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
+<ol>
+<li>一个进程P1读取值的时候是A</li>
+<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
+<li>另一个进程P2把A改成了B, 然后又改回了A</li>
+<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
+</ol>
+<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[荣耀6刷入CM11]]></title>
+      <url>http://niko2014.github.io/2016/04/04/linux/android/honor6_root_rom/</url>
+      <content type="html"><![CDATA[<h1 id="刷入过程"><a href="#刷入过程" class="headerlink" title="刷入过程"></a>刷入过程</h1><h2 id="0-准备"><a href="#0-准备" class="headerlink" title="0. 准备"></a>0. 准备</h2><ul>
+<li>下载recovery和SU：<a href="http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113</a></li>
+<li>下载ROM：<a href="http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056</a></li>
+<li>保证1G的TF卡空闲空间</li>
+</ul>
+<h2 id="1-解锁"><a href="#1-解锁" class="headerlink" title="1. 解锁"></a>1. 解锁</h2><p>官网解锁说明：<a href="https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step" target="_blank" rel="external">https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step</a><br>获取解锁码：<a href="https://www.emui.com/plugin.php?id=unlock" target="_blank" rel="external">https://www.emui.com/plugin.php?id=unlock</a></p>
+<h2 id="2-第三方recovery和root"><a href="#2-第三方recovery和root" class="headerlink" title="2. 第三方recovery和root"></a>2. 第三方recovery和root</h2><p>adb 连接手机，刷入recovery（ClockworkMod）：</p>
+<pre><code>fastboot flash recovery cwm-6.0.5.1_2015xxxx_h60_l0x.img
+（cwm-6.0.5.1_2015xxxx_h60_l0x.img 太长了，最好改个名）
+</code></pre><p>进入recovery，安装SuperSU。</p>
+<h2 id="3-ROM"><a href="#3-ROM" class="headerlink" title="3. ROM"></a>3. ROM</h2><p>我的是H60-L01,<code>20150822</code>这个版本已经可以使用<code>cm-11-20150822-UNOFFICIAL-h60_l02.zip</code>ROM了，有些教程会让你改<code>META-INF/com/google/android/updater-script</code>来跳过机型验证，这个版本的ROM并不需要。<br>由于我改了<code>updater-script</code>导致无法刷入，然而重新启动后，卡在开机画面无法继续。我必须拷贝原ROM到TF卡，再重新进入recovery。</p>
+<p>然而，坑爹的是，荣耀6按住电源键10秒可以重启，没有强制关机的方法。而进入recovery必须在关机状态下，按住<code>电源和音量+</code>键。</p>
+<p>所以准备拔电源了，但是荣耀拔电源是在苦逼，掀了后盖后缺少螺丝刀，于是去午睡准备晚上接着搞。<br>午休时迷迷糊糊灵光一现，能不能在重启的时候，有那几秒，快速进入recovery模式呢？哈哈，问题解决！插入TF卡，5分钟不到，就刷入了CM11。比起之前的EMUI，这流畅度简直让人上天啊。<br>好困，午休就这么过去了～～</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC" target="_blank" rel="external">http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[motorola defy 刷到 android 4.4]]></title>
+      <url>http://niko2014.github.io/2016/04/01/linux/defy_to_cm_android44/</url>
+      <content type="html"><![CDATA[<p>motorola defy，相信是很多人的回忆，他伴随我走过了大学四年，只要我在手里，就感觉是会到了大学校园，教室的最后一排。然而现在很多App已经不能安装了，因为系统仍然是2.x版本，所以需要升级到<code>4.x</code>才能重生。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>我的机子是android 2.3版本的，已root。<br>所以需要的工具只是：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">终端模拟器.apk</div><div class="line">cm-11-20160330-NIGHTLY-mb52x.zip</div><div class="line">defy_bootstrap_ext3.img</div><div class="line">resize.zip</div></pre></td></tr></table></figure>
+<p>模拟器需要先安装，后面三个文件要放到SD卡根目录。</p>
+<h2 id="开搞"><a href="#开搞" class="headerlink" title="开搞"></a>开搞</h2><p>这次的刷机比以前简单多了，首先，安装完终端模拟器，进入终端使用<code>su</code>命令获取root权限：</p>
+<p>把img写入<code>/dev/block/mmcblk1p21</code>  ：</p>
+<pre><code>cat /sdcard/defy_bootstrap_ext3.img &gt; /dev/block/mmcblk1p21
+</code></pre><p>重启，若无反应，拔电池重新开机：</p>
+<p><img src="/images/defy_android44_recovery_home.jpg" alt=""></p>
+<p>从图标可以看出，对应了手机底部的几个物理按键，选择<code>recovery</code>：</p>
+<p>然后点击<code>install</code>， 进入sdcard选择<code>resize.zip</code>，滑动按钮到右边进行install：</p>
+<p>重启：</p>
+<p>再次进入recovery和install，这次选择<code>cm-11-20160330-NIGHTLY-mb52x.zip</code>，这次文件比较大，会比上次时间长一点，完成后选择<code>reboot system</code>：</p>
+<p>这次进入home界面时，选择<code>Continue</code>进入系统，系统会有2～3分钟的loading动画进行初始化操作，然后就进入用户界面的初始设置，升级complete：</p>
+<p><img src="/images/defy_android44_installed.jpg" alt=""></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p><a href="http://tieba.baidu.com/p/3600016194" target="_blank" rel="external">http://tieba.baidu.com/p/3600016194</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[disconf - 【1】 server 搭建]]></title>
+      <url>http://niko2014.github.io/2016/03/01/java/dist/disconf_1_server/</url>
+      <content type="html"><![CDATA[<p>disconf是分布式配置管理服务平台，目前已经在 百度、滴滴出行、银联、网易、拉勾网、苏宁易购等公司使用，专注于解决分布式环境下的配置管理。</p>
+<h1 id="部署web-server："><a href="#部署web-server：" class="headerlink" title="部署web server："></a>部署web server：</h1><hr>
+<p>要使用disconf，首先需要搭建disconf服务端先，不过先把项目clone下来：</p>
+<pre><code>git clone https://github.com/knightliao/disconf
+</code></pre><h2 id="准备配置文件"><a href="#准备配置文件" class="headerlink" title="准备配置文件"></a>准备配置文件</h2><pre><code>mkdir /home/work/dsp/disconf-rd/online-resources
+mkdir /home/work/dsp/disconf-rd/war
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd  $DISCONF_HOME/disconf-web/</div><div class="line">cp  profile/rd/application-demo.properties /home/work/dsp/disconf-rd/online-resources/application.properties</div><div class="line">cp  profile/rd/jdbc-mysql.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/redis-config.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/zoo.properties /home/work/dsp/disconf-rd/online-resources/</div></pre></td></tr></table></figure>
+<h2 id="build-amp-deploy"><a href="#build-amp-deploy" class="headerlink" title="build &amp; deploy"></a>build &amp; deploy</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ONLINE_CONFIG_PATH=/home/work/dsp/disconf-rd/online-resources</div><div class="line">WAR_ROOT_PATH=/home/work/dsp/disconf-rd/war</div><div class="line">export ONLINE_CONFIG_PATH</div><div class="line">export WAR_ROOT_PATH</div><div class="line">cd disconf-web</div><div class="line">sh deploy/deploy.sh</div></pre></td></tr></table></figure>
+<h2 id="准备mysql"><a href="#准备mysql" class="headerlink" title="准备mysql"></a>准备mysql</h2><p>修改mysql用户和密码：</p>
+<pre><code>vim /home/work/dsp/disconf-rd/online-resources/jdbc-mysql.properties
+</code></pre><p>初始化数据库：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; source 0-init_table.sql</div><div class="line">mysql&gt; source 1-init_data.sql</div><div class="line">mysql&gt; source 201512/20151225.sql</div></pre></td></tr></table></figure></p>
+<h2 id="准备Redis"><a href="#准备Redis" class="headerlink" title="准备Redis"></a>准备Redis</h2><p>默认配置，启动就行了。参考官方文档：<a href="http://redis.io/download" target="_blank" rel="external">http://redis.io/download</a></p>
+<h2 id="准备zookeeper"><a href="#准备zookeeper" class="headerlink" title="准备zookeeper"></a>准备zookeeper</h2><p>默认的disconf的zookeeper客户端配置是三个实例的，如果只是为了体验disconf，可以改成standalone的配置。<br>修改zookeeper服务器的<code>clientPort</code>，使和disconf的zkClient配置一致：</p>
+<p>vim $ZK_HOME/conf/zoo.cfg</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">##############</div><div class="line">clientPort=8581</div><div class="line">##############</div></pre></td></tr></table></figure>
+<p>其他同理（127.0.0.1:8582,127.0.0.1:8583…）。</p>
+<h2 id="准备tomcat"><a href="#准备tomcat" class="headerlink" title="准备tomcat"></a>准备tomcat</h2><p>vim $TOMCAT_HOME/conf/server.xml<br>在Host结点下增加：</p>
+<pre><code>&lt;Context path=&quot;&quot; docBase=&quot;/home/work/dsp/disconf-rd/war&quot;&gt;&lt;/Context&gt;
+</code></pre><p>访问端口设为<code>8015</code>。</p>
+<h2 id="准备nginx"><a href="#准备nginx" class="headerlink" title="准备nginx"></a>准备nginx</h2><p>vim /path/nginx.conf</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">upstream disconf &#123;</div><div class="line">    server 127.0.0.1:8015;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line"></div><div class="line">    listen   8081;</div><div class="line">    server_name localhost;</div><div class="line">    access_log /home/work/var/logs/disconf/access.log;</div><div class="line">    error_log /home/work/var/logs/disconf/error.log;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root /home/work/dsp/disconf-rd/war/html;</div><div class="line">        # niko , use alias if root not working</div><div class="line">        # alias /home/work/dsp/disconf-rd/war/html/;</div><div class="line">        if ($query_string) &#123;</div><div class="line">            expires max;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location ~ ^/(api|export) &#123;</div><div class="line">        proxy_pass_header Server;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line">        proxy_set_header X-Real-IP $remote_addr;</div><div class="line">        proxy_set_header X-Scheme $scheme;</div><div class="line">        proxy_pass http://disconf;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>记得要</p>
+<pre><code>mkdir /home/work/var/logs/disconf/ -p
+</code></pre><p>如果没有该目录，无法访问页面。</p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>完成以上的搭建后，访问<code>http://localhost:8081/main.html</code>，就可以看到管理页面了（账号密码是<code>admin/admin</code>）。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/knightliao/disconf" target="_blank" rel="external">https://github.com/knightliao/disconf</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Git钩子Script之客户端`pre-push`]]></title>
+      <url>http://niko2014.github.io/2016/02/22/git/git-prevent-push-master-by-hook/</url>
+      <content type="html"><![CDATA[<p>有个童鞋说，老是会忘记当前分支和误推了master，有没有办法防止这种低级错误。好吧，发生这种事，其实是那个repo没有设置服务器钩子脚本，来防止客户端的推送操作（我们用的不是gitlab，没有那种功能，暂时是人为终端控制）。<code>%&gt;_&lt;%</code>，我们要实现童鞋想要的功能，需要使用到 git hook scripts，git hook scripts又分为客户端和服务器端两种：</p>
+<p><code>client side</code></p>
+<ul>
+<li>pre-commit</li>
+<li>prepare-commit-msg</li>
+<li>commit-msg</li>
+<li>post-commit</li>
+<li>post-merge</li>
+<li>pre-push<br>…</li>
+</ul>
+<p><code>server side</code></p>
+<ul>
+<li>pre-receive</li>
+<li>update</li>
+<li>post-receive</li>
+</ul>
+<p>博客后面的链接【1】可以了解所有的script，这里需要的是叫做<code>pre-push</code>的script。</p>
+<h1 id="pre-push"><a href="#pre-push" class="headerlink" title="pre-push"></a>pre-push</h1><p>首先，我们把工作目录切到git repo的根目录，然后编写<code>.git/hooks/pre-push</code>文件：</p>
+<pre><code>vim .git/hooks/pre-push
+</code></pre><p>文件内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"># Prevents force-pushing to master.</div><div class="line"># Based on: https://gist.github.com/pixelhandler/5718585</div><div class="line"># Install:</div><div class="line"># cd path/to/git/repo</div><div class="line"># curl -fL -o .git/hooks/pre-push https://gist.githubusercontent.com/stefansundin/d465f1e331fc5c632088/raw/pre-push</div><div class="line"># chmod +x .git/hooks/pre-push</div><div class="line"></div><div class="line">BRANCH=`git rev-parse --abbrev-ref HEAD`</div><div class="line">PUSH_COMMAND=`ps -ocommand= -p $PPID`</div><div class="line"></div><div class="line">if [[ &quot;$BRANCH&quot; == &quot;master&quot; &amp;&amp; &quot;$PUSH_COMMAND&quot; =~ push|force|delete|-f ]]; then</div><div class="line">  echo &quot;Prevented force-push to $BRANCH. This is a very dangerous command.&quot;</div><div class="line">  echo &quot;If you really want to do this, use --no-verify to bypass this pre-push hook.&quot;</div><div class="line">  exit 1</div><div class="line">fi</div><div class="line"></div><div class="line">exit 0</div></pre></td></tr></table></figure>
+<p>这段script也很容易理解。</p>
+<h2 id="执行结果："><a href="#执行结果：" class="headerlink" title="执行结果："></a>执行结果：</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ chmod u+x .git/hooks/pre-push</div><div class="line">$ git push</div><div class="line">Prevented force-push to master. This is a very dangerous command.</div><div class="line">If you really want to do this, use --no-verify to bypass this pre-push hook.</div><div class="line">error: failed to push some refs to &apos;git@git.xxx.net:user/repo.git&apos;</div></pre></td></tr></table></figure>
+<p>如上，如果执行<code>git push</code>，我们的echo提示出现了，说明script起作用了。<br>如果我们想跳过<code>pre-push</code>钩子，可以使用<code>--no-verify</code>参数。<br>或者把<code>.git/hooks/pre-push</code>改个名字。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" target="_blank" rel="external">https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks</a><br>【2】<a href="https://gist.github.com/stefansundin/d465f1e331fc5c632088" target="_blank" rel="external">https://gist.github.com/stefansundin/d465f1e331fc5c632088</a></p>
+<p>#</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[共享 shadowsocks]]></title>
+      <url>http://niko2014.github.io/2016/02/11/linux/shadowsocks_share/</url>
+      <content type="html"><![CDATA[<p>如果你的shadowsocks是从pip下载的python脚本，则默认是绑定监听lo网卡的（socks5），若是想分享给其他人（ <code>UI妹子⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄</code> ）上网用，可能就不行，需要做一些操作。对外暴露一个端口，然后把这个端口的请求转发到lo网卡。</p>
+<h1 id="方法一：使用polipo"><a href="#方法一：使用polipo" class="headerlink" title="方法一：使用polipo"></a>方法一：使用polipo</h1><p>polipo是一款优秀的web代理工具，使用它可以容易的把ss分享给其他人，而且还能提供http代理。<br>据说</p>
+<h2 id="安装-amp-配置"><a href="#安装-amp-配置" class="headerlink" title="安装 &amp; 配置"></a>安装 &amp; 配置</h2><pre><code>sudo apt-get install polipo
+
+vim /etc/polipo/config
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">### Basic configuration</div><div class="line"></div><div class="line"># Add your proxy&apos;s address</div><div class="line">proxyAddress = 0.0.0.0</div><div class="line">socksParentProxy = &quot;127.0.0.1:1080&quot;</div><div class="line"></div><div class="line"># Allow from anyone in the 192.168.0.* range to connect to your proxy</div><div class="line">allowedClients = 192.168.0.0/24</div></pre></td></tr></table></figure>
+<h2 id="启动-amp-测试"><a href="#启动-amp-测试" class="headerlink" title="启动 &amp; 测试"></a>启动 &amp; 测试</h2><p>sudo /etc/init.d/polipo restart</p>
+<p>export http_proxy=<a href="http://ip:8123/" target="_blank" rel="external">http://ip:8123/</a></p>
+<p><code>8123</code>是默认的端口，其他机器设置好代理访问facebook：</p>
+<p><img src="/images/linux/shadowsocks_share_ss-log-facebook.png" alt=""></p>
+<p>可以看到请求的log，并成功访问facebook。</p>
+<h1 id="其他方法"><a href="#其他方法" class="headerlink" title="其他方法"></a>其他方法</h1><p>privoxy<br>proxychains<br>…</p>
+<p>#</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[ubuntu安装nvidia显卡驱动]]></title>
+      <url>http://niko2014.github.io/2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/</url>
+      <content type="html"><![CDATA[<p>最近换硬盘重装了ubuntu, 但在用xmind和窗口切换时, 老是卡死(鼠标/键盘动不了, 但能ssh进去) , 想了一下, 应该是显卡驱动没装的原因, 由于自己的ubuntu关闭了所有动画和特效, 一直没有去装N卡驱动, 于是安装验证了一下是否这个原因导致的～</p>
+<h1 id="安装前"><a href="#安装前" class="headerlink" title="安装前"></a>安装前</h1><p>安装前我们要先查看当前的显卡型号:</p>
+<pre><code>lspci | grep VGA
+01:00.0 VGA compatible controller: NVIDIA Corporation GF119 [GeForce GT 705] (rev a1)
+</code></pre><p>可以发现这个显卡是<code>GT 705</code>(这个台式机显卡渣渣啊), 这个在接下来找驱动会用到.</p>
+<blockquote>
+<p>若要查看更多设备信息, 可以使用 <code>lspci -v</code></p>
+</blockquote>
+<h1 id="option-1-使用管理器安装"><a href="#option-1-使用管理器安装" class="headerlink" title="option 1: 使用管理器安装:"></a>option 1: 使用管理器安装:</h1><p>如果嫌麻烦的, 可以在<code>software &amp; update</code>管理器中选择显卡驱动安装.</p>
+<p><img src="/images/linux/nvidia_manager_install.png" alt=""></p>
+<p>我的是第二种方式安装的</p>
+<h1 id="option-2-手动安装"><a href="#option-2-手动安装" class="headerlink" title="option 2: 手动安装:"></a>option 2: 手动安装:</h1><p>首先到[Nvidia官方网站]（<a href="http://www.geforce.cn/drivers）下载显卡对应的驱动，" target="_blank" rel="external">http://www.geforce.cn/drivers）下载显卡对应的驱动，</a> 需要对应自己的显卡和系统平台选择下载，比如我的是<code>NVIDIA-Linux-x86_64-352.79.run</code>。</p>
+<p>接着删除已有nvidia的包:</p>
+<pre><code>sudo apt-get --purge remove nvidia-*
+sudo apt-get install ubuntu-desktop
+echo &apos;nouveau&apos; | sudo tee -a /etc/modules
+</code></pre><p>重启， 并进入tty1（按ctrl+alt+F1）：</p>
+<pre><code>sudo service lightdm stop
+cd  /directory/of/NVIDIA.run.file
+sudo sh ./NVIDIA-Linux-x86_64-352.79.run
+</code></pre><p>执行完后，<code>sudo reboot</code>。<br>重启后， 可以在程序搜索中找到nvidia manager。</p>
+<p>查看当前驱动：</p>
+<p>在所有应用中搜索<code>nvidia</code>，可以发现<code>nvidia x server settings</code>的程序：</p>
+<p><img src="/images/linux/nvidia-config-01.png" alt=""></p>
+<p>也可以在<code>software &amp; update</code>管理器中查看安装情况。</p>
+<p>或者：</p>
+<pre><code>prime-select query
+</code></pre><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>最后，装了N卡驱动后，ubuntu的unity崩溃真的少了很多，xmind的卡死也没有再出现过。</p>
+<h1 id="参考引用"><a href="#参考引用" class="headerlink" title="参考引用"></a>参考引用</h1><hr>
+<p>【1】<a href="http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html" target="_blank" rel="external">http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html</a><br>【2】<a href="http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14" target="_blank" rel="external">http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14</a></p>
+<p>#</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[terminator 使用]]></title>
+      <url>http://niko2014.github.io/2016/01/30/linux/tools/terminator/</url>
+      <content type="html"><![CDATA[<p>terminator是一个多窗口的控制台管理器( terminal multiplexer )，通过它我们可以很方便的切割多个控制台窗口，分类任务，充分地利用屏幕空间，使桌面下的工作效率大大提高。除了terminator，若是在纯console下作业，<code>tmux</code>也是不错的选择。</p>
+<h1 id="layout"><a href="#layout" class="headerlink" title="layout"></a>layout</h1><hr>
+<p>由于我们需要打开许多console，所以才需要terminator，但每次开启都要手工去建好tab和window，再进入不同的工作路径等等，实在太烦人。因此，terminator提供了layout的功能，能够满足我们的一键还原console工作环境的需求。接下来通过实操感受一下：</p>
+<h2 id="1-新建一个layout"><a href="#1-新建一个layout" class="headerlink" title="1. 新建一个layout"></a>1. 新建一个layout</h2><p>首先，我们先建立好想要的窗口布局，然后进入<code>Preferences</code>-&gt;<code>layout tab</code>：<br>点击左下角<code>Add</code>一个Layout File, 并命名为<code>work1</code>，这个<code>layout</code>内容就是当前的布局。</p>
+<p><img src="/images/linux/terminator_1.png" alt=""></p>
+<h2 id="2-查看-amp-编辑配置文件"><a href="#2-查看-amp-编辑配置文件" class="headerlink" title="2. 查看&amp;编辑配置文件"></a>2. 查看&amp;编辑配置文件</h2><pre><code>vim ~/.config/terminator/config
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">  [[work01]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
+<p>找到<code>work01</code>的节点，改名为<code>default</code>,原先的<code>default</code>改名为<code>default_bak</code>。</p>
+<p>然后关闭重新打开terminator，可以发现自动打开了两个tab，分割成四个窗口，但是</p>
+<h2 id="3-增加command"><a href="#3-增加command" class="headerlink" title="3. 增加command"></a>3. 增加command</h2><p>这一步可以编辑<code>~/.config/terminator/config</code>文件（如果不嫌麻烦），也可以通过<code>Preference</code>修改。</p>
+<p>通过<code>Preference</code>方式修改：</p>
+<p>找到Terminal，将<code>sslocal -c /etc/ss.json ; bash</code>填入<code>Custom command</code>，其他同理。重新打开</p>
+<p><img src="/images/linux/terminator_2.png" alt=""></p>
+<p>重新打开terminator, perfect。每个上午都可以愉悦的开始一天的工作！</p>
+<p>最后附上修改后的配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">      command = cd ~/dev/tools/servers/ ; bash</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">      command = top; bash</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">      command = sslocal -c /etc/ss.json ; bash</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">      command = cd  ~/dev/git_repos/HexoBlog/hexo-hello/; bash</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">      command = cd ~/dev/git_repos/Java/MavenProj/; bash</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">  [[default_bak]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout" target="_blank" rel="external">http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[man的铺助工具——cheat]]></title>
+      <url>http://niko2014.github.io/2016/01/26/linux/tools/cheat-cmd/</url>
+      <content type="html"><![CDATA[<h1 id="man"><a href="#man" class="headerlink" title="man"></a>man</h1><p>相信使用Linux的小伙伴, 想要查询一个命令的用法时, 都会使用<code>man</code>命令数据库，或者试一试命令自带的<code>--help</code>参数。<br>但是使用<code>man</code>有个不好的地方，就是信息太多太全了，对我们来说，需要的可能只是某个用法，而且例子是比较少的，有时man的效率确实比较低。<br>所以我的习惯是，写博客和笔记，并附有许多常用的例子。<br>其实，还有一个常用工具，可以满足需求的——<code>cheat</code>。</p>
+<h1 id="cheat-命令"><a href="#cheat-命令" class="headerlink" title="cheat 命令"></a>cheat 命令</h1><p>首先，看一下效果，以tar为例：</p>
+<p><img src="/images/linux/linux-python-cheat-tar.png" alt=""></p>
+<h1 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h1><p>cheat是python写的，可以用pip安装。</p>
+<pre><code>pip install cheat
+</code></pre><h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><hr>
+<p><a href="https://github.com/chrisallenlane/cheat" target="_blank" rel="external">github 地址</a></p>
+<p>#</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[synergy 安装和使用 （一套键鼠掌握世界）]]></title>
+      <url>http://niko2014.github.io/2016/01/13/linux/synergy/</url>
+      <content type="html"><![CDATA[<p>由于有两台电脑，四个显示器，在使用的时候，难免要切换，但笔记本的触控板和键盘实在太难用～<code>%&gt;_&lt;%</code> 但是机械键盘和鼠标只有一套，怎么办呢？<br>还好之前看一些大牛的工作环境时，看到有一个工具叫synergy，用来同步鼠标和键盘，可以随意在多台电脑中切换。</p>
+<h1 id="通过apt-get-安装"><a href="#通过apt-get-安装" class="headerlink" title="通过apt-get 安装"></a>通过apt-get 安装</h1><p>因为我常用的操作系统是ubuntu和kali，当然是直接apt-get。</p>
+<pre><code>apt-get install synergy
+</code></pre><p>安装后，两台ubuntu（synergy版本1.4.12）之间操作没问题，然而在kali上是1.4.16版本，有不兼容的问题。于是找了下源，并没有找到对应的仓库，干脆就两边使用最新的源码install好了。</p>
+<h1 id="通过源码安装"><a href="#通过源码安装" class="headerlink" title="通过源码安装"></a>通过源码安装</h1><p>首先，安装依赖</p>
+<pre><code>sudo apt-get install cmake make g++ xorg-dev libqt4-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev libssl-dev
+</code></pre><p>访问<a href="https://github.com/symless/synergy/releases" target="_blank" rel="external">synergy on github</a>，git clone或者直接<a href="https://github.com/symless/synergy/archive/v1.7.5-stable.tar.gz" target="_blank" rel="external">下载</a>，然后：</p>
+<pre><code>tar xzvf v1.7.5-stable.tar.gz
+cd synergy-1.7.5-stable
+./hm conf -g1
+./hm build
+</code></pre><p>搞定。kali上也是如此操作，因为也是基于Debian。</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>跟着上面的操作，工作目录还在<code>synergy-1.7.5-stable</code>，执行<code>bin/synergy</code></p>
+<p>1，开启服务器（服务器即是你鼠标和键盘连接的那台电脑），synergy 会有个向导，选择服务器模式；<br>2，点击<code>Configure Server</code>，拖拽显示右上角的显示到格子中，想要的放置位置，这里要注意显示器的name需要填写正确，这个name就是client（或server）的名称，client若对不上，会被server拒绝连接的（name在<code>Edit - Settings</code>中设置）。</p>
+<p><img src="/images/synergy_server_conf.png" alt=""><br><img src="/images/synergy_name_settings.png" alt=""></p>
+<p>3，主界面点击start，界面可以看到log，包括客户端的连接。<br>4，启动server后，其他主机同样<code>bin/synergy</code>启动，选择client模式，接着设置一下自己的name，填写server的IP，点击<code>Start</code>。<br>5，Okay，这时可以发现，一套键鼠可以操控多台计算机啦，尽情地享受多屏多机的快感吧，工作效率杠杠的。    :-D</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[【spring】事务提交后进行某些操作]]></title>
+      <url>http://niko2014.github.io/2016/01/12/java/spring/spring_transaction_manager/</url>
+      <content type="html"><![CDATA[<p>在工作中，我们经常会有这样的需求。当修改了某些东西后，需要通知其他服务模块或系统进行某些处理。<br>这个如果硬编码的话，是一种很不优雅的方法：<br>首先，它的灵活性很差，当需求变更时，无可避免的要修改业务操作的代码，容易出bug，不符合<code>开关</code>原则（虽然不是讨论设计模式）。<br>其次，主业务操作（数据修改）部分和后续的通知处理应该是隔离的，后续的通知是否成功，对业务操作都不应有影响，或者在功能和时间上尽可能不影响主业务操作。</p>
+<p>那么如果不用硬编码，事件（消息）驱动的方式是常用的一种方法，这样我们就可以把后续通知的相关处理和主业务操作解耦开来，就算要进行拓展也是很安全和方便的。</p>
+<h2 id="spring-的-TransactionSynchronizationManager"><a href="#spring-的-TransactionSynchronizationManager" class="headerlink" title="spring 的 TransactionSynchronizationManager"></a>spring 的 TransactionSynchronizationManager</h2><p>在spring中，TransactionSynchronizationManager有一个事务提交后的回调支持，我们可以视线注册需要在事务commit后才进行的某些操作，如<code>afterCommit()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 这里是上下文</div><div class="line">TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() &#123;</div><div class="line">        @Override</div><div class="line">        public void suspend() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void resume() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void flush() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCommit(boolean readOnly) &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCompletion() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCommit() &#123;</div><div class="line">            log.info(&apos;afterCommit()&apos;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCompletion(int status) &#123;</div><div class="line">        &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>因为TransactionSynchronization是interface，所以TransactionSynchronization的实现是一个匿名内部类，相当于一个闭包，可以访问上下文的变量等，方便我们进行某些操作。</p>
+<h2 id="运行细节-源码"><a href="#运行细节-源码" class="headerlink" title="运行细节 ( 源码 )"></a>运行细节 ( 源码 )</h2><p>接下来看一下TransactionSynchronizationManager的实现，它的成员中，有个ThreadLocal副本，保存了不同线程已注册的同步操作：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static final ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations =</div><div class="line">			new NamedThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt;(&quot;Transaction synchronizations&quot;);</div></pre></td></tr></table></figure>
+<p>在spring运行过程中，事务相关的操作会通过TransactionInterceptor执行invocation：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	public Object invoke(final MethodInvocation invocation) throws Throwable &#123;</div><div class="line">		// Work out the target class: may be &#123;@code null&#125;.</div><div class="line">		// The TransactionAttributeSource should be passed the target class</div><div class="line">		// as well as the method, which may be from an interface.</div><div class="line">		Class&lt;?&gt; targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);</div><div class="line"></div><div class="line">		// Adapt to TransactionAspectSupport&apos;s invokeWithinTransaction...</div><div class="line">		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() &#123;</div><div class="line">			@Override</div><div class="line">			public Object proceedWithInvocation() throws Throwable &#123;</div><div class="line">				return invocation.proceed();</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">    protected Object invokeWithinTransaction(Method method, Class&lt;?&gt; targetClass, final InvocationCallback invocation)</div><div class="line">			throws Throwable &#123;</div><div class="line">            ...</div><div class="line">            ...</div><div class="line">			commitTransactionAfterReturning(txInfo);</div><div class="line">			return retVal;</div><div class="line">		&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>invokeWithinTransaction()是父类TransactionAspectSupport的方法，并会调用commitTransactionAfterReturning(TransactionInfo txInfo))来提交事务：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionInterceptor.java</div><div class="line"></div><div class="line">   protected void commitTransactionAfterReturning(TransactionInfo txInfo) &#123;</div><div class="line">	if (txInfo != null &amp;&amp; txInfo.hasTransaction()) &#123;</div><div class="line">		if (logger.isTraceEnabled()) &#123;</div><div class="line">			logger.trace(&quot;Completing transaction for [&quot; + txInfo.getJoinpointIdentification() + &quot;]&quot;);</div><div class="line">		&#125;</div><div class="line">		txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// AbstractPlatformTransactionManager.java</div><div class="line"></div><div class="line">@Override</div><div class="line">public final void commit(TransactionStatus status) throws TransactionException &#123;</div><div class="line">    ...</div><div class="line">	processCommit(defStatus);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>processCommit()这个方法中很详细的介绍了提交事务的处理细节，包括beforeCommit() / beforeCompletion() / afterCommit() / afterCompletion()在事务提交时的调用和发生异常时的处理方法，还可以看到如isNewTransaction、globalRollbackOnly等对事务处理的影响。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private void processCommit(DefaultTransactionStatus status) throws TransactionException &#123;</div><div class="line">    try &#123;</div><div class="line">        boolean beforeCompletionInvoked = false;</div><div class="line">        try &#123;</div><div class="line">            prepareForCommit(status);</div><div class="line">            triggerBeforeCommit(status);</div><div class="line">            triggerBeforeCompletion(status);</div><div class="line">            beforeCompletionInvoked = true;</div><div class="line">            boolean globalRollbackOnly = false;</div><div class="line">            if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) &#123;</div><div class="line">                globalRollbackOnly = status.isGlobalRollbackOnly();</div><div class="line">            &#125;</div><div class="line">            if (status.hasSavepoint()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Releasing transaction savepoint&quot;);</div><div class="line">                &#125;</div><div class="line">                status.releaseHeldSavepoint();</div><div class="line">            &#125;</div><div class="line">            else if (status.isNewTransaction()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Initiating transaction commit&quot;);</div><div class="line">                &#125;</div><div class="line">                doCommit(status);</div><div class="line">            &#125;</div><div class="line">            // Throw UnexpectedRollbackException if we have a global rollback-only</div><div class="line">            // marker but still didn&apos;t get a corresponding exception from commit.</div><div class="line">            if (globalRollbackOnly) &#123;</div><div class="line">                throw new UnexpectedRollbackException(</div><div class="line">                        &quot;Transaction silently rolled back because it has been marked as rollback-only&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        catch (UnexpectedRollbackException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_ROLLED_BACK);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (TransactionException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            if (isRollbackOnCommitFailure()) &#123;</div><div class="line">                doRollbackOnCommitException(status, ex);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                triggerAfterCompletion(status, TransactionSynchronization.STATUS_UNKNOWN);</div><div class="line">            &#125;</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (RuntimeException ex) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, ex);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (Error err) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, err);</div><div class="line">            throw err;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // Trigger afterCommit callbacks, with an exception thrown there</div><div class="line">        // propagated to callers but the transaction still considered as committed.</div><div class="line">        try &#123;</div><div class="line">            triggerAfterCommit(status);</div><div class="line">        &#125;</div><div class="line">        finally &#123;</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_COMMITTED);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        cleanupAfterCompletion(status);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到triggerAfterCommit()在doCommit(status)，不管是否抛出异常都会执行afterCompletion()，这个细节在平时开发也要留意，做好异常的处理。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   private void triggerAfterCommit(DefaultTransactionStatus status) &#123;</div><div class="line">	if (status.isNewSynchronization()) &#123;</div><div class="line">		if (status.isDebug()) &#123;</div><div class="line">			logger.trace(&quot;Triggering afterCommit synchronization&quot;);</div><div class="line">		&#125;</div><div class="line">		TransactionSynchronizationUtils.triggerAfterCommit();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>终于，前面我们注册在TransactionSynchronizationManager的TransactionSynchronization，在这里被get出来执行，如果注册了多个通知操作，会被按顺序执行，因为这个Set的实现是LinkedHashSet。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionSynchronizationUtils</div><div class="line">   public static void triggerAfterCommit() &#123;</div><div class="line">	invokeAfterCommit(TransactionSynchronizationManager.getSynchronizations());</div><div class="line">&#125;</div><div class="line"></div><div class="line">   public static void invokeAfterCommit(List&lt;TransactionSynchronization&gt; synchronizations) &#123;</div><div class="line">	if (synchronizations != null) &#123;</div><div class="line">		for (TransactionSynchronization synchronization : synchronizations) &#123;</div><div class="line">			synchronization.afterCommit();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>至今为止，以上讨论的是弱一致性的业务场景，一致性要求比较高的，需要分布式事务或者其他的手段来实现。<br>而且需要注意的，afterCommit()中的操作是同步的，和业务操作在同一个响应时间内的，所以，尽量不要做一些耗时的操作。<br>afterCommit()中，除了直接发送消息到队列，也可以使用本地队列来优化，用来存储和异步发送消息，这样会快很多。</p>
+<p>``</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[【spring】自我调用中transaction的常见问题]]></title>
+      <url>http://niko2014.github.io/2016/01/05/java/spring/spring-transactional-aop/</url>
+      <content type="html"><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><hr>
+<p>最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。<br>既然如此只好debug一下，接着很快便知道了。</p>
+<h2 id="代码大概是这样的"><a href="#代码大概是这样的" class="headerlink" title="代码大概是这样的"></a>代码大概是这样的</h2><hr>
+<p><a href="https://github.com/niko2014/blog-demo/tree/master/java/starter-jpa-transaction-self-invoke" target="_blank" rel="external">示例代码</a>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodMain() throws Exception &#123;</div><div class="line">        int status = 5;</div><div class="line">        methodA(status);</div><div class="line">        try &#123;</div><div class="line">            methodB(status);        // 位置A</div><div class="line">//            memberOrderCopyService.methodB(status);     // 位置B</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        methodC(status);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodA(Integer status) &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(1L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)</div><div class="line">    public void methodB(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(2L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">        th();</div><div class="line">    &#125;</div><div class="line">    public void methodC(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(3L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    private void th() throws Exception &#123;</div><div class="line">        throw new Exception(&quot;test&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>如上，methodB()中有一个持久化的操作，在那之后有可能会抛异常(th()方法)。<br>实习生的想法是，methodB()加一个注解@Transactional(rollbackFor)，想让methodB执行失败时回滚事务。<br>然而，这种是对spring aop不了解导致的错误。</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><hr>
+<p>我对实习生说了这个错误之后，他却坚持这样是有效的。。没办法，只好以理服人。断点debug，翻源码。</p>
+<p><img src="/images/spring-tx-aop/error_debug_01.png" alt=""></p>
+<p>如上图，可看到methodB()的调用栈，发现methodMaster()是经过拦截器后调用的（Cglib生成代理对象的情况下，AOP拦截和回调可在<code>DynamicAdvisedInterceptor.intercept()</code>方法中找到，如下）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Override</div><div class="line">public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line">    try &#123;</div><div class="line">        if (this.advised.exposeProxy) &#123;</div><div class="line">            // Make invocation available if necessary.</div><div class="line">            oldProxy = AopContext.setCurrentProxy(proxy);</div><div class="line">            setProxyContext = true;</div><div class="line">        &#125;</div><div class="line">        // May be null. Get as late as possible to minimize the time we</div><div class="line">        // &quot;own&quot; the target, in case it comes from a pool...</div><div class="line">        target = getTarget();</div><div class="line">        if (target != null) &#123;</div><div class="line">            targetClass = target.getClass();</div><div class="line">        &#125;</div><div class="line">        List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line">        Object retVal;</div><div class="line">        // Check whether we only have one InvokerInterceptor: that is,</div><div class="line">        // no real advice, but just reflective invocation of the target.</div><div class="line">        if (chain.isEmpty() &amp;&amp; Modifier.isPublic(method.getModifiers())) &#123;</div><div class="line">            // We can skip creating a MethodInvocation: just invoke the target directly.</div><div class="line">            // Note that the final invoker must be an InvokerInterceptor, so we know</div><div class="line">            // it does nothing but a reflective operation on the target, and no hot</div><div class="line">            // swapping or fancy proxying.</div><div class="line">            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</div><div class="line">            retVal = methodProxy.invoke(target, argsToUse);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // We need to create a method invocation...</div><div class="line">            retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();</div><div class="line">        &#125;</div><div class="line">        retVal = processReturnType(proxy, target, method, retVal);</div><div class="line">        return retVal;</div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        if (target != null) &#123;</div><div class="line">            releaseTarget(target);</div><div class="line">        &#125;</div><div class="line">        if (setProxyContext) &#123;</div><div class="line">            // Restore old proxy.</div><div class="line">            AopContext.setCurrentProxy(oldProxy);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在在来看methodB()：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_self_invoke.png" alt=""></p>
+<p>很明显，methodB是在methodMaster()中调用的，<code>TransactionInterceptor</code>并没有拦截，因此@Transactional是无效的。</p>
+<p>现在来对比一下，切换启用位置B代码（使用<code>memberOrderCopyService.methodB(status)</code>）的执行情况：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_of_copy_service.png" alt=""></p>
+<p>从上图可知，此时memberOrderCopyService.methodB()和原先的memberOrderService.methodMaster()都经过了TransactionInterceptor，然后通过代理invoke，这种是正确的，当有异常出现，事务也会正常回滚。</p>
+<p>其实，这是一个简单的问题，通过推理也可以猜到，而且如果内部每个方法都用拦截器，会是一个很大的性能问题。</p>
+<div style="display:none"><br>    FastClassBySpringCGLIB<br>    EnhancerBySpringCGLIB<br>    其实如果用Aspect也可以实现类似Transactional的功能，<br>    下次有空写一个<code>Aspect 和 Transactional</code>的对比。<br></div>
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？]]></title>
+      <url>http://niko2014.github.io/2015/12/30/books/self_ctrl/self_ctrl_6/</url>
+      <content type="html"><![CDATA[<h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><hr>
+<p><img src="/images/book_self_ctrl_6.png" alt=""></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[git 常用命令清单]]></title>
+      <url>http://niko2014.github.io/2015/12/26/git/git_cmd/</url>
+      <content type="html"><![CDATA[<p>这个清单是基于<a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单 - 阮一峰</a>的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。</p>
+<h1 id="常用-Git-命令清单"><a href="#常用-Git-命令清单" class="headerlink" title="常用 Git 命令清单"></a>常用 Git 命令清单</h1><blockquote>
+<p>我每天使用 Git ，但是很多命令记不住。<br>　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。</p>
+</blockquote>
+<p><img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png" alt=""></p>
+<blockquote>
+<p>下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。<br>Workspace：工作区<br>Index / Stage：暂存区<br>Repository：仓库区（或本地仓库）<br>Remote：远程仓库</p>
+</blockquote>
+<h1 id="安装配置-niko"><a href="#安装配置-niko" class="headerlink" title="安装配置 - niko"></a>安装配置 - niko</h1><h2 id="ssh-key-简要流程"><a href="#ssh-key-简要流程" class="headerlink" title="ssh key 简要流程"></a>ssh key 简要流程</h2><ol>
+<li>ssh-keygen -t rsa -C “foo@gmail.com”，选择生成位置（~/.ssh/foo_rsa）。</li>
+<li><p>ssh-agent -s<br>若提示 <code>Could not open a connection to your authentication agent.</code>, 使用：</p>
+<p> eval <code>ssh-agent -s</code></p>
+</li>
+<li><p>ssh-add ~/.ssh/foo_rsa</p>
+</li>
+<li>clip &lt; ~/.ssh/foo_rsa.pub</li>
+<li>添加到远程服务器的ssh_keys；</li>
+<li>git clone …</li>
+</ol>
+<h3 id="设置ssh配置"><a href="#设置ssh配置" class="headerlink" title="设置ssh配置"></a>设置ssh配置</h3><p>vim ~/.ssh/config</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Host dev</div><div class="line">    HostName dev.example.com</div><div class="line">    Port 22000</div><div class="line">    User fooey&lt;/p&gt;</div><div class="line">Host github.com</div><div class="line">    IdentityFile ~/.ssh/github.key</div></pre></td></tr></table></figure>
+<div style="display:none"><br><a href="http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/" target="_blank" rel="external">http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/</a><br></div>
+
+<h1 id="一、新建代码库"><a href="#一、新建代码库" class="headerlink" title="一、新建代码库"></a>一、新建代码库</h1><ul>
+<li><p>在当前目录新建一个Git代码库<br>$ git init</p>
+</li>
+<li><p>新建一个目录，将其初始化为Git代码库<br>$ git init [project-name]</p>
+</li>
+<li><p>下载一个项目和它的整个代码历史<br>$ git clone [url]</p>
+</li>
+</ul>
+<h1 id="二、git-配置"><a href="#二、git-配置" class="headerlink" title="二、git 配置"></a>二、git 配置</h1><p>　　Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。</p>
+<ul>
+<li><p>显示当前的Git配置<br>$ git config –list</p>
+</li>
+<li><p>编辑Git配置文件<br>$ git config -e [–global]</p>
+</li>
+<li><p>设置提交代码时的用户信息<br>$ git config [–global] user.name “[name]”<br>$ git config [–global] user.email “[email address]”</p>
+</li>
+<li><p>push pull 策略</p>
+</li>
+</ul>
+<p>ref ： <a href="http://blog.angular.in/git-pushmo-ren-fen-zhi/" target="_blank" rel="external">http://blog.angular.in/git-pushmo-ren-fen-zhi/</a></p>
+<p><code>push.default</code> 未设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">warning: push.default is unset; its implicit value is changing in</div><div class="line">Git 2.0 from &apos;matching&apos; to &apos;simple&apos;. To squelch this message</div><div class="line">and maintain the current behavior after the default changes, use:</div><div class="line"></div><div class="line">  git config --global push.default matching</div><div class="line"></div><div class="line">To squelch this message and adopt the new behavior now, use:</div><div class="line"></div><div class="line">  git config --global push.default simple</div><div class="line"></div><div class="line">When push.default is set to &apos;matching&apos;, git will push local branches</div><div class="line">to the remote branches that already exist with the same name.</div><div class="line"></div><div class="line">In Git 2.0, Git will default to the more conservative &apos;simple&apos;</div><div class="line">behavior, which only pushes the current branch to the corresponding</div><div class="line">remote branch that &apos;git pull&apos; uses to update the current branch.</div><div class="line"></div><div class="line">See &apos;git help config&apos; and search for &apos;push.default&apos; for further information.</div><div class="line">(the &apos;simple&apos; mode was introduced in Git 1.7.11. Use the similar mode</div><div class="line">&apos;current&apos; instead of &apos;simple&apos; if you sometimes use older versions of Git)</div></pre></td></tr></table></figure>
+<p>git config –global push.default ‘option’</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">option：</div><div class="line"></div><div class="line">nothing - push操作无效，除非显式指定远程分支，例如git push origin develop（我觉得。。。可以给那些不愿学git的同事配上此项）。</div><div class="line"></div><div class="line">current - push当前分支到远程同名分支，如果远程同名分支不存在则自动创建同名分支。</div><div class="line"></div><div class="line">upstream - push当前分支到它的upstream分支上（这一项其实用于经常从本地分支push/pull到同一远程仓库的情景，这种模式叫做central workflow）。</div><div class="line"></div><div class="line">simple - simple和upstream是相似的，只有一点不同，simple必须保证本地分支和它的远程 upstream分支同名，否则会拒绝push操作。</div><div class="line"></div><div class="line">matching - push所有本地和远程两端都存在的同名分支。</div></pre></td></tr></table></figure>
+<h1 id="三、增加-删除文件"><a href="#三、增加-删除文件" class="headerlink" title="三、增加/删除文件"></a>三、增加/删除文件</h1><ul>
+<li><p>添加指定文件到暂存区<br>$ git add [file1] [file2] …</p>
+</li>
+<li><p>添加指定目录到暂存区，包括子目录<br>$ git add [dir]</p>
+</li>
+<li><p>添加当前目录的所有文件到暂存区<br>git add .<br>git add –all (对删除文件有效)</p>
+</li>
+<li><p>删除工作区文件，并且将这次删除放入暂存区<br>git rm [file1] [file2] …</p>
+</li>
+<li><p>停止追踪指定文件，但该文件会保留在工作区<br>git rm <code>--cached</code> [file]</p>
+</li>
+<li><p>取消放入暂存区<br>use “git reset HEAD <file>…” to unstage</file></p>
+</li>
+<li><p>改名文件，并且将这个改名放入暂存区<br>git mv [file-original] [file-renamed]</p>
+</li>
+<li><p>取消改名<br>git mv [file-renamed] [file-original]</p>
+</li>
+</ul>
+<h1 id="四、代码提交"><a href="#四、代码提交" class="headerlink" title="四、代码提交"></a>四、代码提交</h1><hr>
+<ul>
+<li><p>提交暂存区到仓库区<br>git commit -m [message]</p>
+</li>
+<li><p>提交暂存区的指定文件到仓库区<br>git commit [file1] [file2] … -m [message]</p>
+</li>
+<li><p>提交工作区自上次commit之后的变化，直接到仓库区<br>git commit -a</p>
+</li>
+<li><p>提交时显示所有diff信息<br>git commit -v</p>
+</li>
+<li><p>使用一次新的commit，替代上一次提交</p>
+</li>
+<li>重做上一次commit，并包括指定文件的新变化</li>
+<li>如果代码没有任何新变化，则用来改写上一次commit的提交信息<br>$ git commit <code>--amend</code> -m [message]<br>$ git commit –amend   …</li>
+</ul>
+<h1 id="五、分支"><a href="#五、分支" class="headerlink" title="五、分支"></a>五、分支</h1><ul>
+<li><p>列出所有本地分支<br>$ git branch</p>
+</li>
+<li><p>列出所有远程分支<br>$ git branch -r</p>
+</li>
+<li><p>列出所有本地分支和远程分支<br>$ git branch -a</p>
+</li>
+<li><p>新建一个分支，但依然停留在当前分支<br>$ git branch [branch-name]</p>
+</li>
+<li><p>新建一个分支，并切换到该分支<br>$ git checkout -b [branch]</p>
+</li>
+<li><p>新建一个分支，指向指定commit<br>$ git branch [branch] [commit]</p>
+</li>
+<li><p>新建一个分支，与指定的远程分支建立追踪关系<br>$ git branch –track [branch] [remote-branch]</p>
+</li>
+<li><p>切换到指定分支，并更新工作区<br>$ git checkout [branch-name]</p>
+</li>
+<li><p>建立追踪关系，在现有分支与指定的远程分支之间<br>$ git branch –set-upstream [branch] [remote-branch]</p>
+</li>
+<li><p>合并指定分支到当前分支<br>$ git merge [branch]</p>
+</li>
+<li><p>选择一个commit，合并进当前分支<br>$ git <code>cherry-pick</code> [commit]</p>
+</li>
+<li><p>终止(abort) merge 操作：<br>$ git reset –hard HEAD<br><a href="http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge" target="_blank" rel="external">http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge</a></p>
+</li>
+<li><p>删除分支<br>$ git branch -d [branch-name]</p>
+</li>
+<li><p>删除远程分支<br>git push origin –delete <branchname><br>git push origin –delete<br>git branch -dr</branchname></p>
+</li>
+</ul>
+<h1 id="六、标签"><a href="#六、标签" class="headerlink" title="六、标签"></a>六、标签</h1><ul>
+<li><p>列出所有tag<br>$ git tag</p>
+</li>
+<li><p>新建一个tag在当前commit<br>git tag [tag]<br>注释：<br>git tag -a v1.4 -m ‘my version 1.4’</p>
+</li>
+<li><p>新建一个tag在指定commit<br>$ git tag [tag] [commit]</p>
+</li>
+<li><p>查看tag信息<br>$ git show [tag]</p>
+</li>
+<li><p>提交指定tag<br>$ git push [remote] [tag]</p>
+</li>
+<li><p>提交所有tag<br>$ git push [remote] –tags</p>
+</li>
+<li><p>新建一个分支，指向某个tag<br>$ git checkout -b [branch] [tag]</p>
+</li>
+</ul>
+<h1 id="七、查看信息"><a href="#七、查看信息" class="headerlink" title="七、查看信息"></a>七、查看信息</h1><ul>
+<li><p>显示有变更的文件<br>$ git status</p>
+</li>
+<li><p>GUI 审查代码<br>git difftool</p>
+</li>
+<li><p>显示当前分支的版本历史<br>$ git log</p>
+</li>
+<li><p>显示commit历史，以及每次commit发生变更的文件<br>$ git log –stat</p>
+</li>
+<li><p>显示某个文件的版本历史，包括文件改名<br>$ git log –follow [file]<br>$ git whatchanged [file]</p>
+</li>
+<li><p>显示指定文件相关的每一次diff<br>$ git log -p [file]</p>
+</li>
+<li><p>华丽的分支log<br>$ git log –graph –decorate –pretty=oneline –abbrev-commit develop  origin/develop  temp-branch</p>
+</li>
+<li><p>显示指定文件是什么人在什么时间修改过<br><code>git blame</code> [file]</p>
+</li>
+<li><p>显示暂存区和工作区的差异<br>git diff</p>
+</li>
+<li><p>显示暂存区和上一个commit的差异<br>$ git diff <code>--cached</code> []</p>
+</li>
+<li><p>显示工作区与当前分支最新commit之间的差异<br>$ git diff <code>HEAD</code></p>
+</li>
+<li><p>显示两次提交之间的差异<br>$ git diff [first-branch]…[second-branch]</p>
+</li>
+<li><p>显示某次提交的元数据和内容变化<br>$ git show [commit]</p>
+</li>
+<li><p>显示某次提交发生变化的文件<br>$ git show <code>--name-only</code> [commit]</p>
+</li>
+<li><p>显示某次提交时，某个文件的内容<br>$ git show [commit]:[filename]</p>
+</li>
+<li><p>显示当前分支的最近几次提交<br>git reflog</p>
+<blockquote>
+<p>Reference logs, or “reflogs”, record when the tips of branches and other references were updated in the local repository. Reflogs are useful in various Git commands, to specify the old value of a reference.</p>
+</blockquote>
+</li>
+</ul>
+<p>reflog可以看到被删除的记录(如)，而git log不能。</p>
+<h1 id="八、远程同步"><a href="#八、远程同步" class="headerlink" title="八、远程同步"></a>八、远程同步</h1><hr>
+<ul>
+<li>下载远程仓库的所有变动<br>$ git fetch [remote]</li>
+</ul>
+<blockquote>
+<p>Download objects and refs from another repository<br>用”git fetch”” 来执行”git pull”前半部分的工作， 但是这条命令并不会把抓下来的修改合并到当前分支里。</p>
+</blockquote>
+<ul>
+<li><p>显示所有远程仓库<br>$ git remote -v</p>
+</li>
+<li><p>显示某个远程仓库的信息<br>$ git remote show [remote]</p>
+</li>
+<li><p>增加一个新的远程仓库，并命名<br>$ git remote add [shortname] [url]</p>
+</li>
+<li><p>取回远程仓库的变化，并与本地分支合并<br>$ git pull [remote] [branch]</p>
+</li>
+<li><p>上传本地指定分支到远程仓库<br>$ git push [remote] [branch]</p>
+</li>
+<li><p>推送本地指定的分支名到远程仓库 - niko<br>$ git push origin develop:develop_remote<br>$ git push <remote> <local branch="" name="">:<remote branch="" to="" push="" into=""></remote></local></remote></p>
+</li>
+<li><p>强行推送当前分支到远程仓库，即使有冲突<br>$ git push [remote] –force</p>
+</li>
+<li><p>推送所有分支到远程仓库<br>$ git push [remote] –all</p>
+</li>
+<li><p>with rebase<br>git pull –rebase</p>
+</li>
+</ul>
+<h1 id="九、撤销"><a href="#九、撤销" class="headerlink" title="九、撤销"></a>九、撤销</h1><ul>
+<li><p>恢复暂存区的指定文件到工作区<br>$ git checkout [file]</p>
+</li>
+<li><p>恢复某个commit的指定文件到工作区<br>$ git checkout [commit] [file]</p>
+</li>
+<li><p>恢复上一个commit的所有文件到工作区<br>$ git checkout .</p>
+</li>
+<li><p>取消commit<br>$ git reset –soft HEAD~</p>
+</li>
+<li><p>重置暂存区的指定文件，与上一次commit保持一致，但工作区不变<br>$ git reset [file]<br>REF: <a href="http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit" target="_blank" rel="external">http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit</a></p>
+</li>
+<li><p>重置暂存区与工作区，与上一次commit保持一致<br>$ git <code>reset --hard</code></p>
+</li>
+<li><p>重置当前分支的指针为指定commit，同时重置暂存区，但工作区不变<br>$ git reset [commit]</p>
+</li>
+<li><p>重置当前分支的HEAD为指定commit，同时重置暂存区和工作区，与指定commit一致<br>$ git reset <code>--hard</code> [commit]</p>
+</li>
+<li><p>重置当前HEAD为指定commit，但保持暂存区和工作区不变<br>$ git reset <code>--keep</code> [commit]</p>
+</li>
+<li><p>undo reset<br>git reflog<br>git reset HEAD@{1}<br><a href="http://stackoverflow.com/questions/2510276/undoing-git-reset" target="_blank" rel="external">undo reset</a></p>
+</li>
+<li><p>新建一个commit，用来撤销指定commit</p>
+</li>
+<li><p>后者的所有变化都将被前者抵消，并且应用到当前分支<br>$ git <code>revert [commit]</code></p>
+</li>
+<li><p>恢复删除的分支<br>// TODO<br><a href="http://stackoverflow.com/questions/16793637/recover-deleted-branch-git" target="_blank" rel="external">http://stackoverflow.com/questions/16793637/recover-deleted-branch-git</a><br><a href="https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html" target="_blank" rel="external">https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html</a></p>
+</li>
+<li><p>TODO rebase<br>If you prefer to skip this patch,<br><a href="https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/" target="_blank" rel="external">https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/</a></p>
+</li>
+</ul>
+<h1 id="十、其他"><a href="#十、其他" class="headerlink" title="十、其他"></a>十、其他</h1><ul>
+<li><p>生成一个可供发布的压缩包<br>git archive<br>via：ruanyifeng.com</p>
+</li>
+<li><p>git rebase<br>使分支历史看起来像没有经过合并一样。</p>
+</li>
+<li><p>分支上一次合并的信息 - niko<br>git show –summary <code>git merge-base A B</code></p>
+</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？]]></title>
+      <url>http://niko2014.github.io/2015/12/23/books/self_ctrl/self_ctrl_5/</url>
+      <content type="html"><![CDATA[<h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><hr>
+<p><img src="/images/book_self_ctrl_5.png" alt=""></p>
+<p>##</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[【转】 如何用十条命令在一分钟内检查Linux服务器性能]]></title>
+      <url>http://niko2014.github.io/2015/12/20/linux/ten-cmd-linux-performance/</url>
+      <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过执行以下命令，可以在1分钟内对系统资源使用情况有个大致的了解。</p>
+<p>其中一些命令需要安装sysstat包，有一些由procps包提供。这些命令的输出，有助于快速定位性能瓶颈，检查出所有资源（CPU、内存、磁盘IO等）的利用率（utilization）、饱和度（saturation）和错误（error）度量，也就是所谓的<a href="http://www.brendangregg.com/usemethod.html" target="_blank" rel="external">USE方法</a>。</p>
+<p>下面我们来逐一介绍下这些命令，有关这些命令更多的参数和说明，请参照命令的手册。</p>
+<h2 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ uptime</div><div class="line">23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02</div></pre></td></tr></table></figure>
+<p>分别表示1分钟、5分钟、15分钟的平均负载情况</p>
+<h2 id="dmesg-tail"><a href="#dmesg-tail" class="headerlink" title="dmesg | tail"></a>dmesg | tail</h2><p>该命令会输出系统日志，可以帮助排查性能问题（如内核的oom kill和一次TCP丢包等）。</p>
+<h2 id="vmstat-1"><a href="#vmstat-1" class="headerlink" title="vmstat 1"></a>vmstat 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">niko@ubuntu:~$ vmstat 1</div><div class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</div><div class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</div><div class="line"> 2  0   4176 2746396 160728 1916384    0    0    15    85   12   47  9  7 84  0  0</div><div class="line"> 0  0   4176 2746228 160728 1916416    0    0     0     0 2129 4270  3  4 93  0  0</div><div class="line"> 1  0   4176 2746420 160748 1916468    0    0     0   372 1865 3960  4  5 91  0  0</div><div class="line"> 0  0   4176 2744964 160748 1916416    0    0     0     0 2000 4256  2  4 93  0  0</div><div class="line"> 1  0   4176 2745316 160748 1916420    0    0     0     0 2032 4288  2  4 94  0  0</div><div class="line"> 0  0   4176 2745052 160748 1916420    0    0     0     0 2070 4496  1  5 94  0  0</div><div class="line"> 0  0   4176 2744984 160748 1916420    0    0     0     0 2099 4202  2  5 93  0  0</div></pre></td></tr></table></figure>
+<p>vmstat(8) 命令，每行会输出一些系统核心指标，这些指标可以让我们更详细的了解系统状态。后面跟的参数1，表示每秒输出一次统计信息，表头提示了每一列的含义，这几介绍一些和性能调优相关的列：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">FIELD DESCRIPTION FOR VM MODE</div><div class="line">   Procs</div><div class="line">       r: The number of runnable processes (running or waiting for run time).</div><div class="line">       b: The number of processes in uninterruptible sleep.</div><div class="line"></div><div class="line">   Memory</div><div class="line">       swpd: the amount of virtual memory used.</div><div class="line">       free: the amount of idle memory.</div><div class="line">       buff: the amount of memory used as buffers.</div><div class="line">       cache: the amount of memory used as cache.</div><div class="line">       inact: the amount of inactive memory.  (-a option)</div><div class="line">       active: the amount of active memory.  (-a option)</div><div class="line"></div><div class="line">   Swap</div><div class="line">       si: Amount of memory swapped in from disk (/s).</div><div class="line">       so: Amount of memory swapped to disk (/s).</div><div class="line"></div><div class="line">   IO</div><div class="line">       bi: Blocks received from a block device (blocks/s).</div><div class="line">       bo: Blocks sent to a block device (blocks/s).</div><div class="line"></div><div class="line">   System</div><div class="line">       in: The number of interrupts per second, including the clock.</div><div class="line">       cs: The number of context switches per second.</div></pre></td></tr></table></figure>
+<p>r：等待在CPU资源的进程数。这个数据比平均负载更加能够体现CPU负载情况，数据中不包含等待IO的进程。如果这个数值大于机器CPU核数，那么机器的CPU资源已经饱和。<br>free：系统可用内存数（以千字节为单位），如果剩余内存不足，也会导致系统性能问题。下文介绍到的free命令，可以更详细的了解系统内存的使用情况。</p>
+<p>si, so：交换区写入和读取的数量。如果这个数据不为0，说明系统已经在使用交换区（swap），机器物理内存已经不足。</p>
+<p>us, sy, id, wa, st：这些都代表了CPU时间的消耗，它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen，一般被其他虚拟机消耗）。</p>
+<p>上述这些CPU时间，可以让我们很快了解CPU是否出于繁忙状态。一般情况下，如果用户时间和系统时间相加非常大，CPU出于忙于执行指令。如果IO等待时间很长，那么系统的瓶颈可能在磁盘IO。</p>
+<p>示例命令的输出可以看见，大量CPU时间消耗在用户态，也就是用户应用程序消耗了CPU时间。这不一定是性能问题，需要结合r队列，一起分析。</p>
+<h2 id="mpstat-P-ALL-1"><a href="#mpstat-P-ALL-1" class="headerlink" title="mpstat -P ALL 1"></a>mpstat -P ALL 1</h2><p>显示每个CPU的使用情况：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">niko@ubuntu:~$ mpstat -P ALL 1</div><div class="line">Linux 3.13.0-39-generic (ubuntu) 	03/18/2016 	_x86_64_	(4 CPU)</div><div class="line"></div><div class="line">01:18:13 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle</div><div class="line">01:18:14 PM  all    8.70    0.00   18.84    0.58    0.00    1.45    0.00    0.00    0.00   70.43</div><div class="line">01:18:14 PM    0    7.06    0.00   16.47    0.00    0.00    2.35    0.00    0.00    0.00   74.12</div><div class="line">01:18:14 PM    1    7.78    0.00   18.89    1.11    0.00    2.22    0.00    0.00    0.00   70.00</div><div class="line">01:18:14 PM    2   11.76    0.00   17.65    2.35    0.00    1.18    0.00    0.00    0.00   67.06</div><div class="line">01:18:14 PM    3    8.24    0.00   21.18    0.00    0.00    0.00    0.00    0.00    0.00   70.59</div></pre></td></tr></table></figure>
+<h2 id="pidstat-1"><a href="#pidstat-1" class="headerlink" title="pidstat 1"></a>pidstat 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ pidstat 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)</div><div class="line">07:41:02 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</div><div class="line">07:41:03 PM     0         9    0.00    0.94    0.00    0.94     1  rcuos/0</div><div class="line">07:41:03 PM     0      4214    5.66    5.66    0.00   11.32    15  mesos-slave</div><div class="line">07:41:03 PM     0      4354    0.94    0.94    0.00    1.89     8  java</div><div class="line">07:41:03 PM     0      6521 1596.23    1.89    0.00 1598.11    27  java</div><div class="line">07:41:03 PM     0      6564 1571.70    7.55    0.00 1579.25    28  java</div><div class="line">07:41:03 PM 60004     60154    0.94    4.72    0.00    5.66     9  pidstat</div><div class="line">07:41:03 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</div><div class="line">07:41:04 PM     0      4214    6.00    2.00    0.00    8.00    15  mesos-slave</div><div class="line">07:41:04 PM     0      6521 1590.00    1.00    0.00 1591.00    27  java</div><div class="line">07:41:04 PM     0      6564 1573.00   10.00    0.00 1583.00    28  java</div><div class="line">07:41:04 PM   108      6718    1.00    0.00    0.00    1.00     0  snmp-pass</div><div class="line">07:41:04 PM 60004     60154    1.00    4.00    0.00    5.00     9  pidstat</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>pidstat命令输出进程的CPU占用率，该命令会持续输出，并且不会覆盖之前的数据，可以方便观察系统动态。如上的输出，可以看见两个JAVA进程占用了将近1600%的CPU时间，既消耗了大约16个CPU核心的运算资源。</p>
+<h2 id="iostat-xz-1"><a href="#iostat-xz-1" class="headerlink" title="iostat -xz 1"></a>iostat -xz 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ iostat -xz 1</div><div class="line"></div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)</div><div class="line"></div><div class="line">avg-cpu:  %user   %nice %system %iowait  %steal   %idle</div><div class="line">          73.96    0.00    3.73    0.03    0.06   22.21</div><div class="line"></div><div class="line">Device:   rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util</div><div class="line">xvda        0.00     0.23    0.21    0.18     4.52     2.08    34.37     0.00    9.98   13.80    5.42   2.44   0.09</div><div class="line">xvdb        0.01     0.00    1.02    8.94   127.97   598.53   145.79     0.00    0.43    1.78    0.28   0.25   0.25</div><div class="line">xvdc        0.01     0.00    1.02    8.86   127.79   595.94   146.50     0.00    0.45    1.82    0.30   0.27   0.26</div><div class="line">dm-0        0.00     0.00    0.69    2.32    10.47    31.69    28.01     0.01    3.23    0.71    3.98   0.13   0.04</div><div class="line">dm-1        0.00     0.00    0.00    0.94     0.01     3.78     8.00     0.33  345.84    0.04  346.81   0.01   0.00</div><div class="line">dm-2        0.00     0.00    0.09    0.07     1.35     0.36    22.50     0.00    2.55    0.23    5.62   1.78   0.03</div><div class="line">[...]</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>iostat命令主要用于查看机器磁盘IO情况。该命令输出的列，主要含义是：</p>
+<p>r/s, w/s, rkB/s, wkB/s：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。</p>
+<p>await：IO操作的平均等待时间，单位是毫秒。这是应用程序在和磁盘交互时，需要消耗的时间，包括IO等待和实际操作的耗时。如果这个数值过大，可能是硬件设备遇到了瓶颈或者出现故障。</p>
+<p>avgqu-sz：向设备发出的请求平均数量。如果这个数值大于1，可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）。</p>
+<p>%util：设备利用率。这个数值表示设备的繁忙程度，经验值是如果超过60，可能会影响IO性能（可以参照IO操作平均等待时间）。如果到达100%，说明硬件设备已经饱和。<br>如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。</p>
+<h2 id="free-m"><a href="#free-m" class="headerlink" title="free -m"></a><code>free</code> -m</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ free -m</div><div class="line">             total       used       free     shared    buffers     cached</div><div class="line">Mem:        245998      24545     221453         83         59        541</div><div class="line">-/+ buffers/cache:      23944     222053</div><div class="line">Swap:            0          0          0</div></pre></td></tr></table></figure>
+<p>free命令可以查看系统内存的使用情况，-m参数表示按照兆字节展示。最后两列分别表示用于IO缓存的内存数，和用于文件系统页缓存的内存数。需要注意的是，第二行-/+ buffers/cache，看上去缓存占用了大量内存空间。这是Linux系统的内存使用策略，尽可能的利用内存，如果应用程序需要内存，这部分内存会立即被回收并分配给应用程序。因此，这部分内存一般也被当成是可用内存。</p>
+<p>如果可用内存非常少，系统可能会动用交换区（如果配置了的话），这样会增加IO开销（可以在iostat命令中提现），降低系统性能。</p>
+<h2 id="网络吞吐"><a href="#网络吞吐" class="headerlink" title="网络吞吐"></a>网络吞吐</h2><p><code>sar -n DEV 1</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sar -n DEV 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)</div><div class="line">12:16:48 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</div><div class="line">12:16:49 AM      eth0  18763.00   5032.00  20686.42    478.30      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM        lo     14.00     14.00      1.36      1.36      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</div><div class="line">12:16:50 AM      eth0  19763.00   5101.00  21999.10    482.56      0.00      0.00      0.00      0.00</div><div class="line">12:16:50 AM        lo     20.00     20.00      3.25      3.25      0.00      0.00      0.00      0.00</div><div class="line">12:16:50 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>sar命令在这里可以查看网络设备的吞吐率。在排查性能问题时，可以通过网络设备的吞吐量，判断网络设备是否已经饱和。如示例输出中，eth0网卡设备，吞吐率大概在22 Mbytes/s，既176 Mbits/sec，没有达到1Gbit/sec的硬件上限。</p>
+<p><code>sar -n TCP,ETCP 1</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sar -n TCP,ETCP 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)</div><div class="line">12:17:19 AM  active/s passive/s    iseg/s    oseg/s</div><div class="line">12:17:20 AM      1.00      0.00  10233.00  18846.00</div><div class="line">12:17:19 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s</div><div class="line">12:17:20 AM      0.00      0.00      0.00      0.00      0.00</div><div class="line">12:17:20 AM  active/s passive/s    iseg/s    oseg/s</div><div class="line">12:17:21 AM      1.00      0.00   8359.00   6039.00</div><div class="line">12:17:20 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s</div><div class="line">12:17:21 AM      0.00      0.00      0.00      0.00      0.00</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>sar命令在这里用于查看TCP连接状态，其中包括：</p>
+<p>active/s：每秒本地发起的TCP连接数，既通过connect调用创建的TCP连接；<br>passive/s：每秒远程发起的TCP连接数，即通过accept调用创建的TCP连接；<br>retrans/s：每秒TCP重传数量；</p>
+<p>atmptf/s<br>     The number of times per second TCP connections have made a direct transition to the CLOSED state from either the SYN-SENT state or the SYN-RCVD state, plus the number of times  per  second  TCP  connections<br>     have made a direct transition to the LISTEN state from the SYN-RCVD state [tcpAttemptFails].</p>
+<p>estres/s<br>     The number of times per second TCP connections have made a direct transition to the CLOSED state from either the ESTABLISHED state or the CLOSE-WAIT state [tcpEstabResets].</p>
+<p>retrans/s<br>     The total number of segments retransmitted per second - that is, the number of TCP segments transmitted containing one or more previously transmitted octets [tcpRetransSegs].</p>
+<p>isegerr/s<br>     The total number of segments received in error (e.g., bad TCP checksums) per second [tcpInErrs].</p>
+<p>TCP连接数可以用来判断性能问题是否由于建立了过多的连接，进一步可以判断是主动发起的连接，还是被动接受的连接。TCP重传可能是因为网络环境恶劣，或者服务器压力过大导致丢包。</p>
+<h2 id="top"><a href="#top" class="headerlink" title="top"></a><code>top</code></h2><p>top命令包含了前面好几个命令的检查的内容。比如系统负载情况（uptime）、系统内存使用情况（free）、系统CPU使用情况（vmstat）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，top命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。</p>
+<p>但是，top命令相对于前面一些命令，输出是一个瞬间值，如果不持续盯着，可能会错过一些线索。这时可能需要暂停top命令刷新，来记录和比对数据。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>排查Linux服务器性能问题还有很多工具，上面介绍的一些命令，可以帮助我们快速的定位问题。例如前面的示例输出，多个证据证明有JAVA进程占用了大量CPU资源，之后的性能调优就可以针对应用程序进行。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p>【1】原文：<a href="http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html" target="_blank" rel="external">Netflix性能工程团队的这篇博文</a><br>【2】 <a href="http://www.infoq.com/cn/news/2015/12/linux-performance?utm_campaign=rightbar_v2&amp;utm_source=infoq&amp;utm_medium=news_link&amp;utm_content=link_text" target="_blank" rel="external">金灵杰 译 InfoQ</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在ubuntu上安装vmware]]></title>
+      <url>http://niko2014.github.io/2015/12/19/linux/install/install_vmware_on_ubuntu/</url>
+      <content type="html"><![CDATA[<h1 id="install-vmware-on-ubuntu"><a href="#install-vmware-on-ubuntu" class="headerlink" title="install vmware on ubuntu"></a>install vmware on ubuntu</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">download VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle</div><div class="line">chmod u+x ./VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle</div><div class="line">./VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle</div></pre></td></tr></table></figure>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="super-键被宿主机拦截"><a href="#super-键被宿主机拦截" class="headerlink" title="super 键被宿主机拦截"></a>super 键被宿主机拦截</h2><p><a href="http://askubuntu.com/questions/485303/how-do-i-stop-ubuntu-from-intercepting-the-super-key-when-running-vmware" target="_blank" rel="external">解决方法</a>是:</p>
+<blockquote>
+<p>Pressing the Super key invokes the Unity Dash.<br>Pressing and holding the Super key invokes the keyboard shortcut overlay.<br>I suspect you are doing the later, based on your description.<br>Nevertheless, you could change the key used to invoke the Unity Dash using Unity Tweak Tool. This way, VMware will get your key-press signal immediately, when you press Super.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">Install Unity Tweak Tool</div><div class="line"></div><div class="line">sudo apt-get install unity-tweak-tool</div><div class="line"></div><div class="line">Launch Unity Tewak Tool.</div><div class="line"></div><div class="line">In the Unity section, select Additional.</div><div class="line"></div><div class="line">Click on &lt;Super&gt; next to Show the launcher.</div><div class="line"></div><div class="line">Select a different key (or key-combination) to invoke the launcher.</div></pre></td></tr></table></figure>
+<h2 id="cached-Memory"><a href="#cached-Memory" class="headerlink" title="cached Memory"></a>cached Memory</h2><p>有同学反应, 在关闭vmware后, free内存并没有增加, 大概是下面这样: </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">top - 11:59:35 up  3:14, 13 users,  load average: 0.49, 0.52, 0.51</div><div class="line">Tasks: 264 total,   3 running, 261 sleeping,   0 stopped,   0 zombie</div><div class="line">%Cpu(s):  4.8 us,  2.9 sy,  0.0 ni, 92.0 id,  0.2 wa,  0.1 hi,  0.0 si,  0.0 st</div><div class="line">KiB Mem:  16380532 total, 12103952 used,  4276580 free,  3168896 buffers</div><div class="line">KiB Swap:  8386556 total,        0 used,  8386556 free.  5171564 cached Mem</div><div class="line"></div><div class="line">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                        </div><div class="line"> 6520 niko      20   0 4635876 971856  35672 S   4.6  5.9  15:55.71 java                                           </div><div class="line">10006 niko      20   0 2750752 365712 101492 S   1.7  2.2   0:58.00 et</div></pre></td></tr></table></figure>
+<p>如上, 我的是16G内存的机子, 但是显示使用了12G, 刚才关闭了5G的vmware虚拟机, 但是内存仍在<code>cached Mem</code>中.</p>
+<p>其实, 当你执行复制文件时, 也是这样的, 不用担心, 相关内容请看另一篇博客.<br>// TODO</p>
+<p>#</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[java版目录watchdog]]></title>
+      <url>http://niko2014.github.io/2015/12/01/java/utils/java_dir_watchdog/</url>
+      <content type="html"><![CDATA[<p>工作中我们经常会用到监听目录的功能, 当目录中有文件增加删除等操作时, 执行某些任务. 如果是Java来写, 怎么做呢 ?</p>
+<h1 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h1><p>实现这个功能, 我们要使用到<code>WatchService</code>和<code>Path</code>这两个东西, 首先创建一个WatchService:</p>
+<pre><code>WatchService watcher = FileSystems.getDefault().newWatchService();
+</code></pre><p>接着就可以注册这个WatchService到某个Path了:</p>
+<pre><code>Path dir = ...;
+WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+`ENTRY_CREATE`等事件定义在`StandardWatchEventKinds`中.
+</code></pre><p>注册后, 我们使用<code>WatchService.take()</code>就可以获取目录变更的事件了, 若没有, 则wait .</p>
+<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><p>接下来就是写一个工具类<code>WatchDirUtils</code>, 用来接收和注册监听请求及回调.</p>
+<p>相对于<code>WatchDirUtils</code>, 客户端的需求无非就两个, 一个是要监听的目录, 另一个是变更时的Callback. 我们可以封装成一个类.</p>
+<p>我们暂且定义<code>WatchPath</code>和<code>WatchCallback</code>两个接口:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchPath &#123;</div><div class="line">    public java.nio.file.Path getPath();</div><div class="line">&#125;</div><div class="line">public interface WatchCallback &#123;</div><div class="line">    public void handle(WatchEvent&lt;?&gt; event);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后, 定义一个<code>WatchRequest</code>接口, 继承<code>WatchPath</code>和<code>WatchCallback</code>, 同时要求返回是否递归监听.<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchRequest extends WatchPath, WatchCallback &#123;</div><div class="line">    public boolean isRecursive();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接口定义好了, 接下来就是实现了, 我们新建一个<code>DebugWatchRequest</code>实现类,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class DebugWatchRequest implements WatchRequest &#123;</div><div class="line">    ...</div><div class="line">    @Override</div><div class="line">    public void handle(WatchEvent&lt;Path&gt; ev) &#123;</div><div class="line">        Path name = ev.context();</div><div class="line">        Path child = dir.resolve(name);</div><div class="line">        System.out.format(&quot;%s: %s\n&quot;, event.kind().name(), child);</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>封装好了watch请求, 只需要定义一个静态方法, 把请求传入即可.</p>
+<pre><code>WatchDirUtils.register(new DebugWatchRequest(Path dir));
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static void register(WatchRequest watchRequest) throws IOException &#123;</div><div class="line">        if (started.compareAndSet(false, true)) &#123;</div><div class="line">            init();</div><div class="line">        &#125;</div><div class="line">        if (serviceDown.get()) &#123;</div><div class="line">            throw new Exception(&quot;watch service down.&quot;);</div><div class="line">        &#125;</div><div class="line">        try &#123;</div><div class="line">            Path dir = watchRequest.getPath();</div><div class="line">            if (watchRequest.isRecursive()) &#123;</div><div class="line">                System.out.format(&quot;Scanning %s ...\n&quot;, dir);</div><div class="line">                registerRecursive(dir, watchRequest);</div><div class="line">                System.out.println(&quot;Done.&quot;);</div><div class="line">            &#125; else &#123;</div><div class="line">                registerNonRecursive(watchRequest);</div><div class="line">            &#125;</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>当该方法第一次被调用时, 会进行初始化:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static void init() throws IOException &#123;</div><div class="line">        watcher = FileSystems.getDefault().newWatchService();</div><div class="line">        keysToWatchRequest = new ConcurrentHashMap&lt;&gt;();</div><div class="line">        trace = true;</div><div class="line"></div><div class="line">        // 启动线程来处理事件</div><div class="line">        ExecutorService exec = Executors.newSingleThreadExecutor();</div><div class="line">        exec.execute(new EventProcessor());</div><div class="line"></div><div class="line">        serviceDown.set(false);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>初始化包括新建watcher, 还有keysToWatchRequest(<br>在前面的介绍中, 我们已经知道, register某个目录后, 会有一个WatchKey返回, 所以需要有一个Map来关联WatchKey和Callback ).</p>
+<p>最后启动一个线程来从watcher获取变更的事件, 并调用对应的Callback去handle该事件.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// EventProcessor</div><div class="line"></div><div class="line">private static class EventProcessor implements Runnable &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            while (!Thread.interrupted()) &#123;</div><div class="line">                // wait for key to be signalled</div><div class="line">                WatchKey key;</div><div class="line">                try &#123;</div><div class="line">                    key = watcher.take();</div><div class="line">                &#125; catch (InterruptedException x) &#123;</div><div class="line">                    serviceDown();</div><div class="line">                    return;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                WatchRequest watchRequest = keysToWatchRequest.get(key);</div><div class="line">                if (watchRequest == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no cb) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">                Path dir = watchRequest.getPath();</div><div class="line">                if (dir == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no path) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                for (WatchEvent&lt;?&gt; event: key.pollEvents()) &#123;</div><div class="line">                    WatchEvent.Kind kind = event.kind();</div><div class="line">                    // TBD - provide example of how OVERFLOW event is handled</div><div class="line">                    if (kind == OVERFLOW) &#123;</div><div class="line">                        continue;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    // handle</div><div class="line">                    watchRequest.handle(event);</div><div class="line"></div><div class="line">                    // Context for directory entry event is the file name of entry</div><div class="line">                    WatchEvent&lt;Path&gt; ev = cast(event);</div><div class="line">                    Path name = ev.context();</div><div class="line">                    Path child = dir.resolve(name);</div><div class="line"></div><div class="line">                    // if directory is created, and watching recursively, then</div><div class="line">                    // register it and its sub-directories</div><div class="line">                    if (watchRequest.isRecursive() &amp;&amp; (kind == ENTRY_CREATE)) &#123;</div><div class="line">                        try &#123;</div><div class="line">                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) &#123;</div><div class="line">                                registerRecursive(child, new DebugWatchRequest(child).setIsRecursive(true));</div><div class="line">                            &#125;</div><div class="line">                        &#125; catch (IOException x) &#123;</div><div class="line">                            // ignore to keep sample readbale</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                // reset key and remove from set if directory no longer accessible</div><div class="line">                boolean valid = key.reset();</div><div class="line">                if (!valid) &#123;</div><div class="line">                    keysToWatchRequest.remove(key);</div><div class="line"></div><div class="line">                    // all directories are inaccessible</div><div class="line">                    if (keysToWatchRequest.isEmpty()) &#123;</div><div class="line">                        break;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            serviceDown();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private void serviceDown() &#123;</div><div class="line">            serviceDown.set(true);</div><div class="line">            // TODO REPORT IT</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h1 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h1><p>这个demo实现了一个简单的目录watch功能, 还有许多地方需要改进. 比如:</p>
+<ul>
+<li><strong>InterruptedException等异常 及 客户端自定义通知方</strong></li>
+</ul>
+<p>当发生interrupt时, 应该停止服务释放资源, 进行记录日志并通过一些report通知给中控或相关人员, 关闭WatchService等 不过也应支持一下客户端自定义通知方式.<br>同时,  OVERFLOW等异常也要有对应的处理方式, 这个WatchService也不能100%保证可靠, 可以采取一些定时扫描的其他措施来弥补.</p>
+<ul>
+<li><strong>事件的处理和Callback的调用效率</strong></li>
+</ul>
+<p>目前的事件处理线程是只有一个的, 而且Callback的handle()时同步调用的.</p>
+<p><strong> 那能够改成异步的呢 ? </strong></p>
+<p>这个要看情况.<br>如果这个回调操作是次要业务, 那就不能使用异步. 因为如果一瞬间促发了许多回调, 那么这些回调同时运行, 极有可能迅速占用系统功能, 影响主业务, 甚至崩溃.<br>使用异步是有一定风险的, 不过开多几个线程还是可以考虑的.</p>
+<ul>
+<li><strong>支持多个WatchCallback</strong></li>
+</ul>
+<p>这个demo支持一个WatchKey对应一个Callback, 当有新的到来时, 就会覆盖旧的, 这个明显不太好. 不过要支持多个WatchCallback也很容易修改.</p>
+<ul>
+<li><strong>增加取消注册的功能</strong></li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://docs.oracle.com/javase/tutorial/essential/io/notification.html" target="_blank" rel="external">https://docs.oracle.com/javase/tutorial/essential/io/notification.html</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Git 分支管理]]></title>
+      <url>http://niko2014.github.io/2015/11/30/git/git_flow/</url>
+      <content type="html"><![CDATA[<h2 id="为什么要用分支"><a href="#为什么要用分支" class="headerlink" title="为什么要用分支"></a>为什么要用分支</h2><hr>
+<p>记得刚加入现在团队的时候，和boss搭了GOGS（类似的还有gitlab），到最近完成v0.1版本，一直都是用一个分支了。最近团队加入了几个新成员，产品那边也有大量的新需求和迭代。若还不进行分支管理，必定一定会陷入混乱（如果你问为什么？看了后面的分支管理模型，你就会恍然大悟）。</p>
+<p>这也让我想起在第一家公司实习的时候，有一个team，用了git，后来发现，只是用来更新和提交，真是高射炮打蚊子。就算是后来人员扩充了之后，仍然没有分支管理，当时觉得不可思议。他们的产品迭代速度很慢，质量也很差，我觉得这跟他们的代码管理也有一点关系。</p>
+<h2 id="一个通用模型"><a href="#一个通用模型" class="headerlink" title="一个通用模型"></a>一个通用模型</h2><hr>
+<p>关于分支的管理和工程实践上，最广为认知的是Vincent Driessen在2010年发表的一篇博客：<a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">《一种成功的Git分支管理模型》</a>，这篇博客总结了一种通用的分支管理模型，这个模型可以覆盖大部分的场景和研发流程。或许你没看过这篇博客，但如果你参与过团队分支管理策略的制定，你一定可以找到共鸣。</p>
+<p>博客中有一张图很清晰地描述了这个模型和各种场景：<br><img src="/images/git-model@2x.png" alt=""></p>
+<p>我记得在第一次实习时，团队中用的是svn，那时还没看过这篇博客，不过那时我们根据研发流程和需求场景制定出来的svn分支管理策略和这个类似，只是一个简化版，没有做太细。有一部分原因是因为svn的分支功能确实sucks，团队也不想浪费太多精力和成本。据说现在他们也换为git了，因为并行开发的功能太多了，svn终于让他们“心力交瘁”。</p>
+<h3 id="git-flow"><a href="#git-flow" class="headerlink" title="git-flow"></a>git-flow</h3><hr>
+<p>git的分支管理非常强大和方便，而git-flow可以让我们简化分支管理的操作。git-flow是git的一个扩展集，按<code>Vincent Driessen</code>的分支模型提供高层的操作，具体可参考<a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">这篇指南</a>。</p>
+<p>（现在想起当年用svn的分支管理，仍隐隐觉得蛋疼。那一堆堆tree-conflict（尤其是目录）历历在目，还好后来转到git）</p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
+<li>修改配置<br>git flow config<br>或者，修改配置文件：<br>vim your_repo/.git/config</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
+<p>分支管理是一门管理艺术，一味地盲目模仿不切实际，只会增加混乱和成本，在执行上也会遇到各种阻碍，所以针对自身团队和业务特点，找到最适合自己的管理策略。不过若你的产品需要快速的更新和迭代，你一定要试一下git。</p>
+<!--
+1. 小张和小何在开发两个大功能（`A-v0.1`和`B-v0.1`），小张先完成了A，然后部署生产了，小何继续B开发。
+小何过了两天也完成了B，然后提交代码，自动化部署B后，发现A功能出问题了，原来小张在这两天在进行A功能小优化（`A-v0.1.1`），还未完成就“被”部署上去了。
+这个故事告诉我们，需要把必须将正式（master）和开发（develop）的代码分开。
+
+2. 现在代码分成了两个分支，小张小何都在develop开发。小张完成`A-v0.2`，要部署。合并的代码发现有小何的代码，于是问小何，小何说`我在做B-v0.2`，还没做完，你不可以合并。
+所以问题还是没有解决，产品汪质问小张，为什么还不部署，这个功能很急的，小何表示压力很大。
+这次，小张小何约定，从develop分支再建立分支，叫做feature分支，用来。
+
+3...  场景太多了， 不写了
+-->
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
+<ol>
+<li><a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">git-flow 备忘清单</a></li>
+<li><a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">A successful Git branching model » nvie.com</a></li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[github 上的配色项目 - solarized]]></title>
+      <url>http://niko2014.github.io/2015/11/29/linux/solarized_colors/</url>
+      <content type="html"><![CDATA[<h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
+<h3 id="for-vim"><a href="#for-vim" class="headerlink" title="for vim"></a>for vim</h3><hr>
+<p>vim的配置非常简单，有两种方式：</p>
+<h4 id="1-手工安装"><a href="#1-手工安装" class="headerlink" title="1. 手工安装"></a>1. 手工安装</h4><p>下载：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 任意目录下载源码</div><div class="line">git clone git://github.com/altercation/vim-colors-solarized.git</div><div class="line">cd vim-colors-solarized/colors</div><div class="line">mv solarized.vim ~/.vim/colors/</div></pre></td></tr></table></figure>
+<p>修改vimrc</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">syntax enable</div><div class="line">set background=dark</div><div class="line">colorscheme solarized</div></pre></td></tr></table></figure>
+<p>如果不喜欢dark，可以换成<code>set background=light</code>主题。</p>
+<h4 id="2-使用pathogen插件管理"><a href="#2-使用pathogen插件管理" class="headerlink" title="2. 使用pathogen插件管理"></a>2. 使用pathogen插件管理</h4><p>使用pathogen可以很好的管理插件， 解决vim文件分散、管理麻烦的问题，这也是官方推荐的方式。</p>
+<p>安装pathogen</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/.vim/</div><div class="line">mkdir autoload</div><div class="line">cd autoload/</div><div class="line">wget https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim</div></pre></td></tr></table></figure>
+<p>启用pathogen</p>
+<pre><code>vim ~/.vimrc
+// 增加以下内容， 注意需要在`filetype plugin indent on `之前。
+call pathogen#infect()
+</code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
+<pre><code>cd ~/.vim/bundle
+git clone git://github.com/altercation/vim-colors-solarized.git
+</code></pre><p>然后跟方式一的<code>修改vimrc</code>步骤一样执行。</p>
+<h4 id="效果图："><a href="#效果图：" class="headerlink" title="效果图："></a>效果图：</h4><p>虽然官方文档有很多案例图，还是贴一下个人的效果图：</p>
+<p><img src="/images/solarized_vim_show.png" alt=""></p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>如果你希望保留之前terminal的透明度，可以在<code>～/.vimrc</code>增加以下配置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
+<h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
+<p>// TODO</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[vim 插件收集]]></title>
+      <url>http://niko2014.github.io/2015/11/29/linux/vim_plugins/</url>
+      <content type="html"><![CDATA[<p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
+<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
+<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
+<p>使用指南：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
+<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
+<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
+<p>其他功能都可以在文档中找到。</p>
+<p>常用功能：</p>
+<ul>
+<li>gt/gT<br>上/下切换tab</li>
+</ul>
+<blockquote>
+<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
+</blockquote>
+<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
+<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
+<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
+<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
+<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
+<p>Vundle // TODO and pathogen</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[spring配置加载顺序]]></title>
+      <url>http://niko2014.github.io/2015/11/01/java/spring/spring-boot_config_order/</url>
+      <content type="html"><![CDATA[<h1 id="spring的配置加载顺序"><a href="#spring的配置加载顺序" class="headerlink" title="spring的配置加载顺序"></a>spring的配置加载顺序</h1><p>Spring使用了特定的配置属性加载顺序，为了让后者可以覆写前者的配置，而前者提供一些默认的约定配置。具体的加载顺序是：</p>
+<ul>
+<li>Command line arguments.</li>
+<li>Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)</li>
+<li>JNDI attributes from java:comp/env.</li>
+<li>Java System properties (System.getProperties()).</li>
+<li>OS environment variables.</li>
+<li><p>A RandomValuePropertySource that only has properties in <code>random.*.</code></p>
+</li>
+<li><p>Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)</p>
+</li>
+<li>Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)</li>
+<li>Application properties outside of your packaged jar (application.properties and YAML variants).</li>
+<li>Application properties packaged inside your jar (application.properties and YAML variants).</li>
+<li>@PropertySource annotations on your @Configuration classes.</li>
+<li>Default properties (specified using SpringApplication.setDefaultProperties).</li>
+</ul>
+<h1 id="配置覆写测试和验证"><a href="#配置覆写测试和验证" class="headerlink" title="配置覆写测试和验证"></a>配置覆写测试和验证</h1><p>使用starter-web来测试：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Controller</div><div class="line">@EnableAutoConfiguration</div><div class="line">public class SampleController &#123;</div><div class="line"></div><div class="line">    @Value(&quot;$&#123;myname&#125;&quot;)</div><div class="line">    String myName;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    String home() &#123;</div><div class="line">        return &quot;Hello, &quot; + myName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line">        SpringApplication.run(SampleController.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试用命令行传入：</p>
+<pre><code>java -jar target/app.jar --myname=&quot;niko&quot;
+</code></pre><p>测试shell环境变量</p>
+<pre><code>export SPRING_APPLICATION_JSON=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
+java -jar target/app.jar
+</code></pre><p>测试使用系统变量</p>
+<pre><code>java -jar target/app.jar -Dspring.application.json=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
+</code></pre><p>测试<code>application.properties</code>和<code>application-dev.properties</code>：<br>application.properties：</p>
+<pre><code>spring.profiles.active=dev
+myname=application.properties
+</code></pre><p>application-dev.properties：</p>
+<pre><code>myname=application-dev.properties
+</code></pre><h1 id="其他细节"><a href="#其他细节" class="headerlink" title="其他细节"></a>其他细节</h1><h2 id="application-properties-的查找顺序"><a href="#application-properties-的查找顺序" class="headerlink" title="application.properties 的查找顺序"></a>application.properties 的查找顺序</h2><p>Spring会加载配置文件<code>application.properties</code>从以下位置：</p>
+<ul>
+<li>A <code>/config</code> subdirectory of the current directory.</li>
+<li>The current directory</li>
+<li>A classpath <code>/config</code> package</li>
+<li>The classpath root</li>
+</ul>
+<p>如果你不喜欢<code>application</code>这个name，可以传入<code>--spring.config.name=othername</code>来设置，或者是使用<code>--spring.config.location=classpath:/default.properties,classpath:/override.properties</code>。<br>值得注意的是，<code>spring.config.location</code>声明的加载优先级是从低到高，即是会先加载<code>classpath:/override.properties</code>。</p>
+<h2 id="占位符使用"><a href="#占位符使用" class="headerlink" title="占位符使用"></a>占位符使用</h2><p><code>application.properties</code></p>
+<pre><code>app.name=MyApp
+app.description=${app.name} is a Spring Boot application
+</code></pre><p>这个就算是<code>app.name</code>的声明顺序倒过来也是okay的。</p>
+<p>&gt;</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[git stash 使用]]></title>
+      <url>http://niko2014.github.io/2015/10/30/git/git-stash/</url>
+      <content type="html"><![CDATA[<h1 id="git-stash-干嘛滴"><a href="#git-stash-干嘛滴" class="headerlink" title="git stash 干嘛滴"></a>git stash 干嘛滴</h1><p>假如你正在开发feature-01，但是依赖的一个模块代码修改了，你必须pull代码，然而你又不想commit，这时可以使用<code>git stash</code>来保存当前未commit的代码更改。</p>
+<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p>假设仓库已经有stash-01.txt空文件，vim stash-01.txt，你加了一行文本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">I am developing feature-01</div></pre></td></tr></table></figure>
+<p>这时同学A说，你必须pull代码，然后你微笑着用<code>git stash</code>保存当前未commit的代码：</p>
+<blockquote>
+<p>$ git stash<br>Saved working directory and index state WIP on develop: 80ccebf add stash file<br>HEAD is now at 80ccebf add stash file</p>
+</blockquote>
+<p>之后<code>git status</code>再次确认了当前状态是干净的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch develop</div><div class="line">Your branch is up-to-date with &apos;origin/develop&apos;.</div><div class="line">nothing to commit, working directory clean</div></pre></td></tr></table></figure>
+<p>这时候可以放心的pull了：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (2/2), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   80ccebf..d2b1d0b  develop    -&gt; origin/develop</div><div class="line">Updating 80ccebf..d2b1d0b</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
+<p>这个pull操作可能修改了多个文件，很可能涉及到你刚才stash的文件，这时会发生什么呢？我们接着看：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash pop</div><div class="line">Auto-merging git-stash/stash-01.txt</div><div class="line">CONFLICT (content): Merge conflict in git-stash/stash-01.txt</div></pre></td></tr></table></figure>
+<p>Ohhh，冲突了，这是当然的啦。就算是commit之后再pull也是会冲突，只要merge一下就好了。</p>
+<p><img src="/images/git/git-stash-pop-merge.png" alt=""></p>
+<p>这时你检查了一下，发现其实已经完成feature-01了，所以commit and push了。</p>
+<p>之后，你开始了feature-02的开发，同样你加了一行：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">common lib modified</div><div class="line">I am developing feature-01</div><div class="line">I am developing feature-02</div></pre></td></tr></table></figure>
+<p>这时，同学A又让你pull代码，所以你又再次微笑着：</p>
+<blockquote>
+<p>$ git stash<br>Saved working directory and index state WIP on develop: 425394b feature-01 done<br>HEAD is now at 425394b feature-01 done</p>
+<p>$ git pull</p>
+<p>$ git stash pop</p>
+<p>$ git merge</p>
+</blockquote>
+<p>这时候你被打断，没有commit feature-02，后来继续开发feature-03了，接着第三次pull来了：</p>
+<blockquote>
+<p>$ git stash<br>Saved working directory and index state WIP on develop: 7ed8d8d 2th, common lib2 modified<br>HEAD is now at 7ed8d8d 2th, common lib2 modified</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (3/3), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   7ed8d8d..a73e880  develop    -&gt; origin/develop</div><div class="line">Updating 7ed8d8d..a73e880</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
+<p><img src="/images/git/git-stash-merge-not-commited-2nd.png" alt=""></p>
+<p>上图， 可以发现，刚才未提交的merge结果（同学A竟然把2nd写错了⊙﹏⊙），相同的位置现在需要重新merge，这时赶紧commit &amp; push。</p>
+<pre><code>$ git commit -m &quot;Add: feature-02 and 03 done&quot;
+</code></pre><p>如果刚才不是同一个文件，可以stash多次，这个堆栈可以这样查看：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash list</div><div class="line">stash@&#123;0&#125;: WIP on develop: 7ed8d8d 2th, common lib2 modified</div><div class="line">stash@&#123;1&#125;: WIP on develop: 425394b feature-01 done</div><div class="line">stash@&#123;2&#125;: WIP on develop: 80ccebf add stash file</div></pre></td></tr></table></figure>
+<p>发现pop出来的stash还存在着，还可以切回去某一次stash：</p>
+<pre><code>$ git stash apply stash@{0}
+</code></pre><p>当然，你可能面临冲突，谨慎使用，看场景～～</p>
+<p>#</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[spring-boot 简介]]></title>
+      <url>http://niko2014.github.io/2015/10/26/java/spring/spring-boot/</url>
+      <content type="html"><![CDATA[<h2 id="spring-boot-是什么？"><a href="#spring-boot-是什么？" class="headerlink" title="spring-boot 是什么？"></a>spring-boot 是什么？</h2><p>每次开始一个新的spring应用，少不了要细心准备各种文件和基础配置项，配置完还要进行测试，少不了的会有配置遗漏或错误。如果是老手，可能很快的看出问题，或者有保存自己的配置模板，复制一下改一改。但毕竟是有问题的，为什么创建一个spring应用这么麻烦，为什么不向其他语言和框架脚手架等工具借鉴一下呢？正因如此，spring社区也感受到了开发者的痛点，于是退出了spring-boot这个项目。</p>
+<p>spring-boot，目标是减少创建spring应用的工作量，免除繁琐的XML配置而无需生成代码，遵循<code>约定优于配置</code>的哲学，还提供许多常用的特性和功能（如内置服务器、安全、健康检查等），使开发者能够快速的创建工业级配置的spring应用。让你专心做事，不再因为配置而分心烦躁。而且就算在命令行中，也可以迅速地 get things done。</p>
+<p><a href="https://github.com/spring-projects/spring-boot" target="_blank" rel="external">github传送门</a></p>
+<h2 id="快速安装"><a href="#快速安装" class="headerlink" title="快速安装"></a>快速安装</h2><p>首先当然，除了java环境，maven和gradle之一还是要装的，毕竟需要一种构建工具（这里使用maven），spring-boot提供了许多starter和samples进行参考，下面就来体验一下。</p>
+<h3 id="例：spring-web-starter"><a href="#例：spring-web-starter" class="headerlink" title="例：spring web starter"></a>例：spring web starter</h3><p>创建一个maven项目，并继承<code>spring-boot-starter-parent</code>的pom：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/parent&gt;</div></pre></td></tr></table></figure>
+<p>增加对<code>starter-web</code>的依赖：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<p>如果要用jetty而非tomcat，替换掉依赖即可：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;exclusions&gt;</div><div class="line">        &lt;exclusion&gt;</div><div class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;/exclusion&gt;</div><div class="line">    &lt;/exclusions&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-jetty&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<p>新建一个Controller：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@RestController</div><div class="line">@EnableAutoConfiguration</div><div class="line">public class SampleController &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    String home() &#123;</div><div class="line">        return &quot;Hello World!&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line">        SpringApplication.run(SampleController.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>运行：</p>
+<pre><code>mvn spring-boot:run
+</code></pre><p>这个是在命令行是使用maven运行，需要安装spring-boot插件（也可以不适用maven插件，运行main()方法亦可）：</p>
+<p><code>pom.xml</code>：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;build&gt;</div><div class="line">    &lt;plugins&gt;</div><div class="line">        &lt;plugin&gt;</div><div class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</div><div class="line">        &lt;/plugin&gt;</div><div class="line">    &lt;/plugins&gt;</div><div class="line">&lt;/build&gt;</div></pre></td></tr></table></figure></p>
+<p>打开浏览器访问<a href="http://localhost:8080/" target="_blank" rel="external">http://localhost:8080/</a>，出现了熟悉的”Hello World!”。</p>
+<p>从上面的sample可以感受到，<code>starter-web</code>为我们简化了许多操作，其实看一下当前的依赖tree就可以知道：</p>
+<p><code>mvn dependency:tree &gt; deps.txt</code></p>
+<p>依赖树：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[INFO] --- maven-dependency-plugin:2.10:tree (default-cli) @ learning-starter-web ---</div><div class="line">[INFO] org.niko.learn.spring.boot:learning-starter-web:jar:1.3.1.RELEASE</div><div class="line">[INFO] \- org.springframework.boot:spring-boot-starter-web:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    +- org.springframework.boot:spring-boot-starter:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework.boot:spring-boot:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework.boot:spring-boot-autoconfigure:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework.boot:spring-boot-starter-logging:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  |  +- ch.qos.logback:logback-classic:jar:1.1.3:compile</div><div class="line">[INFO]    |  |  |  +- ch.qos.logback:logback-core:jar:1.1.3:compile</div><div class="line">[INFO]    |  |  |  \- org.slf4j:slf4j-api:jar:1.7.13:compile</div><div class="line">[INFO]    |  |  +- org.slf4j:jcl-over-slf4j:jar:1.7.13:compile</div><div class="line">[INFO]    |  |  +- org.slf4j:jul-to-slf4j:jar:1.7.13:compile</div><div class="line">[INFO]    |  |  \- org.slf4j:log4j-over-slf4j:jar:1.7.13:compile</div><div class="line">[INFO]    |  +- org.springframework:spring-core:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  \- org.yaml:snakeyaml:jar:1.16:runtime</div><div class="line">[INFO]    +- org.springframework.boot:spring-boot-starter-tomcat:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:8.0.30:compile</div><div class="line">[INFO]    |  +- org.apache.tomcat.embed:tomcat-embed-el:jar:8.0.30:compile</div><div class="line">[INFO]    |  +- org.apache.tomcat.embed:tomcat-embed-logging-juli:jar:8.0.30:compile</div><div class="line">[INFO]    |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:8.0.30:compile</div><div class="line">[INFO]    +- org.springframework.boot:spring-boot-starter-validation:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  \- org.hibernate:hibernate-validator:jar:5.2.2.Final:compile</div><div class="line">[INFO]    |     +- javax.validation:validation-api:jar:1.1.0.Final:compile</div><div class="line">[INFO]    |     +- org.jboss.logging:jboss-logging:jar:3.3.0.Final:compile</div><div class="line">[INFO]    |     \- com.fasterxml:classmate:jar:1.1.0:compile</div><div class="line">[INFO]    +- com.fasterxml.jackson.core:jackson-databind:jar:2.6.4:compile</div><div class="line">[INFO]    |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.6.4:compile</div><div class="line">[INFO]    |  \- com.fasterxml.jackson.core:jackson-core:jar:2.6.4:compile</div><div class="line">[INFO]    +- org.springframework:spring-web:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework:spring-aop:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  |  \- aopalliance:aopalliance:jar:1.0:compile</div><div class="line">[INFO]    |  +- org.springframework:spring-beans:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  \- org.springframework:spring-context:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    \- org.springframework:spring-webmvc:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]       \- org.springframework:spring-expression:jar:4.2.4.RELEASE:compile</div></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>【1】 <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started-first-application.html" target="_blank" rel="external">https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started-first-application.html</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[锁之MySQL和JPA]]></title>
+      <url>http://niko2014.github.io/2015/10/12/java/lock__mysql_jpa/</url>
+      <content type="html"><![CDATA[<h2 id="今天"><a href="#今天" class="headerlink" title="今天"></a>今天</h2><p>今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，<br>当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。</p>
+<h2 id="MySQL-行级锁"><a href="#MySQL-行级锁" class="headerlink" title="MySQL 行级锁"></a>MySQL 行级锁</h2><p>行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。<br>（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）</p>
+<p>首先回顾一下大学的基础知识：<br>数据库的锁，是事务在某个数据对象（如表、行等）进行操作前，对数据库发起请求，对其加锁，<br>使其不被其他事务所修改。<br>基本的锁有两种：读锁和写锁。<br>写锁，也称排它锁（ExclusiveLock，也称X锁），若事务对数据D加了X锁，则其他事务不能读取和修改D。<br>读锁，也称共享锁（ShareLock，也称S锁），若事务对数据D加了S锁，则其他事务只能对D加S锁，不能修改D。</p>
+<h3 id="S-LOCK-在MySQL："><a href="#S-LOCK-在MySQL：" class="headerlink" title="S LOCK 在MySQL："></a>S LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_02.png" alt=""><br><img src="/images/mysql_x_lock_demo_04.png" alt=""><br>从上面的测试中可以发现，事务1（窗口1）加了S锁后，事务2不能加X锁和进行修改。<br>如果S锁一段时间后仍未释放就会超时，如下图：<br><img src="/images/mysql_x_lock_demo_03.png" alt=""></p>
+<h3 id="X-LOCK-在MySQL："><a href="#X-LOCK-在MySQL：" class="headerlink" title="X LOCK 在MySQL："></a>X LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_01.png" alt=""></p>
+<p>从上面的测试中可以发现，事务1加了X锁之后，事务2不能加S锁，但只要去掉<br><code>LOCK IN SHARE MODE</code>就可以查询了。</p>
+<p>其他的场景，可用以上SQL测试验证一下。<br>（注意：当用到索引时，MySql才会使用row-lock，否则table-lock。）</p>
+<h2 id="JPA-规范"><a href="#JPA-规范" class="headerlink" title="JPA 规范"></a>JPA 规范</h2><hr>
+<p>看完了锁在MySQL的实现，那在Java中如何使用呢？这里以spring+JPA为例（为了方便，使用了starter-jpa）：</p>
+<h3 id="JPA-锁相关规范"><a href="#JPA-锁相关规范" class="headerlink" title="JPA 锁相关规范"></a>JPA 锁相关规范</h3><p>在spring-data-jpa中，<code>@Lock + LockModeType</code> 可以为某个数据操作进行锁控制，比如用X锁：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Lock(LockModeType.PESSIMISTIC_WRITE)</div><div class="line">List&lt;MemberOrder&gt; findByOrderNo(String orderNo);</div></pre></td></tr></table></figure>
+<p>可以跑一下测试：</p>
+<ol>
+<li>使用上面的窗口二先加S锁，不commit。</li>
+<li>然后调用findByOrderNo()查询。</li>
+<li>可以发现，程序抛出LockAcquisitionException异常，不能获取锁，等待超时，如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Caused by: org.hibernate.exception.LockAcquisitionException: could not extract ResultSet</div><div class="line">        at org.hibernate.dialect.MySQLDialect$1.convert(MySQLDialect.java:451)</div><div class="line">        ...</div><div class="line">Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</div><div class="line">        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</div><div class="line">        at java.lang.reflect.Constructor.newInstance(Constructor.java:422)</div><div class="line">        at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)</div><div class="line">        at com.mysql.jdbc.Util.getInstance(Util.java:387)</div><div class="line">        at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:946)</div><div class="line">        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3878)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRowFast(MysqlIO.java:2090)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRow(MysqlIO.java:1964)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readSingleRowSet(MysqlIO.java:3306)</div><div class="line">        atannotation com.mysql.jdbc.MysqlIO.getResultSet(MysqlIO.java:463)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readResultsForQueryOrUpdate(MysqlIO.java:3040)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readAllResults(MysqlIO.java:2288)</div><div class="line">        at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2681)</div><div class="line">        at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2551)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeQuery(PreparedStatement.java:1962)</div><div class="line">        at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.extract(ResultSetReturnImpl.java:82)</div><div class="line">        ... 64 more</div></pre></td></tr></table></figure>
+<p>现在来看Lock和LockModeType，Lock是spring-data的annotation，<br>LockModeType属于JPA规范，可作为EntityManager的方法参数传入或者使用Query.setLockMode()或TypedQuery.setLockMode()进行设置。<br>当然使用spring-data的话，直接使用@Lock即可，如果对细节感兴趣，可以去看spring-data的源码。<br>LockModeType是一个enum，它包括：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">READ：同OPTIMISTIC</div><div class="line">WRITE：同OPTIMISTIC_FORCE_INCREMENT</div><div class="line">OPTIMISTIC：乐观锁</div><div class="line">OPTIMISTIC_FORCE_INCREMENT：乐观锁，带版本更新</div><div class="line">PESSIMISTIC_READ：悲观读 （MySQL对应： `lock in share mode`）</div><div class="line">PESSIMISTIC_WRITE：悲观写 （MySQL对应： `for update`）</div><div class="line">PESSIMISTIC_FORCE_INCREMENT：悲观写，带版本更新</div></pre></td></tr></table></figure>
+<p>上面涉及到了悲观锁和乐观锁：<br>所谓悲观锁，就是对数据被其他事务修改的概率保持悲观态度，<br>因此在处理过程中，都将数据锁定。<br>而乐观锁，反过来即是保持乐观态度，认为数据被其他事务修改的概率是较低的，所以在真正提交更新的时候，<br>才去检测数据是否冲突，实现方式可以是版本号或者时间戳，这里不再赘述。</p>
+<p>悲观锁能严格保证数据的正确性，但凡事有利必有弊，很多事情我们都需要去平衡。<br>如果一个并发冲突的概率不高，而使用悲观锁，会对数据库性能开销影响比较大。<br>除此之外，良好的设计也可有效地避免一些并发问题。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
+<p>【1】 <a href="https://spring.io/guides/gs/accessing-data-jpa/" target="_blank" rel="external">https://spring.io/guides/gs/accessing-data-jpa/</a><br>【2】 <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html" target="_blank" rel="external">http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html</a><br>【3】 <a href="https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[使用 Java 8 函数接口避免 Null Check]]></title>
+      <url>http://niko2014.github.io/2015/10/01/java/j8/java8_null_check/</url>
+      <content type="html"><![CDATA[<p><script><br>  (function() {<br>    var cx = ‘005735843669583756565:phrkilwibwg’;<br>    var gcse = document.createElement(‘script’);<br>    gcse.type = ‘text/javascript’;<br>    gcse.async = true;<br>    gcse.src = ‘<a href="https://cse.google.com/cse.js?cx=">https://cse.google.com/cse.js?cx=</a>‘ + cx;<br>    var s = document.getElementsByTagName(‘script’)[0];<br>    s.parentNode.insertBefore(gcse, s);<br>  })();<br></script></p>
+<p><gcse:search></gcse:search></p>
+<h1 id="使用-Optional"><a href="#使用-Optional" class="headerlink" title="使用 Optional"></a>使用 <code>Optional</code></h1><hr>
+<p>Optional是核心类库的新成员，用来替换null。相信大家对NPE已经司空见惯，在代码里也有不少 null check，null 这个东西也是颇有争议的， 而Optional可以消除我们这种厌恶感，鼓励我们适当时候去检查null值，防止程序崩溃。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例 :"></a>示例 :</h2><p>Shop.java</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class Shop &#123;</div><div class="line">    private Integer provinceId;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (shop.getProvinceId() != null) &#123;</div><div class="line">    ProvinceEntity productEntity = provinceJpaRepository.findOne(shop.getProvinceId());</div><div class="line">    if (productEntity != null) &#123;</div><div class="line">        shop.setProvinceName(productEntity.getName());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
+<p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
+<h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[（随笔）shadowsocks 科学上网工具]]></title>
+      <url>http://niko2014.github.io/2015/08/22/shadowsocks/</url>
+      <content type="html"><![CDATA[<p>最近网络比较“不稳定”，上google也是断断续续的，<br>三个科学上网工具 —— 红杏/VPN/shadowsocks， 已经跪了两个，只剩shadowsocks了，中国的程序员效率降低了一半以上。<br>看来平时的”冗余容错”很重要啊，几百块花得值了，T_T, 虽然两个工具暂时不能用，还好现在还能通过shadowsocks上网。</p>
+<h2 id="简单原理"><a href="#简单原理" class="headerlink" title="简单原理"></a>简单原理</h2><p>当前的gfw的特征检测对shadowsocks还是没什么特别好的办法，我们可以看一下shadowsocks原理:</p>
+<p><img src="/images/what-is-shadowsocks.png" alt=""></p>
+<p>如上图，sslocal是你本机的一个代理，ss server是部署在国外（vps）。<br>shadowsocks使用的是socks5协议， 该协议处于OSI的会话层层，在传输层之上。<br>所以数据在ss local和ss server做了加密解密，在gfw的特征检查下就是个普通的tcp包，因此允许通过。</p>
+<hr>
+<h3 id="小事件"><a href="#小事件" class="headerlink" title="小事件"></a>小事件</h3><p>BTW, 在github上看到一个留言：</p>
+<p><img src="/images/shadowsocks_clowwindy.jpg" alt=""></p>
+<p>随便逛了一下，clowwindy大神（任职知乎）的项目还真全删了，twitter也设成私密模式了。<br>根据各大科学上网工具的公告，我也理解最近是特殊时期。<br>最后想说的和能说的是，感谢clowwindy。</p>
+<hr>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<p>页面已被访问<span id="busuanzi_value_site_pv"></span>次</p>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p>[1] <a href="https://tumutanzi.com/archives/13005" target="_blank" rel="external">https://tumutanzi.com/archives/13005</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[monit 监控]]></title>
+      <url>http://niko2014.github.io/2015/07/18/linux/monit/</url>
+      <content type="html"><![CDATA[<p>Monit 是一个开源的非常实用的进程管理和监控工具，如Linux下的apache、nginx、MySql、FTP等服务都可以使用。</p>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><hr>
+<pre><code># for RedHat/CentOS/Fedora/
+yum install monit
+# for Ubuntu/Debian/Linux Mint
+sudo apt-get install monit
+</code></pre><h2 id="configure"><a href="#configure" class="headerlink" title="configure"></a>configure</h2><hr>
+<pre><code>安装完后，配置文件目录如下所示：
+</code></pre><p><img src="/images/etc-monit.png" alt=""></p>
+<pre><code># 这个是monit的配置文件，里边记录了log位置、deamon数、监控脚本等配置。
+sudo vim /etc/monit/monitrc
+</code></pre><p>翻到最后，可以发现有个<code>include</code>指令，后面跟你的监控脚本的位置，这样可以避免全部脚本写在同一个地方。</p>
+<pre><code>include /etc/monit/include/*
+</code></pre><h2 id="for-tomcat"><a href="#for-tomcat" class="headerlink" title="for tomcat"></a>for tomcat</h2><hr>
+<p>这里以tomcat为例，写一个monit脚本，实现停机时的邮件提醒和自动重启：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set alert alertwho@foo.com</div><div class="line"></div><div class="line">set mailserver mail.×××.com</div><div class="line">  port 25</div><div class="line">  username &quot;mail&quot; password &quot;pwd&quot;</div><div class="line">  using tlsv1</div><div class="line">  with timeout 30 seconds</div><div class="line"></div><div class="line">check host tomcat with address localhost</div><div class="line">  stop program &quot;/.../bin/catalina.sh stop&quot;</div><div class="line">  start program &quot;/.../bin/catalina.sh restart&quot;</div><div class="line">  if failed port 8080 and protocol http</div><div class="line">  # then start 重启</div><div class="line">  then alert</div></pre></td></tr></table></figure>
+<p>mail server 的语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">SET MAILSERVER &lt;hostname|ip-address [PORT number] [USERNAME string]</div><div class="line"> [PASSWORD string] [using SSLAUTO|SSLV2|SSLV3|TLSV1|TLSV11|TLSV12]</div><div class="line"> [CERTMD5 checksum]&gt;, ...</div><div class="line">   [with TIMEOUT X SECONDS]</div><div class="line">   [using HOSTNAME hostname]</div></pre></td></tr></table></figure>
+<p>其他语法都很易懂。<br>monit监控tomcat的方式其实有两种，一种是检查pid文件，另一种就是上面的port检查。</p>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><h2 id="others"><a href="#others" class="headerlink" title="others"></a>others</h2><p><a href="http://www.tecmint.com/command-line-tools-to-monitor-linux-performance/" target="_blank" rel="external">20 Command Line Tools to Monitor Linux Performance</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[vim 大法好 - 命令指南]]></title>
+      <url>http://niko2014.github.io/2015/07/01/linux/tools/vim_cmd/</url>
+      <content type="html"><![CDATA[<h1 id="基本模式"><a href="#基本模式" class="headerlink" title="基本模式"></a>基本模式</h1><ul>
+<li>命令模式</li>
+</ul>
+<p>进入vim后, 默认就是命令模式.</p>
+<ul>
+<li><code>input</code>模式</li>
+</ul>
+<p>命令模式下, 输入<code>i</code>进入input模式, <code>esc</code>返回命令模式.</p>
+<h1 id="文本操作"><a href="#文本操作" class="headerlink" title="文本操作"></a>文本操作</h1><hr>
+<p><code>文本选择</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V</td>
+<td>selects entire lines</td>
+</tr>
+<tr>
+<td>v</td>
+<td>selects range of text</td>
+</tr>
+<tr>
+<td>ctrl-v</td>
+<td>列选择</td>
+</tr>
+<tr>
+<td>gv</td>
+<td>重新选择上次选择的区块</td>
+</tr>
+</tbody>
+</table>
+<p><code>选择 / 复制 / 粘贴 ...</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v(V for lines) -&gt; y  (yank)</td>
+<td>选择-&gt;复制</td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+</tr>
+<tr>
+<td>v -&gt; d  (delete)</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl + shift + v</td>
+<td>paster from clipboard in <code>input</code> mode</td>
+</tr>
+<tr>
+<td>ctrl + ;</td>
+<td>弹出clipboard菜单, 选择一个粘贴 (<code>input</code> mode)</td>
+</tr>
+</tbody>
+</table>
+<p><code>输入</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u</td>
+<td>undo</td>
+</tr>
+<tr>
+<td>ctrl + r</td>
+<td>redo</td>
+</tr>
+<tr>
+<td>ctrl-p or ctrl-n</td>
+<td>使用当前session中的pattern来自动完成</td>
+</tr>
+<tr>
+<td>a</td>
+<td>在光标后开始编辑</td>
+</tr>
+<tr>
+<td>o</td>
+<td>当前行后面插入一个新行</td>
+</tr>
+<tr>
+<td>O</td>
+<td>当前行前面插入一个新行</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>选择一个词</td>
+</tr>
+<tr>
+<td>v + gU</td>
+<td>(变大写)</td>
+</tr>
+<tr>
+<td>v + gu</td>
+<td>gu (变小写)</td>
+</tr>
+<tr>
+<td>ye</td>
+<td>复制当前光标到单词结尾的部分</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><code>缩进</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v or V</td>
+<td>区块缩进前需要选择文本</td>
+</tr>
+<tr>
+<td>5&gt;</td>
+<td>表示右缩进5个tab</td>
+</tr>
+<tr>
+<td><code>4&lt;</code></td>
+<td>同理, 左向4个tab</td>
+</tr>
+</tbody>
+</table>
+<p><code>浏览 / 移动</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ctrl + e</td>
+<td>向下滚屏，保持光标</td>
+</tr>
+<tr>
+<td>ctrl + y</td>
+<td>向上滚屏, 保持光标</td>
+</tr>
+<tr>
+<td>ctrl + d</td>
+<td>向下, 不保持光标</td>
+</tr>
+<tr>
+<td>ctrl + u</td>
+<td>向上, 不保持光标</td>
+</tr>
+<tr>
+<td>0 或 ^</td>
+<td>跳至行头</td>
+</tr>
+<tr>
+<td>$</td>
+<td>跳至行尾</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移至档尾（最后一行的第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移至档首（第一行之第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>ctrl+f</td>
+<td>下翻页</td>
+</tr>
+<tr>
+<td>ctrl+b</td>
+<td>上翻页</td>
+</tr>
+<tr>
+<td>w</td>
+<td>移至次一个字（word）字首。当然是指英文单字。</td>
+</tr>
+<tr>
+<td>W</td>
+<td>同上，但会忽略一些标点符号。</td>
+</tr>
+<tr>
+<td>)</td>
+<td>移至下一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>(</td>
+<td>移至上一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>}</td>
+<td>移至下一个段落（paragraph）首。</td>
+</tr>
+<tr>
+<td>{</td>
+<td>移至上一个段落（paragraph）首。</td>
+</tr>
+</tbody>
+</table>
+<p><code>查找 / 替换</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/ + your-search-string</td>
+<td>搜索, 可以使用正则, 注意转义</td>
+</tr>
+<tr>
+<td>ggn</td>
+<td></td>
+</tr>
+<tr>
+<td>GN</td>
+<td>最后一个</td>
+</tr>
+<tr>
+<td>/ + ↑或↓</td>
+<td>搜索历史</td>
+</tr>
+<tr>
+<td>:%s/源字符串/目的字符串/g</td>
+<td>全局替换， <code>%</code>表示所有行</td>
+</tr>
+<tr>
+<td>:4s/源字符串/目的字符串/g</td>
+<td>替换从第4行</td>
+</tr>
+<tr>
+<td>:1,4s/源字符串/目的字符串/g</td>
+<td>替换从第1行到第4行</td>
+</tr>
+</tbody>
+</table>
+<h1 id="多窗口"><a href="#多窗口" class="headerlink" title="多窗口"></a>多窗口</h1><hr>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:vsp file_path</td>
+<td>新增窗口垂直打开</td>
+</tr>
+<tr>
+<td>:sv</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, s</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, v</td>
+<td>垂直, 复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl w + up/down</td>
+<td>切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, w</td>
+<td>循环切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, h/j/k/l</td>
+<td>按方向切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, H/J/K/L</td>
+<td>按方向移动窗口</td>
+</tr>
+<tr>
+<td>ctrl w , q 或 c</td>
+<td>关闭窗口</td>
+</tr>
+</tbody>
+</table>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:set noautoindent</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number!</td>
+<td>切换</td>
+</tr>
+<tr>
+<td>:set number&amp;</td>
+<td>Set option to default value</td>
+</tr>
+<tr>
+<td>:set number?</td>
+<td>Show value of option</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>更多请参看另一博客，将会记录常见的配置及相关命令。</p>
+<h2 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h2><p>1.<br><code>:!command</code><br>如：</p>
+<pre><code>:!ls -al
+</code></pre><p>执行一个命令, 但不退出vim.</p>
+<p>2.<br><code>:r !command</code><br>将shell命令command的结果插入到当前行的下一行</p>
+<p>这个命令比较常用, 比如输入当前目录:</p>
+<pre><code>:r !pwd
+</code></pre><p>3.<br><code>:起始行号,结束行号 !command</code><br>将起始行号和结束行号指定的范围中的内容输入到shell命令command处理，并将处理结果替换起始行号和结束行号指定的范围中的内容</p>
+<p>4.<br><code>:起始行号,结束行号 w !command</code><br>将起始行号和结束行号所指定的范围的内容作为命令command的输入。不会改变当前编辑的文件的内容</p>
+<h2 id="编辑root权限的文件"><a href="#编辑root权限的文件" class="headerlink" title="编辑root权限的文件"></a>编辑root权限的文件</h2><p>这个功能也经常用到, 比如编辑某个root的文件(readonly)时, 忘记了sudo, 当改了很多内容才发现, 怎么办呢 ?</p>
+<pre><code>:w !sudo tee %
+</code></pre><p>若是sudo不能解决的, 先写到临时文件:</p>
+<pre><code>:w! ~/tempfile.ext
+</code></pre><h2 id="其他-待续…"><a href="#其他-待续…" class="headerlink" title="其他, 待续…"></a>其他, 待续…</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>[1] <a href="http://vimgifs.com/" target="_blank" rel="external">http://vimgifs.com/</a><br>[2] <a href="http://vimcasts.org/episodes/working-with-windows/" target="_blank" rel="external">http://vimcasts.org/episodes/working-with-windows/</a><br>[3] <a href="http://blog.csdn.net/topgun_chenlingyun/article/details/8013115" target="_blank" rel="external">http://blog.csdn.net/topgun_chenlingyun/article/details/8013115</a><br>[4] <a href="http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions" target="_blank" rel="external">http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[log 为什么使用isDebugEnable()和isTraceEnabled()]]></title>
+      <url>http://niko2014.github.io/2015/05/30/java/log_why_use_isDebug/</url>
+      <content type="html"><![CDATA[<p>今天看源码，发现许多框架的log部分都会有log.isTraceEnabled()之类的判断，然后再进行调用trace()打印日志。<br>我不禁想，为什么不直接使用log.trace(),结果不是一样吗。但细细想来，肯定有原因的。</p>
+<p>再看看if(isTraceEnabled()){}中的内容，有些打印日志的字符是比较多的，如果不判断直接调用的话，势必造成大量的资源消耗，如字符串拼接和对象toString()的操作。如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (log.isTraceEnabled()) &#123;</div><div class="line">    log.trace(&quot;attempting to get session; create = &quot; + create +</div><div class="line">            &quot;; session is null = &quot; + (this.session == null) +</div><div class="line">            &quot;; session has id = &quot; + (this.session != null &amp;&amp; session.getId() != null));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>原因就是这样～～</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[spring aop 简介 & JDK 动态代理]]></title>
+      <url>http://niko2014.github.io/2015/05/01/java/spring/spring-aop/</url>
+      <content type="html"><![CDATA[<h2 id="aop-简介"><a href="#aop-简介" class="headerlink" title="aop 简介"></a>aop 简介</h2><p>aop，全称：aspect-oriented programming，即是面向切面编程。<br>aop和Ioc并称为spring的两大特性，但aop有什么用呢？</p>
+<p>场景一：</p>
+<blockquote>
+<p>对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util的被调用。<br>假如我们需要在每次数据库操作之前或之后使用某个util记录日志，使用直接调用的话，要是有100个操作，你就需要在这100个操作前后调用log util。<br>又有可能，后来你不需要这个util了，你又需要在100个地方取消它。是不是很痛苦呢～～<br>当然，可以通过面向对象和设计模式的方法来解决一部分问题，但仍显得不够优雅和敏捷。</p>
+</blockquote>
+<p>当然应用场景还不仅这些，还有如session管理，验证，事务，权限等等方面都有类似的问题。</p>
+<p>为了解决这些痛点，于是便有了AOP。那AOP是如何解决这个问题的呢？首先了解基本概念。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><hr>
+<p><img src="/images/spring-pointcut.png" alt=""></p>
+<p><img src="/images/aop-gif.gif" alt=""></p>
+<p>以上两张图，很好的展示了AOP的工作方式，以及为什么叫切面编程。<br>这里主要涉及到几个概念：</p>
+<h4 id="Advice（通知）："><a href="#Advice（通知）：" class="headerlink" title="Advice（通知）："></a>Advice（通知）：</h4><p>如图，主要描述要增强的行为，如场景一中的log行为，但不仅如此，Advice还分BeforeAdvice、AfterAdvice、ThrowsAdvice等类型。</p>
+<h4 id="Pointcut（切点）："><a href="#Pointcut（切点）：" class="headerlink" title="Pointcut（切点）："></a>Pointcut（切点）：</h4><p>这个描述了Advice或切面要嵌入的位置，比如场景一中的数据库操作，其实就是一个Pointcut。</p>
+<p>现在，有了Advice和Pointcut，总感觉差点什么。没错，需要一个配置器（通知器），把两者关联起来。因此定义为：</p>
+<h4 id="Advisor（通知器）："><a href="#Advisor（通知器）：" class="headerlink" title="Advisor（通知器）："></a>Advisor（通知器）：</h4><p>通知器建立了Advice和Pointcut的关联，因此我们终于可以知道在某个切点要用哪个通知了。</p>
+<hr>
+<p>因此，场景一的AOP解决方案，以Spring Aspect（注解版）为例：</p>
+<p>1, 使用spring注解，如下代码， 定义Advice，下面我们使用<code>@Before</code>注解，被标注的方法相当与一个Advice。<br>2, <code>@Before</code>注解中有个参数，这个参数定义了切点的描述，这里可以使用一些通配符来简化配置。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Aspect</div><div class="line">@Component</div><div class="line">public class LogAspect &#123;</div><div class="line"></div><div class="line">    @Before(&quot;execution(* foo.FooDao.op(..))&quot;)</div><div class="line">    public void log(JoinPoint joinPoint) &#123;</div><div class="line">        LOG.info(&quot;before ...&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用注解，好处就是省去了Advisor的配置，偷个懒～～  当然在<code>applicationContext.xml</code>中要启用<code>&lt;aop:aspectj-autoproxy/&gt;</code>和<code>&lt;context:component-scan</code>才行。<br><a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html" target="_blank" rel="external">XML 声明文档传送门</a></p>
+<p>看完这个，你一定对spring aop的实现很好奇，接下来就简单看一下spring aop的工作flow吧。</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><hr>
+<p>也许你已经猜到，要实现AOP，必须使用反射和动态代理。没错，Java的这个特性可以实现AOP。<br>spring环境下，再结合Ioc的统一对象管理，功能无比强大啊。<br>接下来我们就一起结合源码看一下aop是怎么工作的。</p>
+<h3 id="生成-aop-proxy"><a href="#生成-aop-proxy" class="headerlink" title="生成 aop proxy"></a>生成 aop proxy</h3><hr>
+<p>这里Ioc部分不介绍了（请参阅另一博文<code>spring Ioc</code>），直接以aop proxy生成为入口。<br>以下是主要的类，接下来让我们慢慢体会这样设计的原因：</p>
+<p><img src="/images/ProxyCreatorSupport-hierarchy.png" alt=""></p>
+<p>具体的aop代理对象的生成，分别是由AspectJProxyFactory、ProxyFactoryBean和ProxyFactory来完成的。</p>
+<p>以ProxyFactoryBean.getObject()为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object getObject() throws BeansException &#123;</div><div class="line">    initializeAdvisorChain();</div><div class="line">    if (isSingleton()) &#123;</div><div class="line">        return getSingletonInstance();</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        ...</div><div class="line">        return newPrototypeInstance();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>initializeAdvisorChain()代码比较长，主要流程是 : 根据内置成员<code>interceptorNames : String[]</code>生成bean，然后namedBeanToAdvisor()转换成Advisor，<br>再调用父类AdvisedSupport.addAdvisor(Advisor)增加到通知器链<code>LinkedList&lt;Advisor&gt;</code>中，后面也会对这部分进行更详细介绍。</p>
+<p>结合上面的class hierarchy图，可知AdvisedSupport主要封装了对通知和通知器的相关操作（从命名也可以知道），这些操作对不同的代理对象应该是一致的，<br>而代理对象的生成，是交给子类去实现的，<code>ProxyCreatorSupport</code>则协助子类进行proxy的生成。</p>
+<p>而生成的proxy, 可以是singleton或者prototype，这个功能都是由AopProxy完成的。<br>而这个AopProxy是由AopProxyFactory创建，这部分代码在ProxyCreatorSupport中：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// ProxyCreatorSupport.java</div><div class="line">protected final synchronized AopProxy createAopProxy() &#123;</div><div class="line">    if (!this.active) &#123;</div><div class="line">        activate();</div><div class="line">    &#125;</div><div class="line">    return getAopProxyFactory().createAopProxy(this);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中getAopProxyFactory()，即this.aopProxyFactory，是spring封装的DefaultAopProxyFactory：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public ProxyCreatorSupport() &#123;</div><div class="line">    this.aopProxyFactory = new DefaultAopProxyFactory();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>DefaultAopProxyFactory createAopProxy()会根据target class是否接口来选择不同的生成方式(下图)。<br>如果是接口，则使用jdk动态代理；否则使用cglib，如下所示：<br>所以，上面提到的AopProxy是一个接口，它有两个实现：CglibAopProxy和JdkDynamicAopProxy。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException &#123;</div><div class="line">    if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) &#123;</div><div class="line">        Class targetClass = config.getTargetClass();</div><div class="line">        if (targetClass == null) &#123;</div><div class="line">            throw new AopConfigException(&quot;TargetSource cannot determine target class: &quot; +</div><div class="line">                    &quot;Either an interface or a target is required for proxy creation.&quot;);</div><div class="line">        &#125;</div><div class="line">        if (targetClass.isInterface()) &#123;</div><div class="line">            return new JdkDynamicAopProxy(config);</div><div class="line">        &#125;</div><div class="line">        return CglibProxyFactory.createCglibProxy(config);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        return new JdkDynamicAopProxy(config);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>jdk和cglib的生成方式这里略过，感兴趣的话查看<code>new JdkDynamicAopProxy(AdvisedSupport)</code>和<code>CglibProxyFactory.createCglibProxy(config)</code>即可。</p>
+<h3 id="拦截器调用"><a href="#拦截器调用" class="headerlink" title="拦截器调用"></a>拦截器调用</h3><hr>
+<p>生成代理完成时，相关的拦截器已经配置完成了，现在只需在代理对象调用时回调这些拦截器即可，Jdk和cglib的代理和回调有些不同。</p>
+<p>这里以大家熟悉的jdk dynamic proxy为例，如下图，JdkDynamicAopProxy实现了InvocationHandler：</p>
+<p><img src="/images/JdkDynamicAopProxy.png" alt=""></p>
+<p>invoke()的源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</div><div class="line">    MethodInvocation invocation;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line"></div><div class="line">    TargetSource targetSource = this.advised.targetSource;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line"></div><div class="line">    ...</div><div class="line">    // Get the interception chain for this method.</div><div class="line">    List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line"></div><div class="line">    // Check whether we have any advice. If we don&apos;t, we can fallback on direct</div><div class="line">    // reflective invocation of the target, and avoid creating a MethodInvocation.</div><div class="line">    if (chain.isEmpty()) &#123;</div><div class="line">        // We can skip creating a MethodInvocation: just invoke the target directly</div><div class="line">        // Note that the final invoker must be an InvokerInterceptor so we know it does</div><div class="line">        // nothing but a reflective operation on the target, and no hot swapping or fancy proxying.</div><div class="line">        retVal = AopUtils.invokeJoinpointUsingReflection(target, method, args);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        // We need to create a method invocation...</div><div class="line">        invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);</div><div class="line">        // Proceed to the joinpoint through the interceptor chain.</div><div class="line">        retVal = invocation.proceed();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如上可知，<code>chain</code>是通过<code>AdvisedSupport</code>（this.advised）的getInterceptorsAndDynamicInterceptionAdvice()获取的。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public List&lt;Object&gt; getInterceptorsAndDynamicInterceptionAdvice(Method method, Class targetClass) &#123;</div><div class="line">    MethodCacheKey cacheKey = new MethodCacheKey(method);</div><div class="line">    List&lt;Object&gt; cached = this.methodCache.get(cacheKey);</div><div class="line">    if (cached == null) &#123;</div><div class="line">        cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(</div><div class="line">                this, method, targetClass);</div><div class="line">        this.methodCache.put(cacheKey, cached);</div><div class="line">    &#125;</div><div class="line">    return cached;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，this.advisorChainFactory是一个叫DefaultAdvisorChainFactory的工厂，主要实现了拦截器链的获取。<br>而且，会注册到<code>AdvisorAdapterRegistry</code>接口的实现<code>DefaultAdvisorAdapterRegistry</code>中。<br>DefaultAdvisorAdapterRegistry的构造器如下所示，可以看到，这里注册了一些常见的AdviceAdapter：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public DefaultAdvisorAdapterRegistry() &#123;</div><div class="line">    registerAdvisorAdapter(new MethodBeforeAdviceAdapter());</div><div class="line">    registerAdvisorAdapter(new AfterReturningAdviceAdapter());</div><div class="line">    registerAdvisorAdapter(new ThrowsAdviceAdapter());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="/images/AdvisorAdapter-hierarchy.png" alt=""></p>
+<p>上面这些adapters，主要有两个作用，以<code>AfterReturningAdviceAdapter</code>为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class AfterReturningAdviceAdapter implements AdvisorAdapter, Serializable &#123;</div><div class="line"></div><div class="line">    public boolean supportsAdvice(Advice advice) &#123;</div><div class="line">        return (advice instanceof AfterReturningAdvice);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public MethodInterceptor getInterceptor(Advisor advisor) &#123;</div><div class="line">        AfterReturningAdvice advice = (AfterReturningAdvice) advisor.getAdvice();</div><div class="line">        return new AfterReturningAdviceInterceptor(advice);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>作用之一是判断某个Advice属于什么类型;还有就是返回相对应的AdviceInterceptor。</p>
+<p>advice的实现其实也是拦截器(实现了MethodInterceptor)，如下所示：</p>
+<p><img src="/images/AdviceInterceptor.png" alt=""></p>
+<p>和上面保持一致，以AfterReturingInterceptor为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object invoke(MethodInvocation mi) throws Throwable &#123;</div><div class="line">    Object retVal = mi.proceed();</div><div class="line">    this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());</div><div class="line">    return retVal;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>回到<code>JdkDynamicAopProxy.invoke()</code>，其中的ReflectiveMethodInvocation.proceed()就是链调用主要入口, 如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">public Object proceed() throws Throwable &#123;</div><div class="line">    //  We start with an index of -1 and increment early.</div><div class="line">    if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) &#123;</div><div class="line">        return invokeJoinpoint();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Object interceptorOrInterceptionAdvice =</div><div class="line">            this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);</div><div class="line">    if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) &#123;</div><div class="line">        // Evaluate dynamic method matcher here: static part will already have</div><div class="line">        // been evaluated and found to match.</div><div class="line">        InterceptorAndDynamicMethodMatcher dm =</div><div class="line">                (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;</div><div class="line">        if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) &#123;</div><div class="line">            return dm.interceptor.invoke(this);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // Dynamic matching failed.</div><div class="line">            // Skip this interceptor and invoke the next in the chain.</div><div class="line">            return proceed();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        // It&apos;s an interceptor, so we just invoke it: The pointcut will have</div><div class="line">        // been evaluated statically before this object was constructed.</div><div class="line">        return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面主要是遍历每个 interceptorOrInterceptionAdvice，并调用相应的拦截器，这样串起来，整个流程就清晰了。<br>其中InterceptorAndDynamicMethodMatcher组合MethodInterceptor和MethodMatcher，使其作为通知链的一个element使用，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class InterceptorAndDynamicMethodMatcher &#123;</div><div class="line"></div><div class="line">    final MethodInterceptor interceptor;</div><div class="line"></div><div class="line">    final MethodMatcher methodMatcher;</div><div class="line"></div><div class="line">    public InterceptorAndDynamicMethodMatcher(MethodInterceptor interceptor, MethodMatcher methodMatcher) &#123;</div><div class="line">        this.interceptor = interceptor;</div><div class="line">        this.methodMatcher = methodMatcher;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上就是ProxyFactoryBean调用的主要流程，只是一个大概的流程，看源码的话，spring会有许多细节验证和处理。不过阅读时，一定要抓住重要的主线，还有熟悉常见的设计模式，这会让你有个全景的认识和理解。</p>
+<h2 id="DIY-属于自己的AOP"><a href="#DIY-属于自己的AOP" class="headerlink" title="DIY 属于自己的AOP"></a>DIY 属于自己的AOP</h2><p>// TODO still in drafts 。</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[python scrapy 爬虫初体验]]></title>
+      <url>http://niko2014.github.io/2015/03/30/python/python_scrapy_get_started/</url>
+      <content type="html"><![CDATA[<p>之前写爬虫都是用Java，换成Python来写，开发速度应该会更快，今天就来试试。</p>
+<h1 id="初体验"><a href="#初体验" class="headerlink" title="初体验"></a>初体验</h1><hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><hr>
+<p>首先，安装Python（for Ubuntu）:</p>
+<pre><code>sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev
+</code></pre><p>安装<a href="https://pip.pypa.io/en/latest/installing/" target="_blank" rel="external">pip</a>，pip类似Java的Maven</p>
+<p>安装使用虚拟环境：</p>
+<pre><code>sudo pip install virtualenv
+virtualenv foo_env
+source ./foo_env/bin/active
+</code></pre><p>安装scrapy：</p>
+<pre><code>pip install scrapy
+</code></pre><h1 id="scrapy-架构"><a href="#scrapy-架构" class="headerlink" title="scrapy 架构"></a>scrapy 架构</h1><p>Scrapy 的架构图如下所示，有个大概的印象即可，以后会陆续使用到：</p>
+<p><img src="/images/scrapy_architecture.png" alt=""></p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><hr>
+<p>写一个小爬虫，来获取一个网页的所有图片：</p>
+<p>进入一个新建目录，生成项目结构：</p>
+<pre><code>scrapy startproject hello
+</code></pre><p>目录结构：</p>
+<pre><code>.
+├── hello
+│   ├── __init__.py
+│   ├── items.py
+│   ├── pipelines.py
+│   ├── settings.py
+│   └── spiders
+│       └── __init__.py
+└── scrapy.cfg
+</code></pre><p>首先，我们定义要crawl的东西，会把它封装成一个Item，传递给框架的其他组件处理：</p>
+<p><code>hello/items.py</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import scrapy</div><div class="line"></div><div class="line"></div><div class="line">class HelloItem(scrapy.Item):</div><div class="line">    # define the fields for your item here like:</div><div class="line">    link = scrapy.Field()</div></pre></td></tr></table></figure>
+<p>这个Item只定义了一个属性<code>link</code>，来保存图片链接。</p>
+<p>接下来编写Spider：</p>
+<p>新建<code>hello/spiders/img_spider.py</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">from hello.items import HelloItem</div><div class="line"></div><div class="line">__author__ = &apos;niko&apos;</div><div class="line"></div><div class="line">import scrapy</div><div class="line"></div><div class="line">class HelloSpider(scrapy.Spider):</div><div class="line">    name = &quot;img&quot;</div><div class="line">    allowed_domains = [&quot;moegirl.org&quot;]</div><div class="line">    start_urls = [</div><div class="line">        &quot;https://zh.moegirl.org/index.php?title=%E7%BB%AB%E6%B3%A2%E4%B8%BD&amp;mobileaction=toggle_view_desktop&quot;,</div><div class="line">    ]</div><div class="line"></div><div class="line">    def parse(self, response):</div><div class="line">        title = response.xpath(&apos;//title/text()&apos;).extract()[0]</div><div class="line">        # TODO make dir with value of title</div><div class="line">        items = []</div><div class="line">        for image_link in response.xpath(&apos;//img/@src&apos;).extract():</div><div class="line">            item = HelloItem()</div><div class="line">            item[&apos;link&apos;] = image_link</div><div class="line">            items.append(item)</div><div class="line">        return items</div></pre></td></tr></table></figure>
+<p>上面的代码是使用xpath的选择器，简单的选取了<code>img</code>标签的src属性，并构造了HelloItem实例，传递给框架的pipelines来处理，下面我们看一下pipelines：</p>
+<p><code>hello/pipelines.py</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class HelloPipeline(object):</div><div class="line">    def process_item(self, item, spider):</div><div class="line">        print &apos;\n\n processing image =&gt; &apos; + item[&apos;link&apos;]</div><div class="line">        return item</div></pre></td></tr></table></figure>
+<p>上面定义了一个HelloPipeline，第二个参数<code>item</code>就是我们刚才构造的HelloItem；在process_item()方法中，我们通常会做如下处理：</p>
+<ul>
+<li>清洗数据</li>
+<li>验证数据</li>
+<li>数据去重</li>
+<li>持久化数据</li>
+<li>～～～</li>
+</ul>
+<p>写好自定义的Pipeline之后，我们还需要在<code>settings.py</code>注册：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ITEM_PIPELINES = &#123;</div><div class="line">   &apos;hello.pipelines.HelloPipeline&apos;: 300</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>300</code>是多个pipelines执行的顺序值。</p>
+<p>现在可以执行刚才定义的<code>img</code>小蜘蛛了：</p>
+<pre><code>scrapy crawl img
+</code></pre><p>在console可以看到我们我们爬取网页的所有图片URL了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在这个小例子中，只涉及到了架构图中的Spider和Pipeline，这些middleware还需要更深入的学习和实践。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://doc.scrapy.org/en/latest/intro/tutorial.html" target="_blank" rel="external">http://doc.scrapy.org/en/latest/intro/tutorial.html</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[slf4j 绑定机制浅析]]></title>
+      <url>http://niko2014.github.io/2015/03/03/java/slf4j/</url>
+      <content type="html"><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。</p>
+<p>可能你还是要问， 为什么要使用slf4j呢？<br>举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。<br>现在你想换成logback或其他的日志实现，你就需要修改100个地方。<br>而如果使用slf4j来写入日志，因为多了一层绑定的过程，你只要切换你的依赖即可。</p>
+<p>使用slf4j很简单，只要加入slf4j-api-xxx.jar、第三方日志实现及其binding包的依赖即可。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;!-- slf4j api --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;slf4j.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback binding --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback impl --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<p>接下来， 你就可以“hello world”啦！</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import org.slf4j.Logger;</div><div class="line">import org.slf4j.LoggerFactory;</div><div class="line"></div><div class="line">public class HelloWorld &#123;</div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    Logger logger = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line">    logger.info(&quot;Hello World&quot;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>根据slf4j的介绍，</p>
+<blockquote>
+<p>each SLF4J binding is hardwired at compile time to use one and only one specific logging framework</p>
+</blockquote>
+<p>它是静态绑定的， 接下来，让我们一起来揭开绑定的神秘面纱吧。</p>
+<h2 id="绑定原理"><a href="#绑定原理" class="headerlink" title="绑定原理"></a>绑定原理</h2><p>这是官网的一张图, 这里展示了常见的一些log实现和绑定：</p>
+<p><img src="/images/slf4j-concrete-bindings.png" alt=""></p>
+<p>前面说过， slf4j是在静态绑定， 为什么这么说呢？ 答案就在绑定实现的包中， 如下：</p>
+<p>logback-classic.jar<br><img src="/images/logback-jar.png" alt=""></p>
+<p>slf4j-log4j.jar<br><img src="/images/slf4j-log4j.png" alt=""></p>
+<p>如上图，可以发现都有<code>org.slf4j.impl.StaticLoggerBinder</code>,<br>再看LoggerFactory.getLogger()时，即<code>org.slf4j.LoggerFactory.getILoggerFactory</code>的调用hierarchy：</p>
+<p><img src="/images/slf4j_LoggerFactory_bind_called.png" alt=""></p>
+<p>其中bind()内部是我们想要的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">private final static void bind() &#123;</div><div class="line">  try &#123;</div><div class="line">    Set staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();</div><div class="line">    reportMultipleBindingAmbiguity(staticLoggerBinderPathSet);</div><div class="line">    // the next line does the binding</div><div class="line">    StaticLoggerBinder.getSingleton();</div><div class="line">    INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;</div><div class="line">    reportActualBinding(staticLoggerBinderPathSet);</div><div class="line">    emitSubstituteLoggerWarning();</div><div class="line">  &#125; catch (NoClassDefFoundError ncde) &#123;</div><div class="line">    String msg = ncde.getMessage();</div><div class="line">    if (messageContainsOrgSlf4jImplStaticLoggerBinder(msg)) &#123;</div><div class="line">      INITIALIZATION_STATE = NOP_FALLBACK_INITIALIZATION;</div><div class="line">      Util.report(&quot;Failed to load class \&quot;org.slf4j.impl.StaticLoggerBinder\&quot;.&quot;);</div><div class="line">      Util.report(&quot;Defaulting to no-operation (NOP) logger implementation&quot;);</div><div class="line">      Util.report(&quot;See &quot; + NO_STATICLOGGERBINDER_URL</div><div class="line">              + &quot; for further details.&quot;);</div><div class="line">    &#125; else &#123;</div><div class="line">      failedBinding(ncde);</div><div class="line">      throw ncde;</div><div class="line">    &#125;</div><div class="line">  &#125; catch (java.lang.NoSuchMethodError nsme) &#123;</div><div class="line">    String msg = nsme.getMessage();</div><div class="line">    if (msg != null &amp;&amp; msg.indexOf(&quot;org.slf4j.impl.StaticLoggerBinder.getSingleton()&quot;) != -1) &#123;</div><div class="line">      INITIALIZATION_STATE = FAILED_INITIALIZATION;</div><div class="line">      Util.report(&quot;slf4j-api 1.6.x (or later) is incompatible with this binding.&quot;);</div><div class="line">      Util.report(&quot;Your binding is version 1.5.5 or earlier.&quot;);</div><div class="line">      Util.report(&quot;Upgrade your binding to version 1.6.x.&quot;);</div><div class="line">    &#125;</div><div class="line">    throw nsme;</div><div class="line">  &#125; catch (Exception e) &#123;</div><div class="line">    failedBinding(e);</div><div class="line">    throw new IllegalStateException(&quot;Unexpected initialization failure&quot;, e);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如代码，绑定方法bind()，首先通过<code>findPossibleStaticLoggerBinderPathSet()：staticLoggerBinderPathSet</code>来获取classpath中可能的binder paths, 如下：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Enumeration&lt;URL&gt; ClassLoader.getSystemResources(String STATIC_LOGGER_BINDER_PATH)</div></pre></td></tr></table></figure></p>
+<p>其中STATIC_LOGGER_BINDER_PATH = “org/slf4j/impl/StaticLoggerBinder.class”。</p>
+<h3 id="多个绑定存在的情况"><a href="#多个绑定存在的情况" class="headerlink" title="多个绑定存在的情况"></a>多个绑定存在的情况</h3><p>当发生多个绑定同时存在时，官方的说明是这样的：</p>
+<blockquote>
+<p>The warning emitted by SLF4J is just that, a warning. Even when multiple bindings are present, SLF4J will pick one logging framework/implementation and bind with it. The way SLF4J picks a binding is determined by the JVM and for all practical purposes should be considered random.</p>
+</blockquote>
+<p>实际运行结果并结合以上代码，当返回的URL有多个时，reportMultipleBindingAmbiguity()会打印出警告：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class path contains multiple SLF4J bindings.</div><div class="line">Found binding in [jar:file:/home/niko/.m2/repository/.../logback-classic-1.1.3.jar!/org/slf4j/impl/StaticLoggerBinder.class[]</div><div class="line">Found binding in [...]</div></pre></td></tr></table></figure>
+<p>然后reportActualBinding()再打印出真正被加载的<code>StaticLoggerBinder</code>的class name，比如：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]</div></pre></td></tr></table></figure></p>
+<p>为了避免这种问题，可以使用maven的全局排除依赖来保证只会出现某一个实现。</p>
+<blockquote>
+<p>more info -&gt; <a href="http://www.slf4j.org/codes.html" target="_blank" rel="external">http://www.slf4j.org/codes.html</a></p>
+</blockquote>
+<h2 id="MDC-Mapped-Diagnostic-Context"><a href="#MDC-Mapped-Diagnostic-Context" class="headerlink" title="MDC (Mapped Diagnostic Context )"></a>MDC (Mapped Diagnostic Context )</h2><p>这个功能只有log4j和logback支持。<br>具体内容请查看log4j和logback部分。</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[maven 模块聚合与继承]]></title>
+      <url>http://niko2014.github.io/2015/01/02/java/maven/maven_aggregate/</url>
+      <content type="html"><![CDATA[<p>在开发中，出于分工和设计和管理上的原因，我们无可避免地要进行分模块开发。<br>虽然OSGi、Jigsaw都有涉及到模块化，但常见的应用中，我们会使用一些构建工具（如maven）进行模块的管理。</p>
+<h2 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h2><p>举个例子（<a href="https://github.com/niko2014/blog-demo/tree/master/java/maven-aggregator-quick-start" target="_blank" rel="external">示例代码</a>），假设有两个模块：<br>user-model，用来定义用户的领域对象;<br>user-service，用来定义用户相关的业务操作，并依赖<code>user-model</code>模块。</p>
+<p>如今我们需要构建这个项目，如果没有模块之间没有关联，可能需要cd到每个模块，进行<code>mvn package</code>，build我们想要的模块。<br>而且这些依赖模块代码若有更新，手工去重新build，明显是不现实的。</p>
+<p>为了解决这个痛点，maven为我们提供了聚合模块的功能。</p>
+<p>在maven中，我们只需要：</p>
+<h3 id="1-定义一个-pom-packaging类型的module"><a href="#1-定义一个-pom-packaging类型的module" class="headerlink" title="1. 定义一个 pom packaging类型的module"></a>1. 定义一个 <code>pom</code> packaging类型的module</h3><p>模块暂且称为<code>user-aggregator</code>，<br>并在<code>user-aggregator/pom.xml</code>中定义其他模块成员的信息（<code>&lt;modules&gt;</code>）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;groupId&gt;org.niko.blog.demo.aggregator&lt;/groupId&gt;</div><div class="line">&lt;artifactId&gt;user-aggregator&lt;/artifactId&gt;</div><div class="line">&lt;packaging&gt;pom&lt;/packaging&gt;</div><div class="line">&lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</div><div class="line">...</div><div class="line">&lt;modules&gt;</div><div class="line">    &lt;module&gt;user-model&lt;/module&gt;</div><div class="line">    &lt;module&gt;../user-service&lt;/module&gt;</div><div class="line">&lt;/modules&gt;</div></pre></td></tr></table></figure>
+<p>说明一下，maven 的聚合模块可以使用两种结构：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">- 父子结构  </div><div class="line">| aggregator</div><div class="line">|-- son1  </div><div class="line">|-- son2</div><div class="line"></div><div class="line">- 平行结构</div><div class="line">|--aggregator  </div><div class="line">|--son1  </div><div class="line">|--son2</div></pre></td></tr></table></figure></p>
+<p>然而像上面那样混合使用也是可以的，目录结构类似下面：</p>
+<p><img src="/images/demo_user_modules_aggregate.png" alt=""></p>
+<p>个人经验来说，平行结构的一个好处就是，当你的不同模块在不同git仓库时，平行模块会比较适合。<br>即son1和son2是两个git仓库，这时候平行结构可以使其互不影响，这种场景在开发中还是经常会有的。</p>
+<h3 id="2-子项目增加parent的声明："><a href="#2-子项目增加parent的声明：" class="headerlink" title="2. 子项目增加parent的声明："></a>2. 子项目增加parent的声明：</h3><p>user-model/pom.xml 模块：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">      &lt;groupId&gt;org.niko.blog.demo.aggregator&lt;/groupId&gt;</div><div class="line">      &lt;artifactId&gt;user-aggregator&lt;/artifactId&gt;</div><div class="line">      &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</div><div class="line">      &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;</div><div class="line">  &lt;/parent&gt;</div></pre></td></tr></table></figure></p>
+<p>user-service/pom.xml 模块：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">      &lt;groupId&gt;org.niko.blog.demo.aggregator&lt;/groupId&gt;</div><div class="line">      &lt;artifactId&gt;user-aggregator&lt;/artifactId&gt;</div><div class="line">      &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</div><div class="line">      &lt;relativePath&gt;../user-aggregator/pom.xml&lt;/relativePath&gt;</div><div class="line">  &lt;/parent&gt;</div></pre></td></tr></table></figure></p>
+<h3 id="3-构建所有模块"><a href="#3-构建所有模块" class="headerlink" title="3. 构建所有模块"></a>3. 构建所有模块</h3><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[INFO] Scanning for projects...</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] Reactor Build Order:</div><div class="line">[INFO]</div><div class="line">[INFO] user-aggregator</div><div class="line">[INFO] user-model</div><div class="line">[INFO] user-service</div><div class="line">...</div><div class="line">...</div><div class="line">[INFO] Reactor Summary:</div><div class="line">[INFO]</div><div class="line">[INFO] user-aggregator ................................... SUCCESS [3.804s]</div><div class="line">[INFO] user-model ........................................ SUCCESS [33.208s]</div><div class="line">[INFO] user-service ...................................... SUCCESS [2.032s]</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] BUILD SUCCESS</div><div class="line">[INFO] ------------------------------------------------------------------------</div></pre></td></tr></table></figure>
+<h2 id="Reactor-反应堆"><a href="#Reactor-反应堆" class="headerlink" title="Reactor 反应堆"></a>Reactor 反应堆</h2><hr>
+<p>细心的童鞋已经发现，上面一次构建的输出信息中有<code>Reactor Build Order</code>这几个单词，那这又是什么东西呢？<br>翻译过来就是反应堆，顾名思义，表示所有模块组成的一个构建集合（一个模块可以看做一个反应堆）。<br>不过反应堆还包含了模块间的依赖和继承，并会计算出构建顺序。</p>
+<h3 id="裁剪反应堆"><a href="#裁剪反应堆" class="headerlink" title="裁剪反应堆"></a>裁剪反应堆</h3><p>上面的操作，是构建所有模块。那如果现在我想只构建某个模块（不构建没用到的模块）呢？这时就应该裁剪反应堆了。</p>
+<h4 id="具体使用"><a href="#具体使用" class="headerlink" title="具体使用"></a>具体使用</h4><p>&lt;！–<br>Maven 3.2.1 has added this feature, you can use -pl ! for exclude certain modules. This can be comma separated list of values that you want to include/exclude, exc<br>–&gt;</p>
+<p>假设user-service依赖user-model，现在使用裁剪反应堆来构建user-service，user-model也会被自动构建：</p>
+<pre><code>/.../user-aggregator/$ `mvn clean package -pl ../user-service -am`
+</code></pre><p>参数说明：</p>
+<pre><code>Options:
+-amd,--also-make-dependents：构建依赖于指定模块的模块
+-rf,--resume-from：从构建顺序的某个模块开始构建
+-pl，--projects: 构建指定的模块，模块间用逗号分割
+-am，--also-make : 同时构健模块的所依赖的模块
+</code></pre><h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><hr>
+<p>从上面介绍可以发现，使用聚合模块和继承有以下好处：</p>
+<ol>
+<li>配置重用（继承）；</li>
+<li>依赖和插件统一管理，如dependencyManagement和pluginManagement；</li>
+<li>自动分析和构建依赖，而且方便自身项目的version管理。</li>
+</ol>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>
+<p>【1】<a href="https://maven.apache.org/guides/mini/guide-multiple-modules.html" target="_blank" rel="external">https://maven.apache.org/guides/mini/guide-multiple-modules.html</a><br>【2】Maven实战.徐晓斌</p>
+]]></content>
+    </entry>
+    
+  
+  
+</search>

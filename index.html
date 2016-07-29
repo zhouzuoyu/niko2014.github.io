@@ -358,6 +358,122 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
             
             
               
+                <a class="post-title-link" href="/2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="url">
+                  Java 并发之 CAS
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-05T00:00:00+08:00" content="2016-04-05">
+              2016-04-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/05/java/concurrent/CAS_ABA_Java/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
+<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
+<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
+<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
+<ol>
+<li>一个进程P1读取值的时候是A</li>
+<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
+<li>另一个进程P2把A改成了B, 然后又改回了A</li>
+<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
+</ol>
+<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/04/04/linux/android/honor6_root_rom/" itemprop="url">
                   荣耀6刷入CM11
                 </a>
@@ -547,122 +663,6 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
 <p><img src="/images/defy_android44_installed.jpg" alt=""></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
 <p><a href="http://tieba.baidu.com/p/3600016194" target="_blank" rel="external">http://tieba.baidu.com/p/3600016194</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/03/02/java/concurrent/CAS_ABA_Java/" itemprop="url">
-                  Java 并发之 CAS
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-03-02T00:00:00+08:00" content="2016-03-02">
-              2016-03-02
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/03/02/java/concurrent/CAS_ABA_Java/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/02/java/concurrent/CAS_ABA_Java/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
-<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
-<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
-<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
-<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
-<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
-<ol>
-<li>一个进程P1读取值的时候是A</li>
-<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
-<li>另一个进程P2把A改成了B, 然后又改回了A</li>
-<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
-</ol>
-<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
-<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
 
             
           </span>
@@ -1439,14 +1439,14 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-count">49</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">122</span>
+              <span class="site-state-item-count">121</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
