@@ -202,6 +202,119 @@
             
             
               
+                <a class="post-title-link" href="/2016/01/13/linux/synergy/" itemprop="url">
+                  synergy 安装和使用 （一套键鼠掌握世界）
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-13T15:03:30+08:00" content="2016-01-13">
+              2016-01-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/13/linux/synergy/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/linux/synergy/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>由于有两台电脑，四个显示器，在使用的时候，难免要切换，但笔记本的触控板和键盘实在太难用～<code>%&gt;_&lt;%</code> 但是机械键盘和鼠标只有一套，怎么办呢？<br>还好之前看一些大牛的工作环境时，看到有一个工具叫synergy，用来同步鼠标和键盘，可以随意在多台电脑中切换。</p>
+<h1 id="通过apt-get-安装"><a href="#通过apt-get-安装" class="headerlink" title="通过apt-get 安装"></a>通过apt-get 安装</h1><p>因为我常用的操作系统是ubuntu和kali，当然是直接apt-get。</p>
+<pre><code>apt-get install synergy
+</code></pre><p>安装后，两台ubuntu（synergy版本1.4.12）之间操作没问题，然而在kali上是1.4.16版本，有不兼容的问题。于是找了下源，并没有找到对应的仓库，干脆就两边使用最新的源码install好了。</p>
+<h1 id="通过源码安装"><a href="#通过源码安装" class="headerlink" title="通过源码安装"></a>通过源码安装</h1><p>首先，安装依赖</p>
+<pre><code>sudo apt-get install cmake make g++ xorg-dev libqt4-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev libssl-dev
+</code></pre><p>访问<a href="https://github.com/symless/synergy/releases" target="_blank" rel="external">synergy on github</a>，git clone或者直接<a href="https://github.com/symless/synergy/archive/v1.7.5-stable.tar.gz" target="_blank" rel="external">下载</a>，然后：</p>
+<pre><code>tar xzvf v1.7.5-stable.tar.gz
+cd synergy-1.7.5-stable
+./hm conf -g1
+./hm build
+</code></pre><p>搞定。kali上也是如此操作，因为也是基于Debian。</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>跟着上面的操作，工作目录还在<code>synergy-1.7.5-stable</code>，执行<code>bin/synergy</code></p>
+<p>1，开启服务器（服务器即是你鼠标和键盘连接的那台电脑），synergy 会有个向导，选择服务器模式；<br>2，点击<code>Configure Server</code>，拖拽显示右上角的显示到格子中，想要的放置位置，这里要注意显示器的name需要填写正确，这个name就是client（或server）的名称，client若对不上，会被server拒绝连接的（name在<code>Edit - Settings</code>中设置）。</p>
+<p><img src="/images/synergy_server_conf.png" alt=""><br><img src="/images/synergy_name_settings.png" alt=""></p>
+<p>3，主界面点击start，界面可以看到log，包括客户端的连接。<br>4，启动server后，其他主机同样<code>bin/synergy</code>启动，选择client模式，接着设置一下自己的name，填写server的IP，点击<code>Start</code>。<br>5，Okay，这时可以发现，一套键鼠可以操控多台计算机啦，尽情地享受多屏多机的快感吧，工作效率杠杠的。    :-D</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/01/12/java/spring/spring_transaction_manager/" itemprop="url">
                   【spring】事务提交后进行某些操作
                 </a>
@@ -1213,6 +1326,146 @@
             
             
               
+                <a class="post-title-link" href="/2015/12/01/java/utils/java_dir_watchdog/" itemprop="url">
+                  java版目录watchdog
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-01T00:00:00+08:00" content="2015-12-01">
+              2015-12-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/01/java/utils/java_dir_watchdog/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/01/java/utils/java_dir_watchdog/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>工作中我们经常会用到监听目录的功能, 当目录中有文件增加删除等操作时, 执行某些任务. 如果是Java来写, 怎么做呢 ?</p>
+<h1 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h1><p>实现这个功能, 我们要使用到<code>WatchService</code>和<code>Path</code>这两个东西, 首先创建一个WatchService:</p>
+<pre><code>WatchService watcher = FileSystems.getDefault().newWatchService();
+</code></pre><p>接着就可以注册这个WatchService到某个Path了:</p>
+<pre><code>Path dir = ...;
+WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+`ENTRY_CREATE`等事件定义在`StandardWatchEventKinds`中.
+</code></pre><p>注册后, 我们使用<code>WatchService.take()</code>就可以获取目录变更的事件了, 若没有, 则wait .</p>
+<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><p>接下来就是写一个工具类<code>WatchDirUtils</code>, 用来接收和注册监听请求及回调.</p>
+<p>相对于<code>WatchDirUtils</code>, 客户端的需求无非就两个, 一个是要监听的目录, 另一个是变更时的Callback. 我们可以封装成一个类.</p>
+<p>我们暂且定义<code>WatchPath</code>和<code>WatchCallback</code>两个接口:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchPath &#123;</div><div class="line">    public java.nio.file.Path getPath();</div><div class="line">&#125;</div><div class="line">public interface WatchCallback &#123;</div><div class="line">    public void handle(WatchEvent&lt;?&gt; event);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后, 定义一个<code>WatchRequest</code>接口, 继承<code>WatchPath</code>和<code>WatchCallback</code>, 同时要求返回是否递归监听.<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchRequest extends WatchPath, WatchCallback &#123;</div><div class="line">    public boolean isRecursive();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接口定义好了, 接下来就是实现了, 我们新建一个<code>DebugWatchRequest</code>实现类,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class DebugWatchRequest implements WatchRequest &#123;</div><div class="line">    ...</div><div class="line">    @Override</div><div class="line">    public void handle(WatchEvent&lt;Path&gt; ev) &#123;</div><div class="line">        Path name = ev.context();</div><div class="line">        Path child = dir.resolve(name);</div><div class="line">        System.out.format(&quot;%s: %s\n&quot;, event.kind().name(), child);</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>封装好了watch请求, 只需要定义一个静态方法, 把请求传入即可.</p>
+<pre><code>WatchDirUtils.register(new DebugWatchRequest(Path dir));
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static void register(WatchRequest watchRequest) throws IOException &#123;</div><div class="line">        if (started.compareAndSet(false, true)) &#123;</div><div class="line">            init();</div><div class="line">        &#125;</div><div class="line">        if (serviceDown.get()) &#123;</div><div class="line">            throw new Exception(&quot;watch service down.&quot;);</div><div class="line">        &#125;</div><div class="line">        try &#123;</div><div class="line">            Path dir = watchRequest.getPath();</div><div class="line">            if (watchRequest.isRecursive()) &#123;</div><div class="line">                System.out.format(&quot;Scanning %s ...\n&quot;, dir);</div><div class="line">                registerRecursive(dir, watchRequest);</div><div class="line">                System.out.println(&quot;Done.&quot;);</div><div class="line">            &#125; else &#123;</div><div class="line">                registerNonRecursive(watchRequest);</div><div class="line">            &#125;</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>当该方法第一次被调用时, 会进行初始化:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static void init() throws IOException &#123;</div><div class="line">        watcher = FileSystems.getDefault().newWatchService();</div><div class="line">        keysToWatchRequest = new ConcurrentHashMap&lt;&gt;();</div><div class="line">        trace = true;</div><div class="line"></div><div class="line">        // 启动线程来处理事件</div><div class="line">        ExecutorService exec = Executors.newSingleThreadExecutor();</div><div class="line">        exec.execute(new EventProcessor());</div><div class="line"></div><div class="line">        serviceDown.set(false);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>初始化包括新建watcher, 还有keysToWatchRequest(<br>在前面的介绍中, 我们已经知道, register某个目录后, 会有一个WatchKey返回, 所以需要有一个Map来关联WatchKey和Callback ).</p>
+<p>最后启动一个线程来从watcher获取变更的事件, 并调用对应的Callback去handle该事件.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// EventProcessor</div><div class="line"></div><div class="line">private static class EventProcessor implements Runnable &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            while (!Thread.interrupted()) &#123;</div><div class="line">                // wait for key to be signalled</div><div class="line">                WatchKey key;</div><div class="line">                try &#123;</div><div class="line">                    key = watcher.take();</div><div class="line">                &#125; catch (InterruptedException x) &#123;</div><div class="line">                    serviceDown();</div><div class="line">                    return;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                WatchRequest watchRequest = keysToWatchRequest.get(key);</div><div class="line">                if (watchRequest == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no cb) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">                Path dir = watchRequest.getPath();</div><div class="line">                if (dir == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no path) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                for (WatchEvent&lt;?&gt; event: key.pollEvents()) &#123;</div><div class="line">                    WatchEvent.Kind kind = event.kind();</div><div class="line">                    // TBD - provide example of how OVERFLOW event is handled</div><div class="line">                    if (kind == OVERFLOW) &#123;</div><div class="line">                        continue;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    // handle</div><div class="line">                    watchRequest.handle(event);</div><div class="line"></div><div class="line">                    // Context for directory entry event is the file name of entry</div><div class="line">                    WatchEvent&lt;Path&gt; ev = cast(event);</div><div class="line">                    Path name = ev.context();</div><div class="line">                    Path child = dir.resolve(name);</div><div class="line"></div><div class="line">                    // if directory is created, and watching recursively, then</div><div class="line">                    // register it and its sub-directories</div><div class="line">                    if (watchRequest.isRecursive() &amp;&amp; (kind == ENTRY_CREATE)) &#123;</div><div class="line">                        try &#123;</div><div class="line">                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) &#123;</div><div class="line">                                registerRecursive(child, new DebugWatchRequest(child).setIsRecursive(true));</div><div class="line">                            &#125;</div><div class="line">                        &#125; catch (IOException x) &#123;</div><div class="line">                            // ignore to keep sample readbale</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                // reset key and remove from set if directory no longer accessible</div><div class="line">                boolean valid = key.reset();</div><div class="line">                if (!valid) &#123;</div><div class="line">                    keysToWatchRequest.remove(key);</div><div class="line"></div><div class="line">                    // all directories are inaccessible</div><div class="line">                    if (keysToWatchRequest.isEmpty()) &#123;</div><div class="line">                        break;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            serviceDown();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private void serviceDown() &#123;</div><div class="line">            serviceDown.set(true);</div><div class="line">            // TODO REPORT IT</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h1 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h1><p>这个demo实现了一个简单的目录watch功能, 还有许多地方需要改进. 比如:</p>
+<ul>
+<li><strong>InterruptedException等异常 及 客户端自定义通知方</strong></li>
+</ul>
+<p>当发生interrupt时, 应该停止服务释放资源, 进行记录日志并通过一些report通知给中控或相关人员, 关闭WatchService等 不过也应支持一下客户端自定义通知方式.<br>同时,  OVERFLOW等异常也要有对应的处理方式, 这个WatchService也不能100%保证可靠, 可以采取一些定时扫描的其他措施来弥补.</p>
+<ul>
+<li><strong>事件的处理和Callback的调用效率</strong></li>
+</ul>
+<p>目前的事件处理线程是只有一个的, 而且Callback的handle()时同步调用的.</p>
+<p><strong> 那能够改成异步的呢 ? </strong></p>
+<p>这个要看情况.<br>如果这个回调操作是次要业务, 那就不能使用异步. 因为如果一瞬间促发了许多回调, 那么这些回调同时运行, 极有可能迅速占用系统功能, 影响主业务, 甚至崩溃.<br>使用异步是有一定风险的, 不过开多几个线程还是可以考虑的.</p>
+<ul>
+<li><strong>支持多个WatchCallback</strong></li>
+</ul>
+<p>这个demo支持一个WatchKey对应一个Callback, 当有新的到来时, 就会覆盖旧的, 这个明显不太好. 不过要支持多个WatchCallback也很容易修改.</p>
+<ul>
+<li><strong>增加取消注册的功能</strong></li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://docs.oracle.com/javase/tutorial/essential/io/notification.html" target="_blank" rel="external">https://docs.oracle.com/javase/tutorial/essential/io/notification.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/11/30/git/git_flow/" itemprop="url">
                   Git 分支管理
                 </a>
@@ -1325,247 +1578,6 @@
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
-                  github 上的配色项目 - solarized
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/solarized_colors/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/solarized_colors/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
-<h3 id="for-vim"><a href="#for-vim" class="headerlink" title="for vim"></a>for vim</h3><hr>
-<p>vim的配置非常简单，有两种方式：</p>
-<h4 id="1-手工安装"><a href="#1-手工安装" class="headerlink" title="1. 手工安装"></a>1. 手工安装</h4><p>下载：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 任意目录下载源码</div><div class="line">git clone git://github.com/altercation/vim-colors-solarized.git</div><div class="line">cd vim-colors-solarized/colors</div><div class="line">mv solarized.vim ~/.vim/colors/</div></pre></td></tr></table></figure>
-<p>修改vimrc</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">syntax enable</div><div class="line">set background=dark</div><div class="line">colorscheme solarized</div></pre></td></tr></table></figure>
-<p>如果不喜欢dark，可以换成<code>set background=light</code>主题。</p>
-<h4 id="2-使用pathogen插件管理"><a href="#2-使用pathogen插件管理" class="headerlink" title="2. 使用pathogen插件管理"></a>2. 使用pathogen插件管理</h4><p>使用pathogen可以很好的管理插件， 解决vim文件分散、管理麻烦的问题，这也是官方推荐的方式。</p>
-<p>安装pathogen</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/.vim/</div><div class="line">mkdir autoload</div><div class="line">cd autoload/</div><div class="line">wget https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim</div></pre></td></tr></table></figure>
-<p>启用pathogen</p>
-<pre><code>vim ~/.vimrc
-// 增加以下内容， 注意需要在`filetype plugin indent on `之前。
-call pathogen#infect()
-</code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
-<pre><code>cd ~/.vim/bundle
-git clone git://github.com/altercation/vim-colors-solarized.git
-</code></pre><p>然后跟方式一的<code>修改vimrc</code>步骤一样执行。</p>
-<h4 id="效果图："><a href="#效果图：" class="headerlink" title="效果图："></a>效果图：</h4><p>虽然官方文档有很多案例图，还是贴一下个人的效果图：</p>
-<p><img src="/images/solarized_vim_show.png" alt=""></p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>如果你希望保留之前terminal的透明度，可以在<code>～/.vimrc</code>增加以下配置：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
-<h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
-<p>// TODO</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/29/linux/vim_plugins/" itemprop="url">
-                  vim 插件收集
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/vim_plugins/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/vim_plugins/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
-<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
-<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
-<p>使用指南：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
-<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
-<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
-<p>其他功能都可以在文档中找到。</p>
-<p>常用功能：</p>
-<ul>
-<li>gt/gT<br>上/下切换tab</li>
-</ul>
-<blockquote>
-<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
-</blockquote>
-<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
-<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
-<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
-<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
-<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
-<p>Vundle // TODO and pathogen</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1608,21 +1620,21 @@ git clone git://github.com/altercation/vim-colors-solarized.git
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">32</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">51</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">117</span>
+              <span class="site-state-item-count">122</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

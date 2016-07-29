@@ -584,6 +584,122 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
             
             
               
+                <a class="post-title-link" href="/2016/03/02/java/concurrent/CAS_ABA_Java/" itemprop="url">
+                  Java 并发之 CAS
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-03-02T00:00:00+08:00" content="2016-03-02">
+              2016-03-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/03/02/java/concurrent/CAS_ABA_Java/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/02/java/concurrent/CAS_ABA_Java/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
+<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
+<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
+<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
+<ol>
+<li>一个进程P1读取值的时候是A</li>
+<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
+<li>另一个进程P2把A改成了B, 然后又改回了A</li>
+<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
+</ol>
+<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/03/01/java/dist/disconf_1_server/" itemprop="url">
                   disconf - 【1】 server 搭建
                 </a>
@@ -1274,119 +1390,6 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/13/linux/synergy/" itemprop="url">
-                  synergy 安装和使用 （一套键鼠掌握世界）
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-13T15:03:30+08:00" content="2016-01-13">
-              2016-01-13
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/13/linux/synergy/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/linux/synergy/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>由于有两台电脑，四个显示器，在使用的时候，难免要切换，但笔记本的触控板和键盘实在太难用～<code>%&gt;_&lt;%</code> 但是机械键盘和鼠标只有一套，怎么办呢？<br>还好之前看一些大牛的工作环境时，看到有一个工具叫synergy，用来同步鼠标和键盘，可以随意在多台电脑中切换。</p>
-<h1 id="通过apt-get-安装"><a href="#通过apt-get-安装" class="headerlink" title="通过apt-get 安装"></a>通过apt-get 安装</h1><p>因为我常用的操作系统是ubuntu和kali，当然是直接apt-get。</p>
-<pre><code>apt-get install synergy
-</code></pre><p>安装后，两台ubuntu（synergy版本1.4.12）之间操作没问题，然而在kali上是1.4.16版本，有不兼容的问题。于是找了下源，并没有找到对应的仓库，干脆就两边使用最新的源码install好了。</p>
-<h1 id="通过源码安装"><a href="#通过源码安装" class="headerlink" title="通过源码安装"></a>通过源码安装</h1><p>首先，安装依赖</p>
-<pre><code>sudo apt-get install cmake make g++ xorg-dev libqt4-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev libssl-dev
-</code></pre><p>访问<a href="https://github.com/symless/synergy/releases" target="_blank" rel="external">synergy on github</a>，git clone或者直接<a href="https://github.com/symless/synergy/archive/v1.7.5-stable.tar.gz" target="_blank" rel="external">下载</a>，然后：</p>
-<pre><code>tar xzvf v1.7.5-stable.tar.gz
-cd synergy-1.7.5-stable
-./hm conf -g1
-./hm build
-</code></pre><p>搞定。kali上也是如此操作，因为也是基于Debian。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>跟着上面的操作，工作目录还在<code>synergy-1.7.5-stable</code>，执行<code>bin/synergy</code></p>
-<p>1，开启服务器（服务器即是你鼠标和键盘连接的那台电脑），synergy 会有个向导，选择服务器模式；<br>2，点击<code>Configure Server</code>，拖拽显示右上角的显示到格子中，想要的放置位置，这里要注意显示器的name需要填写正确，这个name就是client（或server）的名称，client若对不上，会被server拒绝连接的（name在<code>Edit - Settings</code>中设置）。</p>
-<p><img src="/images/synergy_server_conf.png" alt=""><br><img src="/images/synergy_name_settings.png" alt=""></p>
-<p>3，主界面点击start，界面可以看到log，包括客户端的连接。<br>4，启动server后，其他主机同样<code>bin/synergy</code>启动，选择client模式，接着设置一下自己的name，填写server的IP，点击<code>Start</code>。<br>5，Okay，这时可以发现，一套键鼠可以操控多台计算机啦，尽情地享受多屏多机的快感吧，工作效率杠杠的。    :-D</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1429,21 +1432,21 @@ cd synergy-1.7.5-stable
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">32</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">51</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">117</span>
+              <span class="site-state-item-count">122</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

@@ -1,0 +1,1163 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="linux,vim," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="基本模式
+命令模式
+
+进入vim后, 默认就是命令模式.
+
+input模式
+
+命令模式下, 输入i进入input模式, esc返回命令模式.
+文本操作
+文本选择
+
+
+
+快捷键
+说明
+
+
+
+
+V
+selects entire lines
+
+
+v
+selects range of text
+
+
+ctrl-v
+列选择
+
+
+gv
+重新选择上次选择的区块
+
+
+
+选择 / 复制 / 粘贴 ...
+
+
+
+快捷键">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vim 大法好 - 命令指南">
+<meta property="og:url" content="http://niko2014.github.io/2015/07/01/linux/tools/vim_cmd/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="基本模式
+命令模式
+
+进入vim后, 默认就是命令模式.
+
+input模式
+
+命令模式下, 输入i进入input模式, esc返回命令模式.
+文本操作
+文本选择
+
+
+
+快捷键
+说明
+
+
+
+
+V
+selects entire lines
+
+
+v
+selects range of text
+
+
+ctrl-v
+列选择
+
+
+gv
+重新选择上次选择的区块
+
+
+
+选择 / 复制 / 粘贴 ...
+
+
+
+快捷键">
+<meta property="og:updated_time" content="2016-07-25T00:10:45.984Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="vim 大法好 - 命令指南">
+<meta name="twitter:description" content="基本模式
+命令模式
+
+进入vim后, 默认就是命令模式.
+
+input模式
+
+命令模式下, 输入i进入input模式, esc返回命令模式.
+文本操作
+文本选择
+
+
+
+快捷键
+说明
+
+
+
+
+V
+selects entire lines
+
+
+v
+selects range of text
+
+
+ctrl-v
+列选择
+
+
+gv
+重新选择上次选择的区块
+
+
+
+选择 / 复制 / 粘贴 ...
+
+
+
+快捷键">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> vim 大法好 - 命令指南 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                vim 大法好 - 命令指南
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-07-01T00:00:00+08:00" content="2015-07-01">
+              2015-07-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/07/01/linux/tools/vim_cmd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/01/linux/tools/vim_cmd/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="基本模式"><a href="#基本模式" class="headerlink" title="基本模式"></a>基本模式</h1><ul>
+<li>命令模式</li>
+</ul>
+<p>进入vim后, 默认就是命令模式.</p>
+<ul>
+<li><code>input</code>模式</li>
+</ul>
+<p>命令模式下, 输入<code>i</code>进入input模式, <code>esc</code>返回命令模式.</p>
+<h1 id="文本操作"><a href="#文本操作" class="headerlink" title="文本操作"></a>文本操作</h1><hr>
+<p><code>文本选择</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V</td>
+<td>selects entire lines</td>
+</tr>
+<tr>
+<td>v</td>
+<td>selects range of text</td>
+</tr>
+<tr>
+<td>ctrl-v</td>
+<td>列选择</td>
+</tr>
+<tr>
+<td>gv</td>
+<td>重新选择上次选择的区块</td>
+</tr>
+</tbody>
+</table>
+<p><code>选择 / 复制 / 粘贴 ...</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v(V for lines) -&gt; y  (yank)</td>
+<td>选择-&gt;复制</td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+</tr>
+<tr>
+<td>v -&gt; d  (delete)</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl + shift + v</td>
+<td>paster from clipboard in <code>input</code> mode</td>
+</tr>
+<tr>
+<td>ctrl + ;</td>
+<td>弹出clipboard菜单, 选择一个粘贴 (<code>input</code> mode)</td>
+</tr>
+</tbody>
+</table>
+<p><code>输入</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u</td>
+<td>undo</td>
+</tr>
+<tr>
+<td>ctrl + r</td>
+<td>redo</td>
+</tr>
+<tr>
+<td>ctrl-p or ctrl-n</td>
+<td>使用当前session中的pattern来自动完成</td>
+</tr>
+<tr>
+<td>a</td>
+<td>在光标后开始编辑</td>
+</tr>
+<tr>
+<td>o</td>
+<td>当前行后面插入一个新行</td>
+</tr>
+<tr>
+<td>O</td>
+<td>当前行前面插入一个新行</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>选择一个词</td>
+</tr>
+<tr>
+<td>v + gU</td>
+<td>(变大写)</td>
+</tr>
+<tr>
+<td>v + gu</td>
+<td>gu (变小写)</td>
+</tr>
+<tr>
+<td>ye</td>
+<td>复制当前光标到单词结尾的部分</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><code>缩进</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v or V</td>
+<td>区块缩进前需要选择文本</td>
+</tr>
+<tr>
+<td>5&gt;</td>
+<td>表示右缩进5个tab</td>
+</tr>
+<tr>
+<td><code>4&lt;</code></td>
+<td>同理, 左向4个tab</td>
+</tr>
+</tbody>
+</table>
+<p><code>浏览 / 移动</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ctrl + e</td>
+<td>向下滚屏，保持光标</td>
+</tr>
+<tr>
+<td>ctrl + y</td>
+<td>向上滚屏, 保持光标</td>
+</tr>
+<tr>
+<td>ctrl + d</td>
+<td>向下, 不保持光标</td>
+</tr>
+<tr>
+<td>ctrl + u</td>
+<td>向上, 不保持光标</td>
+</tr>
+<tr>
+<td>0 或 ^</td>
+<td>跳至行头</td>
+</tr>
+<tr>
+<td>$</td>
+<td>跳至行尾</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移至档尾（最后一行的第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移至档首（第一行之第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>ctrl+f</td>
+<td>下翻页</td>
+</tr>
+<tr>
+<td>ctrl+b</td>
+<td>上翻页</td>
+</tr>
+<tr>
+<td>w</td>
+<td>移至次一个字（word）字首。当然是指英文单字。</td>
+</tr>
+<tr>
+<td>W</td>
+<td>同上，但会忽略一些标点符号。</td>
+</tr>
+<tr>
+<td>)</td>
+<td>移至下一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>(</td>
+<td>移至上一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>}</td>
+<td>移至下一个段落（paragraph）首。</td>
+</tr>
+<tr>
+<td>{</td>
+<td>移至上一个段落（paragraph）首。</td>
+</tr>
+</tbody>
+</table>
+<p><code>查找 / 替换</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/ + your-search-string</td>
+<td>搜索, 可以使用正则, 注意转义</td>
+</tr>
+<tr>
+<td>ggn</td>
+<td></td>
+</tr>
+<tr>
+<td>GN</td>
+<td>最后一个</td>
+</tr>
+<tr>
+<td>/ + ↑或↓</td>
+<td>搜索历史</td>
+</tr>
+<tr>
+<td>:%s/源字符串/目的字符串/g</td>
+<td>全局替换， <code>%</code>表示所有行</td>
+</tr>
+<tr>
+<td>:4s/源字符串/目的字符串/g</td>
+<td>替换从第4行</td>
+</tr>
+<tr>
+<td>:1,4s/源字符串/目的字符串/g</td>
+<td>替换从第1行到第4行</td>
+</tr>
+</tbody>
+</table>
+<h1 id="多窗口"><a href="#多窗口" class="headerlink" title="多窗口"></a>多窗口</h1><hr>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:vsp file_path</td>
+<td>新增窗口垂直打开</td>
+</tr>
+<tr>
+<td>:sv</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, s</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, v</td>
+<td>垂直, 复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl w + up/down</td>
+<td>切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, w</td>
+<td>循环切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, h/j/k/l</td>
+<td>按方向切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, H/J/K/L</td>
+<td>按方向移动窗口</td>
+</tr>
+<tr>
+<td>ctrl w , q 或 c</td>
+<td>关闭窗口</td>
+</tr>
+</tbody>
+</table>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:set noautoindent</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number!</td>
+<td>切换</td>
+</tr>
+<tr>
+<td>:set number&amp;</td>
+<td>Set option to default value</td>
+</tr>
+<tr>
+<td>:set number?</td>
+<td>Show value of option</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>更多请参看另一博客，将会记录常见的配置及相关命令。</p>
+<h2 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h2><p>1.<br><code>:!command</code><br>如：</p>
+<pre><code>:!ls -al
+</code></pre><p>执行一个命令, 但不退出vim.</p>
+<p>2.<br><code>:r !command</code><br>将shell命令command的结果插入到当前行的下一行</p>
+<p>这个命令比较常用, 比如输入当前目录:</p>
+<pre><code>:r !pwd
+</code></pre><p>3.<br><code>:起始行号,结束行号 !command</code><br>将起始行号和结束行号指定的范围中的内容输入到shell命令command处理，并将处理结果替换起始行号和结束行号指定的范围中的内容</p>
+<p>4.<br><code>:起始行号,结束行号 w !command</code><br>将起始行号和结束行号所指定的范围的内容作为命令command的输入。不会改变当前编辑的文件的内容</p>
+<h2 id="编辑root权限的文件"><a href="#编辑root权限的文件" class="headerlink" title="编辑root权限的文件"></a>编辑root权限的文件</h2><p>这个功能也经常用到, 比如编辑某个root的文件(readonly)时, 忘记了sudo, 当改了很多内容才发现, 怎么办呢 ?</p>
+<pre><code>:w !sudo tee %
+</code></pre><p>若是sudo不能解决的, 先写到临时文件:</p>
+<pre><code>:w! ~/tempfile.ext
+</code></pre><h2 id="其他-待续…"><a href="#其他-待续…" class="headerlink" title="其他, 待续…"></a>其他, 待续…</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>[1] <a href="http://vimgifs.com/" target="_blank" rel="external">http://vimgifs.com/</a><br>[2] <a href="http://vimcasts.org/episodes/working-with-windows/" target="_blank" rel="external">http://vimcasts.org/episodes/working-with-windows/</a><br>[3] <a href="http://blog.csdn.net/topgun_chenlingyun/article/details/8013115" target="_blank" rel="external">http://blog.csdn.net/topgun_chenlingyun/article/details/8013115</a><br>[4] <a href="http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions" target="_blank" rel="external">http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag">#linux</a>
+          
+            <a href="/tags/vim/" rel="tag">#vim</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/05/30/java/log_why_use_isDebug/" rel="next" title="log 为什么使用isDebugEnable()和isTraceEnabled()">
+                <i class="fa fa-chevron-left"></i> log 为什么使用isDebugEnable()和isTraceEnabled()
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/18/linux/monit/" rel="prev" title="monit 监控">
+                monit 监控 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/07/01/linux/tools/vim_cmd/"
+                   data-title="vim 大法好 - 命令指南" data-url="http://niko2014.github.io/2015/07/01/linux/tools/vim_cmd/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">122</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本模式"><span class="nav-number">1.</span> <span class="nav-text">基本模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文本操作"><span class="nav-number">2.</span> <span class="nav-text">文本操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多窗口"><span class="nav-number">3.</span> <span class="nav-text">多窗口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常用命令"><span class="nav-number">4.</span> <span class="nav-text">常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#执行shell命令"><span class="nav-number">4.1.</span> <span class="nav-text">执行shell命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑root权限的文件"><span class="nav-number">4.2.</span> <span class="nav-text">编辑root权限的文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他-待续…"><span class="nav-number">4.3.</span> <span class="nav-text">其他, 待续…</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
