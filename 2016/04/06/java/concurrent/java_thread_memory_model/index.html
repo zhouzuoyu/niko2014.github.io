@@ -1,0 +1,758 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="JVM," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: JSR-133)
+主内存和工作内存
+首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书&amp;lt;深入理解Java虚拟机&amp;gt;中有一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java thread 内存模型">
+<meta property="og:url" content="http://niko2014.github.io/2016/04/06/java/concurrent/java_thread_memory_model/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: JSR-133)
+主内存和工作内存
+首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书&amp;lt;深入理解Java虚拟机&amp;gt;中有一">
+<meta property="og:image" content="http://niko2014.github.io/images/java/main_working_memory.png">
+<meta property="og:updated_time" content="2016-08-05T03:09:35.017Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java thread 内存模型">
+<meta name="twitter:description" content="java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: JSR-133)
+主内存和工作内存
+首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书&amp;lt;深入理解Java虚拟机&amp;gt;中有一">
+<meta name="twitter:image" content="http://niko2014.github.io/images/java/main_working_memory.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> java thread 内存模型 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                java thread 内存模型
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-06T00:00:00+08:00" content="2016-04-06">
+              2016-04-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/06/java/concurrent/java_thread_memory_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: <a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a>)</p>
+<h1 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h1><hr>
+<p>首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书<code>&lt;深入理解Java虚拟机&gt;</code>中有一幅图, 描述两者的关系:</p>
+<p><img src="/images/java/main_working_memory.png" alt=""></p>
+<p>如果要快速地理解他们之间的关系, 可以类比CPU/高速缓存/内存的关系(对应线程/工作内存/主内存).</p>
+<p>映射到底层来看, 主内存在物理硬件内存中, 工作内存可能会存在于寄存器或高速缓存.</p>
+<h1 id="线程操作术语和框架"><a href="#线程操作术语和框架" class="headerlink" title="线程操作术语和框架"></a>线程操作术语和框架</h1><hr>
+<p>以下操作都是原子的:</p>
+<ul>
+<li><code>lock</code></li>
+</ul>
+<p>锁定一个变量为某个线程独占</p>
+<ul>
+<li><code>unlock</code></li>
+</ul>
+<p>释放已lock的变量</p>
+<ul>
+<li><code>read</code></li>
+</ul>
+<p>从主内存读取variable到工作内存</p>
+<ul>
+<li><code>load</code></li>
+</ul>
+<p>把read到的variable放入工作内存的变量副本</p>
+<ul>
+<li><code>use</code></li>
+</ul>
+<p>把工作内存的变量传递给执行引擎</p>
+<ul>
+<li><code>assign</code></li>
+</ul>
+<p>执行引擎通过此操作值赋给工作内存的变量</p>
+<ul>
+<li><code>store</code></li>
+</ul>
+<p>把工作内存的一个变量值送到主内存中</p>
+<ul>
+<li><code>write</code></li>
+</ul>
+<p>把store送到主内存的值写到主内存变量中</p>
+<p>以上八个操作更详细的介绍可以从这个<a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">JVM Specs 文档</a>中查阅.</p>
+<h1 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h1><hr>
+<p>有了以上8种基本操作, 可以观察到, 这些操作的一些pattern组合是有意义的, 一些是不合法无意义的. 因此我们还需要一些规则来限定这些操作的顺序和组合, 如下:</p>
+<h2 id="变量规则"><a href="#变量规则" class="headerlink" title="变量规则"></a>变量规则</h2><ul>
+<li>不允许丢失最近的<code>assign</code>, 必须把工作内存的变化同步回主内存</li>
+<li>不允许线程没有发生<code>assign</code>就把内容同步回主内存.</li>
+<li>新线程创建时工作内存是空的, 而且需从主内存获取(即use/store前必须已经assign/load)</li>
+<li>read+load和store+write是成对按顺序出现的, 从主内存read了, 工作内存就必须接受; store了主内存, 主内存就必须write</li>
+</ul>
+<h2 id="lock-规则"><a href="#lock-规则" class="headerlink" title="lock 规则"></a>lock 规则</h2><ul>
+<li>同一时刻只能有一个线程进行lock操作, 但同一线程可以lock多次, 同时unlock也需要执行相同的次数.</li>
+<li>不允许lock未被lock的以及被其他线程lock住的变量</li>
+</ul>
+<h2 id="lock和变量互动规则"><a href="#lock和变量互动规则" class="headerlink" title="lock和变量互动规则"></a>lock和变量互动规则</h2><ul>
+<li>unlock时, 必须把内容同步会主内存</li>
+<li>当lock某个变量时, 会清空工作内存中的该变量的值, 当执行引擎使用到该变量时, 从主内存进行load或assign.</li>
+</ul>
+<h1 id="先行发生原则"><a href="#先行发生原则" class="headerlink" title="先行发生原则"></a>先行发生原则</h1><hr>
+<p>观察上面这些规则的设计, 可以发现是比较严谨繁琐的. 但写代码时, 我们判断是否<code>线程安全</code>的方法用的是<code>先行发生(happens-before)原则</code>. 如果程序不在该规则及其推导中, 那么就不是线程安全的. 以下是<a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5" target="_blank" rel="external">主要规则</a>:</p>
+<ul>
+<li>一个线程内, 代码按控制流顺序执行</li>
+<li>监视器上的unlock先于器lock操作</li>
+<li>volatile的write先于随后的read</li>
+<li>start()的调用先于此线程的所有action</li>
+<li>所有action先于该线程的join()返回</li>
+<li>对象初始化操作先于其他action</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a><br><a href="http://gvsmirnov.ru/blog/tech/2014/02/10/jmm-under-the-hood.html" target="_blank" rel="external">Java Memory Model Under The Hood</a><br><a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">VM Spec Threads and Locks</a><br><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html" target="_blank" rel="external">Chapter 17. Threads and Locks</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag">#JVM</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/05/java/concurrent/CAS_ABA_Java/" rel="next" title="Java 并发之 CAS">
+                <i class="fa fa-chevron-left"></i> Java 并发之 CAS
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" rel="prev" title="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
+                使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/04/06/java/concurrent/java_thread_memory_model/"
+                   data-title="java thread 内存模型" data-url="http://niko2014.github.io/2016/04/06/java/concurrent/java_thread_memory_model/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">124</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#主内存和工作内存"><span class="nav-number">1.</span> <span class="nav-text">主内存和工作内存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#线程操作术语和框架"><span class="nav-number">2.</span> <span class="nav-text">线程操作术语和框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#规则"><span class="nav-number">3.</span> <span class="nav-text">规则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#变量规则"><span class="nav-number">3.1.</span> <span class="nav-text">变量规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lock-规则"><span class="nav-number">3.2.</span> <span class="nav-text">lock 规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lock和变量互动规则"><span class="nav-number">3.3.</span> <span class="nav-text">lock和变量互动规则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#先行发生原则"><span class="nav-number">4.</span> <span class="nav-text">先行发生原则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

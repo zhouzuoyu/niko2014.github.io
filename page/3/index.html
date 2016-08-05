@@ -12,6 +12,8 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
 
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
 
 
 
@@ -202,8 +204,8 @@
             
             
               
-                <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
-                  github 上的配色项目 - solarized
+                <a class="post-title-link" href="/2015/11/30/git/git_flow/" itemprop="url">
+                  Git 分支管理
                 </a>
               
             
@@ -213,8 +215,8 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
+            <time itemprop="dateCreated" datetime="2015-11-30T15:03:30+08:00" content="2015-11-30">
+              2015-11-30
             </time>
           </span>
 
@@ -223,8 +225,8 @@
               &nbsp; | &nbsp; 分类于
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
                   </a>
                 </span>
 
@@ -239,8 +241,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/solarized_colors/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/solarized_colors/" itemprop="commentsCount"></span>
+                <a href="/2015/11/30/git/git_flow/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/30/git/git_flow/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -262,31 +264,37 @@
         
           <span itemprop="articleBody">
             
-              <h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
-<h3 id="for-vim"><a href="#for-vim" class="headerlink" title="for vim"></a>for vim</h3><hr>
-<p>vim的配置非常简单，有两种方式：</p>
-<h4 id="1-手工安装"><a href="#1-手工安装" class="headerlink" title="1. 手工安装"></a>1. 手工安装</h4><p>下载：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 任意目录下载源码</div><div class="line">git clone git://github.com/altercation/vim-colors-solarized.git</div><div class="line">cd vim-colors-solarized/colors</div><div class="line">mv solarized.vim ~/.vim/colors/</div></pre></td></tr></table></figure>
-<p>修改vimrc</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">syntax enable</div><div class="line">set background=dark</div><div class="line">colorscheme solarized</div></pre></td></tr></table></figure>
-<p>如果不喜欢dark，可以换成<code>set background=light</code>主题。</p>
-<h4 id="2-使用pathogen插件管理"><a href="#2-使用pathogen插件管理" class="headerlink" title="2. 使用pathogen插件管理"></a>2. 使用pathogen插件管理</h4><p>使用pathogen可以很好的管理插件， 解决vim文件分散、管理麻烦的问题，这也是官方推荐的方式。</p>
-<p>安装pathogen</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/.vim/</div><div class="line">mkdir autoload</div><div class="line">cd autoload/</div><div class="line">wget https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim</div></pre></td></tr></table></figure>
-<p>启用pathogen</p>
-<pre><code>vim ~/.vimrc
-// 增加以下内容， 注意需要在`filetype plugin indent on `之前。
-call pathogen#infect()
-</code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
-<pre><code>cd ~/.vim/bundle
-git clone git://github.com/altercation/vim-colors-solarized.git
-</code></pre><p>然后跟方式一的<code>修改vimrc</code>步骤一样执行。</p>
-<h4 id="效果图："><a href="#效果图：" class="headerlink" title="效果图："></a>效果图：</h4><p>虽然官方文档有很多案例图，还是贴一下个人的效果图：</p>
-<p><img src="/images/solarized_vim_show.png" alt=""></p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>如果你希望保留之前terminal的透明度，可以在<code>～/.vimrc</code>增加以下配置：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
-<h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
-<p>// TODO</p>
+              <h2 id="为什么要用分支"><a href="#为什么要用分支" class="headerlink" title="为什么要用分支"></a>为什么要用分支</h2><hr>
+<p>记得刚加入现在团队的时候，和boss搭了GOGS（类似的还有gitlab），到最近完成v0.1版本，一直都是用一个分支了。最近团队加入了几个新成员，产品那边也有大量的新需求和迭代。若还不进行分支管理，必定一定会陷入混乱（如果你问为什么？看了后面的分支管理模型，你就会恍然大悟）。</p>
+<p>这也让我想起在第一家公司实习的时候，有一个team，用了git，后来发现，只是用来更新和提交，真是高射炮打蚊子。就算是后来人员扩充了之后，仍然没有分支管理，当时觉得不可思议。他们的产品迭代速度很慢，质量也很差，我觉得这跟他们的代码管理也有一点关系。</p>
+<h2 id="一个通用模型"><a href="#一个通用模型" class="headerlink" title="一个通用模型"></a>一个通用模型</h2><hr>
+<p>关于分支的管理和工程实践上，最广为认知的是Vincent Driessen在2010年发表的一篇博客：<a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">《一种成功的Git分支管理模型》</a>，这篇博客总结了一种通用的分支管理模型，这个模型可以覆盖大部分的场景和研发流程。或许你没看过这篇博客，但如果你参与过团队分支管理策略的制定，你一定可以找到共鸣。</p>
+<p>博客中有一张图很清晰地描述了这个模型和各种场景：<br><img src="/images/git-model@2x.png" alt=""></p>
+<p>我记得在第一次实习时，团队中用的是svn，那时还没看过这篇博客，不过那时我们根据研发流程和需求场景制定出来的svn分支管理策略和这个类似，只是一个简化版，没有做太细。有一部分原因是因为svn的分支功能确实sucks，团队也不想浪费太多精力和成本。据说现在他们也换为git了，因为并行开发的功能太多了，svn终于让他们“心力交瘁”。</p>
+<h3 id="git-flow"><a href="#git-flow" class="headerlink" title="git-flow"></a>git-flow</h3><hr>
+<p>git的分支管理非常强大和方便，而git-flow可以让我们简化分支管理的操作。git-flow是git的一个扩展集，按<code>Vincent Driessen</code>的分支模型提供高层的操作，具体可参考<a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">这篇指南</a>。</p>
+<p>（现在想起当年用svn的分支管理，仍隐隐觉得蛋疼。那一堆堆tree-conflict（尤其是目录）历历在目，还好后来转到git）</p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
+<li>修改配置<br>git flow config<br>或者，修改配置文件：<br>vim your_repo/.git/config</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
+<p>分支管理是一门管理艺术，一味地盲目模仿不切实际，只会增加混乱和成本，在执行上也会遇到各种阻碍，所以针对自身团队和业务特点，找到最适合自己的管理策略。不过若你的产品需要快速的更新和迭代，你一定要试一下git。</p>
+<!--
+1. 小张和小何在开发两个大功能（`A-v0.1`和`B-v0.1`），小张先完成了A，然后部署生产了，小何继续B开发。
+小何过了两天也完成了B，然后提交代码，自动化部署B后，发现A功能出问题了，原来小张在这两天在进行A功能小优化（`A-v0.1.1`），还未完成就“被”部署上去了。
+这个故事告诉我们，需要把必须将正式（master）和开发（develop）的代码分开。
+
+2. 现在代码分成了两个分支，小张小何都在develop开发。小张完成`A-v0.2`，要部署。合并的代码发现有小何的代码，于是问小何，小何说`我在做B-v0.2`，还没做完，你不可以合并。
+所以问题还是没有解决，产品汪质问小张，为什么还不部署，这个功能很急的，小何表示压力很大。
+这次，小张小何约定，从develop分支再建立分支，叫做feature分支，用来。
+
+3...  场景太多了， 不写了
+-->
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
+<ol>
+<li><a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">git-flow 备忘清单</a></li>
+<li><a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">A successful Git branching model » nvie.com</a></li>
+</ol>
 
             
           </span>
@@ -406,6 +414,128 @@ git clone git://github.com/altercation/vim-colors-solarized.git
 <h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
 <p>Vundle // TODO and pathogen</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
+                  github 上的配色项目 - solarized
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
+              2015-11-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/11/29/linux/solarized_colors/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/solarized_colors/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
+<h3 id="for-vim"><a href="#for-vim" class="headerlink" title="for vim"></a>for vim</h3><hr>
+<p>vim的配置非常简单，有两种方式：</p>
+<h4 id="1-手工安装"><a href="#1-手工安装" class="headerlink" title="1. 手工安装"></a>1. 手工安装</h4><p>下载：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 任意目录下载源码</div><div class="line">git clone git://github.com/altercation/vim-colors-solarized.git</div><div class="line">cd vim-colors-solarized/colors</div><div class="line">mv solarized.vim ~/.vim/colors/</div></pre></td></tr></table></figure>
+<p>修改vimrc</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">syntax enable</div><div class="line">set background=dark</div><div class="line">colorscheme solarized</div></pre></td></tr></table></figure>
+<p>如果不喜欢dark，可以换成<code>set background=light</code>主题。</p>
+<h4 id="2-使用pathogen插件管理"><a href="#2-使用pathogen插件管理" class="headerlink" title="2. 使用pathogen插件管理"></a>2. 使用pathogen插件管理</h4><p>使用pathogen可以很好的管理插件， 解决vim文件分散、管理麻烦的问题，这也是官方推荐的方式。</p>
+<p>安装pathogen</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/.vim/</div><div class="line">mkdir autoload</div><div class="line">cd autoload/</div><div class="line">wget https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim</div></pre></td></tr></table></figure>
+<p>启用pathogen</p>
+<pre><code>vim ~/.vimrc
+// 增加以下内容， 注意需要在`filetype plugin indent on `之前。
+call pathogen#infect()
+</code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
+<pre><code>cd ~/.vim/bundle
+git clone git://github.com/altercation/vim-colors-solarized.git
+</code></pre><p>然后跟方式一的<code>修改vimrc</code>步骤一样执行。</p>
+<h4 id="效果图："><a href="#效果图：" class="headerlink" title="效果图："></a>效果图：</h4><p>虽然官方文档有很多案例图，还是贴一下个人的效果图：</p>
+<p><img src="/images/solarized_vim_show.png" alt=""></p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>如果你希望保留之前terminal的透明度，可以在<code>～/.vimrc</code>增加以下配置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
+<h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
+<p>// TODO</p>
 
             
           </span>
@@ -1291,465 +1421,6 @@ sudo vim /etc/monit/monitrc
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/07/01/linux/tools/vim_cmd/" itemprop="url">
-                  vim 大法好 - 命令指南
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-07-01T00:00:00+08:00" content="2015-07-01">
-              2015-07-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/07/01/linux/tools/vim_cmd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/01/linux/tools/vim_cmd/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="基本模式"><a href="#基本模式" class="headerlink" title="基本模式"></a>基本模式</h1><ul>
-<li>命令模式</li>
-</ul>
-<p>进入vim后, 默认就是命令模式.</p>
-<ul>
-<li><code>input</code>模式</li>
-</ul>
-<p>命令模式下, 输入<code>i</code>进入input模式, <code>esc</code>返回命令模式.</p>
-<h1 id="文本操作"><a href="#文本操作" class="headerlink" title="文本操作"></a>文本操作</h1><hr>
-<p><code>文本选择</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>V</td>
-<td>selects entire lines</td>
-</tr>
-<tr>
-<td>v</td>
-<td>selects range of text</td>
-</tr>
-<tr>
-<td>ctrl-v</td>
-<td>列选择</td>
-</tr>
-<tr>
-<td>gv</td>
-<td>重新选择上次选择的区块</td>
-</tr>
-</tbody>
-</table>
-<p><code>选择 / 复制 / 粘贴 ...</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>v(V for lines) -&gt; y  (yank)</td>
-<td>选择-&gt;复制</td>
-</tr>
-<tr>
-<td>p</td>
-<td>粘贴</td>
-</tr>
-<tr>
-<td>v -&gt; d  (delete)</td>
-<td></td>
-</tr>
-<tr>
-<td>ctrl + shift + v</td>
-<td>paster from clipboard in <code>input</code> mode</td>
-</tr>
-<tr>
-<td>ctrl + ;</td>
-<td>弹出clipboard菜单, 选择一个粘贴 (<code>input</code> mode)</td>
-</tr>
-</tbody>
-</table>
-<p><code>输入</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>u</td>
-<td>undo</td>
-</tr>
-<tr>
-<td>ctrl + r</td>
-<td>redo</td>
-</tr>
-<tr>
-<td>ctrl-p or ctrl-n</td>
-<td>使用当前session中的pattern来自动完成</td>
-</tr>
-<tr>
-<td>a</td>
-<td>在光标后开始编辑</td>
-</tr>
-<tr>
-<td>o</td>
-<td>当前行后面插入一个新行</td>
-</tr>
-<tr>
-<td>O</td>
-<td>当前行前面插入一个新行</td>
-</tr>
-<tr>
-<td>cw</td>
-<td>选择一个词</td>
-</tr>
-<tr>
-<td>v + gU</td>
-<td>(变大写)</td>
-</tr>
-<tr>
-<td>v + gu</td>
-<td>gu (变小写)</td>
-</tr>
-<tr>
-<td>ye</td>
-<td>复制当前光标到单词结尾的部分</td>
-</tr>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><code>缩进</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>v or V</td>
-<td>区块缩进前需要选择文本</td>
-</tr>
-<tr>
-<td>5&gt;</td>
-<td>表示右缩进5个tab</td>
-</tr>
-<tr>
-<td><code>4&lt;</code></td>
-<td>同理, 左向4个tab</td>
-</tr>
-</tbody>
-</table>
-<p><code>浏览 / 移动</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ctrl + e</td>
-<td>向下滚屏，保持光标</td>
-</tr>
-<tr>
-<td>ctrl + y</td>
-<td>向上滚屏, 保持光标</td>
-</tr>
-<tr>
-<td>ctrl + d</td>
-<td>向下, 不保持光标</td>
-</tr>
-<tr>
-<td>ctrl + u</td>
-<td>向上, 不保持光标</td>
-</tr>
-<tr>
-<td>0 或 ^</td>
-<td>跳至行头</td>
-</tr>
-<tr>
-<td>$</td>
-<td>跳至行尾</td>
-</tr>
-<tr>
-<td>G</td>
-<td>移至档尾（最后一行的第一个非空白字元处）</td>
-</tr>
-<tr>
-<td>gg</td>
-<td>移至档首（第一行之第一个非空白字元处）</td>
-</tr>
-<tr>
-<td>ctrl+f</td>
-<td>下翻页</td>
-</tr>
-<tr>
-<td>ctrl+b</td>
-<td>上翻页</td>
-</tr>
-<tr>
-<td>w</td>
-<td>移至次一个字（word）字首。当然是指英文单字。</td>
-</tr>
-<tr>
-<td>W</td>
-<td>同上，但会忽略一些标点符号。</td>
-</tr>
-<tr>
-<td>)</td>
-<td>移至下一个句子（sentence）首。</td>
-</tr>
-<tr>
-<td>(</td>
-<td>移至上一个句子（sentence）首。</td>
-</tr>
-<tr>
-<td>}</td>
-<td>移至下一个段落（paragraph）首。</td>
-</tr>
-<tr>
-<td>{</td>
-<td>移至上一个段落（paragraph）首。</td>
-</tr>
-</tbody>
-</table>
-<p><code>查找 / 替换</code></p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>/ + your-search-string</td>
-<td>搜索, 可以使用正则, 注意转义</td>
-</tr>
-<tr>
-<td>ggn</td>
-<td></td>
-</tr>
-<tr>
-<td>GN</td>
-<td>最后一个</td>
-</tr>
-<tr>
-<td>/ + ↑或↓</td>
-<td>搜索历史</td>
-</tr>
-<tr>
-<td>:%s/源字符串/目的字符串/g</td>
-<td>全局替换， <code>%</code>表示所有行</td>
-</tr>
-<tr>
-<td>:4s/源字符串/目的字符串/g</td>
-<td>替换从第4行</td>
-</tr>
-<tr>
-<td>:1,4s/源字符串/目的字符串/g</td>
-<td>替换从第1行到第4行</td>
-</tr>
-</tbody>
-</table>
-<h1 id="多窗口"><a href="#多窗口" class="headerlink" title="多窗口"></a>多窗口</h1><hr>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>:sp file_path(able to use tab)</td>
-<td>新增窗口打开</td>
-</tr>
-<tr>
-<td>:vsp file_path</td>
-<td>新增窗口垂直打开</td>
-</tr>
-<tr>
-<td>:sv</td>
-<td>复制分割当前窗口</td>
-</tr>
-<tr>
-<td>ctrl + w, s</td>
-<td>复制分割当前窗口</td>
-</tr>
-<tr>
-<td>ctrl + w, v</td>
-<td>垂直, 复制分割当前窗口</td>
-</tr>
-<tr>
-<td>ctrl w + up/down</td>
-<td>切换窗口</td>
-</tr>
-<tr>
-<td>ctrl w, w</td>
-<td>循环切换窗口</td>
-</tr>
-<tr>
-<td>ctrl w, h/j/k/l</td>
-<td>按方向切换窗口</td>
-</tr>
-<tr>
-<td>ctrl w, H/J/K/L</td>
-<td>按方向移动窗口</td>
-</tr>
-<tr>
-<td>ctrl w , q 或 c</td>
-<td>关闭窗口</td>
-</tr>
-</tbody>
-</table>
-<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>:sp file_path(able to use tab)</td>
-<td>新增窗口打开</td>
-</tr>
-<tr>
-<td>:set noautoindent</td>
-<td></td>
-</tr>
-<tr>
-<td>:set number</td>
-<td></td>
-</tr>
-<tr>
-<td>:set number!</td>
-<td>切换</td>
-</tr>
-<tr>
-<td>:set number&amp;</td>
-<td>Set option to default value</td>
-</tr>
-<tr>
-<td>:set number?</td>
-<td>Show value of option</td>
-</tr>
-<tr>
-<td>…</td>
-<td>…</td>
-</tr>
-</tbody>
-</table>
-<p>更多请参看另一博客，将会记录常见的配置及相关命令。</p>
-<h2 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h2><p>1.<br><code>:!command</code><br>如：</p>
-<pre><code>:!ls -al
-</code></pre><p>执行一个命令, 但不退出vim.</p>
-<p>2.<br><code>:r !command</code><br>将shell命令command的结果插入到当前行的下一行</p>
-<p>这个命令比较常用, 比如输入当前目录:</p>
-<pre><code>:r !pwd
-</code></pre><p>3.<br><code>:起始行号,结束行号 !command</code><br>将起始行号和结束行号指定的范围中的内容输入到shell命令command处理，并将处理结果替换起始行号和结束行号指定的范围中的内容</p>
-<p>4.<br><code>:起始行号,结束行号 w !command</code><br>将起始行号和结束行号所指定的范围的内容作为命令command的输入。不会改变当前编辑的文件的内容</p>
-<h2 id="编辑root权限的文件"><a href="#编辑root权限的文件" class="headerlink" title="编辑root权限的文件"></a>编辑root权限的文件</h2><p>这个功能也经常用到, 比如编辑某个root的文件(readonly)时, 忘记了sudo, 当改了很多内容才发现, 怎么办呢 ?</p>
-<pre><code>:w !sudo tee %
-</code></pre><p>若是sudo不能解决的, 先写到临时文件:</p>
-<pre><code>:w! ~/tempfile.ext
-</code></pre><h2 id="其他-待续…"><a href="#其他-待续…" class="headerlink" title="其他, 待续…"></a>其他, 待续…</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>[1] <a href="http://vimgifs.com/" target="_blank" rel="external">http://vimgifs.com/</a><br>[2] <a href="http://vimcasts.org/episodes/working-with-windows/" target="_blank" rel="external">http://vimcasts.org/episodes/working-with-windows/</a><br>[3] <a href="http://blog.csdn.net/topgun_chenlingyun/article/details/8013115" target="_blank" rel="external">http://blog.csdn.net/topgun_chenlingyun/article/details/8013115</a><br>[4] <a href="http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions" target="_blank" rel="external">http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1792,21 +1463,21 @@ sudo vim /etc/monit/monitrc
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">121</span>
+              <span class="site-state-item-count">124</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

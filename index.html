@@ -12,6 +12,8 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
 
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
 
 
 
@@ -358,6 +360,172 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
             
             
               
+                <a class="post-title-link" href="/2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="url">
+                  java thread 内存模型
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-06T00:00:00+08:00" content="2016-04-06">
+              2016-04-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/06/java/concurrent/java_thread_memory_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: <a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a>)</p>
+<h1 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h1><hr>
+<p>首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书<code>&lt;深入理解Java虚拟机&gt;</code>中有一幅图, 描述两者的关系:</p>
+<p><img src="/images/java/main_working_memory.png" alt=""></p>
+<p>如果要快速地理解他们之间的关系, 可以类比CPU/高速缓存/内存的关系(对应线程/工作内存/主内存).</p>
+<p>映射到底层来看, 主内存在物理硬件内存中, 工作内存可能会存在于寄存器或高速缓存.</p>
+<h1 id="线程操作术语和框架"><a href="#线程操作术语和框架" class="headerlink" title="线程操作术语和框架"></a>线程操作术语和框架</h1><hr>
+<p>以下操作都是原子的:</p>
+<ul>
+<li><code>lock</code></li>
+</ul>
+<p>锁定一个变量为某个线程独占</p>
+<ul>
+<li><code>unlock</code></li>
+</ul>
+<p>释放已lock的变量</p>
+<ul>
+<li><code>read</code></li>
+</ul>
+<p>从主内存读取variable到工作内存</p>
+<ul>
+<li><code>load</code></li>
+</ul>
+<p>把read到的variable放入工作内存的变量副本</p>
+<ul>
+<li><code>use</code></li>
+</ul>
+<p>把工作内存的变量传递给执行引擎</p>
+<ul>
+<li><code>assign</code></li>
+</ul>
+<p>执行引擎通过此操作值赋给工作内存的变量</p>
+<ul>
+<li><code>store</code></li>
+</ul>
+<p>把工作内存的一个变量值送到主内存中</p>
+<ul>
+<li><code>write</code></li>
+</ul>
+<p>把store送到主内存的值写到主内存变量中</p>
+<p>以上八个操作更详细的介绍可以从这个<a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">JVM Specs 文档</a>中查阅.</p>
+<h1 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h1><hr>
+<p>有了以上8种基本操作, 可以观察到, 这些操作的一些pattern组合是有意义的, 一些是不合法无意义的. 因此我们还需要一些规则来限定这些操作的顺序和组合, 如下:</p>
+<h2 id="变量规则"><a href="#变量规则" class="headerlink" title="变量规则"></a>变量规则</h2><ul>
+<li>不允许丢失最近的<code>assign</code>, 必须把工作内存的变化同步回主内存</li>
+<li>不允许线程没有发生<code>assign</code>就把内容同步回主内存.</li>
+<li>新线程创建时工作内存是空的, 而且需从主内存获取(即use/store前必须已经assign/load)</li>
+<li>read+load和store+write是成对按顺序出现的, 从主内存read了, 工作内存就必须接受; store了主内存, 主内存就必须write</li>
+</ul>
+<h2 id="lock-规则"><a href="#lock-规则" class="headerlink" title="lock 规则"></a>lock 规则</h2><ul>
+<li>同一时刻只能有一个线程进行lock操作, 但同一线程可以lock多次, 同时unlock也需要执行相同的次数.</li>
+<li>不允许lock未被lock的以及被其他线程lock住的变量</li>
+</ul>
+<h2 id="lock和变量互动规则"><a href="#lock和变量互动规则" class="headerlink" title="lock和变量互动规则"></a>lock和变量互动规则</h2><ul>
+<li>unlock时, 必须把内容同步会主内存</li>
+<li>当lock某个变量时, 会清空工作内存中的该变量的值, 当执行引擎使用到该变量时, 从主内存进行load或assign.</li>
+</ul>
+<h1 id="先行发生原则"><a href="#先行发生原则" class="headerlink" title="先行发生原则"></a>先行发生原则</h1><hr>
+<p>观察上面这些规则的设计, 可以发现是比较严谨繁琐的. 但写代码时, 我们判断是否<code>线程安全</code>的方法用的是<code>先行发生(happens-before)原则</code>. 如果程序不在该规则及其推导中, 那么就不是线程安全的. 以下是<a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5" target="_blank" rel="external">主要规则</a>:</p>
+<ul>
+<li>一个线程内, 代码按控制流顺序执行</li>
+<li>监视器上的unlock先于器lock操作</li>
+<li>volatile的write先于随后的read</li>
+<li>start()的调用先于此线程的所有action</li>
+<li>所有action先于该线程的join()返回</li>
+<li>对象初始化操作先于其他action</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a><br><a href="http://gvsmirnov.ru/blog/tech/2014/02/10/jmm-under-the-hood.html" target="_blank" rel="external">Java Memory Model Under The Hood</a><br><a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">VM Spec Threads and Locks</a><br><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html" target="_blank" rel="external">Chapter 17. Threads and Locks</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="url">
                   Java 并发之 CAS
                 </a>
@@ -418,9 +586,9 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
         
           <span itemprop="articleBody">
             
-              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
-<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
-<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个<code>原子操作</code>. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于<code>CPU提供的原子操作</code>指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现<code>无锁队列</code>.</p>
+<p>从CAS的机制可以发现, 这和<code>乐观锁</code>很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种<code>悲观的策略</code>, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
 <h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
@@ -1285,111 +1453,6 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/26/linux/tools/cheat-cmd/" itemprop="url">
-                  man的铺助工具——cheat
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-26T00:00:00+08:00" content="2016-01-26">
-              2016-01-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/26/linux/tools/cheat-cmd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/26/linux/tools/cheat-cmd/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="man"><a href="#man" class="headerlink" title="man"></a>man</h1><p>相信使用Linux的小伙伴, 想要查询一个命令的用法时, 都会使用<code>man</code>命令数据库，或者试一试命令自带的<code>--help</code>参数。<br>但是使用<code>man</code>有个不好的地方，就是信息太多太全了，对我们来说，需要的可能只是某个用法，而且例子是比较少的，有时man的效率确实比较低。<br>所以我的习惯是，写博客和笔记，并附有许多常用的例子。<br>其实，还有一个常用工具，可以满足需求的——<code>cheat</code>。</p>
-<h1 id="cheat-命令"><a href="#cheat-命令" class="headerlink" title="cheat 命令"></a>cheat 命令</h1><p>首先，看一下效果，以tar为例：</p>
-<p><img src="/images/linux/linux-python-cheat-tar.png" alt=""></p>
-<h1 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h1><p>cheat是python写的，可以用pip安装。</p>
-<pre><code>pip install cheat
-</code></pre><h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><hr>
-<p><a href="https://github.com/chrisallenlane/cheat" target="_blank" rel="external">github 地址</a></p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1432,21 +1495,21 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">121</span>
+              <span class="site-state-item-count">124</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

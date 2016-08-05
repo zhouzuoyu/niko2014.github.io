@@ -12,6 +12,8 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
 
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
 
 
 
@@ -185,6 +187,111 @@
       <div class="main-inner">
         <div id="content" class="content"> 
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/01/26/linux/tools/cheat-cmd/" itemprop="url">
+                  man的铺助工具——cheat
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-26T00:00:00+08:00" content="2016-01-26">
+              2016-01-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/26/linux/tools/cheat-cmd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/26/linux/tools/cheat-cmd/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="man"><a href="#man" class="headerlink" title="man"></a>man</h1><p>相信使用Linux的小伙伴, 想要查询一个命令的用法时, 都会使用<code>man</code>命令数据库，或者试一试命令自带的<code>--help</code>参数。<br>但是使用<code>man</code>有个不好的地方，就是信息太多太全了，对我们来说，需要的可能只是某个用法，而且例子是比较少的，有时man的效率确实比较低。<br>所以我的习惯是，写博客和笔记，并附有许多常用的例子。<br>其实，还有一个常用工具，可以满足需求的——<code>cheat</code>。</p>
+<h1 id="cheat-命令"><a href="#cheat-命令" class="headerlink" title="cheat 命令"></a>cheat 命令</h1><p>首先，看一下效果，以tar为例：</p>
+<p><img src="/images/linux/linux-python-cheat-tar.png" alt=""></p>
+<h1 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h1><p>cheat是python写的，可以用pip安装。</p>
+<pre><code>pip install cheat
+</code></pre><h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><hr>
+<p><a href="https://github.com/chrisallenlane/cheat" target="_blank" rel="external">github 地址</a></p>
+<p>#</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
     
       
 
@@ -1450,134 +1557,6 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/30/git/git_flow/" itemprop="url">
-                  Git 分支管理
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-30T15:03:30+08:00" content="2015-11-30">
-              2015-11-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/30/git/git_flow/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/30/git/git_flow/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="为什么要用分支"><a href="#为什么要用分支" class="headerlink" title="为什么要用分支"></a>为什么要用分支</h2><hr>
-<p>记得刚加入现在团队的时候，和boss搭了GOGS（类似的还有gitlab），到最近完成v0.1版本，一直都是用一个分支了。最近团队加入了几个新成员，产品那边也有大量的新需求和迭代。若还不进行分支管理，必定一定会陷入混乱（如果你问为什么？看了后面的分支管理模型，你就会恍然大悟）。</p>
-<p>这也让我想起在第一家公司实习的时候，有一个team，用了git，后来发现，只是用来更新和提交，真是高射炮打蚊子。就算是后来人员扩充了之后，仍然没有分支管理，当时觉得不可思议。他们的产品迭代速度很慢，质量也很差，我觉得这跟他们的代码管理也有一点关系。</p>
-<h2 id="一个通用模型"><a href="#一个通用模型" class="headerlink" title="一个通用模型"></a>一个通用模型</h2><hr>
-<p>关于分支的管理和工程实践上，最广为认知的是Vincent Driessen在2010年发表的一篇博客：<a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">《一种成功的Git分支管理模型》</a>，这篇博客总结了一种通用的分支管理模型，这个模型可以覆盖大部分的场景和研发流程。或许你没看过这篇博客，但如果你参与过团队分支管理策略的制定，你一定可以找到共鸣。</p>
-<p>博客中有一张图很清晰地描述了这个模型和各种场景：<br><img src="/images/git-model@2x.png" alt=""></p>
-<p>我记得在第一次实习时，团队中用的是svn，那时还没看过这篇博客，不过那时我们根据研发流程和需求场景制定出来的svn分支管理策略和这个类似，只是一个简化版，没有做太细。有一部分原因是因为svn的分支功能确实sucks，团队也不想浪费太多精力和成本。据说现在他们也换为git了，因为并行开发的功能太多了，svn终于让他们“心力交瘁”。</p>
-<h3 id="git-flow"><a href="#git-flow" class="headerlink" title="git-flow"></a>git-flow</h3><hr>
-<p>git的分支管理非常强大和方便，而git-flow可以让我们简化分支管理的操作。git-flow是git的一个扩展集，按<code>Vincent Driessen</code>的分支模型提供高层的操作，具体可参考<a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">这篇指南</a>。</p>
-<p>（现在想起当年用svn的分支管理，仍隐隐觉得蛋疼。那一堆堆tree-conflict（尤其是目录）历历在目，还好后来转到git）</p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
-<li>修改配置<br>git flow config<br>或者，修改配置文件：<br>vim your_repo/.git/config</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
-<p>分支管理是一门管理艺术，一味地盲目模仿不切实际，只会增加混乱和成本，在执行上也会遇到各种阻碍，所以针对自身团队和业务特点，找到最适合自己的管理策略。不过若你的产品需要快速的更新和迭代，你一定要试一下git。</p>
-<!--
-1. 小张和小何在开发两个大功能（`A-v0.1`和`B-v0.1`），小张先完成了A，然后部署生产了，小何继续B开发。
-小何过了两天也完成了B，然后提交代码，自动化部署B后，发现A功能出问题了，原来小张在这两天在进行A功能小优化（`A-v0.1.1`），还未完成就“被”部署上去了。
-这个故事告诉我们，需要把必须将正式（master）和开发（develop）的代码分开。
-
-2. 现在代码分成了两个分支，小张小何都在develop开发。小张完成`A-v0.2`，要部署。合并的代码发现有小何的代码，于是问小何，小何说`我在做B-v0.2`，还没做完，你不可以合并。
-所以问题还是没有解决，产品汪质问小张，为什么还不部署，这个功能很急的，小何表示压力很大。
-这次，小张小何约定，从develop分支再建立分支，叫做feature分支，用来。
-
-3...  场景太多了， 不写了
--->
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
-<ol>
-<li><a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">git-flow 备忘清单</a></li>
-<li><a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">A successful Git branching model » nvie.com</a></li>
-</ol>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1620,21 +1599,21 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">121</span>
+              <span class="site-state-item-count">124</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

@@ -69,11 +69,86 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
     </entry>
     
     <entry>
+      <title><![CDATA[java thread 内存模型]]></title>
+      <url>http://niko2014.github.io/2016/04/06/java/concurrent/java_thread_memory_model/</url>
+      <content type="html"><![CDATA[<p>java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: <a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a>)</p>
+<h1 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h1><hr>
+<p>首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书<code>&lt;深入理解Java虚拟机&gt;</code>中有一幅图, 描述两者的关系:</p>
+<p><img src="/images/java/main_working_memory.png" alt=""></p>
+<p>如果要快速地理解他们之间的关系, 可以类比CPU/高速缓存/内存的关系(对应线程/工作内存/主内存).</p>
+<p>映射到底层来看, 主内存在物理硬件内存中, 工作内存可能会存在于寄存器或高速缓存.</p>
+<h1 id="线程操作术语和框架"><a href="#线程操作术语和框架" class="headerlink" title="线程操作术语和框架"></a>线程操作术语和框架</h1><hr>
+<p>以下操作都是原子的:</p>
+<ul>
+<li><code>lock</code></li>
+</ul>
+<p>锁定一个变量为某个线程独占</p>
+<ul>
+<li><code>unlock</code></li>
+</ul>
+<p>释放已lock的变量</p>
+<ul>
+<li><code>read</code></li>
+</ul>
+<p>从主内存读取variable到工作内存</p>
+<ul>
+<li><code>load</code></li>
+</ul>
+<p>把read到的variable放入工作内存的变量副本</p>
+<ul>
+<li><code>use</code></li>
+</ul>
+<p>把工作内存的变量传递给执行引擎</p>
+<ul>
+<li><code>assign</code></li>
+</ul>
+<p>执行引擎通过此操作值赋给工作内存的变量</p>
+<ul>
+<li><code>store</code></li>
+</ul>
+<p>把工作内存的一个变量值送到主内存中</p>
+<ul>
+<li><code>write</code></li>
+</ul>
+<p>把store送到主内存的值写到主内存变量中</p>
+<p>以上八个操作更详细的介绍可以从这个<a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">JVM Specs 文档</a>中查阅.</p>
+<h1 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h1><hr>
+<p>有了以上8种基本操作, 可以观察到, 这些操作的一些pattern组合是有意义的, 一些是不合法无意义的. 因此我们还需要一些规则来限定这些操作的顺序和组合, 如下:</p>
+<h2 id="变量规则"><a href="#变量规则" class="headerlink" title="变量规则"></a>变量规则</h2><ul>
+<li>不允许丢失最近的<code>assign</code>, 必须把工作内存的变化同步回主内存</li>
+<li>不允许线程没有发生<code>assign</code>就把内容同步回主内存.</li>
+<li>新线程创建时工作内存是空的, 而且需从主内存获取(即use/store前必须已经assign/load)</li>
+<li>read+load和store+write是成对按顺序出现的, 从主内存read了, 工作内存就必须接受; store了主内存, 主内存就必须write</li>
+</ul>
+<h2 id="lock-规则"><a href="#lock-规则" class="headerlink" title="lock 规则"></a>lock 规则</h2><ul>
+<li>同一时刻只能有一个线程进行lock操作, 但同一线程可以lock多次, 同时unlock也需要执行相同的次数.</li>
+<li>不允许lock未被lock的以及被其他线程lock住的变量</li>
+</ul>
+<h2 id="lock和变量互动规则"><a href="#lock和变量互动规则" class="headerlink" title="lock和变量互动规则"></a>lock和变量互动规则</h2><ul>
+<li>unlock时, 必须把内容同步会主内存</li>
+<li>当lock某个变量时, 会清空工作内存中的该变量的值, 当执行引擎使用到该变量时, 从主内存进行load或assign.</li>
+</ul>
+<h1 id="先行发生原则"><a href="#先行发生原则" class="headerlink" title="先行发生原则"></a>先行发生原则</h1><hr>
+<p>观察上面这些规则的设计, 可以发现是比较严谨繁琐的. 但写代码时, 我们判断是否<code>线程安全</code>的方法用的是<code>先行发生(happens-before)原则</code>. 如果程序不在该规则及其推导中, 那么就不是线程安全的. 以下是<a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5" target="_blank" rel="external">主要规则</a>:</p>
+<ul>
+<li>一个线程内, 代码按控制流顺序执行</li>
+<li>监视器上的unlock先于器lock操作</li>
+<li>volatile的write先于随后的read</li>
+<li>start()的调用先于此线程的所有action</li>
+<li>所有action先于该线程的join()返回</li>
+<li>对象初始化操作先于其他action</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a><br><a href="http://gvsmirnov.ru/blog/tech/2014/02/10/jmm-under-the-hood.html" target="_blank" rel="external">Java Memory Model Under The Hood</a><br><a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">VM Spec Threads and Locks</a><br><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html" target="_blank" rel="external">Chapter 17. Threads and Locks</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Java 并发之 CAS]]></title>
       <url>http://niko2014.github.io/2016/04/05/java/concurrent/CAS_ABA_Java/</url>
-      <content type="html"><![CDATA[<h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
-<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
-<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+      <content type="html"><![CDATA[<h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个<code>原子操作</code>. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于<code>CPU提供的原子操作</code>指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现<code>无锁队列</code>.</p>
+<p>从CAS的机制可以发现, 这和<code>乐观锁</code>很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种<code>悲观的策略</code>, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
 <h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
@@ -780,6 +855,34 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     </entry>
     
     <entry>
+      <title><![CDATA[vim 插件收集]]></title>
+      <url>http://niko2014.github.io/2015/11/29/linux/vim_plugins/</url>
+      <content type="html"><![CDATA[<p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
+<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
+<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
+<p>使用指南：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
+<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
+<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
+<p>其他功能都可以在文档中找到。</p>
+<p>常用功能：</p>
+<ul>
+<li>gt/gT<br>上/下切换tab</li>
+</ul>
+<blockquote>
+<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
+</blockquote>
+<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
+<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
+<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
+<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
+<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
+<p>Vundle // TODO and pathogen</p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[github 上的配色项目 - solarized]]></title>
       <url>http://niko2014.github.io/2015/11/29/linux/solarized_colors/</url>
       <content type="html"><![CDATA[<h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
@@ -807,34 +910,6 @@ git clone git://github.com/altercation/vim-colors-solarized.git
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
 <h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
 <p>// TODO</p>
-]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[vim 插件收集]]></title>
-      <url>http://niko2014.github.io/2015/11/29/linux/vim_plugins/</url>
-      <content type="html"><![CDATA[<p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
-<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
-<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
-<p>使用指南：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
-<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
-<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
-<p>其他功能都可以在文档中找到。</p>
-<p>常用功能：</p>
-<ul>
-<li>gt/gT<br>上/下切换tab</li>
-</ul>
-<blockquote>
-<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
-</blockquote>
-<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
-<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
-<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
-<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
-<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
-<p>Vundle // TODO and pathogen</p>
 ]]></content>
     </entry>
     

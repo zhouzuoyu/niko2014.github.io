@@ -12,6 +12,8 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
 
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
 
 
 
@@ -53,7 +55,7 @@ CAS">
 <meta property="og:site_name" content="niko">
 <meta property="og:description" content="CASCAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.
 CAS">
-<meta property="og:updated_time" content="2016-07-29T06:54:34.734Z">
+<meta property="og:updated_time" content="2016-08-05T01:21:44.953Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java 并发之 CAS">
 <meta name="twitter:description" content="CASCAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.
@@ -259,9 +261,9 @@ CAS">
       
 
       
-        <span itemprop="articleBody"><h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原子操作. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
-<p>CAS操作基于CPU提供的原子操作指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现无锁队列.</p>
-<p>从CAS的机制可以发现, 这和乐观锁很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种悲观的策略, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+        <span itemprop="articleBody"><h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个<code>原子操作</code>. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于<code>CPU提供的原子操作</code>指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现<code>无锁队列</code>.</p>
+<p>从CAS的机制可以发现, 这和<code>乐观锁</code>很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种<code>悲观的策略</code>, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
 <h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
@@ -307,8 +309,8 @@ CAS">
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" rel="prev" title="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
-                使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/04/06/java/concurrent/java_thread_memory_model/" rel="prev" title="java thread 内存模型">
+                java thread 内存模型 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -378,21 +380,21 @@ CAS">
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">121</span>
+              <span class="site-state-item-count">124</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
