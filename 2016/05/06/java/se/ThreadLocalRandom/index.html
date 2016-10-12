@@ -1,0 +1,721 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="java," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
+
+创建java.util.Random实例
+使用Math.random(), 其实内部也是创建了一个java.util.Random
+
+使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.但是, 如果在多线程下使用Random, 会导致多线">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThreadLocalRandom - 为多线程而生">
+<meta property="og:url" content="http://niko2014.github.io/2016/05/06/java/se/ThreadLocalRandom/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
+
+创建java.util.Random实例
+使用Math.random(), 其实内部也是创建了一个java.util.Random
+
+使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.但是, 如果在多线程下使用Random, 会导致多线">
+<meta property="og:updated_time" content="2016-08-23T08:46:53.272Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ThreadLocalRandom - 为多线程而生">
+<meta name="twitter:description" content="今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
+
+创建java.util.Random实例
+使用Math.random(), 其实内部也是创建了一个java.util.Random
+
+使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.但是, 如果在多线程下使用Random, 会导致多线">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> ThreadLocalRandom - 为多线程而生 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ThreadLocalRandom - 为多线程而生
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-06T00:00:00+08:00" content="2016-05-06">
+              2016-05-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/06/java/se/ThreadLocalRandom/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/06/java/se/ThreadLocalRandom/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>今天要说的 <code>ThreadLocalRandom</code> 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用</p>
+<ol>
+<li>创建<code>java.util.Random</code>实例</li>
+<li>使用Math.random(), 其实内部也是创建了一个<code>java.util.Random</code></li>
+</ol>
+<p>使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.<br>但是, 如果在多线程下使用Random, 会导致多线程的竞争开销, 也会降低Random的随机性, 于是便有了<code>ThreadLocalRandom</code>.</p>
+<h1 id="ThreadLocalRandom"><a href="#ThreadLocalRandom" class="headerlink" title="ThreadLocalRandom"></a><code>ThreadLocalRandom</code></h1><hr>
+<p>那么, 对于前面的问题, <code>ThreadLocalRandom</code>对这些做了哪些工作呢 ?</p>
+<p>假设使用以下代码获取随机数 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">int randomInt = ThreadLocalRandom.current().nextInt();</div></pre></td></tr></table></figure>
+<h2 id="ThreadLocalRandom-current"><a href="#ThreadLocalRandom-current" class="headerlink" title="ThreadLocalRandom.current():"></a><code>ThreadLocalRandom.current()</code>:</h2><hr>
+<p>我们来看一下<code>ThreadLocalRandom</code>的内部实现:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static ThreadLocalRandom current() &#123;</div><div class="line">    if (UNSAFE.getInt(Thread.currentThread(), PROBE) == 0)</div><div class="line">        localInit();</div><div class="line">    return instance;</div><div class="line">&#125;</div><div class="line"></div><div class="line">static final void localInit() &#123;</div><div class="line">    int p = probeGenerator.addAndGet(PROBE_INCREMENT);</div><div class="line">    int probe = (p == 0) ? 1 : p; // skip 0</div><div class="line">    long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));</div><div class="line">    Thread t = Thread.currentThread();</div><div class="line">    UNSAFE.putLong(t, SEED, seed);</div><div class="line">    UNSAFE.putInt(t, PROBE, probe);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中, <code>SEED</code>和<code>PROBE</code>可以参考下面定义:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class&lt;?&gt; tk = Thread.class;</div><div class="line">SEED = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSeed&quot;));</div><div class="line">PROBE = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomProbe&quot;));</div><div class="line">SECONDARY = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSecondarySeed&quot;));</div></pre></td></tr></table></figure>
+<p><code>Thread.java</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@sun.misc.Contended(&quot;tlr&quot;)</div><div class="line">int threadLocalRandomProbe;</div></pre></td></tr></table></figure>
+<p><code>UNSAFE.getInt(Thread.currentThread(), PROBE)</code>就是获取<code>Thread</code>对象中offset偏移地址对应的field <code>threadLocalRandomProbe</code>的值, <code>threadLocalRandomProbe</code> 是<code>nonzero if threadLocalRandomSeed initialized</code>.<br>所以, 如果<code>PROBE</code>值为零, 将进行localInit(), 当前Thread对象的threadLocalRandomSeed 和 threadLocalRandomProbe将会被赋值. (<code>@sun.misc.Contended(&quot;tlr&quot;)</code>是为了解决伪共享的问题, 将另起一篇博客介绍)</p>
+<h2 id="nextInt"><a href="#nextInt" class="headerlink" title="nextInt()"></a><code>nextInt()</code></h2><hr>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public int nextInt() &#123;</div><div class="line">    return mix32(nextSeed());</div><div class="line">&#125;</div><div class="line"></div><div class="line">final long nextSeed() &#123;</div><div class="line">    Thread t; long r; // read and update per-thread seed</div><div class="line">    UNSAFE.putLong(t = Thread.currentThread(), SEED,</div><div class="line">                   r = UNSAFE.getLong(t, SEED) + GAMMA);</div><div class="line">    return r;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>注意:</code><br><code>SEED</code>是field的偏移量<br><code>GAMMA</code>是seed的increment<br>这里会更新当前Thread的SEED, 最终mix32()生成int随机数.</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>从上可知<code>ThreadLocalRandom</code>的工作方式, 它为每个线程分配了一个SEED(被Thread对象持有), 故而减少了多线程下的竞争开销, 也使随机性更加好.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://www.jdon.com/concurrent/concurrent-random.html" target="_blank" rel="external">http://www.jdon.com/concurrent/concurrent-random.html</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/05/books/procrastination/procrastination-12/" rel="next" title="【书：拖延心理学】（12） 作战武器 - 明确目标和可行性的计划">
+                <i class="fa fa-chevron-left"></i> 【书：拖延心理学】（12） 作战武器 - 明确目标和可行性的计划
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/08/search/es/es-partial-update/" rel="prev" title="【api】elasticsearch - 部分更新文档">
+                【api】elasticsearch - 部分更新文档 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/05/06/java/se/ThreadLocalRandom/"
+                   data-title="ThreadLocalRandom - 为多线程而生" data-url="http://niko2014.github.io/2016/05/06/java/se/ThreadLocalRandom/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ThreadLocalRandom"><span class="nav-number">1.</span> <span class="nav-text">ThreadLocalRandom</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ThreadLocalRandom-current"><span class="nav-number">1.1.</span> <span class="nav-text">ThreadLocalRandom.current():</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nextInt"><span class="nav-number">1.2.</span> <span class="nav-text">nextInt()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">2.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

@@ -61,7 +61,7 @@ lspci | grep VGA
 01:00.0 VGA compatible contro">
 <meta property="og:image" content="http://niko2014.github.io/images/linux/nvidia_manager_install.png">
 <meta property="og:image" content="http://niko2014.github.io/images/linux/nvidia-config-01.png">
-<meta property="og:updated_time" content="2016-07-04T03:15:29.664Z">
+<meta property="og:updated_time" content="2016-10-11T02:10:37.746Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ubuntu安装nvidia显卡驱动">
 <meta name="twitter:description" content="最近换硬盘重装了ubuntu, 但在用xmind和窗口切换时, 老是卡死(鼠标/键盘动不了, 但能ssh进去) , 想了一下, 应该是显卡驱动没装的原因, 由于自己的ubuntu关闭了所有动画和特效, 一直没有去装N卡驱动, 于是安装验证了一下是否这个原因导致的～
@@ -298,6 +298,7 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 <p>或者：</p>
 <pre><code>prime-select query
 </code></pre><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>最后，装了N卡驱动后，ubuntu的unity崩溃真的少了很多，xmind的卡死也没有再出现过。</p>
+<h1 id="补充-使用apt安装"><a href="#补充-使用apt安装" class="headerlink" title="补充: 使用apt安装"></a>补充: 使用apt安装</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo apt-get purge nvidia*</div><div class="line">sudo add-apt-repository ppa:graphics-drivers/ppa</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install nvidia-352</div></pre></td></tr></table></figure>
 <h1 id="参考引用"><a href="#参考引用" class="headerlink" title="参考引用"></a>参考引用</h1><hr>
 <p>【1】<a href="http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html" target="_blank" rel="external">http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html</a><br>【2】<a href="http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14" target="_blank" rel="external">http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14</a></p>
 <p>#</p>
@@ -399,21 +400,21 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">49</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">124</span>
+              <span class="site-state-item-count">134</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -441,7 +442,7 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装前"><span class="nav-number">1.</span> <span class="nav-text">安装前</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#option-1-使用管理器安装"><span class="nav-number">2.</span> <span class="nav-text">option 1: 使用管理器安装:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#option-2-手动安装"><span class="nav-number">3.</span> <span class="nav-text">option 2: 手动安装:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考引用"><span class="nav-number">5.</span> <span class="nav-text">参考引用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装前"><span class="nav-number">1.</span> <span class="nav-text">安装前</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#option-1-使用管理器安装"><span class="nav-number">2.</span> <span class="nav-text">option 1: 使用管理器安装:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#option-2-手动安装"><span class="nav-number">3.</span> <span class="nav-text">option 2: 手动安装:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#补充-使用apt安装"><span class="nav-number">5.</span> <span class="nav-text">补充: 使用apt安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考引用"><span class="nav-number">6.</span> <span class="nav-text">参考引用</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>

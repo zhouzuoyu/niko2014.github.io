@@ -204,8 +204,8 @@
             
             
               
-                <a class="post-title-link" href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="url">
-                  使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志
+                <a class="post-title-link" href="/2016/07/02/cs/protocol/CORS_nginx/" itemprop="url">
+                  跨域之CORS简介
                 </a>
               
             
@@ -215,8 +215,1285 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2016-04-28T00:00:00+08:00" content="2016-04-28">
-              2016-04-28
+            <time itemprop="dateCreated" datetime="2016-07-02T00:00:00+08:00" content="2016-07-02">
+              2016-07-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/07/02/cs/protocol/CORS_nginx/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/02/cs/protocol/CORS_nginx/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..</p>
+<h1 id="Cross-Origin-Resource-Sharing-CORS"><a href="#Cross-Origin-Resource-Sharing-CORS" class="headerlink" title="Cross-Origin Resource Sharing (CORS)"></a>Cross-Origin Resource Sharing (CORS)</h1><hr>
+<p>Cross-Origin Resource Sharing (CORS), 是浏览器跨源服务器进行资源共享的一个标准, 是解决跨越访问的方法之一.</p>
+<p>那什么是跨域呢?</p>
+<p>举个例子, 如果你的网页处于<code>a.niko</code>域名下, 若使用ajax访问<code>b.niko</code>下的资源, 就会有跨域的问题. 如果<code>b.niko</code>不允许<code>a.niko</code>的资源请求, 那么这个请求将会失败.</p>
+<h1 id="实例演示"><a href="#实例演示" class="headerlink" title="实例演示"></a>实例演示</h1><p>首先建立nginx实验环境, 来模拟跨域的问题, 编辑nginx的配置, 建立两个server :</p>
+<p><code>a.niko</code> 服务器</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name  a.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:3000;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>b.niko</code> 服务器</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name b.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:8080;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当然<code>/etc/hosts</code>记得加入这两个域名.</p>
+<p>接着打开<code>a.niko</code>的页面, 页面中的js会使用ajax请求<code>b.niko</code>的某一资源, 这时浏览器会提示不允许跨域请求, 如下:</p>
+<p><img src="/images/cs/protocol/cors-fail-001.png" alt=""></p>
+<h1 id="使用CORS解决跨域"><a href="#使用CORS解决跨域" class="headerlink" title="使用CORS解决跨域"></a>使用CORS解决跨域</h1><p>如果要解决这个问题, 只需要在服务器的响应头加一个header: <code>Access-Control-Allow-Origin</code>.</p>
+<p>在nginx中是这样设置:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name b.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:8080;</div><div class="line">                add_header &apos;Access-Control-Allow-Origin&apos; &apos;http://a.niko&apos;;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中的值填写Origin域名, <code>*</code>号表示所有.</p>
+<p>然后刷新页面, 查看跨域请求的结果:</p>
+<p><img src="/images/cs/protocol/cors-success-001.png" alt=""></p>
+<p>如上, 跨域请求成功, 可以看<code>Origin</code>和<code>Access-Control-Allow-Origin</code> header.</p>
+<h1 id="为什么POST前有一个OPTIONS请求"><a href="#为什么POST前有一个OPTIONS请求" class="headerlink" title="为什么POST前有一个OPTIONS请求"></a>为什么POST前有一个OPTIONS请求</h1><p>这次改为POST方法试一下, 使用<code>ajax-POST</code>请求<code>b.niko</code>的资源, 观察请求:</p>
+<p><img src="/images/cs/protocol/cors-post-options-001.png" alt=""></p>
+<p>你会看到第一个发出去的是<code>OPTIONS</code>方法的请求, 而不是<code>POST</code>.</p>
+<p>为什么呢?</p>
+<p>这个<code>OPTIONS</code>请求其实叫做是<code>CORS preflight request</code>， 作用是在真正的请求发往服务器前， 向服务器确认是否有权限去做这个请求。</p>
+<p>根据CORS的规范， <code>Content-Type</code>非<code>application/x-www-form-urlencoded, multipart/form-data, or text/plain</code> 的POST请求会进行<code>preflight</code>.</p>
+<p>下面的链接会有更详细的介绍哪些请求会进行preflight:<br><a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">Types of CORS requests</a></p>
+<p>如果需要对这个<code>OPTIONS</code>请求进行特殊处理, nginx设置如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">location / &#123;</div><div class="line">     if ($request_method = &apos;OPTIONS&apos;) &#123;</div><div class="line">        add_header &apos;Access-Control-Allow-Origin&apos; &apos;*&apos;;</div><div class="line">        add_header &apos;Access-Control-Allow-Methods&apos; &apos;GET, POST, OPTIONS&apos;;</div><div class="line">        #</div><div class="line">        # Custom headers and headers various browsers *should* be OK with but aren&apos;t</div><div class="line">        #</div><div class="line">        add_header &apos;Access-Control-Allow-Headers&apos; &apos;DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type&apos;;</div><div class="line">        #</div><div class="line">        # Tell client that this pre-flight info is valid for 20 days</div><div class="line">        #</div><div class="line">        add_header &apos;Access-Control-Max-Age&apos; 1728000;</div><div class="line">        add_header &apos;Content-Type&apos; &apos;text/plain charset=UTF-8&apos;;</div><div class="line">        add_header &apos;Content-Length&apos; 0;</div><div class="line">        return 200;</div><div class="line">     &#125;</div><div class="line">     ...</div><div class="line">     ...</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>如上， response的header除了<code>Access-Control-Allow-Origin</code>, 还有其他跨域相关的header（<code>Access-Control-Allow-Origin</code> / <code>Access-Control-Allow-Methods</code> / <code>Access-Control-Allow-Headers</code>等等）, 用以告诉客户端请求跨域访问时的条件和规则, 相关说明可查阅<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">CORS规范文档</a>。</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>我们都知道， 上面的场景是属于能够控制跨域服务器的情况， 因此可以通过CORS解决跨域问题。<br>否则， 只能通过JSONP和代理等其他方式来实现, 有兴趣的童鞋可以了解一下, 这里不再赘述.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS</a><br><a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">http://www.html5rocks.com/en/tutorials/cors/</a><br><a href="http://www.itnose.net/detail/6501161.html" target="_blank" rel="external">http://www.itnose.net/detail/6501161.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/07/01/linux/manage/remove-deb/" itemprop="url">
+                  卸载删除已安装的 `.deb` 包
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-07-01T00:00:00+08:00" content="2016-07-01">
+              2016-07-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/07/01/linux/manage/remove-deb/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/01/linux/manage/remove-deb/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>下面以删除<code>xmind</code>deb包为例, 简述移除过程:</p>
+<h1 id="查询你要删除的包信息"><a href="#查询你要删除的包信息" class="headerlink" title="查询你要删除的包信息:"></a>查询你要删除的包信息:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dpkg -l | grep xmind</div><div class="line">ii  xmind                                                 3.6.51                                              amd64        Professional &amp; Powerful Mind Mapping Software</div></pre></td></tr></table></figure>
+<p><code>ii</code> 表示<code>installed ok installed</code>.</p>
+<h1 id="r-移除"><a href="#r-移除" class="headerlink" title="-r 移除"></a><code>-r</code> 移除</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dpkg -r xmind</div><div class="line">dpkg: error: requested operation requires superuser privilege</div><div class="line">niko@ubuntu14:/usr/lib/xmind$ sudo dpkg -r xmind</div><div class="line">(Reading database ... 178948 files and directories currently installed.)</div><div class="line">Removing xmind (3.6.51) ...</div><div class="line">Processing triggers for shared-mime-info (1.2-0ubuntu3) ...</div><div class="line">Processing triggers for man-db (2.6.7.1-1) ...</div><div class="line">Processing triggers for fontconfig (2.11.0-0ubuntu4) ...</div><div class="line">Processing triggers for gnome-menus (3.10.1-0ubuntu2) ...</div><div class="line">Processing triggers for desktop-file-utils (0.22-1ubuntu1) ...</div><div class="line">Processing triggers for bamfdaemon (0.5.1+14.04.20140409-0ubuntu1) ...</div><div class="line">Rebuilding /usr/share/applications/bamf-2.index...</div><div class="line">Processing triggers for mime-support (3.54ubuntu1) ...</div></pre></td></tr></table></figure>
+<p>再次查询</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dpkg -l | grep xmind</div><div class="line">rc  xmind                                                 3.6.51                                              amd64        Professional &amp; Powerful Mind Mapping Software</div></pre></td></tr></table></figure>
+<p>为什么删除了仍然可以查询到呢?</p>
+<p>我们留意到<code>ii</code>已经变成了<code>rc</code>, 表示<code>removed ok config-files</code>,<br>即<code>-r</code>没有移除配置文件, 已安装的包状态是存在<code>/var/lib/dpkg/status</code>中.</p>
+<p>比如, 可以查看一下<code>xmind</code>的信息:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Package: xmind</div><div class="line">Status: deinstall ok config-files</div><div class="line">Priority: optional</div><div class="line">Section: non-free/editors</div><div class="line">Installed-Size: 148888</div><div class="line">Maintainer: XMind Ltd. &lt;dev@xmind.net&gt;</div><div class="line">Architecture: amd64</div><div class="line">Version: 3.6.51</div><div class="line">Config-Version: 3.6.51</div><div class="line">Depends: default-jre (&gt;= 2:1.7-0) | java7-runtime | java8-runtime, libgtk2.0-0 (&gt;= 2.8.0), libwebkitgtk-1.0-0, lame, libc6 (&gt;= 2.7), libglib2.0-0 (&gt;= 2.12.0)</div><div class="line">Conffiles:</div><div class="line"> /etc/XMind.ini 3553ecb1eb8875b4be37733ce8f29839</div><div class="line">Description: Professional &amp; Powerful Mind Mapping Software</div><div class="line"> XMind, is an open source brainstorming and mind mapping software tool</div><div class="line"> developed by XMind Ltd. It helps people to capture ideas, organize to</div><div class="line"> various charts, and share them for collaboration. Supporting mind maps,</div><div class="line"> fishbone diagrams, tree diagrams, org-charts, logic charts, and even</div><div class="line"> matrix. Often used for knowledge management, meeting minutes, task</div><div class="line"> management, and GTD. XMind is compatible with Freemind/Mindmanager.</div><div class="line"> XMind is dual licensed under 2 open source licenses: the Eclipse Public</div><div class="line"> License v1.0 (EPL) and the GNU Lesser General Public License v3 (LGPL).</div><div class="line"> XMind Plus/Pro is released under the terms of the XMIND PROPRIETARY LICENSE</div><div class="line"> AGREEMENT, which is available at http://www.xmind.net/license/xpla/ .</div></pre></td></tr></table></figure>
+<p>状态是<code>Status: deinstall ok config-files</code>.</p>
+<h1 id="P-purge"><a href="#P-purge" class="headerlink" title="-P purge"></a><code>-P</code> purge</h1><p>如果要完全移除<code>xmind</code>程序和配置, 可使用<code>-P</code>:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sudo dpkg -P xmind</div><div class="line">[sudo] password for niko:</div><div class="line">(Reading database ... 175311 files and directories currently installed.)</div><div class="line">Removing xmind (3.6.51) ...</div><div class="line">Purging configuration files for xmind (3.6.51) ...</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/08/search/es/es-partial-update/" itemprop="url">
+                  【api】elasticsearch - 部分更新文档
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-08T00:00:00+08:00" content="2016-05-08">
+              2016-05-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/08/search/es/es-partial-update/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/08/search/es/es-partial-update/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="document-的部分更新"><a href="#document-的部分更新" class="headerlink" title="document 的部分更新"></a>document 的部分更新</h1><p>对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。</p>
+<p>但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考虑version的话， 为何不在服务器完成， 提供一个部分更新的api， 让用户根据场景合理使用api， 比之前的做法可以节省一个请求。</p>
+<p>所以说， elasticsearch还是很人性化的， 它提供了这个api， 不过在其内部来说， api实现还是遵循了<code>retrieve-change-reindex</code>的步骤, 操作在shard中完成。</p>
+<h1 id="更新的安全问题"><a href="#更新的安全问题" class="headerlink" title="更新的安全问题"></a>更新的安全问题</h1><p>那么如果有多个客户端同时更新， 那么并发安全的问题es如何处理呢？<br>前面提到了， es内部是<code>retrieve-change-reindex</code>的步骤， 在<code>retrieve</code>阶段， es会获取当前的<code>_version</code>， 并在后面的<code>reindex</code>阶段使用。<br>如果其他进程修改了document， <code>_version</code>将会和update request中的不同， 从而更新将会失败。</p>
+<p>这个类似乐观锁的策略， 如果需要重试的话， 可以使用<code>retry_on_conflict</code>设置重试次数，比如：</p>
+<p><code>.../_update?retry_on_conflict=5</code></p>
+<p>不过， 这个重试使用的场景在计数器上用的较多， 因为这个更新的顺序是不那么重要的。</p>
+<h1 id="REST-api"><a href="#REST-api" class="headerlink" title="REST api"></a>REST api</h1><p>言归正传， 接下来，介绍以下api的使用吧。</p>
+<p>假设有个<code>blog</code>的document， 其中有个field叫做<code>tags</code>， 如果要部分更新这个<code>tags</code>：</p>
+<p>最简单的方式是使用<code>doc</code>参数， 和已有document合并， 已有的field会被覆盖， 新的field将会新增到document， REST api 如下：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   "doc" : &#123;</div><div class="line">      "tags" : [ "testing" ],</div><div class="line">      "views": 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果成功， 会收到这样的response：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span> :   <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_id"</span> :      <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_type"</span> :    <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_version"</span> : <span class="number">3</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>再获取一次这个文档， 检查一下是否真的只更新了<code>tags</code>这个field：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span>:    <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_type"</span>:     <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_id"</span>:       <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_version"</span>:  <span class="number">3</span>,</div><div class="line">   <span class="attr">"found"</span>:     <span class="literal">true</span>,</div><div class="line">   <span class="attr">"_source"</span>: &#123;</div><div class="line">      <span class="attr">"title"</span>:  <span class="string">"My first blog entry"</span>,</div><div class="line">      <span class="attr">"text"</span>:   <span class="string">"Starting to get the hang of this..."</span>,</div><div class="line">      <span class="attr">"tags"</span>: [ <span class="string">"testing"</span> ],</div><div class="line">      <span class="attr">"views"</span>:  <span class="number">0</span></div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="java-api"><a href="#java-api" class="headerlink" title="java api"></a>java api</h1><p>如果使用 java api 的话：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;website&quot;, &quot;blog&quot;, &quot;1&quot;)</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;tags&quot;, new String[]&#123;&quot;testing&quot;&#125;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
+<h1 id="spring-data-elasticsearch-api"><a href="#spring-data-elasticsearch-api" class="headerlink" title="spring data elasticsearch api"></a>spring data elasticsearch api</h1><p>如果使用spring-data-elasticsearch的<code>ElasticsearchTemplate</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line">UpdateRequest updateRequest = <span class="keyword">new</span> UpdateRequest();</div><div class="line">updateRequest</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">                .startObject()</div><div class="line">                .field(field, value)</div><div class="line">                .endObject());</div><div class="line">UpdateQuery updateQuery = <span class="keyword">new</span> UpdateQueryBuilder()</div><div class="line">        <span class="comment">//.withIndexName(indexName).withType(objectType)</span></div><div class="line">        .withClass(clz)</div><div class="line">        .withId(String.valueOf(id))</div><div class="line">        .withUpdateRequest(updateRequest)</div><div class="line">        .build();</div><div class="line">elasticsearchTemplate.update(updateQuery);</div><div class="line">elasticsearchTemplate.refresh(indexName, <span class="keyword">true</span>);</div></pre></td></tr></table></figure>
+<p>使用这个api时可能会有这样的疑惑， UpdateQuery中有指定indexName和objectType， 但是<code>@Document</code>的Class中也有声明， 那么使用哪个呢？</p>
+<p>我们可以看看<code>elasticsearchTemplate.update(updateQuery)</code>的源码:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   @Override</div><div class="line">public UpdateResponse update(UpdateQuery query) &#123;</div><div class="line">	return this.prepareUpdate(query).execute().actionGet();</div><div class="line">&#125;</div><div class="line"></div><div class="line">   private UpdateRequestBuilder prepareUpdate(UpdateQuery query) &#123;</div><div class="line">   		String indexName = isNotBlank(query.getIndexName()) ? query.getIndexName() : getPersistentEntityFor(query.getClazz()).getIndexName();</div><div class="line">   		String type = isNotBlank(query.getType()) ? query.getType() : getPersistentEntityFor(query.getClazz()).getIndexType();</div><div class="line">   		Assert.notNull(indexName, &quot;No index defined for Query&quot;);</div><div class="line">   		Assert.notNull(type, &quot;No type define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getId(), &quot;No Id define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getUpdateRequest(), &quot;No IndexRequest define for Query&quot;);</div><div class="line">   		UpdateRequestBuilder updateRequestBuilder = client.prepareUpdate(indexName, type, query.getId());</div><div class="line"></div><div class="line">   		...</div><div class="line">   	&#125;</div></pre></td></tr></table></figure>
+<p>由上可知， <code>query.getIndexName()</code>和<code>query.getIndexName()</code>会被优先使用， 如果未指定， 会从document的Class注解中获取。<br>如果为了提高性能, 能写上也好, 不过最好统一管理这两个名称, 方便以后修改变更.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/06/java/se/ThreadLocalRandom/" itemprop="url">
+                  ThreadLocalRandom - 为多线程而生
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-06T00:00:00+08:00" content="2016-05-06">
+              2016-05-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/06/java/se/ThreadLocalRandom/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/06/java/se/ThreadLocalRandom/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>今天要说的 <code>ThreadLocalRandom</code> 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用</p>
+<ol>
+<li>创建<code>java.util.Random</code>实例</li>
+<li>使用Math.random(), 其实内部也是创建了一个<code>java.util.Random</code></li>
+</ol>
+<p>使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.<br>但是, 如果在多线程下使用Random, 会导致多线程的竞争开销, 也会降低Random的随机性, 于是便有了<code>ThreadLocalRandom</code>.</p>
+<h1 id="ThreadLocalRandom"><a href="#ThreadLocalRandom" class="headerlink" title="ThreadLocalRandom"></a><code>ThreadLocalRandom</code></h1><hr>
+<p>那么, 对于前面的问题, <code>ThreadLocalRandom</code>对这些做了哪些工作呢 ?</p>
+<p>假设使用以下代码获取随机数 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">int randomInt = ThreadLocalRandom.current().nextInt();</div></pre></td></tr></table></figure>
+<h2 id="ThreadLocalRandom-current"><a href="#ThreadLocalRandom-current" class="headerlink" title="ThreadLocalRandom.current():"></a><code>ThreadLocalRandom.current()</code>:</h2><hr>
+<p>我们来看一下<code>ThreadLocalRandom</code>的内部实现:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static ThreadLocalRandom current() &#123;</div><div class="line">    if (UNSAFE.getInt(Thread.currentThread(), PROBE) == 0)</div><div class="line">        localInit();</div><div class="line">    return instance;</div><div class="line">&#125;</div><div class="line"></div><div class="line">static final void localInit() &#123;</div><div class="line">    int p = probeGenerator.addAndGet(PROBE_INCREMENT);</div><div class="line">    int probe = (p == 0) ? 1 : p; // skip 0</div><div class="line">    long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));</div><div class="line">    Thread t = Thread.currentThread();</div><div class="line">    UNSAFE.putLong(t, SEED, seed);</div><div class="line">    UNSAFE.putInt(t, PROBE, probe);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中, <code>SEED</code>和<code>PROBE</code>可以参考下面定义:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class&lt;?&gt; tk = Thread.class;</div><div class="line">SEED = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSeed&quot;));</div><div class="line">PROBE = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomProbe&quot;));</div><div class="line">SECONDARY = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSecondarySeed&quot;));</div></pre></td></tr></table></figure>
+<p><code>Thread.java</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@sun.misc.Contended(&quot;tlr&quot;)</div><div class="line">int threadLocalRandomProbe;</div></pre></td></tr></table></figure>
+<p><code>UNSAFE.getInt(Thread.currentThread(), PROBE)</code>就是获取<code>Thread</code>对象中offset偏移地址对应的field <code>threadLocalRandomProbe</code>的值, <code>threadLocalRandomProbe</code> 是<code>nonzero if threadLocalRandomSeed initialized</code>.<br>所以, 如果<code>PROBE</code>值为零, 将进行localInit(), 当前Thread对象的threadLocalRandomSeed 和 threadLocalRandomProbe将会被赋值. (<code>@sun.misc.Contended(&quot;tlr&quot;)</code>是为了解决伪共享的问题, 将另起一篇博客介绍)</p>
+<h2 id="nextInt"><a href="#nextInt" class="headerlink" title="nextInt()"></a><code>nextInt()</code></h2><hr>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public int nextInt() &#123;</div><div class="line">    return mix32(nextSeed());</div><div class="line">&#125;</div><div class="line"></div><div class="line">final long nextSeed() &#123;</div><div class="line">    Thread t; long r; // read and update per-thread seed</div><div class="line">    UNSAFE.putLong(t = Thread.currentThread(), SEED,</div><div class="line">                   r = UNSAFE.getLong(t, SEED) + GAMMA);</div><div class="line">    return r;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>注意:</code><br><code>SEED</code>是field的偏移量<br><code>GAMMA</code>是seed的increment<br>这里会更新当前Thread的SEED, 最终mix32()生成int随机数.</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>从上可知<code>ThreadLocalRandom</code>的工作方式, 它为每个线程分配了一个SEED(被Thread对象持有), 故而减少了多线程下的竞争开销, 也使随机性更加好.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://www.jdon.com/concurrent/concurrent-random.html" target="_blank" rel="external">http://www.jdon.com/concurrent/concurrent-random.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/05/books/procrastination/procrastination-12/" itemprop="url">
+                  【书：拖延心理学】（12） 作战武器 - 明确目标和可行性的计划
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-05T00:00:00+08:00" content="2016-05-05">
+              2016-05-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/books/" itemprop="url" rel="index">
+                    <span itemprop="name">books</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/05/books/procrastination/procrastination-12/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/05/books/procrastination/procrastination-12/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h1><p><img src="/images/books/tech-less/procrastination-12-01.png" alt=""></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="url">
+                  Levenshtein 距离
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-04T00:00:00+08:00" content="2016-05-04">
+              2016-05-04
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="Levenshtein-距离"><a href="#Levenshtein-距离" class="headerlink" title="Levenshtein 距离"></a>Levenshtein 距离</h1><p>什么是<code>Levenshtein</code>距离?<br><code>Levenshtein距离</code>是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。</p>
+<blockquote>
+<p>Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。<br>指两个字串之间，由一个转成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。</p>
+</blockquote>
+<p>比如将kitten一字转成sitting, 有三步：</p>
+<p>sitten （k→s）<br>sittin （e→i）<br>sitting （→g）</p>
+<h1 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h1><ul>
+<li>相似度检测</li>
+<li>拼写检查</li>
+<li>文本搜索 (Lucene/Solr)</li>
+<li>NLP</li>
+<li>等等</li>
+</ul>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><hr>
+<p>如果用朴素的递归方法实现, 需要O(3^n)的时间复杂度, 明显我们要进行一些优化, 动态规划是比较常用的方法.</p>
+<p>假设字符串target有1~m个字符, 字符串str1有1~n个:</p>
+<h2 id="定义最优子问题"><a href="#定义最优子问题" class="headerlink" title="定义最优子问题"></a>定义最优子问题</h2><p>通过插入/删除/替换操作, 把str1转换为target字符串.<br>要想找到最短编辑距离, 即是<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数</p>
+<h2 id="确定状态转换方程"><a href="#确定状态转换方程" class="headerlink" title="确定状态转换方程"></a>确定状态转换方程</h2><p>我们将<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数, 定义为状态d[i, j].</p>
+<h2 id="确定决策并写出状态转移方程"><a href="#确定决策并写出状态转移方程" class="headerlink" title="确定决策并写出状态转移方程"></a>确定决策并写出状态转移方程</h2><p>当target[j]等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = d[i, j] + 0;</div></pre></td></tr></table></figure></p>
+<p>当target[j]不等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = min(</div><div class="line">    d[i, j-1] + 1,</div><div class="line">    d[i-1, j] + 1,</div><div class="line">    d[i-1, j-1] + 1</div><div class="line">    )</div></pre></td></tr></table></figure></p>
+<h2 id="寻找边界条件"><a href="#寻找边界条件" class="headerlink" title="寻找边界条件"></a>寻找边界条件</h2><p>当target是空字符串时, d[i, 0] = str1的长度<br>当str1是空字符串时, d[0, j] = target的长度</p>
+<p>经过这几步, 就可以开始写代码实现了. 以下给出的是状态递推DP算法, 除此以外, 仍可以使用带记忆的递归算法.</p>
+<h1 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h1><figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getEditDistance</span><span class="params">(<span class="keyword">char</span>[] target, <span class="keyword">char</span>[] str1)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span>[][] distance = <span class="keyword">new</span> <span class="keyword">int</span>[str1.length + <span class="number">1</span>][target.length + <span class="number">1</span>];</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">        distance[i][<span class="number">0</span>] = i;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        distance[<span class="number">0</span>][j] = j;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (str1[i - <span class="number">1</span>] == target[j - <span class="number">1</span> ]) &#123;</div><div class="line">                distance[i][j] = distance[i - <span class="number">1</span>][j - <span class="number">1</span>];</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">int</span> distanceInsert = distance[i][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceDelete = distance[i - <span class="number">1</span>][j] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceEdit = distance[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                distance[i][j] = Math.min(</div><div class="line">                        Math.min(distanceInsert, distanceDelete),</div><div class="line">                        distanceEdit);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> distance[str1.length][target.length];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以<code>snowy</code>和<code>sunny</code>字符串做测试, 计算过程如下:</p>
+<p><img src="/images/cs/dp_edit_distance_01.png" alt=""></p>
+<p>有三个值的, 分别是<code>insert</code>/<code>delete</code>/<code>edit</code>的计算距离, 最后得出最短编辑距离是<code>3</code>.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://zh.wikipedia.org/wiki/%E8%90%8A%E6%96%87%E6%96%AF%E5%9D%A6%E8%B7%9D%E9%9B%A2" target="_blank" rel="external">莱文斯坦距离</a><br>[算法的乐趣 - C3 动态规划]</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/03/linux/tools/tmux/" itemprop="url">
+                  tmux cheatsheet
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-03T00:00:00+08:00" content="2016-05-03">
+              2016-05-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/03/linux/tools/tmux/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/03/linux/tools/tmux/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p><code>tmux</code>是一个终端的terminal <code>multiplexer</code>, 用来切换多个terminal, 和之前博客提到的<code>terminator</code>比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.</p>
+<p><img src="/images/linux/tmux_preview-01.png" alt=""></p>
+<h1 id="tmux-session"><a href="#tmux-session" class="headerlink" title="tmux session"></a><code>tmux</code> session</h1><hr>
+<p>使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach). 比如远程连接断开, 下次再连上服务器时, 原先tmux打开的环境都仍保留着.</p>
+<ul>
+<li><p>start new session:<br><code>tmux new -s myname</code></p>
+</li>
+<li><p>list sessions:<br><code>tmux ls</code></p>
+</li>
+<li><p>attach:<br><code>tmux a</code></p>
+</li>
+<li><p>attach to named:<br><code>tmux a -t myname</code></p>
+</li>
+<li><p><strong>detach</strong><br><code>ctrl + b, d</code></p>
+</li>
+<li><p>切换session<br>如果在tmux中, 想要切换到其他session, 可以这样:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">s</div><div class="line"># 这时会出现session列表, 使用方向键和Enter进行选择即可</div></pre></td></tr></table></figure>
+</li>
+<li><p>命名当前session</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">$</div><div class="line"># 这时可以修改当前的session名称</div></pre></td></tr></table></figure>
+</li>
+<li><p>新建一个session</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:new</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="pane"><a href="#pane" class="headerlink" title="pane"></a>pane</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%</td>
+<td>垂直分割</td>
+</tr>
+<tr>
+<td>“</td>
+<td>水平分割</td>
+</tr>
+<tr>
+<td>o</td>
+<td>panes切换:</td>
+</tr>
+<tr>
+<td>x</td>
+<td>关闭当前pane</td>
+</tr>
+<tr>
+<td>q</td>
+<td>显示 pane number</td>
+</tr>
+<tr>
+<td>空格</td>
+<td>切换不同的layout</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="window"><a href="#window" class="headerlink" title="window"></a>window</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>新建窗口</td>
+</tr>
+<tr>
+<td>n</td>
+<td>切换下一个窗口</td>
+</tr>
+<tr>
+<td>p</td>
+<td>切换前一个窗口</td>
+</tr>
+<tr>
+<td>Shift+7</td>
+<td>关闭当前窗口</td>
+</tr>
+<tr>
+<td>,</td>
+<td>命名窗口</td>
+</tr>
+<tr>
+<td>.</td>
+<td>移动窗口 (使用序号)</td>
+</tr>
+<tr>
+<td>w</td>
+<td>list window</td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>kill window</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="window-pane间操作"><a href="#window-pane间操作" class="headerlink" title="window/pane间操作"></a>window/pane间操作</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:joinp -s :2</td>
+<td>移动窗口2作为当前窗口的一个新pane</td>
+</tr>
+<tr>
+<td>:joinp -t :1</td>
+<td>移动当前pane作为窗口1的一个新pane</td>
+</tr>
+</tbody>
+</table>
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t</td>
+<td>显示时间</td>
+</tr>
+<tr>
+<td>?</td>
+<td>list shortcut</td>
+</tr>
+<tr>
+<td>:</td>
+<td>prompt</td>
+</tr>
+</tbody>
+</table>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://gist.github.com/henrik/1967800" target="_blank" rel="external">https://gist.github.com/henrik/1967800</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="url">
+                  deploy spring-boot as war file
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-02T00:00:00+08:00" content="2016-05-02">
+              2016-05-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?</p>
+<p>spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.</p>
+<p>下面介绍war方式部署:</p>
+<h1 id="pom-xml-修改"><a href="#pom-xml-修改" class="headerlink" title="pom.xml 修改"></a>pom.xml 修改</h1><hr>
+<p>首先把打包类型修改为: <code>&lt;packaging&gt;war&lt;/packaging&gt;</code></p>
+<p>接着修改<code>spring-boot-starter-tomcat</code>为<code>provided</code>的scope, 避免打包到war中:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;provided&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- ... --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li><strong>注意:</strong></li>
+</ul>
+<p><code>boot-start</code>版本要高于<code>1.3</code>, 否则使用tomcat启动会出现异常.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h1 id="部署到-Servlet-3-0-规范的容器"><a href="#部署到-Servlet-3-0-规范的容器" class="headerlink" title="部署到 Servlet 3.0 规范的容器"></a>部署到 Servlet 3.0 规范的容器</h1><hr>
+<p>如果你的web容器支持<code>Servlet 3.0</code>规范, 可以使用以下的方法:</p>
+<p>首先继承<code>SpringBootServletInitializer</code>, 并覆写<code>configure</code>方法, 不需要<code>web.xml</code>.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableAutoConfiguration</div><div class="line">@ComponentScan</div><div class="line">public class Application extends SpringBootServletInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) &#123;</div><div class="line">        // Customize the application or call application.sources(...) to add sources</div><div class="line">        // Since our example is itself a @Configuration class we actually don&apos;t</div><div class="line">        // need to override this method.</div><div class="line">        return application.sources(SampleControllerAndApp.class);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="部署到旧的容器-Servlet-2-5"><a href="#部署到旧的容器-Servlet-2-5" class="headerlink" title="部署到旧的容器 (Servlet 2.5)"></a>部署到旧的容器 (Servlet 2.5)</h1><p>如果你的容器不支持servlet 3.0规范怎么办 ? 下面是一个解决方法:</p>
+<ul>
+<li><p>1<br>增加一个<code>org.springframework.boot:spring-boot-legacy</code>依赖</p>
+</li>
+<li><p>2<br>创建<code>web.xml</code>, 用以声明<code>context listener</code>, 这个listener是<code>org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener</code>, 是在<code>spring-boot</code>下特别使用的, 其他配置和正常spring应用一样. <code>web.xml</code> 如下:</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app version=&quot;2.5&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context-param&gt;</div><div class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</div><div class="line">        &lt;param-value&gt;demo.Application&lt;/param-value&gt;</div><div class="line">    &lt;/context-param&gt;</div><div class="line"></div><div class="line">    &lt;listener&gt;</div><div class="line">        &lt;listener-class&gt;org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener&lt;/listener-class&gt;</div><div class="line">    &lt;/listener&gt;</div><div class="line"></div><div class="line">    &lt;filter&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;</div><div class="line">    &lt;/filter&gt;</div><div class="line"></div><div class="line">    &lt;filter-mapping&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</div><div class="line">    &lt;/filter-mapping&gt;</div><div class="line"></div><div class="line">    &lt;servlet&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</div><div class="line">        &lt;init-param&gt;</div><div class="line">            &lt;param-name&gt;contextAttribute&lt;/param-name&gt;</div><div class="line">            &lt;param-value&gt;org.springframework.web.context.WebApplicationContext.ROOT&lt;/param-value&gt;</div><div class="line">        &lt;/init-param&gt;</div><div class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</div><div class="line">    &lt;/servlet&gt;</div><div class="line"></div><div class="line">    &lt;servlet-mapping&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</div><div class="line">    &lt;/servlet-mapping&gt;</div><div class="line"></div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file" target="_blank" rel="external">howto-create-a-deployable-war-file</a><br><a href="http://docs.spring.io/spring-boot/docs/current/maven-plugin/" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/maven-plugin/</a><br><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/01/linux/practice/my_workspace_management/" itemprop="url">
+                  我的workspace管理之道
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-01T00:03:30+08:00" content="2016-05-01">
+              2016-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/01/linux/practice/my_workspace_management/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/linux/practice/my_workspace_management/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.</p>
+<p>workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.</p>
+<p>为什么这么说呢? 因为我的每个workspace都固定放了不同的工具, 而且不超过2个(保证同一个workspace我可以使用<code>alt+tab</code>快速切换), 这样我不用费时费力去找我要的窗口.</p>
+<p>这样分好类后再加上无敌科学的快捷键, 持之以恒形成条件反射, 外人看来那操作简直碉堡.</p>
+<p>事不宜迟, 赶紧看一下是这个小技巧.</p>
+<h1 id="设置快捷键"><a href="#设置快捷键" class="headerlink" title="设置快捷键"></a>设置快捷键</h1><hr>
+<p>首先我们需要设置用到的快捷键:</p>
+<p>在<code>System Settings</code>的<code>Keyboard</code>中, 可以设置workspace 1-4 的快捷切换键.</p>
+<p>我习惯使用<code>ctrl + 1234</code>, 缺点就是每天感觉在打魔兽, 懂行的一定知道为什么选择这个键.</p>
+<p>如果想用4个以上的workspace点算啊?</p>
+<p>莫担心, 比如我使用的是gnome, 可以这样:</p>
+<pre><code>$ dconf read /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
+[&apos;&lt;Primary&gt;4&apos;]
+</code></pre><p>读出值是: <code>&#39;&lt;Primary&gt;4&#39;</code></p>
+<p>同样的, 我们把workspace 5的键值写入相应的workspace:</p>
+<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
+</code></pre><p>同理, 其他workspace也是这样设置, 为了造福网友, 这里还是贴一下:</p>
+<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-6 &quot;[&apos;&lt;Primary&gt;6&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-7 &quot;[&apos;&lt;Primary&gt;7&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-8 &quot;[&apos;&lt;Primary&gt;8&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-9 &quot;[&apos;&lt;Primary&gt;9&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apos;&lt;Primary&gt;0&apos;]&quot;
+</code></pre><h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
+<p>接下来是工作区的分类, 主要关注每个工作区放置什么工具. 有了这些分类, 切换工具几乎不用时间思考和寻找了.<br>以下是我常用的分类:</p>
+<table>
+<thead>
+<tr>
+<th>workspace</th>
+<th>放置的工具</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>terminator 控制台 &amp; file manger</td>
+</tr>
+<tr>
+<td>-</td>
+<td>PDF reader</td>
+</tr>
+<tr>
+<td>2</td>
+<td>IDE</td>
+</tr>
+<tr>
+<td>3</td>
+<td>博客/笔记工具</td>
+</tr>
+<tr>
+<td>-</td>
+<td>思维导图工具</td>
+</tr>
+<tr>
+<td>4</td>
+<td>chrome (工作用)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>虚拟机</td>
+</tr>
+<tr>
+<td>6</td>
+<td>空</td>
+</tr>
+<tr>
+<td>7</td>
+<td>scrum 任务面板</td>
+</tr>
+<tr>
+<td>-</td>
+<td>WPS sheet</td>
+</tr>
+<tr>
+<td>8</td>
+<td>原型文档</td>
+</tr>
+<tr>
+<td>9</td>
+<td>IDE 2</td>
+</tr>
+<tr>
+<td>0</td>
+<td>音乐播放器</td>
+</tr>
+<tr>
+<td>-</td>
+<td>chrome 2</td>
+</tr>
+</tbody>
+</table>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>需要强调的是, 这个分类是根据个人的实际使用需求来定制的, 制订了一个分类后, 在实际使用的时候, 如果有不适或者更好的, 可以随时调整, 或者说不断迭代吧.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects" target="_blank" rel="external">http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="url">
+                  用tensorflow训练识别手写数字的CNN模型
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-29T13:03:30+08:00" content="2016-04-29">
+              2016-04-29
             </time>
           </span>
 
@@ -241,8 +1518,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="commentsCount"></span>
+                <a href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -264,1174 +1541,54 @@
         
           <span itemprop="articleBody">
             
-              <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。<br>但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。</p>
-<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><p>以下版本亲测兼容：</p>
-<ul>
-<li><p>Logstash 2.3.1</p>
-</li>
-<li><p>Elasticsearch 2.3.x</p>
-</li>
-<li><p>Kibana 4.5.0</p>
-</li>
-</ul>
-<blockquote>
-<p>Compatible with Elasticsearch 2.3.x. Kibana can also be installed from our repositories using apt or yum. See Repositories in the Guide.</p>
-</blockquote>
-<h1 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h1><hr>
-<p>主要作用：负责日志检索和分析。</p>
-<pre><code>tar xvf elasticsearch-2.3.2.tar.gz -C /foo/path
-bin/elasticsearch
-</code></pre><p>默认端口是:</p>
-<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><hr>
-<p>主要作用：负责日志的收集，处理和储存。</p>
-<p>使用：</p>
-<pre><code>tar zxvf logstash-2.3.1.tar.gz
-bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
-`-e`代表直接从命令行输入配置文件, input选择了标准输入, output选择了标准输出。
-</code></pre><p>我们要做的是把nginx日志输出存储到Elasticsearch，使用<code>-f</code>传入预先写好的配置：</p>
-<pre><code>bin/logstash -f logstash-nginx.conf
-</code></pre><p><code>logstash-nginx.conf</code>是我们需要编写的配置文件，用以指定nginx日志的位置和格式，以及es的接口位置。</p>
-<h2 id="编写-logstash-nginx-conf"><a href="#编写-logstash-nginx-conf" class="headerlink" title="编写 logstash-nginx.conf"></a>编写 logstash-nginx.conf</h2><p>更多关于 <code>logstash 配置文件</code> 的编写， 请参考<a href="https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html" target="_blank" rel="external">官方文档</a></p>
-<p>假设nginx的日志格式为:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</div><div class="line">                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div></pre></td></tr></table></figure>
-<p>新建 <code>logstash-nginx.conf</code> 文件，写入:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#</div><div class="line">input &#123;</div><div class="line">    file &#123;</div><div class="line">        path =&gt; [ &quot;/home/niko/mount/hsb_D/niko/temp_trash/logs/foo.com.access_20160617.log&quot; ]</div><div class="line">        type =&gt; &quot;nginx-access&quot;</div><div class="line">        start_position =&gt; &quot;beginning&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">filter &#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;&quot;message&quot; =&gt; &quot;%&#123;IPORHOST:source_ip&#125; - %&#123;USERNAME:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] %&#123;QS:request&#125; %&#123;INT:status&#125; %&#123;INT:body_bytes_sent&#125; %&#123;QS:http_referer&#125; %&#123;QS:http_user_agent&#125;&quot;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123; hosts =&gt; [&quot;localhost:9200&quot;] &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>启动后，等logstash处理完日志文件并写入es，可以查看es的索引:</p>
-<p><a href="http://localhost:9200/_cat/indices" target="_blank" rel="external">http://localhost:9200/_cat/indices</a></p>
-<p>可以看到以下内容：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">yellow open .kibana             1 1 1 0  3.1kb  3.1kb</div><div class="line">yellow open logstash-2016.04.28 5 1 4 0 12.3kb 12.3kb</div></pre></td></tr></table></figure>
-<p>grok 使用请看<a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="external"> grok 插件文档 </a>。</p>
-<p>以上grok解析nginx日志文件到es的配置，当然还可以从其他输入源（不止文件）获取数据，输出到不同位置（redis等其他中间件）。</p>
-<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><hr>
-<p>主要作用：负责日志的可视化。</p>
-<ul>
-<li><p>使用：</p>
-<p>  tar xf kibana-4.5.0-linux-x64.tar.gz -C /foo/path<br>  bin/kibana</p>
-</li>
-<li><p>visit <a href="localhost:5601" target="_blank" rel="external">localhost:5601</a></p>
-</li>
-<li><p>配置index pattern:</p>
-</li>
-<li><p>点击<code>Settings</code>,  在<code>Indices</code>tab, 创建一个<code>index pattern</code>，选择<code>logstash-*</code></p>
-</li>
-<li><p>点击<code>visualization</code>, <code>Create a new visualization</code> 这里选择<code>Line Chart</code>类型图</p>
-</li>
-<li><p>然后选择X和Y坐标，Y有常见的聚合属性，X是nginx日志行的几个字段，完成后点击生成， 如下：</p>
-</li>
-</ul>
-<p><img src="/images/dtai/kibana_01.png" alt=""></p>
-<p>以上只是一个示例，kibana 的功能远强大于此，根据自己的需求去定制可视化吧。</p>
+              <h1 id="tensorflow"><a href="#tensorflow" class="headerlink" title="tensorflow"></a>tensorflow</h1><p>tensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.</p>
+<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>数据集采用<code>MNIST 手写图片数据集</code>的图片，可以从<a href="http://yann.lecun.com/exdb/mnist/" target="_blank" rel="external">这个网站</a>下载, 或者使用这个<a href="https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank" rel="external">python脚本</a>来获取数据:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">from tensorflow.examples.tutorials.mnist import input_data</div><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div></pre></td></tr></table></figure>
+<p>这个数据集有三部分, 55000个训练数据+10000个测试数据+5000个验证数据.</p>
+<p>每个数据包含了手写图片和对应的label, 每个是28*28像素的, 用数组保存, 可以把这个矩阵转换为一个<code>28x28=784</code>大小的vector.</p>
+<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>有了数据集, 就可以导入和开始初始化主要参数:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div><div class="line">model_filepath = &quot;model2.ckpt&quot;</div><div class="line">sess = tf.InteractiveSession()</div><div class="line"></div><div class="line">x = tf.placeholder(tf.float32, [None, 784])</div><div class="line">y_ = tf.placeholder(tf.float32, [None, 10])</div><div class="line"></div><div class="line">W = tf.Variable(tf.zeros([784, 10]))</div><div class="line">b = tf.Variable(tf.zeros([10]))</div></pre></td></tr></table></figure>
+<p>Variable和placeholder的区别是, Variable需要初始化值, 而placeholder则不需要, 你可以在运行时通过<code>Session.run</code>中的<code>feed_dict</code>来指定值.</p>
+<p>上面y的计算描述如下图:</p>
+<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-01.png" alt=""></p>
+<p>写成矩阵计算就是:</p>
+<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-02.png" alt=""></p>
+<h1 id="构建多层卷积网络"><a href="#构建多层卷积网络" class="headerlink" title="构建多层卷积网络"></a>构建多层卷积网络</h1><p>要构建CNN(这里假设你已经了解CNN的相关内容), 我们会创建很多权重和偏置参数, 一般我们应该用小噪声的权重去初始化, 为了<code>symmetry breaking</code>和避免<code>0 gradients</code>. 因为我们使用的是<code>ReLu</code>激活函数, 用较小的正值bias来初始化可以有效地避免<code>dead neurons</code>. 这部分会被反复使用到, 因此需要写成一个function.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def weight_variable(shape):</div><div class="line">    initial = tf.truncated_normal(shape, stddev=0.1)</div><div class="line">    return tf.Variable(initial)</div><div class="line"></div><div class="line">def bias_variable(shape):</div><div class="line">    initial = tf.constant(0.1, shape=shape)</div><div class="line">    return tf.Variable(initial)</div></pre></td></tr></table></figure>
+<h1 id="构建第一卷积层"><a href="#构建第一卷积层" class="headerlink" title="构建第一卷积层"></a>构建第一卷积层</h1><p>使用刚才介绍的初始化function,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv1 = weight_variable([5, 5, 1, 32])</div><div class="line">b_conv1 = bias_variable([32])</div><div class="line">x_image = tf.reshape(x, [-1, 28, 28, 1])</div></pre></td></tr></table></figure>
+<p>上面的<code>[5, 5, 1, 32]</code>，表示weight的形状, 第一和第二参数表示使用<code>5*5</code>的patch，第三个参数表示有一个输入通道（因为是灰度图片），第四个参数表示32个输出通道。同时, 我们有一个相应的偏置向量来对应每个输出通道.</p>
+<p>为了使用这一卷积层, 我们需要把图片输入reshape成四维的tensor: <code>[-1,28,28,1]</code>.<br><code>-1</code>表示flat, 第二三维表示图片大小, 第四维表示颜色通道.</p>
+<h2 id="卷积和池化-采样"><a href="#卷积和池化-采样" class="headerlink" title="卷积和池化(采样)"></a>卷积和池化(采样)</h2><p>接下来, 设置卷积的步长为1和<code>SAME</code>的padding方式, 池化采用2*2的大小. 这个也是可以复用的, 因此封装成一个function.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def conv2d(x, W):</div><div class="line">  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding=&apos;SAME&apos;)</div><div class="line"></div><div class="line">def max_pool_2x2(x):</div><div class="line">  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],</div><div class="line">                        strides=[1, 2, 2, 1], padding=&apos;SAME&apos;)</div></pre></td></tr></table></figure>
+<p>使用上面定义的卷积(使用relu激活)和池化函数计算:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)</div><div class="line">h_pool1 = max_pool_2x2(h_conv1)</div></pre></td></tr></table></figure>
+<h1 id="第二卷积层"><a href="#第二卷积层" class="headerlink" title="第二卷积层"></a>第二卷积层</h1><p>此时, 输入是第一卷积池化层的计算结果. 因此weight的输入channel变成了32, 输出设置为64, 同样的bias向量大小也相应设置为64.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv2 = weight_variable([5, 5, 32, 64])</div><div class="line">b_conv2 = bias_variable([64])</div><div class="line"></div><div class="line">h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)</div><div class="line">h_pool2 = max_pool_2x2(h_conv2)</div></pre></td></tr></table></figure>
+<h1 id="全连接"><a href="#全连接" class="headerlink" title="全连接"></a>全连接</h1><p>经过前面的处理, 此时的图片size已经减到7*7, 可以使用全连接来处理整个输入了. 这里我们选择1024个神经元:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc1 = weight_variable([7 * 7 * 64, 1024])</div><div class="line">b_fc1 = bias_variable([1024])</div><div class="line">h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])</div><div class="line">h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)</div></pre></td></tr></table></figure>
+<h1 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h1><p>这个操作主要减少一些过拟合, 使用的方法是<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">dropout</a>:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">keep_prob = tf.placeholder(tf.float32)</div><div class="line">h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)</div></pre></td></tr></table></figure>
+<h1 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc2 = weight_variable([1024, 10])</div><div class="line">b_fc2 = bias_variable([10])</div></pre></td></tr></table></figure>
+<p>使用 <code>softmax</code> 回归分类, 计算分类结果:</p>
+<pre><code>y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+</code></pre><h1 id="评估模型的方法"><a href="#评估模型的方法" class="headerlink" title="评估模型的方法"></a>评估模型的方法</h1><p>获取到预测值后, 我们需要了解预测值和真实结果的差距, 定义我们的cost function:</p>
+<pre><code>cross_entropy = -tf.reduce_sum(y_ * tf.log(y_conv))
+</code></pre><h1 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h1><p>因此, 要达到我们预期的效果, 训练模型需要把<code>cross_entropy</code>减少到最小, 这里采用<code>AdamOptimizer</code>(更多Optimizer请戳<a href="https://www.tensorflow.org/versions/r0.9/api_docs/python/train.html#optimizers" target="_blank" rel="external">这里</a>):</p>
+<pre><code>train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+for i in range(20000):
+    batch = mnist.train.next_batch(50)
+    train_step.run(feed_dict={x: batch[0], y_: batch[1])    
+</code></pre><h1 id="保存模型"><a href="#保存模型" class="headerlink" title="保存模型"></a>保存模型</h1><p>训练结束后, 可以把结果保存成模型文件, 供以后识别图片使用.</p>
+<pre><code>save_path = saver.save(sess, model_filepath)
+</code></pre><h1 id="查看训练结果"><a href="#查看训练结果" class="headerlink" title="查看训练结果"></a>查看训练结果</h1><p>由于我们需要看当前训练的情况, 要加上一些debug的输出(比如精准度等), 于是将代码修改一下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))</div><div class="line">train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)</div><div class="line">correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))</div><div class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</div><div class="line">sess.run(tf.initialize_all_variables())</div><div class="line"></div><div class="line">for i in range(20000):</div><div class="line">  batch = mnist.train.next_batch(50)</div><div class="line">  if i%100 == 0:</div><div class="line">    train_accuracy = accuracy.eval(feed_dict=&#123;</div><div class="line">        x:batch[0], y_: batch[1], keep_prob: 1.0&#125;)</div><div class="line">    print(&quot;step %d, training accuracy %g&quot;%(i, train_accuracy))</div><div class="line">  train_step.run(feed_dict=&#123;x: batch[0], y_: batch[1], keep_prob: 0.5&#125;)</div><div class="line"></div><div class="line">print(&quot;test accuracy %g&quot;%accuracy.eval(feed_dict=&#123;</div><div class="line">    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0&#125;))</div></pre></td></tr></table></figure>
+<p>运行这个python脚本, 从输出可以看出, 随着step的增加, 训练的精准度在不断提升然后稳定, 最终使用测试集的精确度达到了99.21%, 如下</p>
+<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-01.png" alt=""></p>
+<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-02.png" alt=""></p>
+<p>至于如何使用训练出来的模型去识别图片, 以及如何可视化训练过程, 将在接下来的两篇博客中介绍.</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="https://github.com/elastic/examples/tree/master/ELK_NGINX" target="_blank" rel="external">https://github.com/elastic/examples/tree/master/ELK_NGINX</a><br>【2】<a href="http://www.icyfire.me/2014/11/13/logstash-es-kibana.html" target="_blank" rel="external">http://www.icyfire.me/2014/11/13/logstash-es-kibana.html</a><br>【3】<a href="http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html</a><br>【4】<a href="http://www.wklken.me/posts/2015/05/08/elk-data-collect.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/05/08/elk-data-collect.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="url">
-                  java thread 内存模型
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-06T00:00:00+08:00" content="2016-04-06">
-              2016-04-06
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/06/java/concurrent/java_thread_memory_model/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: <a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a>)</p>
-<h1 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h1><hr>
-<p>首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书<code>&lt;深入理解Java虚拟机&gt;</code>中有一幅图, 描述两者的关系:</p>
-<p><img src="/images/java/main_working_memory.png" alt=""></p>
-<p>如果要快速地理解他们之间的关系, 可以类比CPU/高速缓存/内存的关系(对应线程/工作内存/主内存).</p>
-<p>映射到底层来看, 主内存在物理硬件内存中, 工作内存可能会存在于寄存器或高速缓存.</p>
-<h1 id="线程操作术语和框架"><a href="#线程操作术语和框架" class="headerlink" title="线程操作术语和框架"></a>线程操作术语和框架</h1><hr>
-<p>以下操作都是原子的:</p>
-<ul>
-<li><code>lock</code></li>
-</ul>
-<p>锁定一个变量为某个线程独占</p>
-<ul>
-<li><code>unlock</code></li>
-</ul>
-<p>释放已lock的变量</p>
-<ul>
-<li><code>read</code></li>
-</ul>
-<p>从主内存读取variable到工作内存</p>
-<ul>
-<li><code>load</code></li>
-</ul>
-<p>把read到的variable放入工作内存的变量副本</p>
-<ul>
-<li><code>use</code></li>
-</ul>
-<p>把工作内存的变量传递给执行引擎</p>
-<ul>
-<li><code>assign</code></li>
-</ul>
-<p>执行引擎通过此操作值赋给工作内存的变量</p>
-<ul>
-<li><code>store</code></li>
-</ul>
-<p>把工作内存的一个变量值送到主内存中</p>
-<ul>
-<li><code>write</code></li>
-</ul>
-<p>把store送到主内存的值写到主内存变量中</p>
-<p>以上八个操作更详细的介绍可以从这个<a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">JVM Specs 文档</a>中查阅.</p>
-<h1 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h1><hr>
-<p>有了以上8种基本操作, 可以观察到, 这些操作的一些pattern组合是有意义的, 一些是不合法无意义的. 因此我们还需要一些规则来限定这些操作的顺序和组合, 如下:</p>
-<h2 id="变量规则"><a href="#变量规则" class="headerlink" title="变量规则"></a>变量规则</h2><ul>
-<li>不允许丢失最近的<code>assign</code>, 必须把工作内存的变化同步回主内存</li>
-<li>不允许线程没有发生<code>assign</code>就把内容同步回主内存.</li>
-<li>新线程创建时工作内存是空的, 而且需从主内存获取(即use/store前必须已经assign/load)</li>
-<li>read+load和store+write是成对按顺序出现的, 从主内存read了, 工作内存就必须接受; store了主内存, 主内存就必须write</li>
-</ul>
-<h2 id="lock-规则"><a href="#lock-规则" class="headerlink" title="lock 规则"></a>lock 规则</h2><ul>
-<li>同一时刻只能有一个线程进行lock操作, 但同一线程可以lock多次, 同时unlock也需要执行相同的次数.</li>
-<li>不允许lock未被lock的以及被其他线程lock住的变量</li>
-</ul>
-<h2 id="lock和变量互动规则"><a href="#lock和变量互动规则" class="headerlink" title="lock和变量互动规则"></a>lock和变量互动规则</h2><ul>
-<li>unlock时, 必须把内容同步会主内存</li>
-<li>当lock某个变量时, 会清空工作内存中的该变量的值, 当执行引擎使用到该变量时, 从主内存进行load或assign.</li>
-</ul>
-<h1 id="先行发生原则"><a href="#先行发生原则" class="headerlink" title="先行发生原则"></a>先行发生原则</h1><hr>
-<p>观察上面这些规则的设计, 可以发现是比较严谨繁琐的. 但写代码时, 我们判断是否<code>线程安全</code>的方法用的是<code>先行发生(happens-before)原则</code>. 如果程序不在该规则及其推导中, 那么就不是线程安全的. 以下是<a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5" target="_blank" rel="external">主要规则</a>:</p>
-<ul>
-<li>一个线程内, 代码按控制流顺序执行</li>
-<li>监视器上的unlock先于器lock操作</li>
-<li>volatile的write先于随后的read</li>
-<li>start()的调用先于此线程的所有action</li>
-<li>所有action先于该线程的join()返回</li>
-<li>对象初始化操作先于其他action</li>
-</ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a><br><a href="http://gvsmirnov.ru/blog/tech/2014/02/10/jmm-under-the-hood.html" target="_blank" rel="external">Java Memory Model Under The Hood</a><br><a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">VM Spec Threads and Locks</a><br><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html" target="_blank" rel="external">Chapter 17. Threads and Locks</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="url">
-                  Java 并发之 CAS
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-05T00:00:00+08:00" content="2016-04-05">
-              2016-04-05
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/05/java/concurrent/CAS_ABA_Java/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个<code>原子操作</code>. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
-<p>CAS操作基于<code>CPU提供的原子操作</code>指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现<code>无锁队列</code>.</p>
-<p>从CAS的机制可以发现, 这和<code>乐观锁</code>很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种<code>悲观的策略</code>, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
-<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
-<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
-<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
-<ol>
-<li>一个进程P1读取值的时候是A</li>
-<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
-<li>另一个进程P2把A改成了B, 然后又改回了A</li>
-<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
-</ol>
-<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
-<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/04/linux/android/honor6_root_rom/" itemprop="url">
-                  荣耀6刷入CM11
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-04T00:03:03+08:00" content="2016-04-04">
-              2016-04-04
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/04/linux/android/honor6_root_rom/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/04/linux/android/honor6_root_rom/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="刷入过程"><a href="#刷入过程" class="headerlink" title="刷入过程"></a>刷入过程</h1><h2 id="0-准备"><a href="#0-准备" class="headerlink" title="0. 准备"></a>0. 准备</h2><ul>
-<li>下载recovery和SU：<a href="http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113</a></li>
-<li>下载ROM：<a href="http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056</a></li>
-<li>保证1G的TF卡空闲空间</li>
-</ul>
-<h2 id="1-解锁"><a href="#1-解锁" class="headerlink" title="1. 解锁"></a>1. 解锁</h2><p>官网解锁说明：<a href="https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step" target="_blank" rel="external">https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step</a><br>获取解锁码：<a href="https://www.emui.com/plugin.php?id=unlock" target="_blank" rel="external">https://www.emui.com/plugin.php?id=unlock</a></p>
-<h2 id="2-第三方recovery和root"><a href="#2-第三方recovery和root" class="headerlink" title="2. 第三方recovery和root"></a>2. 第三方recovery和root</h2><p>adb 连接手机，刷入recovery（ClockworkMod）：</p>
-<pre><code>fastboot flash recovery cwm-6.0.5.1_2015xxxx_h60_l0x.img
-（cwm-6.0.5.1_2015xxxx_h60_l0x.img 太长了，最好改个名）
-</code></pre><p>进入recovery，安装SuperSU。</p>
-<h2 id="3-ROM"><a href="#3-ROM" class="headerlink" title="3. ROM"></a>3. ROM</h2><p>我的是H60-L01,<code>20150822</code>这个版本已经可以使用<code>cm-11-20150822-UNOFFICIAL-h60_l02.zip</code>ROM了，有些教程会让你改<code>META-INF/com/google/android/updater-script</code>来跳过机型验证，这个版本的ROM并不需要。<br>由于我改了<code>updater-script</code>导致无法刷入，然而重新启动后，卡在开机画面无法继续。我必须拷贝原ROM到TF卡，再重新进入recovery。</p>
-<p>然而，坑爹的是，荣耀6按住电源键10秒可以重启，没有强制关机的方法。而进入recovery必须在关机状态下，按住<code>电源和音量+</code>键。</p>
-<p>所以准备拔电源了，但是荣耀拔电源是在苦逼，掀了后盖后缺少螺丝刀，于是去午睡准备晚上接着搞。<br>午休时迷迷糊糊灵光一现，能不能在重启的时候，有那几秒，快速进入recovery模式呢？哈哈，问题解决！插入TF卡，5分钟不到，就刷入了CM11。比起之前的EMUI，这流畅度简直让人上天啊。<br>好困，午休就这么过去了～～</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC" target="_blank" rel="external">http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/01/linux/defy_to_cm_android44/" itemprop="url">
-                  motorola defy 刷到 android 4.4
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-01T00:10:39+08:00" content="2016-04-01">
-              2016-04-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/01/linux/defy_to_cm_android44/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/01/linux/defy_to_cm_android44/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>motorola defy，相信是很多人的回忆，他伴随我走过了大学四年，只要我在手里，就感觉是会到了大学校园，教室的最后一排。然而现在很多App已经不能安装了，因为系统仍然是2.x版本，所以需要升级到<code>4.x</code>才能重生。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>我的机子是android 2.3版本的，已root。<br>所以需要的工具只是：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">终端模拟器.apk</div><div class="line">cm-11-20160330-NIGHTLY-mb52x.zip</div><div class="line">defy_bootstrap_ext3.img</div><div class="line">resize.zip</div></pre></td></tr></table></figure>
-<p>模拟器需要先安装，后面三个文件要放到SD卡根目录。</p>
-<h2 id="开搞"><a href="#开搞" class="headerlink" title="开搞"></a>开搞</h2><p>这次的刷机比以前简单多了，首先，安装完终端模拟器，进入终端使用<code>su</code>命令获取root权限：</p>
-<p>把img写入<code>/dev/block/mmcblk1p21</code>  ：</p>
-<pre><code>cat /sdcard/defy_bootstrap_ext3.img &gt; /dev/block/mmcblk1p21
-</code></pre><p>重启，若无反应，拔电池重新开机：</p>
-<p><img src="/images/defy_android44_recovery_home.jpg" alt=""></p>
-<p>从图标可以看出，对应了手机底部的几个物理按键，选择<code>recovery</code>：</p>
-<p>然后点击<code>install</code>， 进入sdcard选择<code>resize.zip</code>，滑动按钮到右边进行install：</p>
-<p>重启：</p>
-<p>再次进入recovery和install，这次选择<code>cm-11-20160330-NIGHTLY-mb52x.zip</code>，这次文件比较大，会比上次时间长一点，完成后选择<code>reboot system</code>：</p>
-<p>这次进入home界面时，选择<code>Continue</code>进入系统，系统会有2～3分钟的loading动画进行初始化操作，然后就进入用户界面的初始设置，升级complete：</p>
-<p><img src="/images/defy_android44_installed.jpg" alt=""></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
-<p><a href="http://tieba.baidu.com/p/3600016194" target="_blank" rel="external">http://tieba.baidu.com/p/3600016194</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/03/01/java/dist/disconf_1_server/" itemprop="url">
-                  disconf - 【1】 server 搭建
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-03-01T00:00:00+08:00" content="2016-03-01">
-              2016-03-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/03/01/java/dist/disconf_1_server/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/01/java/dist/disconf_1_server/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>disconf是分布式配置管理服务平台，目前已经在 百度、滴滴出行、银联、网易、拉勾网、苏宁易购等公司使用，专注于解决分布式环境下的配置管理。</p>
-<h1 id="部署web-server："><a href="#部署web-server：" class="headerlink" title="部署web server："></a>部署web server：</h1><hr>
-<p>要使用disconf，首先需要搭建disconf服务端先，不过先把项目clone下来：</p>
-<pre><code>git clone https://github.com/knightliao/disconf
-</code></pre><h2 id="准备配置文件"><a href="#准备配置文件" class="headerlink" title="准备配置文件"></a>准备配置文件</h2><pre><code>mkdir /home/work/dsp/disconf-rd/online-resources
-mkdir /home/work/dsp/disconf-rd/war
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd  $DISCONF_HOME/disconf-web/</div><div class="line">cp  profile/rd/application-demo.properties /home/work/dsp/disconf-rd/online-resources/application.properties</div><div class="line">cp  profile/rd/jdbc-mysql.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/redis-config.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/zoo.properties /home/work/dsp/disconf-rd/online-resources/</div></pre></td></tr></table></figure>
-<h2 id="build-amp-deploy"><a href="#build-amp-deploy" class="headerlink" title="build &amp; deploy"></a>build &amp; deploy</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ONLINE_CONFIG_PATH=/home/work/dsp/disconf-rd/online-resources</div><div class="line">WAR_ROOT_PATH=/home/work/dsp/disconf-rd/war</div><div class="line">export ONLINE_CONFIG_PATH</div><div class="line">export WAR_ROOT_PATH</div><div class="line">cd disconf-web</div><div class="line">sh deploy/deploy.sh</div></pre></td></tr></table></figure>
-<h2 id="准备mysql"><a href="#准备mysql" class="headerlink" title="准备mysql"></a>准备mysql</h2><p>修改mysql用户和密码：</p>
-<pre><code>vim /home/work/dsp/disconf-rd/online-resources/jdbc-mysql.properties
-</code></pre><p>初始化数据库：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; source 0-init_table.sql</div><div class="line">mysql&gt; source 1-init_data.sql</div><div class="line">mysql&gt; source 201512/20151225.sql</div></pre></td></tr></table></figure></p>
-<h2 id="准备Redis"><a href="#准备Redis" class="headerlink" title="准备Redis"></a>准备Redis</h2><p>默认配置，启动就行了。参考官方文档：<a href="http://redis.io/download" target="_blank" rel="external">http://redis.io/download</a></p>
-<h2 id="准备zookeeper"><a href="#准备zookeeper" class="headerlink" title="准备zookeeper"></a>准备zookeeper</h2><p>默认的disconf的zookeeper客户端配置是三个实例的，如果只是为了体验disconf，可以改成standalone的配置。<br>修改zookeeper服务器的<code>clientPort</code>，使和disconf的zkClient配置一致：</p>
-<p>vim $ZK_HOME/conf/zoo.cfg</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">##############</div><div class="line">clientPort=8581</div><div class="line">##############</div></pre></td></tr></table></figure>
-<p>其他同理（127.0.0.1:8582,127.0.0.1:8583…）。</p>
-<h2 id="准备tomcat"><a href="#准备tomcat" class="headerlink" title="准备tomcat"></a>准备tomcat</h2><p>vim $TOMCAT_HOME/conf/server.xml<br>在Host结点下增加：</p>
-<pre><code>&lt;Context path=&quot;&quot; docBase=&quot;/home/work/dsp/disconf-rd/war&quot;&gt;&lt;/Context&gt;
-</code></pre><p>访问端口设为<code>8015</code>。</p>
-<h2 id="准备nginx"><a href="#准备nginx" class="headerlink" title="准备nginx"></a>准备nginx</h2><p>vim /path/nginx.conf</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">upstream disconf &#123;</div><div class="line">    server 127.0.0.1:8015;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line"></div><div class="line">    listen   8081;</div><div class="line">    server_name localhost;</div><div class="line">    access_log /home/work/var/logs/disconf/access.log;</div><div class="line">    error_log /home/work/var/logs/disconf/error.log;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root /home/work/dsp/disconf-rd/war/html;</div><div class="line">        # niko , use alias if root not working</div><div class="line">        # alias /home/work/dsp/disconf-rd/war/html/;</div><div class="line">        if ($query_string) &#123;</div><div class="line">            expires max;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location ~ ^/(api|export) &#123;</div><div class="line">        proxy_pass_header Server;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line">        proxy_set_header X-Real-IP $remote_addr;</div><div class="line">        proxy_set_header X-Scheme $scheme;</div><div class="line">        proxy_pass http://disconf;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>记得要</p>
-<pre><code>mkdir /home/work/var/logs/disconf/ -p
-</code></pre><p>如果没有该目录，无法访问页面。</p>
-<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>完成以上的搭建后，访问<code>http://localhost:8081/main.html</code>，就可以看到管理页面了（账号密码是<code>admin/admin</code>）。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="https://github.com/knightliao/disconf" target="_blank" rel="external">https://github.com/knightliao/disconf</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/02/22/git/git-prevent-push-master-by-hook/" itemprop="url">
-                  Git钩子Script之客户端`pre-push`
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-02-22T00:00:00+08:00" content="2016-02-22">
-              2016-02-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/02/22/git/git-prevent-push-master-by-hook/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/22/git/git-prevent-push-master-by-hook/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>有个童鞋说，老是会忘记当前分支和误推了master，有没有办法防止这种低级错误。好吧，发生这种事，其实是那个repo没有设置服务器钩子脚本，来防止客户端的推送操作（我们用的不是gitlab，没有那种功能，暂时是人为终端控制）。<code>%&gt;_&lt;%</code>，我们要实现童鞋想要的功能，需要使用到 git hook scripts，git hook scripts又分为客户端和服务器端两种：</p>
-<p><code>client side</code></p>
-<ul>
-<li>pre-commit</li>
-<li>prepare-commit-msg</li>
-<li>commit-msg</li>
-<li>post-commit</li>
-<li>post-merge</li>
-<li>pre-push<br>…</li>
-</ul>
-<p><code>server side</code></p>
-<ul>
-<li>pre-receive</li>
-<li>update</li>
-<li>post-receive</li>
-</ul>
-<p>博客后面的链接【1】可以了解所有的script，这里需要的是叫做<code>pre-push</code>的script。</p>
-<h1 id="pre-push"><a href="#pre-push" class="headerlink" title="pre-push"></a>pre-push</h1><p>首先，我们把工作目录切到git repo的根目录，然后编写<code>.git/hooks/pre-push</code>文件：</p>
-<pre><code>vim .git/hooks/pre-push
-</code></pre><p>文件内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"># Prevents force-pushing to master.</div><div class="line"># Based on: https://gist.github.com/pixelhandler/5718585</div><div class="line"># Install:</div><div class="line"># cd path/to/git/repo</div><div class="line"># curl -fL -o .git/hooks/pre-push https://gist.githubusercontent.com/stefansundin/d465f1e331fc5c632088/raw/pre-push</div><div class="line"># chmod +x .git/hooks/pre-push</div><div class="line"></div><div class="line">BRANCH=`git rev-parse --abbrev-ref HEAD`</div><div class="line">PUSH_COMMAND=`ps -ocommand= -p $PPID`</div><div class="line"></div><div class="line">if [[ &quot;$BRANCH&quot; == &quot;master&quot; &amp;&amp; &quot;$PUSH_COMMAND&quot; =~ push|force|delete|-f ]]; then</div><div class="line">  echo &quot;Prevented force-push to $BRANCH. This is a very dangerous command.&quot;</div><div class="line">  echo &quot;If you really want to do this, use --no-verify to bypass this pre-push hook.&quot;</div><div class="line">  exit 1</div><div class="line">fi</div><div class="line"></div><div class="line">exit 0</div></pre></td></tr></table></figure>
-<p>这段script也很容易理解。</p>
-<h2 id="执行结果："><a href="#执行结果：" class="headerlink" title="执行结果："></a>执行结果：</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ chmod u+x .git/hooks/pre-push</div><div class="line">$ git push</div><div class="line">Prevented force-push to master. This is a very dangerous command.</div><div class="line">If you really want to do this, use --no-verify to bypass this pre-push hook.</div><div class="line">error: failed to push some refs to &apos;git@git.xxx.net:user/repo.git&apos;</div></pre></td></tr></table></figure>
-<p>如上，如果执行<code>git push</code>，我们的echo提示出现了，说明script起作用了。<br>如果我们想跳过<code>pre-push</code>钩子，可以使用<code>--no-verify</code>参数。<br>或者把<code>.git/hooks/pre-push</code>改个名字。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" target="_blank" rel="external">https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks</a><br>【2】<a href="https://gist.github.com/stefansundin/d465f1e331fc5c632088" target="_blank" rel="external">https://gist.github.com/stefansundin/d465f1e331fc5c632088</a></p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/02/11/linux/shadowsocks_share/" itemprop="url">
-                  共享 shadowsocks
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-02-11T00:00:00+08:00" content="2016-02-11">
-              2016-02-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/02/11/linux/shadowsocks_share/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/11/linux/shadowsocks_share/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>如果你的shadowsocks是从pip下载的python脚本，则默认是绑定监听lo网卡的（socks5），若是想分享给其他人（ <code>UI妹子⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄</code> ）上网用，可能就不行，需要做一些操作。对外暴露一个端口，然后把这个端口的请求转发到lo网卡。</p>
-<h1 id="方法一：使用polipo"><a href="#方法一：使用polipo" class="headerlink" title="方法一：使用polipo"></a>方法一：使用polipo</h1><p>polipo是一款优秀的web代理工具，使用它可以容易的把ss分享给其他人，而且还能提供http代理。<br>据说</p>
-<h2 id="安装-amp-配置"><a href="#安装-amp-配置" class="headerlink" title="安装 &amp; 配置"></a>安装 &amp; 配置</h2><pre><code>sudo apt-get install polipo
-
-vim /etc/polipo/config
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">### Basic configuration</div><div class="line"></div><div class="line"># Add your proxy&apos;s address</div><div class="line">proxyAddress = 0.0.0.0</div><div class="line">socksParentProxy = &quot;127.0.0.1:1080&quot;</div><div class="line"></div><div class="line"># Allow from anyone in the 192.168.0.* range to connect to your proxy</div><div class="line">allowedClients = 192.168.0.0/24</div></pre></td></tr></table></figure>
-<h2 id="启动-amp-测试"><a href="#启动-amp-测试" class="headerlink" title="启动 &amp; 测试"></a>启动 &amp; 测试</h2><p>sudo /etc/init.d/polipo restart</p>
-<p>export http_proxy=<a href="http://ip:8123/" target="_blank" rel="external">http://ip:8123/</a></p>
-<p><code>8123</code>是默认的端口，其他机器设置好代理访问facebook：</p>
-<p><img src="/images/linux/shadowsocks_share_ss-log-facebook.png" alt=""></p>
-<p>可以看到请求的log，并成功访问facebook。</p>
-<h1 id="其他方法"><a href="#其他方法" class="headerlink" title="其他方法"></a>其他方法</h1><p>privoxy<br>proxychains<br>…</p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/" itemprop="url">
-                  ubuntu安装nvidia显卡驱动
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-02-01T15:03:30+08:00" content="2016-02-01">
-              2016-02-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>最近换硬盘重装了ubuntu, 但在用xmind和窗口切换时, 老是卡死(鼠标/键盘动不了, 但能ssh进去) , 想了一下, 应该是显卡驱动没装的原因, 由于自己的ubuntu关闭了所有动画和特效, 一直没有去装N卡驱动, 于是安装验证了一下是否这个原因导致的～</p>
-<h1 id="安装前"><a href="#安装前" class="headerlink" title="安装前"></a>安装前</h1><p>安装前我们要先查看当前的显卡型号:</p>
-<pre><code>lspci | grep VGA
-01:00.0 VGA compatible controller: NVIDIA Corporation GF119 [GeForce GT 705] (rev a1)
-</code></pre><p>可以发现这个显卡是<code>GT 705</code>(这个台式机显卡渣渣啊), 这个在接下来找驱动会用到.</p>
-<blockquote>
-<p>若要查看更多设备信息, 可以使用 <code>lspci -v</code></p>
-</blockquote>
-<h1 id="option-1-使用管理器安装"><a href="#option-1-使用管理器安装" class="headerlink" title="option 1: 使用管理器安装:"></a>option 1: 使用管理器安装:</h1><p>如果嫌麻烦的, 可以在<code>software &amp; update</code>管理器中选择显卡驱动安装.</p>
-<p><img src="/images/linux/nvidia_manager_install.png" alt=""></p>
-<p>我的是第二种方式安装的</p>
-<h1 id="option-2-手动安装"><a href="#option-2-手动安装" class="headerlink" title="option 2: 手动安装:"></a>option 2: 手动安装:</h1><p>首先到[Nvidia官方网站]（<a href="http://www.geforce.cn/drivers）下载显卡对应的驱动，" target="_blank" rel="external">http://www.geforce.cn/drivers）下载显卡对应的驱动，</a> 需要对应自己的显卡和系统平台选择下载，比如我的是<code>NVIDIA-Linux-x86_64-352.79.run</code>。</p>
-<p>接着删除已有nvidia的包:</p>
-<pre><code>sudo apt-get --purge remove nvidia-*
-sudo apt-get install ubuntu-desktop
-echo &apos;nouveau&apos; | sudo tee -a /etc/modules
-</code></pre><p>重启， 并进入tty1（按ctrl+alt+F1）：</p>
-<pre><code>sudo service lightdm stop
-cd  /directory/of/NVIDIA.run.file
-sudo sh ./NVIDIA-Linux-x86_64-352.79.run
-</code></pre><p>执行完后，<code>sudo reboot</code>。<br>重启后， 可以在程序搜索中找到nvidia manager。</p>
-<p>查看当前驱动：</p>
-<p>在所有应用中搜索<code>nvidia</code>，可以发现<code>nvidia x server settings</code>的程序：</p>
-<p><img src="/images/linux/nvidia-config-01.png" alt=""></p>
-<p>也可以在<code>software &amp; update</code>管理器中查看安装情况。</p>
-<p>或者：</p>
-<pre><code>prime-select query
-</code></pre><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>最后，装了N卡驱动后，ubuntu的unity崩溃真的少了很多，xmind的卡死也没有再出现过。</p>
-<h1 id="参考引用"><a href="#参考引用" class="headerlink" title="参考引用"></a>参考引用</h1><hr>
-<p>【1】<a href="http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html" target="_blank" rel="external">http://us.download.nvidia.com/XFree86/Linux-x86_64/361.45.11/README/index.html</a><br>【2】<a href="http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14" target="_blank" rel="external">http://www.sanesee.com/article/install-graphics-card-driver-on-ubuntu-14</a></p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/30/linux/tools/terminator/" itemprop="url">
-                  terminator 使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-30T00:00:00+08:00" content="2016-01-30">
-              2016-01-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/30/linux/tools/terminator/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/30/linux/tools/terminator/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>terminator是一个多窗口的控制台管理器( terminal multiplexer )，通过它我们可以很方便的切割多个控制台窗口，分类任务，充分地利用屏幕空间，使桌面下的工作效率大大提高。除了terminator，若是在纯console下作业，<code>tmux</code>也是不错的选择。</p>
-<h1 id="layout"><a href="#layout" class="headerlink" title="layout"></a>layout</h1><hr>
-<p>由于我们需要打开许多console，所以才需要terminator，但每次开启都要手工去建好tab和window，再进入不同的工作路径等等，实在太烦人。因此，terminator提供了layout的功能，能够满足我们的一键还原console工作环境的需求。接下来通过实操感受一下：</p>
-<h2 id="1-新建一个layout"><a href="#1-新建一个layout" class="headerlink" title="1. 新建一个layout"></a>1. 新建一个layout</h2><p>首先，我们先建立好想要的窗口布局，然后进入<code>Preferences</code>-&gt;<code>layout tab</code>：<br>点击左下角<code>Add</code>一个Layout File, 并命名为<code>work1</code>，这个<code>layout</code>内容就是当前的布局。</p>
-<p><img src="/images/linux/terminator_1.png" alt=""></p>
-<h2 id="2-查看-amp-编辑配置文件"><a href="#2-查看-amp-编辑配置文件" class="headerlink" title="2. 查看&amp;编辑配置文件"></a>2. 查看&amp;编辑配置文件</h2><pre><code>vim ~/.config/terminator/config
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">  [[work01]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
-<p>找到<code>work01</code>的节点，改名为<code>default</code>,原先的<code>default</code>改名为<code>default_bak</code>。</p>
-<p>然后关闭重新打开terminator，可以发现自动打开了两个tab，分割成四个窗口，但是</p>
-<h2 id="3-增加command"><a href="#3-增加command" class="headerlink" title="3. 增加command"></a>3. 增加command</h2><p>这一步可以编辑<code>~/.config/terminator/config</code>文件（如果不嫌麻烦），也可以通过<code>Preference</code>修改。</p>
-<p>通过<code>Preference</code>方式修改：</p>
-<p>找到Terminal，将<code>sslocal -c /etc/ss.json ; bash</code>填入<code>Custom command</code>，其他同理。重新打开</p>
-<p><img src="/images/linux/terminator_2.png" alt=""></p>
-<p>重新打开terminator, perfect。每个上午都可以愉悦的开始一天的工作！</p>
-<p>最后附上修改后的配置文件：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">      command = cd ~/dev/tools/servers/ ; bash</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">      command = top; bash</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">      command = sslocal -c /etc/ss.json ; bash</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">      command = cd  ~/dev/git_repos/HexoBlog/hexo-hello/; bash</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">      command = cd ~/dev/git_repos/Java/MavenProj/; bash</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">  [[default_bak]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout" target="_blank" rel="external">http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout</a></p>
+<p><a href="https://www.tensorflow.org/versions/r0.8/tutorials/mnist/pros/index.html#deep-mnist-for-experts" target="_blank" rel="external">Deep MNIST for Experts</a><br><a href="http://blog.csdn.net/heyongluoyao8/article/details/49429629" target="_blank" rel="external">机器学习中防止过拟合的处理方法</a><br><a href="http://www.jianshu.com/p/05c4f1621c7e" target="_blank" rel="external">http://www.jianshu.com/p/05c4f1621c7e</a><br><a href="http://blog.csdn.net/zouxy09/article/details/49080029" target="_blank" rel="external">http://blog.csdn.net/zouxy09/article/details/49080029</a></p>
 
             
           </span>
@@ -1457,7 +1614,7 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1495,21 +1652,21 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-count">50</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">49</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">124</span>
+              <span class="site-state-item-count">134</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

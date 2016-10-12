@@ -1,0 +1,739 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="tensorflow,机器学习," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="tensorflowtensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.
+数据集数据集采用MNIST 手写">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用tensorflow训练识别手写数字的CNN模型">
+<meta property="og:url" content="http://niko2014.github.io/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="tensorflowtensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.
+数据集数据集采用MNIST 手写">
+<meta property="og:image" content="http://niko2014.github.io/images/dtai/tensorflow/mnist_beginer_cal-01.png">
+<meta property="og:image" content="http://niko2014.github.io/images/dtai/tensorflow/mnist_beginer_cal-02.png">
+<meta property="og:image" content="http://niko2014.github.io/images/dtai/tensorflow/tensorflow-mnist-train-result-01.png">
+<meta property="og:image" content="http://niko2014.github.io/images/dtai/tensorflow/tensorflow-mnist-train-result-02.png">
+<meta property="og:updated_time" content="2016-08-15T00:13:21.172Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用tensorflow训练识别手写数字的CNN模型">
+<meta name="twitter:description" content="tensorflowtensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.
+数据集数据集采用MNIST 手写">
+<meta name="twitter:image" content="http://niko2014.github.io/images/dtai/tensorflow/mnist_beginer_cal-01.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> 用tensorflow训练识别手写数字的CNN模型 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                用tensorflow训练识别手写数字的CNN模型
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-29T13:03:30+08:00" content="2016-04-29">
+              2016-04-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/data-science/" itemprop="url" rel="index">
+                    <span itemprop="name">data science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h1 id="tensorflow"><a href="#tensorflow" class="headerlink" title="tensorflow"></a>tensorflow</h1><p>tensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.</p>
+<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>数据集采用<code>MNIST 手写图片数据集</code>的图片，可以从<a href="http://yann.lecun.com/exdb/mnist/" target="_blank" rel="external">这个网站</a>下载, 或者使用这个<a href="https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank" rel="external">python脚本</a>来获取数据:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">from tensorflow.examples.tutorials.mnist import input_data</div><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div></pre></td></tr></table></figure>
+<p>这个数据集有三部分, 55000个训练数据+10000个测试数据+5000个验证数据.</p>
+<p>每个数据包含了手写图片和对应的label, 每个是28*28像素的, 用数组保存, 可以把这个矩阵转换为一个<code>28x28=784</code>大小的vector.</p>
+<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>有了数据集, 就可以导入和开始初始化主要参数:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div><div class="line">model_filepath = &quot;model2.ckpt&quot;</div><div class="line">sess = tf.InteractiveSession()</div><div class="line"></div><div class="line">x = tf.placeholder(tf.float32, [None, 784])</div><div class="line">y_ = tf.placeholder(tf.float32, [None, 10])</div><div class="line"></div><div class="line">W = tf.Variable(tf.zeros([784, 10]))</div><div class="line">b = tf.Variable(tf.zeros([10]))</div></pre></td></tr></table></figure>
+<p>Variable和placeholder的区别是, Variable需要初始化值, 而placeholder则不需要, 你可以在运行时通过<code>Session.run</code>中的<code>feed_dict</code>来指定值.</p>
+<p>上面y的计算描述如下图:</p>
+<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-01.png" alt=""></p>
+<p>写成矩阵计算就是:</p>
+<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-02.png" alt=""></p>
+<h1 id="构建多层卷积网络"><a href="#构建多层卷积网络" class="headerlink" title="构建多层卷积网络"></a>构建多层卷积网络</h1><p>要构建CNN(这里假设你已经了解CNN的相关内容), 我们会创建很多权重和偏置参数, 一般我们应该用小噪声的权重去初始化, 为了<code>symmetry breaking</code>和避免<code>0 gradients</code>. 因为我们使用的是<code>ReLu</code>激活函数, 用较小的正值bias来初始化可以有效地避免<code>dead neurons</code>. 这部分会被反复使用到, 因此需要写成一个function.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def weight_variable(shape):</div><div class="line">    initial = tf.truncated_normal(shape, stddev=0.1)</div><div class="line">    return tf.Variable(initial)</div><div class="line"></div><div class="line">def bias_variable(shape):</div><div class="line">    initial = tf.constant(0.1, shape=shape)</div><div class="line">    return tf.Variable(initial)</div></pre></td></tr></table></figure>
+<h1 id="构建第一卷积层"><a href="#构建第一卷积层" class="headerlink" title="构建第一卷积层"></a>构建第一卷积层</h1><p>使用刚才介绍的初始化function,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv1 = weight_variable([5, 5, 1, 32])</div><div class="line">b_conv1 = bias_variable([32])</div><div class="line">x_image = tf.reshape(x, [-1, 28, 28, 1])</div></pre></td></tr></table></figure>
+<p>上面的<code>[5, 5, 1, 32]</code>，表示weight的形状, 第一和第二参数表示使用<code>5*5</code>的patch，第三个参数表示有一个输入通道（因为是灰度图片），第四个参数表示32个输出通道。同时, 我们有一个相应的偏置向量来对应每个输出通道.</p>
+<p>为了使用这一卷积层, 我们需要把图片输入reshape成四维的tensor: <code>[-1,28,28,1]</code>.<br><code>-1</code>表示flat, 第二三维表示图片大小, 第四维表示颜色通道.</p>
+<h2 id="卷积和池化-采样"><a href="#卷积和池化-采样" class="headerlink" title="卷积和池化(采样)"></a>卷积和池化(采样)</h2><p>接下来, 设置卷积的步长为1和<code>SAME</code>的padding方式, 池化采用2*2的大小. 这个也是可以复用的, 因此封装成一个function.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def conv2d(x, W):</div><div class="line">  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding=&apos;SAME&apos;)</div><div class="line"></div><div class="line">def max_pool_2x2(x):</div><div class="line">  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],</div><div class="line">                        strides=[1, 2, 2, 1], padding=&apos;SAME&apos;)</div></pre></td></tr></table></figure>
+<p>使用上面定义的卷积(使用relu激活)和池化函数计算:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)</div><div class="line">h_pool1 = max_pool_2x2(h_conv1)</div></pre></td></tr></table></figure>
+<h1 id="第二卷积层"><a href="#第二卷积层" class="headerlink" title="第二卷积层"></a>第二卷积层</h1><p>此时, 输入是第一卷积池化层的计算结果. 因此weight的输入channel变成了32, 输出设置为64, 同样的bias向量大小也相应设置为64.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv2 = weight_variable([5, 5, 32, 64])</div><div class="line">b_conv2 = bias_variable([64])</div><div class="line"></div><div class="line">h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)</div><div class="line">h_pool2 = max_pool_2x2(h_conv2)</div></pre></td></tr></table></figure>
+<h1 id="全连接"><a href="#全连接" class="headerlink" title="全连接"></a>全连接</h1><p>经过前面的处理, 此时的图片size已经减到7*7, 可以使用全连接来处理整个输入了. 这里我们选择1024个神经元:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc1 = weight_variable([7 * 7 * 64, 1024])</div><div class="line">b_fc1 = bias_variable([1024])</div><div class="line">h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])</div><div class="line">h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)</div></pre></td></tr></table></figure>
+<h1 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h1><p>这个操作主要减少一些过拟合, 使用的方法是<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">dropout</a>:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">keep_prob = tf.placeholder(tf.float32)</div><div class="line">h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)</div></pre></td></tr></table></figure>
+<h1 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc2 = weight_variable([1024, 10])</div><div class="line">b_fc2 = bias_variable([10])</div></pre></td></tr></table></figure>
+<p>使用 <code>softmax</code> 回归分类, 计算分类结果:</p>
+<pre><code>y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+</code></pre><h1 id="评估模型的方法"><a href="#评估模型的方法" class="headerlink" title="评估模型的方法"></a>评估模型的方法</h1><p>获取到预测值后, 我们需要了解预测值和真实结果的差距, 定义我们的cost function:</p>
+<pre><code>cross_entropy = -tf.reduce_sum(y_ * tf.log(y_conv))
+</code></pre><h1 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h1><p>因此, 要达到我们预期的效果, 训练模型需要把<code>cross_entropy</code>减少到最小, 这里采用<code>AdamOptimizer</code>(更多Optimizer请戳<a href="https://www.tensorflow.org/versions/r0.9/api_docs/python/train.html#optimizers" target="_blank" rel="external">这里</a>):</p>
+<pre><code>train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+for i in range(20000):
+    batch = mnist.train.next_batch(50)
+    train_step.run(feed_dict={x: batch[0], y_: batch[1])    
+</code></pre><h1 id="保存模型"><a href="#保存模型" class="headerlink" title="保存模型"></a>保存模型</h1><p>训练结束后, 可以把结果保存成模型文件, 供以后识别图片使用.</p>
+<pre><code>save_path = saver.save(sess, model_filepath)
+</code></pre><h1 id="查看训练结果"><a href="#查看训练结果" class="headerlink" title="查看训练结果"></a>查看训练结果</h1><p>由于我们需要看当前训练的情况, 要加上一些debug的输出(比如精准度等), 于是将代码修改一下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))</div><div class="line">train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)</div><div class="line">correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))</div><div class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</div><div class="line">sess.run(tf.initialize_all_variables())</div><div class="line"></div><div class="line">for i in range(20000):</div><div class="line">  batch = mnist.train.next_batch(50)</div><div class="line">  if i%100 == 0:</div><div class="line">    train_accuracy = accuracy.eval(feed_dict=&#123;</div><div class="line">        x:batch[0], y_: batch[1], keep_prob: 1.0&#125;)</div><div class="line">    print(&quot;step %d, training accuracy %g&quot;%(i, train_accuracy))</div><div class="line">  train_step.run(feed_dict=&#123;x: batch[0], y_: batch[1], keep_prob: 0.5&#125;)</div><div class="line"></div><div class="line">print(&quot;test accuracy %g&quot;%accuracy.eval(feed_dict=&#123;</div><div class="line">    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0&#125;))</div></pre></td></tr></table></figure>
+<p>运行这个python脚本, 从输出可以看出, 随着step的增加, 训练的精准度在不断提升然后稳定, 最终使用测试集的精确度达到了99.21%, 如下</p>
+<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-01.png" alt=""></p>
+<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-02.png" alt=""></p>
+<p>至于如何使用训练出来的模型去识别图片, 以及如何可视化训练过程, 将在接下来的两篇博客中介绍.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://www.tensorflow.org/versions/r0.8/tutorials/mnist/pros/index.html#deep-mnist-for-experts" target="_blank" rel="external">Deep MNIST for Experts</a><br><a href="http://blog.csdn.net/heyongluoyao8/article/details/49429629" target="_blank" rel="external">机器学习中防止过拟合的处理方法</a><br><a href="http://www.jianshu.com/p/05c4f1621c7e" target="_blank" rel="external">http://www.jianshu.com/p/05c4f1621c7e</a><br><a href="http://blog.csdn.net/zouxy09/article/details/49080029" target="_blank" rel="external">http://blog.csdn.net/zouxy09/article/details/49080029</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tensorflow/" rel="tag">#tensorflow</a>
+          
+            <a href="/tags/机器学习/" rel="tag">#机器学习</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" rel="next" title="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
+                <i class="fa fa-chevron-left"></i> 使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/01/linux/practice/my_workspace_management/" rel="prev" title="我的workspace管理之道">
+                我的workspace管理之道 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/"
+                   data-title="用tensorflow训练识别手写数字的CNN模型" data-url="http://niko2014.github.io/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#tensorflow"><span class="nav-number">1.</span> <span class="nav-text">tensorflow</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据集"><span class="nav-number">2.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始化"><span class="nav-number">3.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建多层卷积网络"><span class="nav-number">4.</span> <span class="nav-text">构建多层卷积网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建第一卷积层"><span class="nav-number">5.</span> <span class="nav-text">构建第一卷积层</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#卷积和池化-采样"><span class="nav-number">5.1.</span> <span class="nav-text">卷积和池化(采样)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第二卷积层"><span class="nav-number">6.</span> <span class="nav-text">第二卷积层</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#全连接"><span class="nav-number">7.</span> <span class="nav-text">全连接</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dropout"><span class="nav-number">8.</span> <span class="nav-text">dropout</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#输出"><span class="nav-number">9.</span> <span class="nav-text">输出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#评估模型的方法"><span class="nav-number">10.</span> <span class="nav-text">评估模型的方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#训练模型"><span class="nav-number">11.</span> <span class="nav-text">训练模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#保存模型"><span class="nav-number">12.</span> <span class="nav-text">保存模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看训练结果"><span class="nav-number">13.</span> <span class="nav-text">查看训练结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">14.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

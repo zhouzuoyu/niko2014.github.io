@@ -1,0 +1,720 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="protocol," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..
+Cross-Origin Resource Sharing (CORS)
+Cross-Origin Resource Sharing (CORS), 是浏览器跨源服务器进行资源共享的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跨域之CORS简介">
+<meta property="og:url" content="http://niko2014.github.io/2016/07/02/cs/protocol/CORS_nginx/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..
+Cross-Origin Resource Sharing (CORS)
+Cross-Origin Resource Sharing (CORS), 是浏览器跨源服务器进行资源共享的">
+<meta property="og:image" content="http://niko2014.github.io/images/cs/protocol/cors-fail-001.png">
+<meta property="og:image" content="http://niko2014.github.io/images/cs/protocol/cors-success-001.png">
+<meta property="og:image" content="http://niko2014.github.io/images/cs/protocol/cors-post-options-001.png">
+<meta property="og:updated_time" content="2016-09-27T06:52:55.795Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跨域之CORS简介">
+<meta name="twitter:description" content="最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..
+Cross-Origin Resource Sharing (CORS)
+Cross-Origin Resource Sharing (CORS), 是浏览器跨源服务器进行资源共享的">
+<meta name="twitter:image" content="http://niko2014.github.io/images/cs/protocol/cors-fail-001.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> 跨域之CORS简介 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跨域之CORS简介
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-07-02T00:00:00+08:00" content="2016-07-02">
+              2016-07-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/07/02/cs/protocol/CORS_nginx/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/02/cs/protocol/CORS_nginx/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..</p>
+<h1 id="Cross-Origin-Resource-Sharing-CORS"><a href="#Cross-Origin-Resource-Sharing-CORS" class="headerlink" title="Cross-Origin Resource Sharing (CORS)"></a>Cross-Origin Resource Sharing (CORS)</h1><hr>
+<p>Cross-Origin Resource Sharing (CORS), 是浏览器跨源服务器进行资源共享的一个标准, 是解决跨越访问的方法之一.</p>
+<p>那什么是跨域呢?</p>
+<p>举个例子, 如果你的网页处于<code>a.niko</code>域名下, 若使用ajax访问<code>b.niko</code>下的资源, 就会有跨域的问题. 如果<code>b.niko</code>不允许<code>a.niko</code>的资源请求, 那么这个请求将会失败.</p>
+<h1 id="实例演示"><a href="#实例演示" class="headerlink" title="实例演示"></a>实例演示</h1><p>首先建立nginx实验环境, 来模拟跨域的问题, 编辑nginx的配置, 建立两个server :</p>
+<p><code>a.niko</code> 服务器</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name  a.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:3000;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>b.niko</code> 服务器</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name b.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:8080;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当然<code>/etc/hosts</code>记得加入这两个域名.</p>
+<p>接着打开<code>a.niko</code>的页面, 页面中的js会使用ajax请求<code>b.niko</code>的某一资源, 这时浏览器会提示不允许跨域请求, 如下:</p>
+<p><img src="/images/cs/protocol/cors-fail-001.png" alt=""></p>
+<h1 id="使用CORS解决跨域"><a href="#使用CORS解决跨域" class="headerlink" title="使用CORS解决跨域"></a>使用CORS解决跨域</h1><p>如果要解决这个问题, 只需要在服务器的响应头加一个header: <code>Access-Control-Allow-Origin</code>.</p>
+<p>在nginx中是这样设置:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name b.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:8080;</div><div class="line">                add_header &apos;Access-Control-Allow-Origin&apos; &apos;http://a.niko&apos;;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中的值填写Origin域名, <code>*</code>号表示所有.</p>
+<p>然后刷新页面, 查看跨域请求的结果:</p>
+<p><img src="/images/cs/protocol/cors-success-001.png" alt=""></p>
+<p>如上, 跨域请求成功, 可以看<code>Origin</code>和<code>Access-Control-Allow-Origin</code> header.</p>
+<h1 id="为什么POST前有一个OPTIONS请求"><a href="#为什么POST前有一个OPTIONS请求" class="headerlink" title="为什么POST前有一个OPTIONS请求"></a>为什么POST前有一个OPTIONS请求</h1><p>这次改为POST方法试一下, 使用<code>ajax-POST</code>请求<code>b.niko</code>的资源, 观察请求:</p>
+<p><img src="/images/cs/protocol/cors-post-options-001.png" alt=""></p>
+<p>你会看到第一个发出去的是<code>OPTIONS</code>方法的请求, 而不是<code>POST</code>.</p>
+<p>为什么呢?</p>
+<p>这个<code>OPTIONS</code>请求其实叫做是<code>CORS preflight request</code>， 作用是在真正的请求发往服务器前， 向服务器确认是否有权限去做这个请求。</p>
+<p>根据CORS的规范， <code>Content-Type</code>非<code>application/x-www-form-urlencoded, multipart/form-data, or text/plain</code> 的POST请求会进行<code>preflight</code>.</p>
+<p>下面的链接会有更详细的介绍哪些请求会进行preflight:<br><a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">Types of CORS requests</a></p>
+<p>如果需要对这个<code>OPTIONS</code>请求进行特殊处理, nginx设置如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">location / &#123;</div><div class="line">     if ($request_method = &apos;OPTIONS&apos;) &#123;</div><div class="line">        add_header &apos;Access-Control-Allow-Origin&apos; &apos;*&apos;;</div><div class="line">        add_header &apos;Access-Control-Allow-Methods&apos; &apos;GET, POST, OPTIONS&apos;;</div><div class="line">        #</div><div class="line">        # Custom headers and headers various browsers *should* be OK with but aren&apos;t</div><div class="line">        #</div><div class="line">        add_header &apos;Access-Control-Allow-Headers&apos; &apos;DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type&apos;;</div><div class="line">        #</div><div class="line">        # Tell client that this pre-flight info is valid for 20 days</div><div class="line">        #</div><div class="line">        add_header &apos;Access-Control-Max-Age&apos; 1728000;</div><div class="line">        add_header &apos;Content-Type&apos; &apos;text/plain charset=UTF-8&apos;;</div><div class="line">        add_header &apos;Content-Length&apos; 0;</div><div class="line">        return 200;</div><div class="line">     &#125;</div><div class="line">     ...</div><div class="line">     ...</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>如上， response的header除了<code>Access-Control-Allow-Origin</code>, 还有其他跨域相关的header（<code>Access-Control-Allow-Origin</code> / <code>Access-Control-Allow-Methods</code> / <code>Access-Control-Allow-Headers</code>等等）, 用以告诉客户端请求跨域访问时的条件和规则, 相关说明可查阅<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">CORS规范文档</a>。</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>我们都知道， 上面的场景是属于能够控制跨域服务器的情况， 因此可以通过CORS解决跨域问题。<br>否则， 只能通过JSONP和代理等其他方式来实现, 有兴趣的童鞋可以了解一下, 这里不再赘述.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS</a><br><a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">http://www.html5rocks.com/en/tutorials/cors/</a><br><a href="http://www.itnose.net/detail/6501161.html" target="_blank" rel="external">http://www.itnose.net/detail/6501161.html</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/protocol/" rel="tag">#protocol</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/01/linux/manage/remove-deb/" rel="next" title="卸载删除已安装的 `.deb` 包">
+                <i class="fa fa-chevron-left"></i> 卸载删除已安装的 `.deb` 包
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/07/02/cs/protocol/CORS_nginx/"
+                   data-title="跨域之CORS简介" data-url="http://niko2014.github.io/2016/07/02/cs/protocol/CORS_nginx/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Cross-Origin-Resource-Sharing-CORS"><span class="nav-number">1.</span> <span class="nav-text">Cross-Origin Resource Sharing (CORS)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例演示"><span class="nav-number">2.</span> <span class="nav-text">实例演示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用CORS解决跨域"><span class="nav-number">3.</span> <span class="nav-text">使用CORS解决跨域</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么POST前有一个OPTIONS请求"><span class="nav-number">4.</span> <span class="nav-text">为什么POST前有一个OPTIONS请求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">5.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
