@@ -204,6 +204,147 @@
             
             
               
+                <a class="post-title-link" href="/2015/12/20/linux/ten-cmd-linux-performance/" itemprop="url">
+                  【转】 如何用十条命令在一分钟内检查Linux服务器性能
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-20T00:00:00+08:00" content="2015-12-20">
+              2015-12-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/20/linux/ten-cmd-linux-performance/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/20/linux/ten-cmd-linux-performance/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过执行以下命令，可以在1分钟内对系统资源使用情况有个大致的了解。</p>
+<p>其中一些命令需要安装sysstat包，有一些由procps包提供。这些命令的输出，有助于快速定位性能瓶颈，检查出所有资源（CPU、内存、磁盘IO等）的利用率（utilization）、饱和度（saturation）和错误（error）度量，也就是所谓的<a href="http://www.brendangregg.com/usemethod.html" target="_blank" rel="external">USE方法</a>。</p>
+<p>下面我们来逐一介绍下这些命令，有关这些命令更多的参数和说明，请参照命令的手册。</p>
+<h2 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ uptime</div><div class="line">23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02</div></pre></td></tr></table></figure>
+<p>分别表示1分钟、5分钟、15分钟的平均负载情况</p>
+<h2 id="dmesg-tail"><a href="#dmesg-tail" class="headerlink" title="dmesg | tail"></a>dmesg | tail</h2><p>该命令会输出系统日志，可以帮助排查性能问题（如内核的oom kill和一次TCP丢包等）。</p>
+<h2 id="vmstat-1"><a href="#vmstat-1" class="headerlink" title="vmstat 1"></a>vmstat 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">niko@ubuntu:~$ vmstat 1</div><div class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</div><div class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</div><div class="line"> 2  0   4176 2746396 160728 1916384    0    0    15    85   12   47  9  7 84  0  0</div><div class="line"> 0  0   4176 2746228 160728 1916416    0    0     0     0 2129 4270  3  4 93  0  0</div><div class="line"> 1  0   4176 2746420 160748 1916468    0    0     0   372 1865 3960  4  5 91  0  0</div><div class="line"> 0  0   4176 2744964 160748 1916416    0    0     0     0 2000 4256  2  4 93  0  0</div><div class="line"> 1  0   4176 2745316 160748 1916420    0    0     0     0 2032 4288  2  4 94  0  0</div><div class="line"> 0  0   4176 2745052 160748 1916420    0    0     0     0 2070 4496  1  5 94  0  0</div><div class="line"> 0  0   4176 2744984 160748 1916420    0    0     0     0 2099 4202  2  5 93  0  0</div></pre></td></tr></table></figure>
+<p>vmstat(8) 命令，每行会输出一些系统核心指标，这些指标可以让我们更详细的了解系统状态。后面跟的参数1，表示每秒输出一次统计信息，表头提示了每一列的含义，这几介绍一些和性能调优相关的列：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">FIELD DESCRIPTION FOR VM MODE</div><div class="line">   Procs</div><div class="line">       r: The number of runnable processes (running or waiting for run time).</div><div class="line">       b: The number of processes in uninterruptible sleep.</div><div class="line"></div><div class="line">   Memory</div><div class="line">       swpd: the amount of virtual memory used.</div><div class="line">       free: the amount of idle memory.</div><div class="line">       buff: the amount of memory used as buffers.</div><div class="line">       cache: the amount of memory used as cache.</div><div class="line">       inact: the amount of inactive memory.  (-a option)</div><div class="line">       active: the amount of active memory.  (-a option)</div><div class="line"></div><div class="line">   Swap</div><div class="line">       si: Amount of memory swapped in from disk (/s).</div><div class="line">       so: Amount of memory swapped to disk (/s).</div><div class="line"></div><div class="line">   IO</div><div class="line">       bi: Blocks received from a block device (blocks/s).</div><div class="line">       bo: Blocks sent to a block device (blocks/s).</div><div class="line"></div><div class="line">   System</div><div class="line">       in: The number of interrupts per second, including the clock.</div><div class="line">       cs: The number of context switches per second.</div></pre></td></tr></table></figure>
+<p>r：等待在CPU资源的进程数。这个数据比平均负载更加能够体现CPU负载情况，数据中不包含等待IO的进程。如果这个数值大于机器CPU核数，那么机器的CPU资源已经饱和。<br>free：系统可用内存数（以千字节为单位），如果剩余内存不足，也会导致系统性能问题。下文介绍到的free命令，可以更详细的了解系统内存的使用情况。</p>
+<p>si, so：交换区写入和读取的数量。如果这个数据不为0，说明系统已经在使用交换区（swap），机器物理内存已经不足。</p>
+<p>us, sy, id, wa, st：这些都代表了CPU时间的消耗，它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen，一般被其他虚拟机消耗）。</p>
+<p>上述这些CPU时间，可以让我们很快了解CPU是否出于繁忙状态。一般情况下，如果用户时间和系统时间相加非常大，CPU出于忙于执行指令。如果IO等待时间很长，那么系统的瓶颈可能在磁盘IO。</p>
+<p>示例命令的输出可以看见，大量CPU时间消耗在用户态，也就是用户应用程序消耗了CPU时间。这不一定是性能问题，需要结合r队列，一起分析。</p>
+<h2 id="mpstat-P-ALL-1"><a href="#mpstat-P-ALL-1" class="headerlink" title="mpstat -P ALL 1"></a>mpstat -P ALL 1</h2><p>显示每个CPU的使用情况：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">niko@ubuntu:~$ mpstat -P ALL 1</div><div class="line">Linux 3.13.0-39-generic (ubuntu) 	03/18/2016 	_x86_64_	(4 CPU)</div><div class="line"></div><div class="line">01:18:13 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle</div><div class="line">01:18:14 PM  all    8.70    0.00   18.84    0.58    0.00    1.45    0.00    0.00    0.00   70.43</div><div class="line">01:18:14 PM    0    7.06    0.00   16.47    0.00    0.00    2.35    0.00    0.00    0.00   74.12</div><div class="line">01:18:14 PM    1    7.78    0.00   18.89    1.11    0.00    2.22    0.00    0.00    0.00   70.00</div><div class="line">01:18:14 PM    2   11.76    0.00   17.65    2.35    0.00    1.18    0.00    0.00    0.00   67.06</div><div class="line">01:18:14 PM    3    8.24    0.00   21.18    0.00    0.00    0.00    0.00    0.00    0.00   70.59</div></pre></td></tr></table></figure>
+<h2 id="pidstat-1"><a href="#pidstat-1" class="headerlink" title="pidstat 1"></a>pidstat 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ pidstat 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)</div><div class="line">07:41:02 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</div><div class="line">07:41:03 PM     0         9    0.00    0.94    0.00    0.94     1  rcuos/0</div><div class="line">07:41:03 PM     0      4214    5.66    5.66    0.00   11.32    15  mesos-slave</div><div class="line">07:41:03 PM     0      4354    0.94    0.94    0.00    1.89     8  java</div><div class="line">07:41:03 PM     0      6521 1596.23    1.89    0.00 1598.11    27  java</div><div class="line">07:41:03 PM     0      6564 1571.70    7.55    0.00 1579.25    28  java</div><div class="line">07:41:03 PM 60004     60154    0.94    4.72    0.00    5.66     9  pidstat</div><div class="line">07:41:03 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</div><div class="line">07:41:04 PM     0      4214    6.00    2.00    0.00    8.00    15  mesos-slave</div><div class="line">07:41:04 PM     0      6521 1590.00    1.00    0.00 1591.00    27  java</div><div class="line">07:41:04 PM     0      6564 1573.00   10.00    0.00 1583.00    28  java</div><div class="line">07:41:04 PM   108      6718    1.00    0.00    0.00    1.00     0  snmp-pass</div><div class="line">07:41:04 PM 60004     60154    1.00    4.00    0.00    5.00     9  pidstat</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>pidstat命令输出进程的CPU占用率，该命令会持续输出，并且不会覆盖之前的数据，可以方便观察系统动态。如上的输出，可以看见两个JAVA进程占用了将近1600%的CPU时间，既消耗了大约16个CPU核心的运算资源。</p>
+<h2 id="iostat-xz-1"><a href="#iostat-xz-1" class="headerlink" title="iostat -xz 1"></a>iostat -xz 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ iostat -xz 1</div><div class="line"></div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)</div><div class="line"></div><div class="line">avg-cpu:  %user   %nice %system %iowait  %steal   %idle</div><div class="line">          73.96    0.00    3.73    0.03    0.06   22.21</div><div class="line"></div><div class="line">Device:   rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util</div><div class="line">xvda        0.00     0.23    0.21    0.18     4.52     2.08    34.37     0.00    9.98   13.80    5.42   2.44   0.09</div><div class="line">xvdb        0.01     0.00    1.02    8.94   127.97   598.53   145.79     0.00    0.43    1.78    0.28   0.25   0.25</div><div class="line">xvdc        0.01     0.00    1.02    8.86   127.79   595.94   146.50     0.00    0.45    1.82    0.30   0.27   0.26</div><div class="line">dm-0        0.00     0.00    0.69    2.32    10.47    31.69    28.01     0.01    3.23    0.71    3.98   0.13   0.04</div><div class="line">dm-1        0.00     0.00    0.00    0.94     0.01     3.78     8.00     0.33  345.84    0.04  346.81   0.01   0.00</div><div class="line">dm-2        0.00     0.00    0.09    0.07     1.35     0.36    22.50     0.00    2.55    0.23    5.62   1.78   0.03</div><div class="line">[...]</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>iostat命令主要用于查看机器磁盘IO情况。该命令输出的列，主要含义是：</p>
+<p>r/s, w/s, rkB/s, wkB/s：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。</p>
+<p>await：IO操作的平均等待时间，单位是毫秒。这是应用程序在和磁盘交互时，需要消耗的时间，包括IO等待和实际操作的耗时。如果这个数值过大，可能是硬件设备遇到了瓶颈或者出现故障。</p>
+<p>avgqu-sz：向设备发出的请求平均数量。如果这个数值大于1，可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）。</p>
+<p>%util：设备利用率。这个数值表示设备的繁忙程度，经验值是如果超过60，可能会影响IO性能（可以参照IO操作平均等待时间）。如果到达100%，说明硬件设备已经饱和。<br>如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。</p>
+<h2 id="free-m"><a href="#free-m" class="headerlink" title="free -m"></a><code>free</code> -m</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ free -m</div><div class="line">             total       used       free     shared    buffers     cached</div><div class="line">Mem:        245998      24545     221453         83         59        541</div><div class="line">-/+ buffers/cache:      23944     222053</div><div class="line">Swap:            0          0          0</div></pre></td></tr></table></figure>
+<p>free命令可以查看系统内存的使用情况，-m参数表示按照兆字节展示。最后两列分别表示用于IO缓存的内存数，和用于文件系统页缓存的内存数。需要注意的是，第二行-/+ buffers/cache，看上去缓存占用了大量内存空间。这是Linux系统的内存使用策略，尽可能的利用内存，如果应用程序需要内存，这部分内存会立即被回收并分配给应用程序。因此，这部分内存一般也被当成是可用内存。</p>
+<p>如果可用内存非常少，系统可能会动用交换区（如果配置了的话），这样会增加IO开销（可以在iostat命令中提现），降低系统性能。</p>
+<h2 id="网络吞吐"><a href="#网络吞吐" class="headerlink" title="网络吞吐"></a>网络吞吐</h2><p><code>sar -n DEV 1</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sar -n DEV 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)</div><div class="line">12:16:48 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</div><div class="line">12:16:49 AM      eth0  18763.00   5032.00  20686.42    478.30      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM        lo     14.00     14.00      1.36      1.36      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</div><div class="line">12:16:50 AM      eth0  19763.00   5101.00  21999.10    482.56      0.00      0.00      0.00      0.00</div><div class="line">12:16:50 AM        lo     20.00     20.00      3.25      3.25      0.00      0.00      0.00      0.00</div><div class="line">12:16:50 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>sar命令在这里可以查看网络设备的吞吐率。在排查性能问题时，可以通过网络设备的吞吐量，判断网络设备是否已经饱和。如示例输出中，eth0网卡设备，吞吐率大概在22 Mbytes/s，既176 Mbits/sec，没有达到1Gbit/sec的硬件上限。</p>
+<p><code>sar -n TCP,ETCP 1</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sar -n TCP,ETCP 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)</div><div class="line">12:17:19 AM  active/s passive/s    iseg/s    oseg/s</div><div class="line">12:17:20 AM      1.00      0.00  10233.00  18846.00</div><div class="line">12:17:19 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s</div><div class="line">12:17:20 AM      0.00      0.00      0.00      0.00      0.00</div><div class="line">12:17:20 AM  active/s passive/s    iseg/s    oseg/s</div><div class="line">12:17:21 AM      1.00      0.00   8359.00   6039.00</div><div class="line">12:17:20 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s</div><div class="line">12:17:21 AM      0.00      0.00      0.00      0.00      0.00</div><div class="line">^C</div></pre></td></tr></table></figure>
+<p>sar命令在这里用于查看TCP连接状态，其中包括：</p>
+<p>active/s：每秒本地发起的TCP连接数，既通过connect调用创建的TCP连接；<br>passive/s：每秒远程发起的TCP连接数，即通过accept调用创建的TCP连接；<br>retrans/s：每秒TCP重传数量；</p>
+<p>atmptf/s<br>     The number of times per second TCP connections have made a direct transition to the CLOSED state from either the SYN-SENT state or the SYN-RCVD state, plus the number of times  per  second  TCP  connections<br>     have made a direct transition to the LISTEN state from the SYN-RCVD state [tcpAttemptFails].</p>
+<p>estres/s<br>     The number of times per second TCP connections have made a direct transition to the CLOSED state from either the ESTABLISHED state or the CLOSE-WAIT state [tcpEstabResets].</p>
+<p>retrans/s<br>     The total number of segments retransmitted per second - that is, the number of TCP segments transmitted containing one or more previously transmitted octets [tcpRetransSegs].</p>
+<p>isegerr/s<br>     The total number of segments received in error (e.g., bad TCP checksums) per second [tcpInErrs].</p>
+<p>TCP连接数可以用来判断性能问题是否由于建立了过多的连接，进一步可以判断是主动发起的连接，还是被动接受的连接。TCP重传可能是因为网络环境恶劣，或者服务器压力过大导致丢包。</p>
+<h2 id="top"><a href="#top" class="headerlink" title="top"></a><code>top</code></h2><p>top命令包含了前面好几个命令的检查的内容。比如系统负载情况（uptime）、系统内存使用情况（free）、系统CPU使用情况（vmstat）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，top命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。</p>
+<p>但是，top命令相对于前面一些命令，输出是一个瞬间值，如果不持续盯着，可能会错过一些线索。这时可能需要暂停top命令刷新，来记录和比对数据。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>排查Linux服务器性能问题还有很多工具，上面介绍的一些命令，可以帮助我们快速的定位问题。例如前面的示例输出，多个证据证明有JAVA进程占用了大量CPU资源，之后的性能调优就可以针对应用程序进行。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p>【1】原文：<a href="http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html" target="_blank" rel="external">Netflix性能工程团队的这篇博文</a><br>【2】 <a href="http://www.infoq.com/cn/news/2015/12/linux-performance?utm_campaign=rightbar_v2&amp;utm_source=infoq&amp;utm_medium=news_link&amp;utm_content=link_text" target="_blank" rel="external">金灵杰 译 InfoQ</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/12/19/linux/install/install_vmware_on_ubuntu/" itemprop="url">
                   在ubuntu上安装vmware
                 </a>
@@ -580,125 +721,6 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
             
             
               
-                <a class="post-title-link" href="/2015/11/29/linux/vim_plugins/" itemprop="url">
-                  vim 插件收集
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/vim_plugins/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/vim_plugins/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>vim插件管理推荐使用<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">pathogen</a>，安装非常简单，自行google即可。<br>接下来记录一些实用的插件：</p>
-<h2 id="NERDTree"><a href="#NERDTree" class="headerlink" title="NERDTree"></a>NERDTree</h2><hr>
-<p>目录树，项目地址：<a href="https://github.com/tpope/vim-pathogen" target="_blank" rel="external">https://github.com/tpope/vim-pathogen</a></p>
-<p>使用指南：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">cd ~/.vim/bundle</div><div class="line"></div><div class="line">git clone https://github.com/scrooloose/nerdtree.git</div><div class="line"></div><div class="line">Then reload vim, run :Helptags</div><div class="line"></div><div class="line">使用</div><div class="line"></div><div class="line">    :help NERD_tree.txt</div><div class="line"></div><div class="line">查看manual。</div></pre></td></tr></table></figure>
-<p><code>NERD_tree.txt</code>有manual文档，比如：</p>
-<p>打开左侧树形目录：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">:NERDTree [&lt;start-directory&gt; | &lt;bookmark&gt;]                         *:NERDTree*</div><div class="line">    Opens a fresh NERD tree. The root of the tree depends on the argument</div><div class="line">    given. There are 3 cases: If no argument is given, the current directory</div><div class="line">    will be used.  If a directory is given, that will be used. If a bookmark</div><div class="line">    name is given, the corresponding directory will be used.  For example: &gt;</div><div class="line">        :NERDTree /home/marty/vim7/src</div><div class="line">        :NERDTree foo   (foo is the name of a bookmark)</div></pre></td></tr></table></figure></p>
-<p>其他功能都可以在文档中找到。</p>
-<p>常用功能：</p>
-<ul>
-<li>gt/gT<br>上/下切换tab</li>
-</ul>
-<blockquote>
-<p>Keyboard Commands<br>Type :help NERDTreeMappings to read through all of the default keyboard shortcuts. These are the ones I use the most frequently:<br>t: Open the selected file in a new tab<br>i: Open the selected file in a horizontal split window<br>s: Open the selected file in a vertical split window<br>I: Toggle hidden files<br>m: Show the NERD Tree menu<br>R: Refresh the tree, useful if files change outside of Vim<br>?: Toggle NERD Tree’s quick help</p>
-</blockquote>
-<p>参考 ：<br><a href="http://usevim.com/2012/07/18/nerdtree/" target="_blank" rel="external">http://usevim.com/2012/07/18/nerdtree/</a></p>
-<h2 id="NERDTree-Tabs"><a href="#NERDTree-Tabs" class="headerlink" title="NERDTree-Tabs"></a>NERDTree-Tabs</h2><hr>
-<h2 id="supertab"><a href="#supertab" class="headerlink" title="supertab"></a>supertab</h2><hr>
-<h2 id="snipmate-vim"><a href="#snipmate-vim" class="headerlink" title="snipmate.vim"></a>snipmate.vim</h2><hr>
-<h2 id="TODO-继续补充…"><a href="#TODO-继续补充…" class="headerlink" title="TODO 继续补充…"></a>TODO 继续补充…</h2><h2 id="vim中的杀手级插件-YouCompleteMe"><a href="#vim中的杀手级插件-YouCompleteMe" class="headerlink" title="vim中的杀手级插件: YouCompleteMe"></a>vim中的杀手级插件: YouCompleteMe</h2><p><a href="https://github.com/Valloric/YouCompleteMe" target="_blank" rel="external">https://github.com/Valloric/YouCompleteMe</a><br><a href="http://valloric.github.io/YouCompleteMe/" target="_blank" rel="external">http://valloric.github.io/YouCompleteMe/</a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Install YCM with Vundle (or Pathogen, but Vundle is a better idea). With Vundle, this would mean adding a Plugin &apos;Valloric/YouCompleteMe&apos; line to your vimrc.</div><div class="line"></div><div class="line">If you don&apos;t install YCM with Vundle, make sure you have run git submodule update --init --recursive after checking out the YCM repository (Vundle will do this for you) to fetch YCM&apos;s dependencies.</div></pre></td></tr></table></figure>
-<p>Vundle // TODO and pathogen</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
                   github 上的配色项目 - solarized
                 </a>
@@ -774,6 +796,8 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 <pre><code>vim ~/.vimrc
 // 增加以下内容， 注意需要在`filetype plugin indent on `之前。
 call pathogen#infect()
+or
+execute pathogen#infect()
 </code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
 <pre><code>cd ~/.vim/bundle
 git clone git://github.com/altercation/vim-colors-solarized.git
@@ -1217,6 +1241,112 @@ app.description=${app.name} is a Spring Boot application
             
             
               
+                <a class="post-title-link" href="/2015/10/22/linux/tools/kill_sign/" itemprop="url">
+                  kill & signal
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-10-22T00:00:00+08:00" content="2015-10-22">
+              2015-10-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/22/linux/tools/kill_sign/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/22/linux/tools/kill_sign/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="kill-命令"><a href="#kill-命令" class="headerlink" title="kill 命令"></a>kill 命令</h1><p>使用kill可以用来终止进程，不过先要获取进程PID（可以使用ps/pstree/top/pidof等工具），向该进程发送终止信号，例如：</p>
+<pre><code>kill -9 &lt;PID&gt;
+</code></pre><p><code>-9</code>应该是最多人认识的信号，更多的信号及其说明可使用<code>man 7 kill</code> 或者 <code>kill -l</code>查看：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ kill -l</div><div class="line"></div><div class="line"> 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP</div><div class="line"> 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1</div><div class="line">11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM</div><div class="line">16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP</div><div class="line">21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ</div><div class="line">26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR</div><div class="line">31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1	64) SIGRTMAX</div></pre></td></tr></table></figure>
+<p>使用manual：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ man 7 kill</div><div class="line"></div><div class="line">...</div><div class="line">Signal     Value     Action   Comment</div><div class="line">       ──────────────────────────────────────────────────────────────────────</div><div class="line">       SIGHUP        1       Term    Hangup detected on controlling terminal</div><div class="line">                                     or death of controlling process</div><div class="line">       SIGINT        2       Term    Interrupt from keyboard</div><div class="line">       SIGQUIT       3       Core    Quit from keyboard</div><div class="line">       SIGILL        4       Core    Illegal Instruction</div><div class="line">       SIGABRT       6       Core    Abort signal from abort(3)</div><div class="line">       SIGFPE        8       Core    Floating point exception</div><div class="line">       SIGKILL       9       Term    Kill signal</div><div class="line">       SIGSEGV      11       Core    Invalid memory reference</div><div class="line">       SIGPIPE      13       Term    Broken pipe: write to pipe with no</div><div class="line">                                     readers</div><div class="line">       SIGALRM      14       Term    Timer signal from alarm(2)</div><div class="line">       SIGTERM      15       Term    Termination signal</div><div class="line">       SIGUSR1   30,10,16    Term    User-defined signal 1</div><div class="line">       SIGUSR2   31,12,17    Term    User-defined signal 2</div><div class="line">       SIGCHLD   20,17,18    Ign     Child stopped or terminated</div><div class="line"></div><div class="line">       SIGCONT   19,18,25    Cont    Continue if stopped</div><div class="line">       SIGSTOP   17,19,23    Stop    Stop process</div><div class="line">       SIGTSTP   18,20,24    Stop    Stop typed at terminal</div><div class="line">       SIGTTIN   21,21,26    Stop    Terminal input for background process</div><div class="line">       SIGTTOU   22,22,27    Stop    Terminal output for background process</div></pre></td></tr></table></figure>
+<p>其实，一开始就<code>kill -9</code>不是一个好主意。默认的情况（不指定信号），kill会发送<code>SIGTERM</code>（信号15）给进程，如果一段时间后，仍未退出，才使用<code>SIGKILL</code>杀死进程。</p>
+<p>因此优秀的程序都会注册SIGTERM信号的处理函数，用以做一些进程退出的准备工作，例如释放资源/写回磁盘/打印重要日志等。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/10/12/java/lock__mysql_jpa/" itemprop="url">
                   锁之MySQL和JPA
                 </a>
@@ -1322,152 +1452,11 @@ app.description=${app.name} is a Spring Boot application
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="url">
-                  JVM 常用GC算法简介
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-10-01T00:00:00+08:00" content="2015-10-01">
-              2015-10-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.</p>
-<h1 id="可回收判断方法"><a href="#可回收判断方法" class="headerlink" title="可回收判断方法"></a>可回收判断方法</h1><hr>
-<p>在介绍回收算法前, 我们需要了解一下, 如何进行对象可回收的判断, 常见的有两种方法:</p>
-<h2 id="1-引用计数"><a href="#1-引用计数" class="headerlink" title="1 引用计数:"></a>1 引用计数:</h2><p>这个方法简单高效, 但是很难解决对象循环引用的问题</p>
-<h2 id="2-引用树-可达性分析"><a href="#2-引用树-可达性分析" class="headerlink" title="2 引用树 (可达性分析) :"></a>2 引用树 (可达性分析) :</h2><p>主流商用语言的主流实现中, 都是通过可达性分析(Reachability Analysis)实现的, 也有人称为引用树.<br>这个方法以<code>GC Roots</code>为起点, 当一个对象不能通过起点到达, 则说明次对象是可回收的.</p>
-<p><code>GC Roots</code>包括以下几种:</p>
-<ul>
-<li>虚拟机栈(栈帧中的本地变量表)引用的对象</li>
-<li>方法区中类静态属性引用的对象</li>
-<li>方法区中常常量引用的对象</li>
-<li>本地方法栈中JNI(Native方法)引用的对象</li>
-</ul>
-<p>当然, Java 引用再细说还分为<code>强引用 软引用 弱引用 虚引用</code>, 他们有特定的回收规则, 这里不再赘述.</p>
-<h1 id="mark-sweep-标记-清除算法"><a href="#mark-sweep-标记-清除算法" class="headerlink" title="mark-sweep 标记-清除算法"></a>mark-sweep 标记-清除算法</h1><hr>
-<p>首先介绍<code>标记-清除</code>算法, 顾名思义, 该算法分为两个阶段:</p>
-<ul>
-<li><p>标记<br>标记出需要回收的对象</p>
-</li>
-<li><p>清除<br>在标记完成后, 统一回收所有被标记的对象</p>
-</li>
-</ul>
-<p>用图来表示会直观一点, 我们首先定义以下图例:</p>
-<p><img src="/images/java/jvm-gc-algo-define-01.png" alt=""></p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-mark-sweep-01.png" alt=""></p>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>从这个回收过程看, 我们也可以发现有以下缺点:</p>
-<ul>
-<li>内存碎片问题<br>大量不连续的内存碎片, 如果碎片过多, 在需要分配大对象时, 无法满足连续的内存需求, 会导致提前触发GC.</li>
-</ul>
-<h1 id="copying-复制算法"><a href="#copying-复制算法" class="headerlink" title="copying 复制算法"></a>copying 复制算法</h1><hr>
-<p>为了解决低存活率内存区的效率问题, 出现了一种”复制”算法.<br>该算法将内存分为大小相同的两部分, 只使用其中的一块, 当其内存快用完时, 将存活对象复制到另外一块, 并将使用内存切换到另外另外一块, 同时原来的整个内存块进行回收. 这种方法不用考虑内存碎片问题, 简单高效(只需移动堆顶指针, 按序分配内存).</p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-copy-01.png" alt=""></p>
-<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><p>内存缩小到了原来的一半.</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>新生代的回收:</p>
-<p>因为新生代的对象98%都是朝生夕死(根据IBM的研究), 比如Hotspot虚拟机, 有一个大的eden内存区和两个survivor区, 运行时使用eden和其中一块survivor, 默认<code>8:1</code>的eden:survivor比例.<br>即是有10%的内存会被用作第二块survivor内存. 当然, 如果survivor空间不足时, 会有其他内存如老年代进行担保, 而且survivor也并不需要很大内存.</p>
-<h1 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h1><hr>
-<p>针对老年代, mark-compact (标记整理) 算法是比较适合的.<br>标记过程和<code>标记-清除</code>算法一样, 不过回收的时候, 是会让存活对象往一端移动, 再清理掉存货对象边界外的内存.</p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-mark-compact-01.png" alt=""></p>
-<h1 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h1><hr>
-<p>该算法主要思想是, 根据对象存活周期和其他特点的不同, 去选择适当的收集算法, 这个策略也在前面提到过了.<br>比如新生代存活比例小, 选择复制算法; 而老年代的存活比例高, 则采用”标记-清除”或”标记-整理”; 分代收集也算是顶层的指导策略了.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1505,7 +1494,7 @@ app.description=${app.name} is a Spring Boot application
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">51</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

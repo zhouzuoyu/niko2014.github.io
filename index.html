@@ -445,6 +445,159 @@
             
             
               
+                <a class="post-title-link" href="/2016/06/02/search/es/es-relations/" itemprop="url">
+                  【设计】elasticsearch - 处理关系型数据
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-06-02T00:00:00+08:00" content="2016-06-02">
+              2016-06-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/02/search/es/es-relations/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/search/es/es-relations/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>不同于关系型数据库， 我们使用es， 一般出于性能、弹性、近实时搜索、大数据量的分析等目的。<br>然而， 在构建es数据模型时， 免不了会涉及到关系型数据的问题。关系型的数据在实际应用中广泛存在， 关系型数据库对此比较在行， 比如ACID支持、join查询等。es并不擅长这些，es的使用场景， 不是作为关系型数据库而存在的。</p>
+<p>当然， 反过来关系型数据库也有不足的地方，比如比较弱的全文搜索、昂贵的join搜索开销、聚合分析等，这些却是es的专业领域。</p>
+<p>es和大部分NoSQL数据库一样， 把数据视为平的, 不能够rollback到index之前的状态。但平的数据模型有他的好处， 比如无锁的快速索引、搜索、大数据量的节点间拓展等， 都非常符合es的使用场景。</p>
+<h1 id="处理关系型数据"><a href="#处理关系型数据" class="headerlink" title="处理关系型数据"></a>处理关系型数据</h1><hr>
+<p>但是， 并不是说关系型不重要，因为即使是在es中，当然无可避免要管理关系型的数据，一般来说，es 主要通过以下的方式或技巧管理：</p>
+<ul>
+<li>应用端join</li>
+<li>反规范化</li>
+<li>嵌套对象</li>
+<li>parent/child 关联</li>
+</ul>
+<p>常见的最终解决方案也来自于这些方法及其混合的使用，接下来分别介绍这些方式：</p>
+<h1 id="应用端join"><a href="#应用端join" class="headerlink" title="应用端join"></a>应用端join</h1><hr>
+<p>我们可以模拟数据库的join， 把操作移到了客户端进行。</p>
+<p>比如有以下数据：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">PUT /my_index/user/1</div><div class="line">&#123;</div><div class="line">  &quot;name&quot;:     &quot;John Smith&quot;,</div><div class="line">  &quot;email&quot;:    &quot;john@smith.com&quot;,</div><div class="line">  &quot;dob&quot;:      &quot;1970/10/24&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line">PUT /my_index/blogpost/2</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;:    &quot;Relationships&quot;,</div><div class="line">  &quot;body&quot;:     &quot;It&apos;s complicated...&quot;,</div><div class="line">  &quot;user&quot;:     1</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果要找用户名为“John”的博客，首先获取user.id：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">GET /my_index/user/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;match&quot;: &#123;</div><div class="line">      &quot;name&quot;: &quot;John&quot;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这时获取到user.id后，再去查询这个user的blogposts：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">GET /my_index/blogpost/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;filtered&quot;: &#123;</div><div class="line">      &quot;filter&quot;: &#123;</div><div class="line">        &quot;terms&quot;: &#123; &quot;user&quot;: [1] &#125;  </div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以发现，这里的数据仍旧是规范化的，只不过要在客户端进行join，因此搜索需要进行额外的请求。<br>而且，上面的例子有个问题，由于现实中叫做“John”的user有很多，所以第二次请求的搜索和结果可能很大。<br>因此这种方法适合于第一个entity比较少的情况，最好修改变动比较少。</p>
+<h1 id="反规范化"><a href="#反规范化" class="headerlink" title="反规范化"></a>反规范化</h1><hr>
+<p>如果要获得更好的性能，正如es所追求的，可以在索引的时候反模式化你的数据，使用冗余数据来避免join。</p>
+<p>接着上面的例子，我们可以把name写入到blogpost的document中：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><div class="line"></div><div class="line">PUT /my_index/blogpost/2</div><div class="line">&#123;</div><div class="line">  "title":    "Relationships",</div><div class="line">  "body":     "It's complicated...",</div><div class="line">  "user":     &#123;</div><div class="line">    "id":       1,</div><div class="line">    "name":     "John Smith"</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这时查询就可以用一个请求了：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">GET /my_index/blogpost/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;bool&quot;: &#123;</div><div class="line">      &quot;must&quot;: [</div><div class="line">        &#123; &quot;match&quot;: &#123; &quot;title&quot;:     &quot;relationships&quot; &#125;&#125;,</div><div class="line">        &#123; &quot;match&quot;: &#123; &quot;user.name&quot;: &quot;John&quot;          &#125;&#125;</div><div class="line">      ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种方式最大的好处就是速度，因为避免了昂贵开销的join操作。</p>
+<p>当然，这种方式也有缺点，一个是index的size会相对大一点，这是当然的，因为你冗余了数据。这个倒不是大问题，因为写到硬盘的数据都是高速压缩的，而且es的易拓展的。</p>
+<p>另一个要关注的问题是，当修改时，冗余数据也需要更新。比如你改了user.name，那么blogpost中的user.name也需要更新。这个业务场景还好，因为一个用户的博客数很少超过几千篇的，使用这些这些批量更新的接口（<a href="https://www.elastic.co/guide/en/elasticsearch/guide/1.x/scan-scroll.html" target="_blank" rel="external">scan-scroll</a>和<a href="https://www.elastic.co/guide/en/elasticsearch/guide/1.x/bulk.html" target="_blank" rel="external">bulk</a>）也不需要一秒。</p>
+<h1 id="嵌套对象"><a href="#嵌套对象" class="headerlink" title="嵌套对象"></a>嵌套对象</h1><hr>
+<p>因为一个document的创建更改删除都是原子操作，那么把紧密的实体关联写入到同一个document也是有好处的。<br>前面我们提到，blogpost中可以冗余一个<code>user</code>的对象，这个<code>user</code>类型其实属于<code>object</code>（和这一节介绍的不一样），它的实现其实是<code>user.id</code>作为一个key，由key-value对的列表组成document来保存，那如果一个数组作为一个field是怎样索引的呢 ？</p>
+<p>假如一个blopost可以有多个comments：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">PUT /my_index/blogpost/1</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;Nest eggs&quot;,</div><div class="line">  &quot;body&quot;:  &quot;Making your money work...&quot;,</div><div class="line">  &quot;tags&quot;:  [ &quot;cash&quot;, &quot;shares&quot; ],</div><div class="line">  &quot;comments&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;name&quot;:    &quot;John Smith&quot;,</div><div class="line">      &quot;comment&quot;: &quot;Great article&quot;,</div><div class="line">      &quot;age&quot;:     28,</div><div class="line">      &quot;stars&quot;:   4,</div><div class="line">      &quot;date&quot;:    &quot;2014-09-01&quot;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      &quot;name&quot;:    &quot;Alice White&quot;,</div><div class="line">      &quot;comment&quot;: &quot;More like this please&quot;,</div><div class="line">      &quot;age&quot;:     31,</div><div class="line">      &quot;stars&quot;:   5,</div><div class="line">      &quot;date&quot;:    &quot;2014-10-22&quot;</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>因为没有不指定<code>comments</code>的类型， 它将会是<code>object</code>类型，索引里大概是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;title&quot;:            [ eggs, nest ],</div><div class="line">  &quot;body&quot;:             [ making, money, work, your ],</div><div class="line">  &quot;tags&quot;:             [ cash, shares ],</div><div class="line">  &quot;comments.name&quot;:    [ alice, john, smith, white ],</div><div class="line">  &quot;comments.comment&quot;: [ article, great, like, more, please, this ],</div><div class="line">  &quot;comments.age&quot;:     [ 28, 31 ],</div><div class="line">  &quot;comments.stars&quot;:   [ 4, 5 ],</div><div class="line">  &quot;comments.date&quot;:    [ 2014-09-01, 2014-10-22 ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样我们搜索某个comments.name的值时，就无法查询到对应哪个comments了，比如<code>Alice White</code>和<code>31</code>的关联就丢失了。所以我们需要使用一个叫<code>nested</code>的类型，来代替<code>object</code>作为comments的field type，具体操作可参考——<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/nested-mapping.html" target="_blank" rel="external">Nested Object Mapping</a>。</p>
+<p>使用<code>nested</code>类型之后，每一个nestd的对象都会被索引成一个<code>hidden separate document</code>，类似这样：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;comments.name&quot;:    [ john, smith ],</div><div class="line">  &quot;comments.comment&quot;: [ article, great ],</div><div class="line">  &quot;comments.age&quot;:     [ 28 ],</div><div class="line">  &quot;comments.stars&quot;:   [ 4 ],</div><div class="line">  &quot;comments.date&quot;:    [ 2014-09-01 ]</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  &quot;comments.name&quot;:    [ alice, white ],</div><div class="line">  &quot;comments.comment&quot;: [ like, more, please, this ],</div><div class="line">  &quot;comments.age&quot;:     [ 31 ],</div><div class="line">  &quot;comments.stars&quot;:   [ 5 ],</div><div class="line">  &quot;comments.date&quot;:    [ 2014-10-22 ]</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;:            [ eggs, nest ],</div><div class="line">  &quot;body&quot;:             [ making, money, work, your ],</div><div class="line">  &quot;tags&quot;:             [ cash, shares ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>虽然把nested object分开索引了，fields还保持了他们间的联系，可以进行inner object不能做的comment查询。不仅如此，nested document和root document的join非常快，接近同一个document中的速度。<br>这些额外的nested document是隐藏的，不能够直接访问，修改增加删除都需要重新索引整个document。</p>
+<h1 id="parent-child-relationships"><a href="#parent-child-relationships" class="headerlink" title="parent-child relationships"></a>parent-child relationships</h1><hr>
+<p>nested objects, 所有实体在同一document中（json 角度看），但使用 parent-child 的 parent 和 children 是分开的 documents.</p>
+<p>parent-child 对比 nested objects 的好处：</p>
+<ul>
+<li>parent document可以被update而无需重新索引children</li>
+<li>Child documents 可以被 added, changed, or deleted，而不会影响parent和其他children。</li>
+<li>Child documents 可以在搜索结果中被返回</li>
+</ul>
+<p>由于es维护了一个映射：哪些 parents 关联了哪些 children，也多亏了这个映射，使查询时的 joins 速度是比较快的，但是也有一个限制：parent document 及其 children 必须在同一个shard中。</p>
+<p>这个 parent-child 的映射被保存在<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues.html" target="_blank" rel="external">Doc Values</a>（documents到terms的映射）中, 当fully hot in memory时可以快速地执行，当太大时将写回磁盘。</p>
+<p>不过因为 Parent-child 使用了 global ordinals 来加速 joins，不管使用了 in-memory cache 或者 on-disk doc values, 当索引改变时 global ordinals 需要重新构建。shard的parents越多，rebuild所花的时间就越多。刷新后的第一次 parent-child query or aggregation之后，会触发global ordinals构建，这时可能触发一个比较明显的延时，可以使用<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html#eager-global-ordinals" target="_blank" rel="external">eager_global_ordinals</a>来优化查询时间，把开销转移到 refresh time。</p>
+<p>因此 parent-children 比较适合这种场景，parent 有许多 children， 而不是很多 parents 和很少children。</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>上面只是介绍了几种处理关系型数据的方式及优缺点，具体还是要结合实际的应用场景，来选择最适合的方式。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/parent-child-performance.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/parent-child-performance.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/relations.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/relations.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/guide/1.x/relations.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/1.x/relations.html</a><br>preload-fielddata - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html#global-ordinals" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html#global-ordinals</a><br>Doc Values - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues.html</a><br>Inner Objects - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#inner-objects" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#inner-objects</a><br>Complex Core Field Types - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#object-arrays" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#object-arrays</a><br>Nested datatype - <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html</a><br>Doc Values Intro - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues-intro.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues-intro.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/05/08/search/es/es-partial-update/" itemprop="url">
                   【api】elasticsearch - 部分更新文档
                 </a>
@@ -1465,156 +1618,11 @@ dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apo
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="url">
-                  用tensorflow训练识别手写数字的CNN模型
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-29T13:03:30+08:00" content="2016-04-29">
-              2016-04-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/data-science/" itemprop="url" rel="index">
-                    <span itemprop="name">data science</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="tensorflow"><a href="#tensorflow" class="headerlink" title="tensorflow"></a>tensorflow</h1><p>tensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.</p>
-<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>数据集采用<code>MNIST 手写图片数据集</code>的图片，可以从<a href="http://yann.lecun.com/exdb/mnist/" target="_blank" rel="external">这个网站</a>下载, 或者使用这个<a href="https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank" rel="external">python脚本</a>来获取数据:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">from tensorflow.examples.tutorials.mnist import input_data</div><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div></pre></td></tr></table></figure>
-<p>这个数据集有三部分, 55000个训练数据+10000个测试数据+5000个验证数据.</p>
-<p>每个数据包含了手写图片和对应的label, 每个是28*28像素的, 用数组保存, 可以把这个矩阵转换为一个<code>28x28=784</code>大小的vector.</p>
-<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>有了数据集, 就可以导入和开始初始化主要参数:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div><div class="line">model_filepath = &quot;model2.ckpt&quot;</div><div class="line">sess = tf.InteractiveSession()</div><div class="line"></div><div class="line">x = tf.placeholder(tf.float32, [None, 784])</div><div class="line">y_ = tf.placeholder(tf.float32, [None, 10])</div><div class="line"></div><div class="line">W = tf.Variable(tf.zeros([784, 10]))</div><div class="line">b = tf.Variable(tf.zeros([10]))</div></pre></td></tr></table></figure>
-<p>Variable和placeholder的区别是, Variable需要初始化值, 而placeholder则不需要, 你可以在运行时通过<code>Session.run</code>中的<code>feed_dict</code>来指定值.</p>
-<p>上面y的计算描述如下图:</p>
-<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-01.png" alt=""></p>
-<p>写成矩阵计算就是:</p>
-<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-02.png" alt=""></p>
-<h1 id="构建多层卷积网络"><a href="#构建多层卷积网络" class="headerlink" title="构建多层卷积网络"></a>构建多层卷积网络</h1><p>要构建CNN(这里假设你已经了解CNN的相关内容), 我们会创建很多权重和偏置参数, 一般我们应该用小噪声的权重去初始化, 为了<code>symmetry breaking</code>和避免<code>0 gradients</code>. 因为我们使用的是<code>ReLu</code>激活函数, 用较小的正值bias来初始化可以有效地避免<code>dead neurons</code>. 这部分会被反复使用到, 因此需要写成一个function.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def weight_variable(shape):</div><div class="line">    initial = tf.truncated_normal(shape, stddev=0.1)</div><div class="line">    return tf.Variable(initial)</div><div class="line"></div><div class="line">def bias_variable(shape):</div><div class="line">    initial = tf.constant(0.1, shape=shape)</div><div class="line">    return tf.Variable(initial)</div></pre></td></tr></table></figure>
-<h1 id="构建第一卷积层"><a href="#构建第一卷积层" class="headerlink" title="构建第一卷积层"></a>构建第一卷积层</h1><p>使用刚才介绍的初始化function,</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv1 = weight_variable([5, 5, 1, 32])</div><div class="line">b_conv1 = bias_variable([32])</div><div class="line">x_image = tf.reshape(x, [-1, 28, 28, 1])</div></pre></td></tr></table></figure>
-<p>上面的<code>[5, 5, 1, 32]</code>，表示weight的形状, 第一和第二参数表示使用<code>5*5</code>的patch，第三个参数表示有一个输入通道（因为是灰度图片），第四个参数表示32个输出通道。同时, 我们有一个相应的偏置向量来对应每个输出通道.</p>
-<p>为了使用这一卷积层, 我们需要把图片输入reshape成四维的tensor: <code>[-1,28,28,1]</code>.<br><code>-1</code>表示flat, 第二三维表示图片大小, 第四维表示颜色通道.</p>
-<h2 id="卷积和池化-采样"><a href="#卷积和池化-采样" class="headerlink" title="卷积和池化(采样)"></a>卷积和池化(采样)</h2><p>接下来, 设置卷积的步长为1和<code>SAME</code>的padding方式, 池化采用2*2的大小. 这个也是可以复用的, 因此封装成一个function.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def conv2d(x, W):</div><div class="line">  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding=&apos;SAME&apos;)</div><div class="line"></div><div class="line">def max_pool_2x2(x):</div><div class="line">  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],</div><div class="line">                        strides=[1, 2, 2, 1], padding=&apos;SAME&apos;)</div></pre></td></tr></table></figure>
-<p>使用上面定义的卷积(使用relu激活)和池化函数计算:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)</div><div class="line">h_pool1 = max_pool_2x2(h_conv1)</div></pre></td></tr></table></figure>
-<h1 id="第二卷积层"><a href="#第二卷积层" class="headerlink" title="第二卷积层"></a>第二卷积层</h1><p>此时, 输入是第一卷积池化层的计算结果. 因此weight的输入channel变成了32, 输出设置为64, 同样的bias向量大小也相应设置为64.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv2 = weight_variable([5, 5, 32, 64])</div><div class="line">b_conv2 = bias_variable([64])</div><div class="line"></div><div class="line">h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)</div><div class="line">h_pool2 = max_pool_2x2(h_conv2)</div></pre></td></tr></table></figure>
-<h1 id="全连接"><a href="#全连接" class="headerlink" title="全连接"></a>全连接</h1><p>经过前面的处理, 此时的图片size已经减到7*7, 可以使用全连接来处理整个输入了. 这里我们选择1024个神经元:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc1 = weight_variable([7 * 7 * 64, 1024])</div><div class="line">b_fc1 = bias_variable([1024])</div><div class="line">h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])</div><div class="line">h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)</div></pre></td></tr></table></figure>
-<h1 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h1><p>这个操作主要减少一些过拟合, 使用的方法是<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">dropout</a>:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">keep_prob = tf.placeholder(tf.float32)</div><div class="line">h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)</div></pre></td></tr></table></figure>
-<h1 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc2 = weight_variable([1024, 10])</div><div class="line">b_fc2 = bias_variable([10])</div></pre></td></tr></table></figure>
-<p>使用 <code>softmax</code> 回归分类, 计算分类结果:</p>
-<pre><code>y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
-</code></pre><h1 id="评估模型的方法"><a href="#评估模型的方法" class="headerlink" title="评估模型的方法"></a>评估模型的方法</h1><p>获取到预测值后, 我们需要了解预测值和真实结果的差距, 定义我们的cost function:</p>
-<pre><code>cross_entropy = -tf.reduce_sum(y_ * tf.log(y_conv))
-</code></pre><h1 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h1><p>因此, 要达到我们预期的效果, 训练模型需要把<code>cross_entropy</code>减少到最小, 这里采用<code>AdamOptimizer</code>(更多Optimizer请戳<a href="https://www.tensorflow.org/versions/r0.9/api_docs/python/train.html#optimizers" target="_blank" rel="external">这里</a>):</p>
-<pre><code>train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-for i in range(20000):
-    batch = mnist.train.next_batch(50)
-    train_step.run(feed_dict={x: batch[0], y_: batch[1])    
-</code></pre><h1 id="保存模型"><a href="#保存模型" class="headerlink" title="保存模型"></a>保存模型</h1><p>训练结束后, 可以把结果保存成模型文件, 供以后识别图片使用.</p>
-<pre><code>save_path = saver.save(sess, model_filepath)
-</code></pre><h1 id="查看训练结果"><a href="#查看训练结果" class="headerlink" title="查看训练结果"></a>查看训练结果</h1><p>由于我们需要看当前训练的情况, 要加上一些debug的输出(比如精准度等), 于是将代码修改一下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))</div><div class="line">train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)</div><div class="line">correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))</div><div class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</div><div class="line">sess.run(tf.initialize_all_variables())</div><div class="line"></div><div class="line">for i in range(20000):</div><div class="line">  batch = mnist.train.next_batch(50)</div><div class="line">  if i%100 == 0:</div><div class="line">    train_accuracy = accuracy.eval(feed_dict=&#123;</div><div class="line">        x:batch[0], y_: batch[1], keep_prob: 1.0&#125;)</div><div class="line">    print(&quot;step %d, training accuracy %g&quot;%(i, train_accuracy))</div><div class="line">  train_step.run(feed_dict=&#123;x: batch[0], y_: batch[1], keep_prob: 0.5&#125;)</div><div class="line"></div><div class="line">print(&quot;test accuracy %g&quot;%accuracy.eval(feed_dict=&#123;</div><div class="line">    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0&#125;))</div></pre></td></tr></table></figure>
-<p>运行这个python脚本, 从输出可以看出, 随着step的增加, 训练的精准度在不断提升然后稳定, 最终使用测试集的精确度达到了99.21%, 如下</p>
-<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-01.png" alt=""></p>
-<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-02.png" alt=""></p>
-<p>至于如何使用训练出来的模型去识别图片, 以及如何可视化训练过程, 将在接下来的两篇博客中介绍.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://www.tensorflow.org/versions/r0.8/tutorials/mnist/pros/index.html#deep-mnist-for-experts" target="_blank" rel="external">Deep MNIST for Experts</a><br><a href="http://blog.csdn.net/heyongluoyao8/article/details/49429629" target="_blank" rel="external">机器学习中防止过拟合的处理方法</a><br><a href="http://www.jianshu.com/p/05c4f1621c7e" target="_blank" rel="external">http://www.jianshu.com/p/05c4f1621c7e</a><br><a href="http://blog.csdn.net/zouxy09/article/details/49080029" target="_blank" rel="external">http://blog.csdn.net/zouxy09/article/details/49080029</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1652,7 +1660,7 @@ for i in range(20000):
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">51</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

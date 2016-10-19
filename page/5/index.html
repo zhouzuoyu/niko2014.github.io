@@ -204,6 +204,147 @@
             
             
               
+                <a class="post-title-link" href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="url">
+                  JVM 常用GC算法简介
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-10-01T00:00:00+08:00" content="2015-10-01">
+              2015-10-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.</p>
+<h1 id="可回收判断方法"><a href="#可回收判断方法" class="headerlink" title="可回收判断方法"></a>可回收判断方法</h1><hr>
+<p>在介绍回收算法前, 我们需要了解一下, 如何进行对象可回收的判断, 常见的有两种方法:</p>
+<h2 id="1-引用计数"><a href="#1-引用计数" class="headerlink" title="1 引用计数:"></a>1 引用计数:</h2><p>这个方法简单高效, 但是很难解决对象循环引用的问题</p>
+<h2 id="2-引用树-可达性分析"><a href="#2-引用树-可达性分析" class="headerlink" title="2 引用树 (可达性分析) :"></a>2 引用树 (可达性分析) :</h2><p>主流商用语言的主流实现中, 都是通过可达性分析(Reachability Analysis)实现的, 也有人称为引用树.<br>这个方法以<code>GC Roots</code>为起点, 当一个对象不能通过起点到达, 则说明次对象是可回收的.</p>
+<p><code>GC Roots</code>包括以下几种:</p>
+<ul>
+<li>虚拟机栈(栈帧中的本地变量表)引用的对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常常量引用的对象</li>
+<li>本地方法栈中JNI(Native方法)引用的对象</li>
+</ul>
+<p>当然, Java 引用再细说还分为<code>强引用 软引用 弱引用 虚引用</code>, 他们有特定的回收规则, 这里不再赘述.</p>
+<h1 id="mark-sweep-标记-清除算法"><a href="#mark-sweep-标记-清除算法" class="headerlink" title="mark-sweep 标记-清除算法"></a>mark-sweep 标记-清除算法</h1><hr>
+<p>首先介绍<code>标记-清除</code>算法, 顾名思义, 该算法分为两个阶段:</p>
+<ul>
+<li><p>标记<br>标记出需要回收的对象</p>
+</li>
+<li><p>清除<br>在标记完成后, 统一回收所有被标记的对象</p>
+</li>
+</ul>
+<p>用图来表示会直观一点, 我们首先定义以下图例:</p>
+<p><img src="/images/java/jvm-gc-algo-define-01.png" alt=""></p>
+<p>算法工作过程如下:</p>
+<p><img src="/images/java/jvm-gc-algo-mark-sweep-01.png" alt=""></p>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>从这个回收过程看, 我们也可以发现有以下缺点:</p>
+<ul>
+<li>内存碎片问题<br>大量不连续的内存碎片, 如果碎片过多, 在需要分配大对象时, 无法满足连续的内存需求, 会导致提前触发GC.</li>
+</ul>
+<h1 id="copying-复制算法"><a href="#copying-复制算法" class="headerlink" title="copying 复制算法"></a>copying 复制算法</h1><hr>
+<p>为了解决低存活率内存区的效率问题, 出现了一种”复制”算法.<br>该算法将内存分为大小相同的两部分, 只使用其中的一块, 当其内存快用完时, 将存活对象复制到另外一块, 并将使用内存切换到另外另外一块, 同时原来的整个内存块进行回收. 这种方法不用考虑内存碎片问题, 简单高效(只需移动堆顶指针, 按序分配内存).</p>
+<p>算法工作过程如下:</p>
+<p><img src="/images/java/jvm-gc-algo-copy-01.png" alt=""></p>
+<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><p>内存缩小到了原来的一半.</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>新生代的回收:</p>
+<p>因为新生代的对象98%都是朝生夕死(根据IBM的研究), 比如Hotspot虚拟机, 有一个大的eden内存区和两个survivor区, 运行时使用eden和其中一块survivor, 默认<code>8:1</code>的eden:survivor比例.<br>即是有10%的内存会被用作第二块survivor内存. 当然, 如果survivor空间不足时, 会有其他内存如老年代进行担保, 而且survivor也并不需要很大内存.</p>
+<h1 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h1><hr>
+<p>针对老年代, mark-compact (标记整理) 算法是比较适合的.<br>标记过程和<code>标记-清除</code>算法一样, 不过回收的时候, 是会让存活对象往一端移动, 再清理掉存货对象边界外的内存.</p>
+<p>算法工作过程如下:</p>
+<p><img src="/images/java/jvm-gc-algo-mark-compact-01.png" alt=""></p>
+<h1 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h1><hr>
+<p>该算法主要思想是, 根据对象存活周期和其他特点的不同, 去选择适当的收集算法, 这个策略也在前面提到过了.<br>比如新生代存活比例小, 选择复制算法; 而老年代的存活比例高, 则采用”标记-清除”或”标记-整理”; 分代收集也算是顶层的指导策略了.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/10/01/java/j8/java8_null_check/" itemprop="url">
                   使用 Java 8 函数接口避免 Null Check
                 </a>
@@ -276,6 +417,117 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
 <p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
 <h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="url">
+                  edup 无线网卡驱动安装
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-08-22T00:00:00+08:00" content="2015-08-22">
+              2015-08-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近买了一个新无线网卡, 可惜在linux上用时, 总是几分钟后就断, 停止working, 于是尝试安装官方光盘中的驱动, 竟然有许多编译错误…只能在网上找驱动了~~</p>
+<h1 id="查询网卡型号"><a href="#查询网卡型号" class="headerlink" title="查询网卡型号"></a>查询网卡型号</h1><p>使用<code>lsusb -v</code>查到usb无线网卡的相关信息, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Bus 003 Device 002: ID 0bda:8178 Realtek Semiconductor Corp. RTL8192CU 802.11n WLAN Adapter</div><div class="line">Device Descriptor:</div><div class="line">  bLength                18</div><div class="line">  bDescriptorType         1</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  idVendor           0x0bda Realtek Semiconductor Corp.</div><div class="line">  idProduct          0x8178 RTL8192CU 802.11n WLAN Adapter</div><div class="line">  bcdDevice            2.00</div><div class="line">  iManufacturer           1 Realtek</div><div class="line">  iProduct                2 802.11n WLAN Adapter</div><div class="line">  iSerial                 3 00e04c000001</div><div class="line">  bNumConfigurations      1</div><div class="line">  Configuration Descriptor:</div><div class="line">    bLength                 9</div><div class="line">    bDescriptorType         2</div><div class="line">    wTotalLength           46</div><div class="line">    bNumInterfaces          1</div><div class="line">    bConfigurationValue     1</div><div class="line">    iConfiguration          0</div><div class="line">    bmAttributes         0xa0</div><div class="line">      (Bus Powered)</div><div class="line">      Remote Wakeup</div><div class="line">    MaxPower              500mA</div><div class="line">    Interface Descriptor:</div><div class="line">      bLength                 9</div><div class="line">      bDescriptorType         4</div><div class="line">      bInterfaceNumber        0</div><div class="line">      bAlternateSetting       0</div><div class="line">      bNumEndpoints           4</div><div class="line">      bInterfaceClass       255 Vendor Specific Class</div><div class="line">      bInterfaceSubClass    255 Vendor Specific Subclass</div><div class="line">      bInterfaceProtocol    255 Vendor Specific Protocol</div><div class="line">      iInterface              0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x81  EP 1 IN</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x02  EP 2 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x03  EP 3 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x84  EP 4 IN</div><div class="line">        bmAttributes            3</div><div class="line">          Transfer Type            Interrupt</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0040  1x 64 bytes</div><div class="line">        bInterval               1</div><div class="line">Device Qualifier (for other device speed):</div><div class="line">  bLength                10</div><div class="line">  bDescriptorType         6</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  bNumConfigurations      1</div><div class="line">Device Status:     0x0000</div><div class="line">  (Bus Powered)</div></pre></td></tr></table></figure>
+<p>可知, 这个网卡型号是<code>Realtek Semiconductor Corp. RTL8192CU 802.11n</code>, 接下来就是搜索驱动.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接google上面查询到的型号, 很容易找到驱动, 接下来就是安装即可:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo add-apt-repository ppa:hanipouspilot/rtlwifi</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install rtl8192cu-dkms linux-firmware</div></pre></td></tr></table></figure>
+<p>完成后要进行reboot.</p>
+<h1 id="生效-amp-测试"><a href="#生效-amp-测试" class="headerlink" title="生效 &amp; 测试"></a>生效 &amp; 测试</h1><p>查看网络状态可以用<code>ethstatus</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ethstatus -i wlan0</div></pre></td></tr></table></figure>
+<p>开个米神的视频测测:</p>
+<p><img src="/images/linux/tools/edup-wireless-card-ethstatus-test-01.png" alt=""></p>
+<p>整首&lt;恰空&gt;播放流畅稳定, 测试完美 ! :-D</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle" target="_blank" rel="external">http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle</a></p>
+
             
           </span>
         
@@ -397,117 +649,6 @@ var _hmt = _hmt || [];
 
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
 <p>[1] <a href="https://tumutanzi.com/archives/13005" target="_blank" rel="external">https://tumutanzi.com/archives/13005</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="url">
-                  edup 无线网卡驱动安装
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-08-22T00:00:00+08:00" content="2015-08-22">
-              2015-08-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>最近买了一个新无线网卡, 可惜在linux上用时, 总是几分钟后就断, 停止working, 于是尝试安装官方光盘中的驱动, 竟然有许多编译错误…只能在网上找驱动了~~</p>
-<h1 id="查询网卡型号"><a href="#查询网卡型号" class="headerlink" title="查询网卡型号"></a>查询网卡型号</h1><p>使用<code>lsusb -v</code>查到usb无线网卡的相关信息, 如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Bus 003 Device 002: ID 0bda:8178 Realtek Semiconductor Corp. RTL8192CU 802.11n WLAN Adapter</div><div class="line">Device Descriptor:</div><div class="line">  bLength                18</div><div class="line">  bDescriptorType         1</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  idVendor           0x0bda Realtek Semiconductor Corp.</div><div class="line">  idProduct          0x8178 RTL8192CU 802.11n WLAN Adapter</div><div class="line">  bcdDevice            2.00</div><div class="line">  iManufacturer           1 Realtek</div><div class="line">  iProduct                2 802.11n WLAN Adapter</div><div class="line">  iSerial                 3 00e04c000001</div><div class="line">  bNumConfigurations      1</div><div class="line">  Configuration Descriptor:</div><div class="line">    bLength                 9</div><div class="line">    bDescriptorType         2</div><div class="line">    wTotalLength           46</div><div class="line">    bNumInterfaces          1</div><div class="line">    bConfigurationValue     1</div><div class="line">    iConfiguration          0</div><div class="line">    bmAttributes         0xa0</div><div class="line">      (Bus Powered)</div><div class="line">      Remote Wakeup</div><div class="line">    MaxPower              500mA</div><div class="line">    Interface Descriptor:</div><div class="line">      bLength                 9</div><div class="line">      bDescriptorType         4</div><div class="line">      bInterfaceNumber        0</div><div class="line">      bAlternateSetting       0</div><div class="line">      bNumEndpoints           4</div><div class="line">      bInterfaceClass       255 Vendor Specific Class</div><div class="line">      bInterfaceSubClass    255 Vendor Specific Subclass</div><div class="line">      bInterfaceProtocol    255 Vendor Specific Protocol</div><div class="line">      iInterface              0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x81  EP 1 IN</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x02  EP 2 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x03  EP 3 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x84  EP 4 IN</div><div class="line">        bmAttributes            3</div><div class="line">          Transfer Type            Interrupt</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0040  1x 64 bytes</div><div class="line">        bInterval               1</div><div class="line">Device Qualifier (for other device speed):</div><div class="line">  bLength                10</div><div class="line">  bDescriptorType         6</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  bNumConfigurations      1</div><div class="line">Device Status:     0x0000</div><div class="line">  (Bus Powered)</div></pre></td></tr></table></figure>
-<p>可知, 这个网卡型号是<code>Realtek Semiconductor Corp. RTL8192CU 802.11n</code>, 接下来就是搜索驱动.</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接google上面查询到的型号, 很容易找到驱动, 接下来就是安装即可:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo add-apt-repository ppa:hanipouspilot/rtlwifi</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install rtl8192cu-dkms linux-firmware</div></pre></td></tr></table></figure>
-<p>完成后要进行reboot.</p>
-<h1 id="生效-amp-测试"><a href="#生效-amp-测试" class="headerlink" title="生效 &amp; 测试"></a>生效 &amp; 测试</h1><p>查看网络状态可以用<code>ethstatus</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ethstatus -i wlan0</div></pre></td></tr></table></figure>
-<p>开个米神的视频测测:</p>
-<p><img src="/images/linux/tools/edup-wireless-card-ethstatus-test-01.png" alt=""></p>
-<p>整首&lt;恰空&gt;播放流畅稳定, 测试完美 ! :-D</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle" target="_blank" rel="external">http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle</a></p>
 
             
           </span>
@@ -1652,143 +1793,11 @@ source ./foo_env/bin/active
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/01/02/java/maven/maven_aggregate/" itemprop="url">
-                  maven 模块聚合与继承
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-01-02T00:00:00+08:00" content="2015-01-02">
-              2015-01-02
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/01/02/java/maven/maven_aggregate/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/01/02/java/maven/maven_aggregate/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>在开发中，出于分工和设计和管理上的原因，我们无可避免地要进行分模块开发。<br>虽然OSGi、Jigsaw都有涉及到模块化，但常见的应用中，我们会使用一些构建工具（如maven）进行模块的管理。</p>
-<h2 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h2><p>举个例子（<a href="https://github.com/niko2014/blog-demo/tree/master/java/maven-aggregator-quick-start" target="_blank" rel="external">示例代码</a>），假设有两个模块：<br>user-model，用来定义用户的领域对象;<br>user-service，用来定义用户相关的业务操作，并依赖<code>user-model</code>模块。</p>
-<p>如今我们需要构建这个项目，如果没有模块之间没有关联，可能需要cd到每个模块，进行<code>mvn package</code>，build我们想要的模块。<br>而且这些依赖模块代码若有更新，手工去重新build，明显是不现实的。</p>
-<p>为了解决这个痛点，maven为我们提供了聚合模块的功能。</p>
-<p>在maven中，我们只需要：</p>
-<h3 id="1-定义一个-pom-packaging类型的module"><a href="#1-定义一个-pom-packaging类型的module" class="headerlink" title="1. 定义一个 pom packaging类型的module"></a>1. 定义一个 <code>pom</code> packaging类型的module</h3><p>模块暂且称为<code>user-aggregator</code>，<br>并在<code>user-aggregator/pom.xml</code>中定义其他模块成员的信息（<code>&lt;modules&gt;</code>）。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;groupId&gt;org.niko.blog.demo.aggregator&lt;/groupId&gt;</div><div class="line">&lt;artifactId&gt;user-aggregator&lt;/artifactId&gt;</div><div class="line">&lt;packaging&gt;pom&lt;/packaging&gt;</div><div class="line">&lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</div><div class="line">...</div><div class="line">&lt;modules&gt;</div><div class="line">    &lt;module&gt;user-model&lt;/module&gt;</div><div class="line">    &lt;module&gt;../user-service&lt;/module&gt;</div><div class="line">&lt;/modules&gt;</div></pre></td></tr></table></figure>
-<p>说明一下，maven 的聚合模块可以使用两种结构：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">- 父子结构  </div><div class="line">| aggregator</div><div class="line">|-- son1  </div><div class="line">|-- son2</div><div class="line"></div><div class="line">- 平行结构</div><div class="line">|--aggregator  </div><div class="line">|--son1  </div><div class="line">|--son2</div></pre></td></tr></table></figure></p>
-<p>然而像上面那样混合使用也是可以的，目录结构类似下面：</p>
-<p><img src="/images/demo_user_modules_aggregate.png" alt=""></p>
-<p>个人经验来说，平行结构的一个好处就是，当你的不同模块在不同git仓库时，平行模块会比较适合。<br>即son1和son2是两个git仓库，这时候平行结构可以使其互不影响，这种场景在开发中还是经常会有的。</p>
-<h3 id="2-子项目增加parent的声明："><a href="#2-子项目增加parent的声明：" class="headerlink" title="2. 子项目增加parent的声明："></a>2. 子项目增加parent的声明：</h3><p>user-model/pom.xml 模块：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">      &lt;groupId&gt;org.niko.blog.demo.aggregator&lt;/groupId&gt;</div><div class="line">      &lt;artifactId&gt;user-aggregator&lt;/artifactId&gt;</div><div class="line">      &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</div><div class="line">      &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;</div><div class="line">  &lt;/parent&gt;</div></pre></td></tr></table></figure></p>
-<p>user-service/pom.xml 模块：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">      &lt;groupId&gt;org.niko.blog.demo.aggregator&lt;/groupId&gt;</div><div class="line">      &lt;artifactId&gt;user-aggregator&lt;/artifactId&gt;</div><div class="line">      &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;</div><div class="line">      &lt;relativePath&gt;../user-aggregator/pom.xml&lt;/relativePath&gt;</div><div class="line">  &lt;/parent&gt;</div></pre></td></tr></table></figure></p>
-<h3 id="3-构建所有模块"><a href="#3-构建所有模块" class="headerlink" title="3. 构建所有模块"></a>3. 构建所有模块</h3><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[INFO] Scanning for projects...</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] Reactor Build Order:</div><div class="line">[INFO]</div><div class="line">[INFO] user-aggregator</div><div class="line">[INFO] user-model</div><div class="line">[INFO] user-service</div><div class="line">...</div><div class="line">...</div><div class="line">[INFO] Reactor Summary:</div><div class="line">[INFO]</div><div class="line">[INFO] user-aggregator ................................... SUCCESS [3.804s]</div><div class="line">[INFO] user-model ........................................ SUCCESS [33.208s]</div><div class="line">[INFO] user-service ...................................... SUCCESS [2.032s]</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] BUILD SUCCESS</div><div class="line">[INFO] ------------------------------------------------------------------------</div></pre></td></tr></table></figure>
-<h2 id="Reactor-反应堆"><a href="#Reactor-反应堆" class="headerlink" title="Reactor 反应堆"></a>Reactor 反应堆</h2><hr>
-<p>细心的童鞋已经发现，上面一次构建的输出信息中有<code>Reactor Build Order</code>这几个单词，那这又是什么东西呢？<br>翻译过来就是反应堆，顾名思义，表示所有模块组成的一个构建集合（一个模块可以看做一个反应堆）。<br>不过反应堆还包含了模块间的依赖和继承，并会计算出构建顺序。</p>
-<h3 id="裁剪反应堆"><a href="#裁剪反应堆" class="headerlink" title="裁剪反应堆"></a>裁剪反应堆</h3><p>上面的操作，是构建所有模块。那如果现在我想只构建某个模块（不构建没用到的模块）呢？这时就应该裁剪反应堆了。</p>
-<h4 id="具体使用"><a href="#具体使用" class="headerlink" title="具体使用"></a>具体使用</h4><p>&lt;！–<br>Maven 3.2.1 has added this feature, you can use -pl ! for exclude certain modules. This can be comma separated list of values that you want to include/exclude, exc<br>–&gt;</p>
-<p>假设user-service依赖user-model，现在使用裁剪反应堆来构建user-service，user-model也会被自动构建：</p>
-<pre><code>/.../user-aggregator/$ `mvn clean package -pl ../user-service -am`
-</code></pre><p>参数说明：</p>
-<pre><code>Options:
--amd,--also-make-dependents：构建依赖于指定模块的模块
--rf,--resume-from：从构建顺序的某个模块开始构建
--pl，--projects: 构建指定的模块，模块间用逗号分割
--am，--also-make : 同时构健模块的所依赖的模块
-</code></pre><h2 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h2><hr>
-<p>从上面介绍可以发现，使用聚合模块和继承有以下好处：</p>
-<ol>
-<li>配置重用（继承）；</li>
-<li>依赖和插件统一管理，如dependencyManagement和pluginManagement；</li>
-<li>自动分析和构建依赖，而且方便自身项目的version管理。</li>
-</ol>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>
-<p>【1】<a href="https://maven.apache.org/guides/mini/guide-multiple-modules.html" target="_blank" rel="external">https://maven.apache.org/guides/mini/guide-multiple-modules.html</a><br>【2】Maven实战.徐晓斌</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1826,7 +1835,7 @@ source ./foo_env/bin/active
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">50</span>
+              <span class="site-state-item-count">51</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
