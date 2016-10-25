@@ -204,6 +204,433 @@
             
             
               
+                <a class="post-title-link" href="/2015/12/26/git/git_cmd/" itemprop="url">
+                  git 常用命令清单
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-26T00:00:00+08:00" content="2015-12-26">
+              2015-12-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/26/git/git_cmd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/26/git/git_cmd/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>这个清单是基于<a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单 - 阮一峰</a>的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。</p>
+<h1 id="常用-Git-命令清单"><a href="#常用-Git-命令清单" class="headerlink" title="常用 Git 命令清单"></a>常用 Git 命令清单</h1><blockquote>
+<p>我每天使用 Git ，但是很多命令记不住。<br>　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。</p>
+</blockquote>
+<p><img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png" alt=""></p>
+<blockquote>
+<p>下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。<br>Workspace：工作区<br>Index / Stage：暂存区<br>Repository：仓库区（或本地仓库）<br>Remote：远程仓库</p>
+</blockquote>
+<h1 id="安装配置-niko"><a href="#安装配置-niko" class="headerlink" title="安装配置 - niko"></a>安装配置 - niko</h1><h2 id="ssh-key-简要流程"><a href="#ssh-key-简要流程" class="headerlink" title="ssh key 简要流程"></a>ssh key 简要流程</h2><ol>
+<li>ssh-keygen -t rsa -C “foo@gmail.com”，选择生成位置（~/.ssh/foo_rsa）。</li>
+<li><p>ssh-agent -s<br>若提示 <code>Could not open a connection to your authentication agent.</code>, 使用：</p>
+<p> eval <code>ssh-agent -s</code></p>
+</li>
+<li><p>ssh-add ~/.ssh/foo_rsa</p>
+</li>
+<li>clip &lt; ~/.ssh/foo_rsa.pub</li>
+<li>添加到远程服务器的ssh_keys；</li>
+<li>git clone …</li>
+</ol>
+<h3 id="设置ssh配置"><a href="#设置ssh配置" class="headerlink" title="设置ssh配置"></a>设置ssh配置</h3><p>vim ~/.ssh/config</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Host dev</div><div class="line">    HostName dev.example.com</div><div class="line">    Port 22000</div><div class="line">    User fooey&lt;/p&gt;</div><div class="line">Host github.com</div><div class="line">    IdentityFile ~/.ssh/github.key</div><div class="line">Host oschina.net</div><div class="line">    IdentityFile ~/.ssh/id_rsa_osc</div><div class="line">Host github.com</div><div class="line">    IdentityFile ~/.ssh/id_rsa_github</div></pre></td></tr></table></figure>
+<div style="display:none"><br><a href="http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/" target="_blank" rel="external">http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/</a><br></div>
+
+<h1 id="一、新建代码库"><a href="#一、新建代码库" class="headerlink" title="一、新建代码库"></a>一、新建代码库</h1><ul>
+<li><p>在当前目录新建一个Git代码库<br>$ git init</p>
+</li>
+<li><p>新建一个目录，将其初始化为Git代码库<br>$ git init [project-name]</p>
+</li>
+<li><p>下载一个项目和它的整个代码历史<br>$ git clone [url]</p>
+</li>
+</ul>
+<h1 id="二、git-配置"><a href="#二、git-配置" class="headerlink" title="二、git 配置"></a>二、git 配置</h1><p>　　Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。</p>
+<ul>
+<li><p>显示当前的Git配置<br>$ git config –list</p>
+</li>
+<li><p>编辑Git配置文件<br>$ git config -e [–global]</p>
+</li>
+<li><p>设置提交代码时的用户信息<br>$ git config [–global] user.name “[name]”<br>$ git config [–global] user.email “[email address]”</p>
+</li>
+<li><p>push pull 策略</p>
+</li>
+</ul>
+<p>ref ： <a href="http://blog.angular.in/git-pushmo-ren-fen-zhi/" target="_blank" rel="external">http://blog.angular.in/git-pushmo-ren-fen-zhi/</a></p>
+<p><code>push.default</code> 未设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">warning: push.default is unset; its implicit value is changing in</div><div class="line">Git 2.0 from &apos;matching&apos; to &apos;simple&apos;. To squelch this message</div><div class="line">and maintain the current behavior after the default changes, use:</div><div class="line"></div><div class="line">  git config --global push.default matching</div><div class="line"></div><div class="line">To squelch this message and adopt the new behavior now, use:</div><div class="line"></div><div class="line">  git config --global push.default simple</div><div class="line"></div><div class="line">When push.default is set to &apos;matching&apos;, git will push local branches</div><div class="line">to the remote branches that already exist with the same name.</div><div class="line"></div><div class="line">In Git 2.0, Git will default to the more conservative &apos;simple&apos;</div><div class="line">behavior, which only pushes the current branch to the corresponding</div><div class="line">remote branch that &apos;git pull&apos; uses to update the current branch.</div><div class="line"></div><div class="line">See &apos;git help config&apos; and search for &apos;push.default&apos; for further information.</div><div class="line">(the &apos;simple&apos; mode was introduced in Git 1.7.11. Use the similar mode</div><div class="line">&apos;current&apos; instead of &apos;simple&apos; if you sometimes use older versions of Git)</div></pre></td></tr></table></figure>
+<p>git config –global push.default ‘option’</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">option：</div><div class="line"></div><div class="line">nothing - push操作无效，除非显式指定远程分支，例如git push origin develop（我觉得。。。可以给那些不愿学git的同事配上此项）。</div><div class="line"></div><div class="line">current - push当前分支到远程同名分支，如果远程同名分支不存在则自动创建同名分支。</div><div class="line"></div><div class="line">upstream - push当前分支到它的upstream分支上（这一项其实用于经常从本地分支push/pull到同一远程仓库的情景，这种模式叫做central workflow）。</div><div class="line"></div><div class="line">simple - simple和upstream是相似的，只有一点不同，simple必须保证本地分支和它的远程 upstream分支同名，否则会拒绝push操作。</div><div class="line"></div><div class="line">matching - push所有本地和远程两端都存在的同名分支。</div></pre></td></tr></table></figure>
+<h1 id="三、增加-删除文件"><a href="#三、增加-删除文件" class="headerlink" title="三、增加/删除文件"></a>三、增加/删除文件</h1><ul>
+<li><p>添加指定文件到暂存区<br>$ git add [file1] [file2] …</p>
+</li>
+<li><p>添加指定目录到暂存区，包括子目录<br>$ git add [dir]</p>
+</li>
+<li><p>添加当前目录的所有文件到暂存区<br>git add .<br>git add –all (对删除文件有效)</p>
+</li>
+<li><p>删除工作区文件，并且将这次删除放入暂存区<br>git rm [file1] [file2] …</p>
+</li>
+<li><p>停止追踪指定文件，但该文件会保留在工作区<br>git rm <code>--cached</code> [file]</p>
+</li>
+<li><p>取消放入暂存区<br>use “git reset HEAD <file>…” to unstage</file></p>
+</li>
+<li><p>改名文件，并且将这个改名放入暂存区<br>git mv [file-original] [file-renamed]</p>
+</li>
+<li><p>取消改名<br>git mv [file-renamed] [file-original]</p>
+</li>
+</ul>
+<h1 id="四、代码提交"><a href="#四、代码提交" class="headerlink" title="四、代码提交"></a>四、代码提交</h1><hr>
+<ul>
+<li><p>提交暂存区到仓库区<br>git commit -m [message]</p>
+</li>
+<li><p>提交暂存区的指定文件到仓库区<br>git commit [file1] [file2] … -m [message]</p>
+</li>
+<li><p>提交工作区自上次commit之后的变化，直接到仓库区<br>git commit -a</p>
+</li>
+<li><p>提交时显示所有diff信息<br>git commit -v</p>
+</li>
+<li><p>使用一次新的commit，替代上一次提交</p>
+</li>
+<li>重做上一次commit，并包括指定文件的新变化</li>
+<li>如果代码没有任何新变化，则用来改写上一次commit的提交信息<br>$ git commit <code>--amend</code> -m [message]<br>$ git commit –amend   …</li>
+</ul>
+<h1 id="五、分支"><a href="#五、分支" class="headerlink" title="五、分支"></a>五、分支</h1><ul>
+<li><p>列出所有本地分支<br>$ git branch</p>
+</li>
+<li><p>列出所有远程分支<br>$ git branch -r</p>
+</li>
+<li><p>列出所有本地分支和远程分支<br>$ git branch -a</p>
+</li>
+<li><p>新建一个分支，但依然停留在当前分支<br>$ git branch [branch-name]</p>
+</li>
+<li><p>新建一个分支，并切换到该分支<br>$ git checkout -b [branch]</p>
+</li>
+<li><p>新建一个分支，指向指定commit<br>$ git branch [branch] [commit]</p>
+</li>
+<li><p>新建一个分支，与指定的远程分支建立追踪关系<br>$ git branch –track [branch] [remote-branch]</p>
+</li>
+<li><p>切换到指定分支，并更新工作区<br>$ git checkout [branch-name]</p>
+</li>
+<li><p>建立追踪关系，在现有分支与指定的远程分支之间<br>$ git branch –set-upstream [branch] [remote-branch]</p>
+</li>
+<li><p>合并指定分支到当前分支<br>$ git merge [branch]</p>
+</li>
+<li><p>选择一个commit，合并进当前分支<br>$ git <code>cherry-pick</code> [commit]</p>
+</li>
+<li><p>终止(abort) merge 操作：<br>$ git reset –hard HEAD<br><a href="http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge" target="_blank" rel="external">http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge</a></p>
+</li>
+<li><p>删除分支<br>$ git branch -d [branch-name]</p>
+</li>
+<li><p>删除远程分支<br>git push origin –delete <branchname><br>git push origin –delete<br>git branch -dr</branchname></p>
+</li>
+</ul>
+<h1 id="六、标签"><a href="#六、标签" class="headerlink" title="六、标签"></a>六、标签</h1><ul>
+<li><p>列出所有tag<br>$ git tag</p>
+</li>
+<li><p>新建一个tag在当前commit<br>git tag [tag]<br>注释：<br>git tag -a v1.4 -m ‘my version 1.4’</p>
+</li>
+<li><p>新建一个tag在指定commit<br>$ git tag [tag] [commit]</p>
+</li>
+<li><p>查看tag信息<br>$ git show [tag]</p>
+</li>
+<li><p>提交指定tag<br>$ git push [remote] [tag]</p>
+</li>
+<li><p>提交所有tag<br>$ git push [remote] –tags</p>
+</li>
+<li><p>新建一个分支，指向某个tag<br>$ git checkout -b [branch] [tag]</p>
+</li>
+</ul>
+<h1 id="七、查看信息"><a href="#七、查看信息" class="headerlink" title="七、查看信息"></a>七、查看信息</h1><ul>
+<li><p>显示有变更的文件<br>$ git status</p>
+</li>
+<li><p>GUI 审查代码<br>git difftool</p>
+</li>
+<li><p>显示当前分支的版本历史<br>$ git log</p>
+</li>
+<li><p>显示commit历史，以及每次commit发生变更的文件<br>$ git log –stat</p>
+</li>
+<li><p>显示某个文件的版本历史，包括文件改名<br>$ git log –follow [file]<br>$ git whatchanged [file]</p>
+</li>
+<li><p>显示指定文件相关的每一次diff<br>$ git log -p [file]</p>
+</li>
+<li><p>华丽的分支log<br>$ git log –graph –decorate –pretty=oneline –abbrev-commit develop  origin/develop  temp-branch</p>
+</li>
+<li><p>显示指定文件是什么人在什么时间修改过<br><code>git blame</code> [file]</p>
+</li>
+<li><p>显示暂存区和工作区的差异<br>git diff</p>
+</li>
+<li><p>显示暂存区和上一个commit的差异<br>$ git diff <code>--cached</code> []</p>
+</li>
+<li><p>显示工作区与当前分支最新commit之间的差异<br>$ git diff <code>HEAD</code></p>
+</li>
+<li><p>显示两次提交之间的差异<br>$ git diff [first-branch]…[second-branch]</p>
+</li>
+<li><p>显示某次提交的元数据和内容变化<br>$ git show [commit]</p>
+</li>
+<li><p>显示某次提交发生变化的文件<br>$ git show <code>--name-only</code> [commit]</p>
+</li>
+<li><p>显示某次提交时，某个文件的内容<br>$ git show [commit]:[filename]</p>
+</li>
+<li><p>显示当前分支的最近几次提交<br>git reflog</p>
+<blockquote>
+<p>Reference logs, or “reflogs”, record when the tips of branches and other references were updated in the local repository. Reflogs are useful in various Git commands, to specify the old value of a reference.</p>
+</blockquote>
+</li>
+</ul>
+<p>reflog可以看到被删除的记录(如)，而git log不能。</p>
+<h1 id="八、远程同步"><a href="#八、远程同步" class="headerlink" title="八、远程同步"></a>八、远程同步</h1><hr>
+<ul>
+<li>下载远程仓库的所有变动<br>$ git fetch [remote]</li>
+</ul>
+<blockquote>
+<p>Download objects and refs from another repository<br>用”git fetch”” 来执行”git pull”前半部分的工作， 但是这条命令并不会把抓下来的修改合并到当前分支里。</p>
+</blockquote>
+<ul>
+<li><p>显示所有远程仓库<br>$ git remote -v</p>
+</li>
+<li><p>显示某个远程仓库的信息<br>$ git remote show [remote]</p>
+</li>
+<li><p>增加一个新的远程仓库，并命名<br>$ git remote add [shortname] [url]</p>
+</li>
+<li><p>取回远程仓库的变化，并与本地分支合并<br>$ git pull [remote] [branch]</p>
+</li>
+<li><p>上传本地指定分支到远程仓库<br>$ git push [remote] [branch]</p>
+</li>
+<li><p>推送本地指定的分支名到远程仓库 - niko<br>$ git push origin develop:develop_remote<br>$ git push <remote> <local branch="" name="">:<remote branch="" to="" push="" into=""></remote></local></remote></p>
+</li>
+<li><p>强行推送当前分支到远程仓库，即使有冲突<br>$ git push [remote] –force</p>
+</li>
+<li><p>推送所有分支到远程仓库<br>$ git push [remote] –all</p>
+</li>
+<li><p>with rebase<br>git pull –rebase</p>
+</li>
+</ul>
+<h1 id="九、撤销"><a href="#九、撤销" class="headerlink" title="九、撤销"></a>九、撤销</h1><ul>
+<li><p>恢复暂存区的指定文件到工作区<br>$ git checkout [file]</p>
+</li>
+<li><p>恢复某个commit的指定文件到工作区<br>$ git checkout [commit] [file]</p>
+</li>
+<li><p>恢复上一个commit的所有文件到工作区<br>$ git checkout .</p>
+</li>
+<li><p>取消commit<br>$ git reset –soft HEAD~</p>
+</li>
+<li><p>重置暂存区的指定文件，与上一次commit保持一致，但工作区不变<br>$ git reset [file]<br>REF: <a href="http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit" target="_blank" rel="external">http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit</a></p>
+</li>
+<li><p>重置暂存区与工作区，与上一次commit保持一致<br>$ git <code>reset --hard</code></p>
+</li>
+<li><p>重置当前分支的指针为指定commit，同时重置暂存区，但工作区不变<br>$ git reset [commit]</p>
+</li>
+<li><p>重置当前分支的HEAD为指定commit，同时重置暂存区和工作区，与指定commit一致<br>$ git reset <code>--hard</code> [commit]</p>
+</li>
+<li><p>重置当前HEAD为指定commit，但保持暂存区和工作区不变<br>$ git reset <code>--keep</code> [commit]</p>
+</li>
+<li><p>undo reset<br>git reflog<br>git reset HEAD@{1}<br><a href="http://stackoverflow.com/questions/2510276/undoing-git-reset" target="_blank" rel="external">undo reset</a></p>
+</li>
+<li><p>新建一个commit，用来撤销指定commit</p>
+</li>
+<li><p>后者的所有变化都将被前者抵消，并且应用到当前分支<br>$ git <code>revert [commit]</code></p>
+</li>
+<li><p>恢复删除的分支<br>// TODO<br><a href="http://stackoverflow.com/questions/16793637/recover-deleted-branch-git" target="_blank" rel="external">http://stackoverflow.com/questions/16793637/recover-deleted-branch-git</a><br><a href="https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html" target="_blank" rel="external">https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html</a></p>
+</li>
+<li><p>TODO rebase<br>If you prefer to skip this patch,<br><a href="https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/" target="_blank" rel="external">https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/</a></p>
+</li>
+</ul>
+<h1 id="十、其他"><a href="#十、其他" class="headerlink" title="十、其他"></a>十、其他</h1><ul>
+<li><p>生成一个可供发布的压缩包<br>git archive<br>via：ruanyifeng.com</p>
+</li>
+<li><p>git rebase<br>使分支历史看起来像没有经过合并一样。</p>
+</li>
+<li><p>分支上一次合并的信息 - niko<br>git show –summary <code>git merge-base A B</code></p>
+</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/12/23/books/self_ctrl/self_ctrl_5/" itemprop="url">
+                  【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-23T00:00:00+08:00" content="2015-12-23">
+              2015-12-23
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/books/" itemprop="url" rel="index">
+                    <span itemprop="name">books</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/23/books/self_ctrl/self_ctrl_5/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/23/books/self_ctrl/self_ctrl_5/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><hr>
+<p><img src="/images/book_self_ctrl_5.png" alt=""></p>
+<p>##</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/12/20/linux/ten-cmd-linux-performance/" itemprop="url">
                   【转】 如何用十条命令在一分钟内检查Linux服务器性能
                 </a>
@@ -1225,233 +1652,6 @@ app.description=${app.name} is a Spring Boot application
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/10/22/linux/tools/kill_sign/" itemprop="url">
-                  kill & signal
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-10-22T00:00:00+08:00" content="2015-10-22">
-              2015-10-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/10/22/linux/tools/kill_sign/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/22/linux/tools/kill_sign/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="kill-命令"><a href="#kill-命令" class="headerlink" title="kill 命令"></a>kill 命令</h1><p>使用kill可以用来终止进程，不过先要获取进程PID（可以使用ps/pstree/top/pidof等工具），向该进程发送终止信号，例如：</p>
-<pre><code>kill -9 &lt;PID&gt;
-</code></pre><p><code>-9</code>应该是最多人认识的信号，更多的信号及其说明可使用<code>man 7 kill</code> 或者 <code>kill -l</code>查看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ kill -l</div><div class="line"></div><div class="line"> 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP</div><div class="line"> 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1</div><div class="line">11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM</div><div class="line">16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP</div><div class="line">21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ</div><div class="line">26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR</div><div class="line">31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1	64) SIGRTMAX</div></pre></td></tr></table></figure>
-<p>使用manual：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ man 7 kill</div><div class="line"></div><div class="line">...</div><div class="line">Signal     Value     Action   Comment</div><div class="line">       ──────────────────────────────────────────────────────────────────────</div><div class="line">       SIGHUP        1       Term    Hangup detected on controlling terminal</div><div class="line">                                     or death of controlling process</div><div class="line">       SIGINT        2       Term    Interrupt from keyboard</div><div class="line">       SIGQUIT       3       Core    Quit from keyboard</div><div class="line">       SIGILL        4       Core    Illegal Instruction</div><div class="line">       SIGABRT       6       Core    Abort signal from abort(3)</div><div class="line">       SIGFPE        8       Core    Floating point exception</div><div class="line">       SIGKILL       9       Term    Kill signal</div><div class="line">       SIGSEGV      11       Core    Invalid memory reference</div><div class="line">       SIGPIPE      13       Term    Broken pipe: write to pipe with no</div><div class="line">                                     readers</div><div class="line">       SIGALRM      14       Term    Timer signal from alarm(2)</div><div class="line">       SIGTERM      15       Term    Termination signal</div><div class="line">       SIGUSR1   30,10,16    Term    User-defined signal 1</div><div class="line">       SIGUSR2   31,12,17    Term    User-defined signal 2</div><div class="line">       SIGCHLD   20,17,18    Ign     Child stopped or terminated</div><div class="line"></div><div class="line">       SIGCONT   19,18,25    Cont    Continue if stopped</div><div class="line">       SIGSTOP   17,19,23    Stop    Stop process</div><div class="line">       SIGTSTP   18,20,24    Stop    Stop typed at terminal</div><div class="line">       SIGTTIN   21,21,26    Stop    Terminal input for background process</div><div class="line">       SIGTTOU   22,22,27    Stop    Terminal output for background process</div></pre></td></tr></table></figure>
-<p>其实，一开始就<code>kill -9</code>不是一个好主意。默认的情况（不指定信号），kill会发送<code>SIGTERM</code>（信号15）给进程，如果一段时间后，仍未退出，才使用<code>SIGKILL</code>杀死进程。</p>
-<p>因此优秀的程序都会注册SIGTERM信号的处理函数，用以做一些进程退出的准备工作，例如释放资源/写回磁盘/打印重要日志等。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/10/12/java/lock__mysql_jpa/" itemprop="url">
-                  锁之MySQL和JPA
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-10-12T13:03:30+08:00" content="2015-10-12">
-              2015-10-12
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/10/12/java/lock__mysql_jpa/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/12/java/lock__mysql_jpa/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="今天"><a href="#今天" class="headerlink" title="今天"></a>今天</h2><p>今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，<br>当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。</p>
-<h2 id="MySQL-行级锁"><a href="#MySQL-行级锁" class="headerlink" title="MySQL 行级锁"></a>MySQL 行级锁</h2><p>行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。<br>（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）</p>
-<p>首先回顾一下大学的基础知识：<br>数据库的锁，是事务在某个数据对象（如表、行等）进行操作前，对数据库发起请求，对其加锁，<br>使其不被其他事务所修改。<br>基本的锁有两种：读锁和写锁。<br>写锁，也称排它锁（ExclusiveLock，也称X锁），若事务对数据D加了X锁，则其他事务不能读取和修改D。<br>读锁，也称共享锁（ShareLock，也称S锁），若事务对数据D加了S锁，则其他事务只能对D加S锁，不能修改D。</p>
-<h3 id="S-LOCK-在MySQL："><a href="#S-LOCK-在MySQL：" class="headerlink" title="S LOCK 在MySQL："></a>S LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_02.png" alt=""><br><img src="/images/mysql_x_lock_demo_04.png" alt=""><br>从上面的测试中可以发现，事务1（窗口1）加了S锁后，事务2不能加X锁和进行修改。<br>如果S锁一段时间后仍未释放就会超时，如下图：<br><img src="/images/mysql_x_lock_demo_03.png" alt=""></p>
-<h3 id="X-LOCK-在MySQL："><a href="#X-LOCK-在MySQL：" class="headerlink" title="X LOCK 在MySQL："></a>X LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_01.png" alt=""></p>
-<p>从上面的测试中可以发现，事务1加了X锁之后，事务2不能加S锁，但只要去掉<br><code>LOCK IN SHARE MODE</code>就可以查询了。</p>
-<p>其他的场景，可用以上SQL测试验证一下。<br>（注意：当用到索引时，MySql才会使用row-lock，否则table-lock。）</p>
-<h2 id="JPA-规范"><a href="#JPA-规范" class="headerlink" title="JPA 规范"></a>JPA 规范</h2><hr>
-<p>看完了锁在MySQL的实现，那在Java中如何使用呢？这里以spring+JPA为例（为了方便，使用了starter-jpa）：</p>
-<h3 id="JPA-锁相关规范"><a href="#JPA-锁相关规范" class="headerlink" title="JPA 锁相关规范"></a>JPA 锁相关规范</h3><p>在spring-data-jpa中，<code>@Lock + LockModeType</code> 可以为某个数据操作进行锁控制，比如用X锁：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Lock(LockModeType.PESSIMISTIC_WRITE)</div><div class="line">List&lt;MemberOrder&gt; findByOrderNo(String orderNo);</div></pre></td></tr></table></figure>
-<p>可以跑一下测试：</p>
-<ol>
-<li>使用上面的窗口二先加S锁，不commit。</li>
-<li>然后调用findByOrderNo()查询。</li>
-<li>可以发现，程序抛出LockAcquisitionException异常，不能获取锁，等待超时，如下：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Caused by: org.hibernate.exception.LockAcquisitionException: could not extract ResultSet</div><div class="line">        at org.hibernate.dialect.MySQLDialect$1.convert(MySQLDialect.java:451)</div><div class="line">        ...</div><div class="line">Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</div><div class="line">        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</div><div class="line">        at java.lang.reflect.Constructor.newInstance(Constructor.java:422)</div><div class="line">        at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)</div><div class="line">        at com.mysql.jdbc.Util.getInstance(Util.java:387)</div><div class="line">        at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:946)</div><div class="line">        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3878)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRowFast(MysqlIO.java:2090)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRow(MysqlIO.java:1964)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readSingleRowSet(MysqlIO.java:3306)</div><div class="line">        atannotation com.mysql.jdbc.MysqlIO.getResultSet(MysqlIO.java:463)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readResultsForQueryOrUpdate(MysqlIO.java:3040)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readAllResults(MysqlIO.java:2288)</div><div class="line">        at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2681)</div><div class="line">        at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2551)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeQuery(PreparedStatement.java:1962)</div><div class="line">        at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.extract(ResultSetReturnImpl.java:82)</div><div class="line">        ... 64 more</div></pre></td></tr></table></figure>
-<p>现在来看Lock和LockModeType，Lock是spring-data的annotation，<br>LockModeType属于JPA规范，可作为EntityManager的方法参数传入或者使用Query.setLockMode()或TypedQuery.setLockMode()进行设置。<br>当然使用spring-data的话，直接使用@Lock即可，如果对细节感兴趣，可以去看spring-data的源码。<br>LockModeType是一个enum，它包括：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">READ：同OPTIMISTIC</div><div class="line">WRITE：同OPTIMISTIC_FORCE_INCREMENT</div><div class="line">OPTIMISTIC：乐观锁</div><div class="line">OPTIMISTIC_FORCE_INCREMENT：乐观锁，带版本更新</div><div class="line">PESSIMISTIC_READ：悲观读 （MySQL对应： `lock in share mode`）</div><div class="line">PESSIMISTIC_WRITE：悲观写 （MySQL对应： `for update`）</div><div class="line">PESSIMISTIC_FORCE_INCREMENT：悲观写，带版本更新</div></pre></td></tr></table></figure>
-<p>上面涉及到了悲观锁和乐观锁：<br>所谓悲观锁，就是对数据被其他事务修改的概率保持悲观态度，<br>因此在处理过程中，都将数据锁定。<br>而乐观锁，反过来即是保持乐观态度，认为数据被其他事务修改的概率是较低的，所以在真正提交更新的时候，<br>才去检测数据是否冲突，实现方式可以是版本号或者时间戳，这里不再赘述。</p>
-<p>悲观锁能严格保证数据的正确性，但凡事有利必有弊，很多事情我们都需要去平衡。<br>如果一个并发冲突的概率不高，而使用悲观锁，会对数据库性能开销影响比较大。<br>除此之外，良好的设计也可有效地避免一些并发问题。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
-<p>【1】 <a href="https://spring.io/guides/gs/accessing-data-jpa/" target="_blank" rel="external">https://spring.io/guides/gs/accessing-data-jpa/</a><br>【2】 <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html" target="_blank" rel="external">http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html</a><br>【3】 <a href="https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1494,7 +1694,7 @@ app.description=${app.name} is a Spring Boot application
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-count">53</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1508,7 +1708,7 @@ app.description=${app.name} is a Spring Boot application
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-count">135</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

@@ -598,6 +598,232 @@
             
             
               
+                <a class="post-title-link" href="/2016/05/20/linux/install/dropbox-install/" itemprop="url">
+                  使用`dropbox`服务
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-20T00:00:00+08:00" content="2016-05-20">
+              2016-05-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/20/linux/install/dropbox-install/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/20/linux/install/dropbox-install/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.</p>
+<h1 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h1><p>首先在<a href="https://www.dropbox.com/install-linux" target="_blank" rel="external">官网</a>下载ubuntu安装包<code>dropbox_2015.10.28_amd64.deb</code>, 安装完成之后, 需要启动dropbox :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">proxychains dropbox start</div><div class="line">ProxyChains-3.1 (http://proxychains.sf.net)</div><div class="line">Starting Dropbox...</div><div class="line">The Dropbox daemon is not installed!</div><div class="line">Run &quot;dropbox start -i&quot; to install the daemon</div></pre></td></tr></table></figure>
+<p>如上, 提示需要安装daemon程序, 继续按着指引做:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dropbox start -i</div></pre></td></tr></table></figure>
+<p>如果没有翻墙, 可能遇到这样的错误:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Trouble connecting to Dropbox servers. Maybe your internet connection is down, or you need to set your http_proxy environment variable.</div></pre></td></tr></table></figure>
+<p>为了继续下载, 本地搭建一个翻墙的http代理, 并export到环境变量:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">export https_proxy=http://127.0.0.1:8123</div></pre></td></tr></table></figure>
+<p>然后重新<code>dropbox start -i</code>:</p>
+<p><img src="/images/linux/tools/dropbox/dropbox-downloading.png" alt=""></p>
+<h1 id="安装完之后-可以使用dropbox-proxy设置数据同步的代理"><a href="#安装完之后-可以使用dropbox-proxy设置数据同步的代理" class="headerlink" title="安装完之后, 可以使用dropbox proxy设置数据同步的代理:"></a>安装完之后, 可以使用<code>dropbox proxy</code>设置数据同步的代理:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox help proxy</div><div class="line"></div><div class="line">dropbox proxy MODE [TYPE] [HOST] [PORT] [USERNAME] [PASSWORD]</div><div class="line"></div><div class="line">Set proxy settings for Dropbox.</div><div class="line"></div><div class="line">MODE - one of &quot;none&quot;, &quot;auto&quot;, &quot;manual&quot;</div><div class="line">TYPE - one of &quot;http&quot;, &quot;socks4&quot;, &quot;socks5&quot; (only valid with &quot;manual&quot; mode)</div><div class="line">HOST - proxy hostname (only valid with &quot;manual&quot; mode)</div><div class="line">PORT - proxy port (only valid with &quot;manual&quot; mode)</div><div class="line">USERNAME - (optional) proxy username (only valid with &quot;manual&quot; mode)</div><div class="line">PASSWORD - (optional) proxy password (only valid with &quot;manual&quot; mode)</div></pre></td></tr></table></figure>
+<h1 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h1><p>启动后, 输入账号密码进行登录:</p>
+<p><img src="/home/niko/mount/hsb_ssd_1/niko/dev/code/git_repos/HexoBlog/hexo-hello/source/images/linux/tools/dropbox/dropbox-login.png" alt=""></p>
+<p>由于dropbox采用和nautilus整合的方式, 只要我们在文件管理器修改了同步文件夹(默认是<code>/home/username/Dropbox</code>)的数据, dropbox会自动同步到云端.</p>
+<h1 id="问题-gnome下icon有时候不显示"><a href="#问题-gnome下icon有时候不显示" class="headerlink" title="问题: gnome下icon有时候不显示"></a>问题: gnome下icon有时候不显示</h1><p>最简单粗暴的方式, 重启一下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox stop</div><div class="line">Dropbox daemon stopped.</div><div class="line">niko@niko-ub1404:~$ dropbox start</div><div class="line">Starting Dropbox...Done!</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/201727/how-can-i-make-dropbox-display-an-icon-in-gnome-shell" target="_blank" rel="external">How can I make dropbox display an icon in Gnome Shell?</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/10/linux/tools/app-as-service-upstart/" itemprop="url">
+                  为 spring boot 程序创建 service
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-10T00:00:00+08:00" content="2016-05-10">
+              2016-05-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/10/linux/tools/app-as-service-upstart/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/10/linux/tools/app-as-service-upstart/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="把应用做成一个service"><a href="#把应用做成一个service" class="headerlink" title="把应用做成一个service"></a>把应用做成一个service</h1><p>我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。<br>为了方便管理，可以考虑制作成一个service。步骤如下：</p>
+<h2 id="创建-upstart-配置文件"><a href="#创建-upstart-配置文件" class="headerlink" title="创建 upstart 配置文件"></a>创建 upstart 配置文件</h2><p>首先用<code>mvn package</code>打包成jar类型的spring-boot程序， 然后 <code>sudo vim /etc/init/hellosb.conf</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">start on filesystem</div><div class="line">exec /usr/bin/java -jar /path_to/program.jar</div></pre></td></tr></table></figure>
+<p>多行的话使用<code>script</code>标记：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># myprogram.conf</div><div class="line">start on filesystem</div><div class="line">script</div><div class="line">    /usr/bin/java -jar /path_to/program</div><div class="line">    echo &quot;Another command&quot;</div><div class="line">end script</div></pre></td></tr></table></figure>
+<h2 id="service-启动"><a href="#service-启动" class="headerlink" title="service 启动"></a>service 启动</h2><pre><code>sudo ln -s /etc/init/myprogram.conf /etc/init.d/myprogram
+</code></pre><p>建立链接后，使用service就可以用自动补全功能了：</p>
+<pre><code>sudo service myprogram start
+</code></pre><p>上面只是一个简单的启动功能，upstart的配置文件远比这强大，可以做更细节的处理（下图是job的状态变迁图）。</p>
+<p><img src="http://www.ibm.com/developerworks/cn/linux/1407_liuming_init2/image003.jpg" alt="job 状态变迁"></p>
+<h1 id="更进一步"><a href="#更进一步" class="headerlink" title="更进一步"></a>更进一步</h1><p>若想要深入了解，可以查看官方文档和学习一下其他程序（nginx等）的upstart脚本：<a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">Upstart Intro, Cookbook and Best Practises</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">http://upstart.ubuntu.com/cookbook/</a><br><a href="http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart" target="_blank" rel="external">http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart</a><br><a href="http://upstart.ubuntu.com/getting-started.html" target="_blank" rel="external">http://upstart.ubuntu.com/getting-started.html</a><br><a href="http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service" target="_blank" rel="external">http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/05/08/search/es/es-partial-update/" itemprop="url">
                   【api】elasticsearch - 部分更新文档
                 </a>
@@ -1232,7 +1458,8 @@
 <td>kill window</td>
 </tr>
 <tr>
-<td></td>
+<td>page-up</td>
+<td>进入滚动模式, 按<code>esc</code>退出滚动</td>
 </tr>
 </tbody>
 </table>
@@ -1303,321 +1530,6 @@
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="url">
-                  deploy spring-boot as war file
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-02T00:00:00+08:00" content="2016-05-02">
-              2016-05-02
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?</p>
-<p>spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.</p>
-<p>下面介绍war方式部署:</p>
-<h1 id="pom-xml-修改"><a href="#pom-xml-修改" class="headerlink" title="pom.xml 修改"></a>pom.xml 修改</h1><hr>
-<p>首先把打包类型修改为: <code>&lt;packaging&gt;war&lt;/packaging&gt;</code></p>
-<p>接着修改<code>spring-boot-starter-tomcat</code>为<code>provided</code>的scope, 避免打包到war中:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;provided&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- ... --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
-<ul>
-<li><strong>注意:</strong></li>
-</ul>
-<p><code>boot-start</code>版本要高于<code>1.3</code>, 否则使用tomcat启动会出现异常.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<h1 id="部署到-Servlet-3-0-规范的容器"><a href="#部署到-Servlet-3-0-规范的容器" class="headerlink" title="部署到 Servlet 3.0 规范的容器"></a>部署到 Servlet 3.0 规范的容器</h1><hr>
-<p>如果你的web容器支持<code>Servlet 3.0</code>规范, 可以使用以下的方法:</p>
-<p>首先继承<code>SpringBootServletInitializer</code>, 并覆写<code>configure</code>方法, 不需要<code>web.xml</code>.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableAutoConfiguration</div><div class="line">@ComponentScan</div><div class="line">public class Application extends SpringBootServletInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) &#123;</div><div class="line">        // Customize the application or call application.sources(...) to add sources</div><div class="line">        // Since our example is itself a @Configuration class we actually don&apos;t</div><div class="line">        // need to override this method.</div><div class="line">        return application.sources(SampleControllerAndApp.class);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="部署到旧的容器-Servlet-2-5"><a href="#部署到旧的容器-Servlet-2-5" class="headerlink" title="部署到旧的容器 (Servlet 2.5)"></a>部署到旧的容器 (Servlet 2.5)</h1><p>如果你的容器不支持servlet 3.0规范怎么办 ? 下面是一个解决方法:</p>
-<ul>
-<li><p>1<br>增加一个<code>org.springframework.boot:spring-boot-legacy</code>依赖</p>
-</li>
-<li><p>2<br>创建<code>web.xml</code>, 用以声明<code>context listener</code>, 这个listener是<code>org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener</code>, 是在<code>spring-boot</code>下特别使用的, 其他配置和正常spring应用一样. <code>web.xml</code> 如下:</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app version=&quot;2.5&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context-param&gt;</div><div class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</div><div class="line">        &lt;param-value&gt;demo.Application&lt;/param-value&gt;</div><div class="line">    &lt;/context-param&gt;</div><div class="line"></div><div class="line">    &lt;listener&gt;</div><div class="line">        &lt;listener-class&gt;org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener&lt;/listener-class&gt;</div><div class="line">    &lt;/listener&gt;</div><div class="line"></div><div class="line">    &lt;filter&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;</div><div class="line">    &lt;/filter&gt;</div><div class="line"></div><div class="line">    &lt;filter-mapping&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</div><div class="line">    &lt;/filter-mapping&gt;</div><div class="line"></div><div class="line">    &lt;servlet&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</div><div class="line">        &lt;init-param&gt;</div><div class="line">            &lt;param-name&gt;contextAttribute&lt;/param-name&gt;</div><div class="line">            &lt;param-value&gt;org.springframework.web.context.WebApplicationContext.ROOT&lt;/param-value&gt;</div><div class="line">        &lt;/init-param&gt;</div><div class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</div><div class="line">    &lt;/servlet&gt;</div><div class="line"></div><div class="line">    &lt;servlet-mapping&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</div><div class="line">    &lt;/servlet-mapping&gt;</div><div class="line"></div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file" target="_blank" rel="external">howto-create-a-deployable-war-file</a><br><a href="http://docs.spring.io/spring-boot/docs/current/maven-plugin/" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/maven-plugin/</a><br><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/01/linux/practice/my_workspace_management/" itemprop="url">
-                  我的workspace管理之道
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-01T00:03:30+08:00" content="2016-05-01">
-              2016-05-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/01/linux/practice/my_workspace_management/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/linux/practice/my_workspace_management/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.</p>
-<p>workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.</p>
-<p>为什么这么说呢? 因为我的每个workspace都固定放了不同的工具, 而且不超过2个(保证同一个workspace我可以使用<code>alt+tab</code>快速切换), 这样我不用费时费力去找我要的窗口.</p>
-<p>这样分好类后再加上无敌科学的快捷键, 持之以恒形成条件反射, 外人看来那操作简直碉堡.</p>
-<p>事不宜迟, 赶紧看一下是这个小技巧.</p>
-<h1 id="设置快捷键"><a href="#设置快捷键" class="headerlink" title="设置快捷键"></a>设置快捷键</h1><hr>
-<p>首先我们需要设置用到的快捷键:</p>
-<p>在<code>System Settings</code>的<code>Keyboard</code>中, 可以设置workspace 1-4 的快捷切换键.</p>
-<p>我习惯使用<code>ctrl + 1234</code>, 缺点就是每天感觉在打魔兽, 懂行的一定知道为什么选择这个键.</p>
-<p>如果想用4个以上的workspace点算啊?</p>
-<p>莫担心, 比如我使用的是gnome, 可以这样:</p>
-<pre><code>$ dconf read /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
-[&apos;&lt;Primary&gt;4&apos;]
-</code></pre><p>读出值是: <code>&#39;&lt;Primary&gt;4&#39;</code></p>
-<p>同样的, 我们把workspace 5的键值写入相应的workspace:</p>
-<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
-</code></pre><p>同理, 其他workspace也是这样设置, 为了造福网友, 这里还是贴一下:</p>
-<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-6 &quot;[&apos;&lt;Primary&gt;6&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-7 &quot;[&apos;&lt;Primary&gt;7&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-8 &quot;[&apos;&lt;Primary&gt;8&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-9 &quot;[&apos;&lt;Primary&gt;9&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apos;&lt;Primary&gt;0&apos;]&quot;
-</code></pre><h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
-<p>接下来是工作区的分类, 主要关注每个工作区放置什么工具. 有了这些分类, 切换工具几乎不用时间思考和寻找了.<br>以下是我常用的分类:</p>
-<table>
-<thead>
-<tr>
-<th>workspace</th>
-<th>放置的工具</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>terminator 控制台 &amp; file manger</td>
-</tr>
-<tr>
-<td>-</td>
-<td>PDF reader</td>
-</tr>
-<tr>
-<td>2</td>
-<td>IDE</td>
-</tr>
-<tr>
-<td>3</td>
-<td>博客/笔记工具</td>
-</tr>
-<tr>
-<td>-</td>
-<td>思维导图工具</td>
-</tr>
-<tr>
-<td>4</td>
-<td>chrome (工作用)</td>
-</tr>
-<tr>
-<td>5</td>
-<td>虚拟机</td>
-</tr>
-<tr>
-<td>6</td>
-<td>空</td>
-</tr>
-<tr>
-<td>7</td>
-<td>scrum 任务面板</td>
-</tr>
-<tr>
-<td>-</td>
-<td>WPS sheet</td>
-</tr>
-<tr>
-<td>8</td>
-<td>原型文档</td>
-</tr>
-<tr>
-<td>9</td>
-<td>IDE 2</td>
-</tr>
-<tr>
-<td>0</td>
-<td>音乐播放器</td>
-</tr>
-<tr>
-<td>-</td>
-<td>chrome 2</td>
-</tr>
-</tbody>
-</table>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
-<p>需要强调的是, 这个分类是根据个人的实际使用需求来定制的, 制订了一个分类后, 在实际使用的时候, 如果有不适或者更好的, 可以随时调整, 或者说不断迭代吧.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects" target="_blank" rel="external">http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1660,7 +1572,7 @@ dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apo
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-count">53</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1674,7 +1586,7 @@ dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apo
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-count">135</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

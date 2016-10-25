@@ -204,8 +204,8 @@
             
             
               
-                <a class="post-title-link" href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="url">
-                  JVM 常用GC算法简介
+                <a class="post-title-link" href="/2015/10/22/linux/tools/kill_sign/" itemprop="url">
+                  kill & signal
                 </a>
               
             
@@ -215,8 +215,114 @@
         <div class="post-meta">
           <span class="post-time">
             发表于
-            <time itemprop="dateCreated" datetime="2015-10-01T00:00:00+08:00" content="2015-10-01">
-              2015-10-01
+            <time itemprop="dateCreated" datetime="2015-10-22T00:00:00+08:00" content="2015-10-22">
+              2015-10-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/22/linux/tools/kill_sign/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/22/linux/tools/kill_sign/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="kill-命令"><a href="#kill-命令" class="headerlink" title="kill 命令"></a>kill 命令</h1><p>使用kill可以用来终止进程，不过先要获取进程PID（可以使用ps/pstree/top/pidof等工具），向该进程发送终止信号，例如：</p>
+<pre><code>kill -9 &lt;PID&gt;
+</code></pre><p><code>-9</code>应该是最多人认识的信号，更多的信号及其说明可使用<code>man 7 kill</code> 或者 <code>kill -l</code>查看：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ kill -l</div><div class="line"></div><div class="line"> 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP</div><div class="line"> 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1</div><div class="line">11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM</div><div class="line">16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP</div><div class="line">21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ</div><div class="line">26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR</div><div class="line">31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1	64) SIGRTMAX</div></pre></td></tr></table></figure>
+<p>使用manual：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ man 7 kill</div><div class="line"></div><div class="line">...</div><div class="line">Signal     Value     Action   Comment</div><div class="line">       ──────────────────────────────────────────────────────────────────────</div><div class="line">       SIGHUP        1       Term    Hangup detected on controlling terminal</div><div class="line">                                     or death of controlling process</div><div class="line">       SIGINT        2       Term    Interrupt from keyboard</div><div class="line">       SIGQUIT       3       Core    Quit from keyboard</div><div class="line">       SIGILL        4       Core    Illegal Instruction</div><div class="line">       SIGABRT       6       Core    Abort signal from abort(3)</div><div class="line">       SIGFPE        8       Core    Floating point exception</div><div class="line">       SIGKILL       9       Term    Kill signal</div><div class="line">       SIGSEGV      11       Core    Invalid memory reference</div><div class="line">       SIGPIPE      13       Term    Broken pipe: write to pipe with no</div><div class="line">                                     readers</div><div class="line">       SIGALRM      14       Term    Timer signal from alarm(2)</div><div class="line">       SIGTERM      15       Term    Termination signal</div><div class="line">       SIGUSR1   30,10,16    Term    User-defined signal 1</div><div class="line">       SIGUSR2   31,12,17    Term    User-defined signal 2</div><div class="line">       SIGCHLD   20,17,18    Ign     Child stopped or terminated</div><div class="line"></div><div class="line">       SIGCONT   19,18,25    Cont    Continue if stopped</div><div class="line">       SIGSTOP   17,19,23    Stop    Stop process</div><div class="line">       SIGTSTP   18,20,24    Stop    Stop typed at terminal</div><div class="line">       SIGTTIN   21,21,26    Stop    Terminal input for background process</div><div class="line">       SIGTTOU   22,22,27    Stop    Terminal output for background process</div></pre></td></tr></table></figure>
+<p>其实，一开始就<code>kill -9</code>不是一个好主意。默认的情况（不指定信号），kill会发送<code>SIGTERM</code>（信号15）给进程，如果一段时间后，仍未退出，才使用<code>SIGKILL</code>杀死进程。</p>
+<p>因此优秀的程序都会注册SIGTERM信号的处理函数，用以做一些进程退出的准备工作，例如释放资源/写回磁盘/打印重要日志等。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/10/12/java/lock__mysql_jpa/" itemprop="url">
+                  锁之MySQL和JPA
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-10-12T13:03:30+08:00" content="2015-10-12">
+              2015-10-12
             </time>
           </span>
 
@@ -241,8 +347,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="commentsCount"></span>
+                <a href="/2015/10/12/java/lock__mysql_jpa/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/12/java/lock__mysql_jpa/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -264,50 +370,30 @@
         
           <span itemprop="articleBody">
             
-              <p>在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.</p>
-<h1 id="可回收判断方法"><a href="#可回收判断方法" class="headerlink" title="可回收判断方法"></a>可回收判断方法</h1><hr>
-<p>在介绍回收算法前, 我们需要了解一下, 如何进行对象可回收的判断, 常见的有两种方法:</p>
-<h2 id="1-引用计数"><a href="#1-引用计数" class="headerlink" title="1 引用计数:"></a>1 引用计数:</h2><p>这个方法简单高效, 但是很难解决对象循环引用的问题</p>
-<h2 id="2-引用树-可达性分析"><a href="#2-引用树-可达性分析" class="headerlink" title="2 引用树 (可达性分析) :"></a>2 引用树 (可达性分析) :</h2><p>主流商用语言的主流实现中, 都是通过可达性分析(Reachability Analysis)实现的, 也有人称为引用树.<br>这个方法以<code>GC Roots</code>为起点, 当一个对象不能通过起点到达, 则说明次对象是可回收的.</p>
-<p><code>GC Roots</code>包括以下几种:</p>
-<ul>
-<li>虚拟机栈(栈帧中的本地变量表)引用的对象</li>
-<li>方法区中类静态属性引用的对象</li>
-<li>方法区中常常量引用的对象</li>
-<li>本地方法栈中JNI(Native方法)引用的对象</li>
-</ul>
-<p>当然, Java 引用再细说还分为<code>强引用 软引用 弱引用 虚引用</code>, 他们有特定的回收规则, 这里不再赘述.</p>
-<h1 id="mark-sweep-标记-清除算法"><a href="#mark-sweep-标记-清除算法" class="headerlink" title="mark-sweep 标记-清除算法"></a>mark-sweep 标记-清除算法</h1><hr>
-<p>首先介绍<code>标记-清除</code>算法, 顾名思义, 该算法分为两个阶段:</p>
-<ul>
-<li><p>标记<br>标记出需要回收的对象</p>
-</li>
-<li><p>清除<br>在标记完成后, 统一回收所有被标记的对象</p>
-</li>
-</ul>
-<p>用图来表示会直观一点, 我们首先定义以下图例:</p>
-<p><img src="/images/java/jvm-gc-algo-define-01.png" alt=""></p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-mark-sweep-01.png" alt=""></p>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>从这个回收过程看, 我们也可以发现有以下缺点:</p>
-<ul>
-<li>内存碎片问题<br>大量不连续的内存碎片, 如果碎片过多, 在需要分配大对象时, 无法满足连续的内存需求, 会导致提前触发GC.</li>
-</ul>
-<h1 id="copying-复制算法"><a href="#copying-复制算法" class="headerlink" title="copying 复制算法"></a>copying 复制算法</h1><hr>
-<p>为了解决低存活率内存区的效率问题, 出现了一种”复制”算法.<br>该算法将内存分为大小相同的两部分, 只使用其中的一块, 当其内存快用完时, 将存活对象复制到另外一块, 并将使用内存切换到另外另外一块, 同时原来的整个内存块进行回收. 这种方法不用考虑内存碎片问题, 简单高效(只需移动堆顶指针, 按序分配内存).</p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-copy-01.png" alt=""></p>
-<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><p>内存缩小到了原来的一半.</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>新生代的回收:</p>
-<p>因为新生代的对象98%都是朝生夕死(根据IBM的研究), 比如Hotspot虚拟机, 有一个大的eden内存区和两个survivor区, 运行时使用eden和其中一块survivor, 默认<code>8:1</code>的eden:survivor比例.<br>即是有10%的内存会被用作第二块survivor内存. 当然, 如果survivor空间不足时, 会有其他内存如老年代进行担保, 而且survivor也并不需要很大内存.</p>
-<h1 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h1><hr>
-<p>针对老年代, mark-compact (标记整理) 算法是比较适合的.<br>标记过程和<code>标记-清除</code>算法一样, 不过回收的时候, 是会让存活对象往一端移动, 再清理掉存货对象边界外的内存.</p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-mark-compact-01.png" alt=""></p>
-<h1 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h1><hr>
-<p>该算法主要思想是, 根据对象存活周期和其他特点的不同, 去选择适当的收集算法, 这个策略也在前面提到过了.<br>比如新生代存活比例小, 选择复制算法; 而老年代的存活比例高, 则采用”标记-清除”或”标记-整理”; 分代收集也算是顶层的指导策略了.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
+              <h2 id="今天"><a href="#今天" class="headerlink" title="今天"></a>今天</h2><p>今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，<br>当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。</p>
+<h2 id="MySQL-行级锁"><a href="#MySQL-行级锁" class="headerlink" title="MySQL 行级锁"></a>MySQL 行级锁</h2><p>行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。<br>（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）</p>
+<p>首先回顾一下大学的基础知识：<br>数据库的锁，是事务在某个数据对象（如表、行等）进行操作前，对数据库发起请求，对其加锁，<br>使其不被其他事务所修改。<br>基本的锁有两种：读锁和写锁。<br>写锁，也称排它锁（ExclusiveLock，也称X锁），若事务对数据D加了X锁，则其他事务不能读取和修改D。<br>读锁，也称共享锁（ShareLock，也称S锁），若事务对数据D加了S锁，则其他事务只能对D加S锁，不能修改D。</p>
+<h3 id="S-LOCK-在MySQL："><a href="#S-LOCK-在MySQL：" class="headerlink" title="S LOCK 在MySQL："></a>S LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_02.png" alt=""><br><img src="/images/mysql_x_lock_demo_04.png" alt=""><br>从上面的测试中可以发现，事务1（窗口1）加了S锁后，事务2不能加X锁和进行修改。<br>如果S锁一段时间后仍未释放就会超时，如下图：<br><img src="/images/mysql_x_lock_demo_03.png" alt=""></p>
+<h3 id="X-LOCK-在MySQL："><a href="#X-LOCK-在MySQL：" class="headerlink" title="X LOCK 在MySQL："></a>X LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_01.png" alt=""></p>
+<p>从上面的测试中可以发现，事务1加了X锁之后，事务2不能加S锁，但只要去掉<br><code>LOCK IN SHARE MODE</code>就可以查询了。</p>
+<p>其他的场景，可用以上SQL测试验证一下。<br>（注意：当用到索引时，MySql才会使用row-lock，否则table-lock。）</p>
+<h2 id="JPA-规范"><a href="#JPA-规范" class="headerlink" title="JPA 规范"></a>JPA 规范</h2><hr>
+<p>看完了锁在MySQL的实现，那在Java中如何使用呢？这里以spring+JPA为例（为了方便，使用了starter-jpa）：</p>
+<h3 id="JPA-锁相关规范"><a href="#JPA-锁相关规范" class="headerlink" title="JPA 锁相关规范"></a>JPA 锁相关规范</h3><p>在spring-data-jpa中，<code>@Lock + LockModeType</code> 可以为某个数据操作进行锁控制，比如用X锁：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Lock(LockModeType.PESSIMISTIC_WRITE)</div><div class="line">List&lt;MemberOrder&gt; findByOrderNo(String orderNo);</div></pre></td></tr></table></figure>
+<p>可以跑一下测试：</p>
+<ol>
+<li>使用上面的窗口二先加S锁，不commit。</li>
+<li>然后调用findByOrderNo()查询。</li>
+<li>可以发现，程序抛出LockAcquisitionException异常，不能获取锁，等待超时，如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Caused by: org.hibernate.exception.LockAcquisitionException: could not extract ResultSet</div><div class="line">        at org.hibernate.dialect.MySQLDialect$1.convert(MySQLDialect.java:451)</div><div class="line">        ...</div><div class="line">Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</div><div class="line">        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</div><div class="line">        at java.lang.reflect.Constructor.newInstance(Constructor.java:422)</div><div class="line">        at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)</div><div class="line">        at com.mysql.jdbc.Util.getInstance(Util.java:387)</div><div class="line">        at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:946)</div><div class="line">        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3878)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRowFast(MysqlIO.java:2090)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRow(MysqlIO.java:1964)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readSingleRowSet(MysqlIO.java:3306)</div><div class="line">        atannotation com.mysql.jdbc.MysqlIO.getResultSet(MysqlIO.java:463)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readResultsForQueryOrUpdate(MysqlIO.java:3040)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readAllResults(MysqlIO.java:2288)</div><div class="line">        at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2681)</div><div class="line">        at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2551)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeQuery(PreparedStatement.java:1962)</div><div class="line">        at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.extract(ResultSetReturnImpl.java:82)</div><div class="line">        ... 64 more</div></pre></td></tr></table></figure>
+<p>现在来看Lock和LockModeType，Lock是spring-data的annotation，<br>LockModeType属于JPA规范，可作为EntityManager的方法参数传入或者使用Query.setLockMode()或TypedQuery.setLockMode()进行设置。<br>当然使用spring-data的话，直接使用@Lock即可，如果对细节感兴趣，可以去看spring-data的源码。<br>LockModeType是一个enum，它包括：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">READ：同OPTIMISTIC</div><div class="line">WRITE：同OPTIMISTIC_FORCE_INCREMENT</div><div class="line">OPTIMISTIC：乐观锁</div><div class="line">OPTIMISTIC_FORCE_INCREMENT：乐观锁，带版本更新</div><div class="line">PESSIMISTIC_READ：悲观读 （MySQL对应： `lock in share mode`）</div><div class="line">PESSIMISTIC_WRITE：悲观写 （MySQL对应： `for update`）</div><div class="line">PESSIMISTIC_FORCE_INCREMENT：悲观写，带版本更新</div></pre></td></tr></table></figure>
+<p>上面涉及到了悲观锁和乐观锁：<br>所谓悲观锁，就是对数据被其他事务修改的概率保持悲观态度，<br>因此在处理过程中，都将数据锁定。<br>而乐观锁，反过来即是保持乐观态度，认为数据被其他事务修改的概率是较低的，所以在真正提交更新的时候，<br>才去检测数据是否冲突，实现方式可以是版本号或者时间戳，这里不再赘述。</p>
+<p>悲观锁能严格保证数据的正确性，但凡事有利必有弊，很多事情我们都需要去平衡。<br>如果一个并发冲突的概率不高，而使用悲观锁，会对数据库性能开销影响比较大。<br>除此之外，良好的设计也可有效地避免一些并发问题。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
+<p>【1】 <a href="https://spring.io/guides/gs/accessing-data-jpa/" target="_blank" rel="external">https://spring.io/guides/gs/accessing-data-jpa/</a><br>【2】 <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html" target="_blank" rel="external">http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html</a><br>【3】 <a href="https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html</a></p>
 
             
           </span>
@@ -417,6 +503,147 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
 <p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
 <h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="url">
+                  JVM 常用GC算法简介
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-10-01T00:00:00+08:00" content="2015-10-01">
+              2015-10-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.</p>
+<h1 id="可回收判断方法"><a href="#可回收判断方法" class="headerlink" title="可回收判断方法"></a>可回收判断方法</h1><hr>
+<p>在介绍回收算法前, 我们需要了解一下, 如何进行对象可回收的判断, 常见的有两种方法:</p>
+<h2 id="1-引用计数"><a href="#1-引用计数" class="headerlink" title="1 引用计数:"></a>1 引用计数:</h2><p>这个方法简单高效, 但是很难解决对象循环引用的问题</p>
+<h2 id="2-引用树-可达性分析"><a href="#2-引用树-可达性分析" class="headerlink" title="2 引用树 (可达性分析) :"></a>2 引用树 (可达性分析) :</h2><p>主流商用语言的主流实现中, 都是通过可达性分析(Reachability Analysis)实现的, 也有人称为引用树.<br>这个方法以<code>GC Roots</code>为起点, 当一个对象不能通过起点到达, 则说明次对象是可回收的.</p>
+<p><code>GC Roots</code>包括以下几种:</p>
+<ul>
+<li>虚拟机栈(栈帧中的本地变量表)引用的对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常常量引用的对象</li>
+<li>本地方法栈中JNI(Native方法)引用的对象</li>
+</ul>
+<p>当然, Java 引用再细说还分为<code>强引用 软引用 弱引用 虚引用</code>, 他们有特定的回收规则, 这里不再赘述.</p>
+<h1 id="mark-sweep-标记-清除算法"><a href="#mark-sweep-标记-清除算法" class="headerlink" title="mark-sweep 标记-清除算法"></a>mark-sweep 标记-清除算法</h1><hr>
+<p>首先介绍<code>标记-清除</code>算法, 顾名思义, 该算法分为两个阶段:</p>
+<ul>
+<li><p>标记<br>标记出需要回收的对象</p>
+</li>
+<li><p>清除<br>在标记完成后, 统一回收所有被标记的对象</p>
+</li>
+</ul>
+<p>用图来表示会直观一点, 我们首先定义以下图例:</p>
+<p><img src="/images/java/jvm-gc-algo-define-01.png" alt=""></p>
+<p>算法工作过程如下:</p>
+<p><img src="/images/java/jvm-gc-algo-mark-sweep-01.png" alt=""></p>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>从这个回收过程看, 我们也可以发现有以下缺点:</p>
+<ul>
+<li>内存碎片问题<br>大量不连续的内存碎片, 如果碎片过多, 在需要分配大对象时, 无法满足连续的内存需求, 会导致提前触发GC.</li>
+</ul>
+<h1 id="copying-复制算法"><a href="#copying-复制算法" class="headerlink" title="copying 复制算法"></a>copying 复制算法</h1><hr>
+<p>为了解决低存活率内存区的效率问题, 出现了一种”复制”算法.<br>该算法将内存分为大小相同的两部分, 只使用其中的一块, 当其内存快用完时, 将存活对象复制到另外一块, 并将使用内存切换到另外另外一块, 同时原来的整个内存块进行回收. 这种方法不用考虑内存碎片问题, 简单高效(只需移动堆顶指针, 按序分配内存).</p>
+<p>算法工作过程如下:</p>
+<p><img src="/images/java/jvm-gc-algo-copy-01.png" alt=""></p>
+<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><p>内存缩小到了原来的一半.</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>新生代的回收:</p>
+<p>因为新生代的对象98%都是朝生夕死(根据IBM的研究), 比如Hotspot虚拟机, 有一个大的eden内存区和两个survivor区, 运行时使用eden和其中一块survivor, 默认<code>8:1</code>的eden:survivor比例.<br>即是有10%的内存会被用作第二块survivor内存. 当然, 如果survivor空间不足时, 会有其他内存如老年代进行担保, 而且survivor也并不需要很大内存.</p>
+<h1 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h1><hr>
+<p>针对老年代, mark-compact (标记整理) 算法是比较适合的.<br>标记过程和<code>标记-清除</code>算法一样, 不过回收的时候, 是会让存活对象往一端移动, 再清理掉存货对象边界外的内存.</p>
+<p>算法工作过程如下:</p>
+<p><img src="/images/java/jvm-gc-algo-mark-compact-01.png" alt=""></p>
+<h1 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h1><hr>
+<p>该算法主要思想是, 根据对象存活周期和其他特点的不同, 去选择适当的收集算法, 这个策略也在前面提到过了.<br>比如新生代存活比例小, 选择复制算法; 而老年代的存活比例高, 则采用”标记-清除”或”标记-整理”; 分代收集也算是顶层的指导策略了.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
+
             
           </span>
         
@@ -1510,289 +1737,6 @@ sudo vim /etc/monit/monitrc
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/03/30/python/python_scrapy_get_started/" itemprop="url">
-                  python scrapy 爬虫初体验
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-03-30T00:00:00+08:00" content="2015-03-30">
-              2015-03-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/python/" itemprop="url" rel="index">
-                    <span itemprop="name">python</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/03/30/python/python_scrapy_get_started/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/30/python/python_scrapy_get_started/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>之前写爬虫都是用Java，换成Python来写，开发速度应该会更快，今天就来试试。</p>
-<h1 id="初体验"><a href="#初体验" class="headerlink" title="初体验"></a>初体验</h1><hr>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><hr>
-<p>首先，安装Python（for Ubuntu）:</p>
-<pre><code>sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev
-</code></pre><p>安装<a href="https://pip.pypa.io/en/latest/installing/" target="_blank" rel="external">pip</a>，pip类似Java的Maven</p>
-<p>安装使用虚拟环境：</p>
-<pre><code>sudo pip install virtualenv
-virtualenv foo_env
-source ./foo_env/bin/active
-</code></pre><p>安装scrapy：</p>
-<pre><code>pip install scrapy
-</code></pre><h1 id="scrapy-架构"><a href="#scrapy-架构" class="headerlink" title="scrapy 架构"></a>scrapy 架构</h1><p>Scrapy 的架构图如下所示，有个大概的印象即可，以后会陆续使用到：</p>
-<p><img src="/images/scrapy_architecture.png" alt=""></p>
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><hr>
-<p>写一个小爬虫，来获取一个网页的所有图片：</p>
-<p>进入一个新建目录，生成项目结构：</p>
-<pre><code>scrapy startproject hello
-</code></pre><p>目录结构：</p>
-<pre><code>.
-├── hello
-│   ├── __init__.py
-│   ├── items.py
-│   ├── pipelines.py
-│   ├── settings.py
-│   └── spiders
-│       └── __init__.py
-└── scrapy.cfg
-</code></pre><p>首先，我们定义要crawl的东西，会把它封装成一个Item，传递给框架的其他组件处理：</p>
-<p><code>hello/items.py</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import scrapy</div><div class="line"></div><div class="line"></div><div class="line">class HelloItem(scrapy.Item):</div><div class="line">    # define the fields for your item here like:</div><div class="line">    link = scrapy.Field()</div></pre></td></tr></table></figure>
-<p>这个Item只定义了一个属性<code>link</code>，来保存图片链接。</p>
-<p>接下来编写Spider：</p>
-<p>新建<code>hello/spiders/img_spider.py</code></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><div class="line"><span class="keyword">from</span> hello.items <span class="keyword">import</span> HelloItem</div><div class="line"></div><div class="line">__author__ = <span class="string">'niko'</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> scrapy</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloSpider</span><span class="params">(scrapy.Spider)</span>:</span></div><div class="line">    name = <span class="string">"img"</span></div><div class="line">    allowed_domains = [<span class="string">"moegirl.org"</span>]</div><div class="line">    start_urls = [</div><div class="line">        <span class="string">"https://zh.moegirl.org/index.php?title=%E7%BB%AB%E6%B3%A2%E4%B8%BD&amp;mobileaction=toggle_view_desktop"</span>,</div><div class="line">    ]</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></div><div class="line">        title = response.xpath(<span class="string">'//title/text()'</span>).extract()[<span class="number">0</span>]</div><div class="line">        <span class="comment"># TODO make dir with value of title</span></div><div class="line">        items = []</div><div class="line">        <span class="keyword">for</span> image_link <span class="keyword">in</span> response.xpath(<span class="string">'//img/@src'</span>).extract():</div><div class="line">            item = HelloItem()</div><div class="line">            item[<span class="string">'link'</span>] = image_link</div><div class="line">            items.append(item)</div><div class="line">        <span class="keyword">return</span> items</div></pre></td></tr></table></figure>
-<p>上面的代码是使用xpath的选择器，简单的选取了<code>img</code>标签的src属性，并构造了HelloItem实例，传递给框架的pipelines来处理，下面我们看一下pipelines：</p>
-<p><code>hello/pipelines.py</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class HelloPipeline(object):</div><div class="line">    def process_item(self, item, spider):</div><div class="line">        print &apos;\n\n processing image =&gt; &apos; + item[&apos;link&apos;]</div><div class="line">        return item</div></pre></td></tr></table></figure>
-<p>上面定义了一个HelloPipeline，第二个参数<code>item</code>就是我们刚才构造的HelloItem；在process_item()方法中，我们通常会做如下处理：</p>
-<ul>
-<li>清洗数据</li>
-<li>验证数据</li>
-<li>数据去重</li>
-<li>持久化数据</li>
-<li>～～～</li>
-</ul>
-<p>写好自定义的Pipeline之后，我们还需要在<code>settings.py</code>注册：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ITEM_PIPELINES = &#123;</div><div class="line">   &apos;hello.pipelines.HelloPipeline&apos;: 300</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>300</code>是多个pipelines执行的顺序值。</p>
-<p>现在可以执行刚才定义的<code>img</code>小蜘蛛了：</p>
-<pre><code>scrapy crawl img
-</code></pre><p>在console可以看到我们我们爬取网页的所有图片URL了。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在这个小例子中，只涉及到了架构图中的Spider和Pipeline，这些middleware还需要更深入的学习和实践。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="http://doc.scrapy.org/en/latest/intro/tutorial.html" target="_blank" rel="external">http://doc.scrapy.org/en/latest/intro/tutorial.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/03/03/java/slf4j/" itemprop="url">
-                  slf4j 绑定机制浅析
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-03-03T00:00:00+08:00" content="2015-03-03">
-              2015-03-03
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/03/03/java/slf4j/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/03/java/slf4j/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。</p>
-<p>可能你还是要问， 为什么要使用slf4j呢？<br>举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。<br>现在你想换成logback或其他的日志实现，你就需要修改100个地方。<br>而如果使用slf4j来写入日志，因为多了一层绑定的过程，你只要切换你的依赖即可。</p>
-<p>使用slf4j很简单，只要加入slf4j-api-xxx.jar、第三方日志实现及其binding包的依赖即可。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;!-- slf4j api --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;slf4j.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback binding --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback impl --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<p>接下来， 你就可以“hello world”啦！</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import org.slf4j.Logger;</div><div class="line">import org.slf4j.LoggerFactory;</div><div class="line"></div><div class="line">public class HelloWorld &#123;</div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    Logger logger = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line">    logger.info(&quot;Hello World&quot;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>根据slf4j的介绍，</p>
-<blockquote>
-<p>each SLF4J binding is hardwired at compile time to use one and only one specific logging framework</p>
-</blockquote>
-<p>它是静态绑定的， 接下来，让我们一起来揭开绑定的神秘面纱吧。</p>
-<h2 id="绑定原理"><a href="#绑定原理" class="headerlink" title="绑定原理"></a>绑定原理</h2><p>这是官网的一张图, 这里展示了常见的一些log实现和绑定：</p>
-<p><img src="/images/slf4j-concrete-bindings.png" alt=""></p>
-<p>前面说过， slf4j是在静态绑定， 为什么这么说呢？ 答案就在绑定实现的包中， 如下：</p>
-<p>logback-classic.jar<br><img src="/images/logback-jar.png" alt=""></p>
-<p>slf4j-log4j.jar<br><img src="/images/slf4j-log4j.png" alt=""></p>
-<p>如上图，可以发现都有<code>org.slf4j.impl.StaticLoggerBinder</code>,<br>再看LoggerFactory.getLogger()时，即<code>org.slf4j.LoggerFactory.getILoggerFactory</code>的调用hierarchy：</p>
-<p><img src="/images/slf4j_LoggerFactory_bind_called.png" alt=""></p>
-<p>其中bind()内部是我们想要的：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">private final static void bind() &#123;</div><div class="line">  try &#123;</div><div class="line">    Set staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();</div><div class="line">    reportMultipleBindingAmbiguity(staticLoggerBinderPathSet);</div><div class="line">    // the next line does the binding</div><div class="line">    StaticLoggerBinder.getSingleton();</div><div class="line">    INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;</div><div class="line">    reportActualBinding(staticLoggerBinderPathSet);</div><div class="line">    emitSubstituteLoggerWarning();</div><div class="line">  &#125; catch (NoClassDefFoundError ncde) &#123;</div><div class="line">    String msg = ncde.getMessage();</div><div class="line">    if (messageContainsOrgSlf4jImplStaticLoggerBinder(msg)) &#123;</div><div class="line">      INITIALIZATION_STATE = NOP_FALLBACK_INITIALIZATION;</div><div class="line">      Util.report(&quot;Failed to load class \&quot;org.slf4j.impl.StaticLoggerBinder\&quot;.&quot;);</div><div class="line">      Util.report(&quot;Defaulting to no-operation (NOP) logger implementation&quot;);</div><div class="line">      Util.report(&quot;See &quot; + NO_STATICLOGGERBINDER_URL</div><div class="line">              + &quot; for further details.&quot;);</div><div class="line">    &#125; else &#123;</div><div class="line">      failedBinding(ncde);</div><div class="line">      throw ncde;</div><div class="line">    &#125;</div><div class="line">  &#125; catch (java.lang.NoSuchMethodError nsme) &#123;</div><div class="line">    String msg = nsme.getMessage();</div><div class="line">    if (msg != null &amp;&amp; msg.indexOf(&quot;org.slf4j.impl.StaticLoggerBinder.getSingleton()&quot;) != -1) &#123;</div><div class="line">      INITIALIZATION_STATE = FAILED_INITIALIZATION;</div><div class="line">      Util.report(&quot;slf4j-api 1.6.x (or later) is incompatible with this binding.&quot;);</div><div class="line">      Util.report(&quot;Your binding is version 1.5.5 or earlier.&quot;);</div><div class="line">      Util.report(&quot;Upgrade your binding to version 1.6.x.&quot;);</div><div class="line">    &#125;</div><div class="line">    throw nsme;</div><div class="line">  &#125; catch (Exception e) &#123;</div><div class="line">    failedBinding(e);</div><div class="line">    throw new IllegalStateException(&quot;Unexpected initialization failure&quot;, e);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如代码，绑定方法bind()，首先通过<code>findPossibleStaticLoggerBinderPathSet()：staticLoggerBinderPathSet</code>来获取classpath中可能的binder paths, 如下：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Enumeration&lt;URL&gt; ClassLoader.getSystemResources(String STATIC_LOGGER_BINDER_PATH)</div></pre></td></tr></table></figure></p>
-<p>其中STATIC_LOGGER_BINDER_PATH = “org/slf4j/impl/StaticLoggerBinder.class”。</p>
-<h3 id="多个绑定存在的情况"><a href="#多个绑定存在的情况" class="headerlink" title="多个绑定存在的情况"></a>多个绑定存在的情况</h3><p>当发生多个绑定同时存在时，官方的说明是这样的：</p>
-<blockquote>
-<p>The warning emitted by SLF4J is just that, a warning. Even when multiple bindings are present, SLF4J will pick one logging framework/implementation and bind with it. The way SLF4J picks a binding is determined by the JVM and for all practical purposes should be considered random.</p>
-</blockquote>
-<p>实际运行结果并结合以上代码，当返回的URL有多个时，reportMultipleBindingAmbiguity()会打印出警告：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class path contains multiple SLF4J bindings.</div><div class="line">Found binding in [jar:file:/home/niko/.m2/repository/.../logback-classic-1.1.3.jar!/org/slf4j/impl/StaticLoggerBinder.class[]</div><div class="line">Found binding in [...]</div></pre></td></tr></table></figure>
-<p>然后reportActualBinding()再打印出真正被加载的<code>StaticLoggerBinder</code>的class name，比如：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]</div></pre></td></tr></table></figure></p>
-<p>为了避免这种问题，可以使用maven的全局排除依赖来保证只会出现某一个实现。</p>
-<blockquote>
-<p>more info -&gt; <a href="http://www.slf4j.org/codes.html" target="_blank" rel="external">http://www.slf4j.org/codes.html</a></p>
-</blockquote>
-<h2 id="MDC-Mapped-Diagnostic-Context"><a href="#MDC-Mapped-Diagnostic-Context" class="headerlink" title="MDC (Mapped Diagnostic Context )"></a>MDC (Mapped Diagnostic Context )</h2><p>这个功能只有log4j和logback支持。<br>具体内容请查看log4j和logback部分。</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1835,7 +1779,7 @@ source ./foo_env/bin/active
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-count">53</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1849,7 +1793,7 @@ source ./foo_env/bin/active
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-count">135</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

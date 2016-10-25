@@ -204,6 +204,323 @@
             
             
               
+                <a class="post-title-link" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="url">
+                  deploy spring-boot as war file
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-02T00:00:00+08:00" content="2016-05-02">
+              2016-05-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?</p>
+<p>spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.</p>
+<p>下面介绍war方式部署:</p>
+<h1 id="pom-xml-修改"><a href="#pom-xml-修改" class="headerlink" title="pom.xml 修改"></a>pom.xml 修改</h1><hr>
+<p>首先把打包类型修改为: <code>&lt;packaging&gt;war&lt;/packaging&gt;</code></p>
+<p>接着修改<code>spring-boot-starter-tomcat</code>为<code>provided</code>的scope, 避免打包到war中:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;provided&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- ... --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li><strong>注意:</strong></li>
+</ul>
+<p><code>boot-start</code>版本要高于<code>1.3</code>, 否则使用tomcat启动会出现异常.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h1 id="部署到-Servlet-3-0-规范的容器"><a href="#部署到-Servlet-3-0-规范的容器" class="headerlink" title="部署到 Servlet 3.0 规范的容器"></a>部署到 Servlet 3.0 规范的容器</h1><hr>
+<p>如果你的web容器支持<code>Servlet 3.0</code>规范, 可以使用以下的方法:</p>
+<p>首先继承<code>SpringBootServletInitializer</code>, 并覆写<code>configure</code>方法, 不需要<code>web.xml</code>.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableAutoConfiguration</div><div class="line">@ComponentScan</div><div class="line">public class Application extends SpringBootServletInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) &#123;</div><div class="line">        // Customize the application or call application.sources(...) to add sources</div><div class="line">        // Since our example is itself a @Configuration class we actually don&apos;t</div><div class="line">        // need to override this method.</div><div class="line">        return application.sources(SampleControllerAndApp.class);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="部署到旧的容器-Servlet-2-5"><a href="#部署到旧的容器-Servlet-2-5" class="headerlink" title="部署到旧的容器 (Servlet 2.5)"></a>部署到旧的容器 (Servlet 2.5)</h1><p>如果你的容器不支持servlet 3.0规范怎么办 ? 下面是一个解决方法:</p>
+<ul>
+<li><p>1<br>增加一个<code>org.springframework.boot:spring-boot-legacy</code>依赖</p>
+</li>
+<li><p>2<br>创建<code>web.xml</code>, 用以声明<code>context listener</code>, 这个listener是<code>org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener</code>, 是在<code>spring-boot</code>下特别使用的, 其他配置和正常spring应用一样. <code>web.xml</code> 如下:</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app version=&quot;2.5&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context-param&gt;</div><div class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</div><div class="line">        &lt;param-value&gt;demo.Application&lt;/param-value&gt;</div><div class="line">    &lt;/context-param&gt;</div><div class="line"></div><div class="line">    &lt;listener&gt;</div><div class="line">        &lt;listener-class&gt;org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener&lt;/listener-class&gt;</div><div class="line">    &lt;/listener&gt;</div><div class="line"></div><div class="line">    &lt;filter&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;</div><div class="line">    &lt;/filter&gt;</div><div class="line"></div><div class="line">    &lt;filter-mapping&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</div><div class="line">    &lt;/filter-mapping&gt;</div><div class="line"></div><div class="line">    &lt;servlet&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</div><div class="line">        &lt;init-param&gt;</div><div class="line">            &lt;param-name&gt;contextAttribute&lt;/param-name&gt;</div><div class="line">            &lt;param-value&gt;org.springframework.web.context.WebApplicationContext.ROOT&lt;/param-value&gt;</div><div class="line">        &lt;/init-param&gt;</div><div class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</div><div class="line">    &lt;/servlet&gt;</div><div class="line"></div><div class="line">    &lt;servlet-mapping&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</div><div class="line">    &lt;/servlet-mapping&gt;</div><div class="line"></div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file" target="_blank" rel="external">howto-create-a-deployable-war-file</a><br><a href="http://docs.spring.io/spring-boot/docs/current/maven-plugin/" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/maven-plugin/</a><br><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/05/01/linux/practice/my_workspace_management/" itemprop="url">
+                  我的workspace管理之道
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-05-01T00:03:30+08:00" content="2016-05-01">
+              2016-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/01/linux/practice/my_workspace_management/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/linux/practice/my_workspace_management/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.</p>
+<p>workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.</p>
+<p>为什么这么说呢? 因为我的每个workspace都固定放了不同的工具, 而且不超过2个(保证同一个workspace我可以使用<code>alt+tab</code>快速切换), 这样我不用费时费力去找我要的窗口.</p>
+<p>这样分好类后再加上无敌科学的快捷键, 持之以恒形成条件反射, 外人看来那操作简直碉堡.</p>
+<p>事不宜迟, 赶紧看一下是这个小技巧.</p>
+<h1 id="设置快捷键"><a href="#设置快捷键" class="headerlink" title="设置快捷键"></a>设置快捷键</h1><hr>
+<p>首先我们需要设置用到的快捷键:</p>
+<p>在<code>System Settings</code>的<code>Keyboard</code>中, 可以设置workspace 1-4 的快捷切换键.</p>
+<p>我习惯使用<code>ctrl + 1234</code>, 缺点就是每天感觉在打魔兽, 懂行的一定知道为什么选择这个键.</p>
+<p>如果想用4个以上的workspace点算啊?</p>
+<p>莫担心, 比如我使用的是gnome, 可以这样:</p>
+<pre><code>$ dconf read /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
+[&apos;&lt;Primary&gt;4&apos;]
+</code></pre><p>读出值是: <code>&#39;&lt;Primary&gt;4&#39;</code></p>
+<p>同样的, 我们把workspace 5的键值写入相应的workspace:</p>
+<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
+</code></pre><p>同理, 其他workspace也是这样设置, 为了造福网友, 这里还是贴一下:</p>
+<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-6 &quot;[&apos;&lt;Primary&gt;6&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-7 &quot;[&apos;&lt;Primary&gt;7&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-8 &quot;[&apos;&lt;Primary&gt;8&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-9 &quot;[&apos;&lt;Primary&gt;9&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apos;&lt;Primary&gt;0&apos;]&quot;
+</code></pre><p>当然还有移动窗口（把当前窗口移动到某个工作区）的快捷键设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-1  &quot;[&apos;&lt;Alt&gt;1&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-2  &quot;[&apos;&lt;Alt&gt;2&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-3  &quot;[&apos;&lt;Alt&gt;3&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-4  &quot;[&apos;&lt;Alt&gt;4&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-5  &quot;[&apos;&lt;Alt&gt;5&apos;]&quot;</div></pre></td></tr></table></figure>
+<h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
+<p>接下来是工作区的分类, 主要关注每个工作区放置什么工具. 有了这些分类, 切换工具几乎不用时间思考和寻找了.<br>以下是我常用的分类:</p>
+<table>
+<thead>
+<tr>
+<th>workspace</th>
+<th>放置的工具</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>terminator 控制台 &amp; file manger</td>
+</tr>
+<tr>
+<td>-</td>
+<td>PDF reader</td>
+</tr>
+<tr>
+<td>2</td>
+<td>IDE</td>
+</tr>
+<tr>
+<td>3</td>
+<td>博客/笔记工具</td>
+</tr>
+<tr>
+<td>-</td>
+<td>思维导图工具</td>
+</tr>
+<tr>
+<td>4</td>
+<td>chrome (工作用)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>虚拟机</td>
+</tr>
+<tr>
+<td>6</td>
+<td>空</td>
+</tr>
+<tr>
+<td>7</td>
+<td>scrum 任务面板</td>
+</tr>
+<tr>
+<td>-</td>
+<td>WPS sheet</td>
+</tr>
+<tr>
+<td>8</td>
+<td>原型文档</td>
+</tr>
+<tr>
+<td>9</td>
+<td>IDE 2</td>
+</tr>
+<tr>
+<td>0</td>
+<td>音乐播放器</td>
+</tr>
+<tr>
+<td>-</td>
+<td>chrome 2</td>
+</tr>
+</tbody>
+</table>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>需要强调的是, 这个分类是根据个人的实际使用需求来定制的, 制订了一个分类后, 在实际使用的时候, 如果有不适或者更好的, 可以随时调整, 或者说不断迭代吧.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects" target="_blank" rel="external">http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="url">
                   用tensorflow训练识别手写数字的CNN模型
                 </a>
@@ -1256,254 +1573,6 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/03/01/java/dist/disconf_1_server/" itemprop="url">
-                  disconf - 【1】 server 搭建
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-03-01T00:00:00+08:00" content="2016-03-01">
-              2016-03-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/03/01/java/dist/disconf_1_server/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/01/java/dist/disconf_1_server/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>disconf是分布式配置管理服务平台，目前已经在 百度、滴滴出行、银联、网易、拉勾网、苏宁易购等公司使用，专注于解决分布式环境下的配置管理。</p>
-<h1 id="部署web-server："><a href="#部署web-server：" class="headerlink" title="部署web server："></a>部署web server：</h1><hr>
-<p>要使用disconf，首先需要搭建disconf服务端先，不过先把项目clone下来：</p>
-<pre><code>git clone https://github.com/knightliao/disconf
-</code></pre><h2 id="准备配置文件"><a href="#准备配置文件" class="headerlink" title="准备配置文件"></a>准备配置文件</h2><pre><code>mkdir /home/work/dsp/disconf-rd/online-resources
-mkdir /home/work/dsp/disconf-rd/war
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd  $DISCONF_HOME/disconf-web/</div><div class="line">cp  profile/rd/application-demo.properties /home/work/dsp/disconf-rd/online-resources/application.properties</div><div class="line">cp  profile/rd/jdbc-mysql.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/redis-config.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/zoo.properties /home/work/dsp/disconf-rd/online-resources/</div></pre></td></tr></table></figure>
-<h2 id="build-amp-deploy"><a href="#build-amp-deploy" class="headerlink" title="build &amp; deploy"></a>build &amp; deploy</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ONLINE_CONFIG_PATH=/home/work/dsp/disconf-rd/online-resources</div><div class="line">WAR_ROOT_PATH=/home/work/dsp/disconf-rd/war</div><div class="line">export ONLINE_CONFIG_PATH</div><div class="line">export WAR_ROOT_PATH</div><div class="line">cd disconf-web</div><div class="line">sh deploy/deploy.sh</div></pre></td></tr></table></figure>
-<h2 id="准备mysql"><a href="#准备mysql" class="headerlink" title="准备mysql"></a>准备mysql</h2><p>修改mysql用户和密码：</p>
-<pre><code>vim /home/work/dsp/disconf-rd/online-resources/jdbc-mysql.properties
-</code></pre><p>初始化数据库：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; source 0-init_table.sql</div><div class="line">mysql&gt; source 1-init_data.sql</div><div class="line">mysql&gt; source 201512/20151225.sql</div></pre></td></tr></table></figure></p>
-<h2 id="准备Redis"><a href="#准备Redis" class="headerlink" title="准备Redis"></a>准备Redis</h2><p>默认配置，启动就行了。参考官方文档：<a href="http://redis.io/download" target="_blank" rel="external">http://redis.io/download</a></p>
-<h2 id="准备zookeeper"><a href="#准备zookeeper" class="headerlink" title="准备zookeeper"></a>准备zookeeper</h2><p>默认的disconf的zookeeper客户端配置是三个实例的，如果只是为了体验disconf，可以改成standalone的配置。<br>修改zookeeper服务器的<code>clientPort</code>，使和disconf的zkClient配置一致：</p>
-<p>vim $ZK_HOME/conf/zoo.cfg</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">##############</div><div class="line">clientPort=8581</div><div class="line">##############</div></pre></td></tr></table></figure>
-<p>其他同理（127.0.0.1:8582,127.0.0.1:8583…）。</p>
-<h2 id="准备tomcat"><a href="#准备tomcat" class="headerlink" title="准备tomcat"></a>准备tomcat</h2><p>vim $TOMCAT_HOME/conf/server.xml<br>在Host结点下增加：</p>
-<pre><code>&lt;Context path=&quot;&quot; docBase=&quot;/home/work/dsp/disconf-rd/war&quot;&gt;&lt;/Context&gt;
-</code></pre><p>访问端口设为<code>8015</code>。</p>
-<h2 id="准备nginx"><a href="#准备nginx" class="headerlink" title="准备nginx"></a>准备nginx</h2><p>vim /path/nginx.conf</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">upstream disconf &#123;</div><div class="line">    server 127.0.0.1:8015;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line"></div><div class="line">    listen   8081;</div><div class="line">    server_name localhost;</div><div class="line">    access_log /home/work/var/logs/disconf/access.log;</div><div class="line">    error_log /home/work/var/logs/disconf/error.log;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root /home/work/dsp/disconf-rd/war/html;</div><div class="line">        # niko , use alias if root not working</div><div class="line">        # alias /home/work/dsp/disconf-rd/war/html/;</div><div class="line">        if ($query_string) &#123;</div><div class="line">            expires max;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location ~ ^/(api|export) &#123;</div><div class="line">        proxy_pass_header Server;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line">        proxy_set_header X-Real-IP $remote_addr;</div><div class="line">        proxy_set_header X-Scheme $scheme;</div><div class="line">        proxy_pass http://disconf;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>记得要</p>
-<pre><code>mkdir /home/work/var/logs/disconf/ -p
-</code></pre><p>如果没有该目录，无法访问页面。</p>
-<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>完成以上的搭建后，访问<code>http://localhost:8081/main.html</code>，就可以看到管理页面了（账号密码是<code>admin/admin</code>）。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="https://github.com/knightliao/disconf" target="_blank" rel="external">https://github.com/knightliao/disconf</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/02/22/git/git-prevent-push-master-by-hook/" itemprop="url">
-                  Git钩子Script之客户端`pre-push`
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-02-22T00:00:00+08:00" content="2016-02-22">
-              2016-02-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/02/22/git/git-prevent-push-master-by-hook/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/22/git/git-prevent-push-master-by-hook/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>有个童鞋说，老是会忘记当前分支和误推了master，有没有办法防止这种低级错误。好吧，发生这种事，其实是那个repo没有设置服务器钩子脚本，来防止客户端的推送操作（我们用的不是gitlab，没有那种功能，暂时是人为终端控制）。<code>%&gt;_&lt;%</code>，我们要实现童鞋想要的功能，需要使用到 git hook scripts，git hook scripts又分为客户端和服务器端两种：</p>
-<p><code>client side</code></p>
-<ul>
-<li>pre-commit</li>
-<li>prepare-commit-msg</li>
-<li>commit-msg</li>
-<li>post-commit</li>
-<li>post-merge</li>
-<li>pre-push<br>…</li>
-</ul>
-<p><code>server side</code></p>
-<ul>
-<li>pre-receive</li>
-<li>update</li>
-<li>post-receive</li>
-</ul>
-<p>博客后面的链接【1】可以了解所有的script，这里需要的是叫做<code>pre-push</code>的script。</p>
-<h1 id="pre-push"><a href="#pre-push" class="headerlink" title="pre-push"></a>pre-push</h1><p>首先，我们把工作目录切到git repo的根目录，然后编写<code>.git/hooks/pre-push</code>文件：</p>
-<pre><code>vim .git/hooks/pre-push
-</code></pre><p>文件内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"># Prevents force-pushing to master.</div><div class="line"># Based on: https://gist.github.com/pixelhandler/5718585</div><div class="line"># Install:</div><div class="line"># cd path/to/git/repo</div><div class="line"># curl -fL -o .git/hooks/pre-push https://gist.githubusercontent.com/stefansundin/d465f1e331fc5c632088/raw/pre-push</div><div class="line"># chmod +x .git/hooks/pre-push</div><div class="line"></div><div class="line">BRANCH=`git rev-parse --abbrev-ref HEAD`</div><div class="line">PUSH_COMMAND=`ps -ocommand= -p $PPID`</div><div class="line"></div><div class="line">if [[ &quot;$BRANCH&quot; == &quot;master&quot; &amp;&amp; &quot;$PUSH_COMMAND&quot; =~ push|force|delete|-f ]]; then</div><div class="line">  echo &quot;Prevented force-push to $BRANCH. This is a very dangerous command.&quot;</div><div class="line">  echo &quot;If you really want to do this, use --no-verify to bypass this pre-push hook.&quot;</div><div class="line">  exit 1</div><div class="line">fi</div><div class="line"></div><div class="line">exit 0</div></pre></td></tr></table></figure>
-<p>这段script也很容易理解。</p>
-<h2 id="执行结果："><a href="#执行结果：" class="headerlink" title="执行结果："></a>执行结果：</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ chmod u+x .git/hooks/pre-push</div><div class="line">$ git push</div><div class="line">Prevented force-push to master. This is a very dangerous command.</div><div class="line">If you really want to do this, use --no-verify to bypass this pre-push hook.</div><div class="line">error: failed to push some refs to &apos;git@git.xxx.net:user/repo.git&apos;</div></pre></td></tr></table></figure>
-<p>如上，如果执行<code>git push</code>，我们的echo提示出现了，说明script起作用了。<br>如果我们想跳过<code>pre-push</code>钩子，可以使用<code>--no-verify</code>参数。<br>或者把<code>.git/hooks/pre-push</code>改个名字。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" target="_blank" rel="external">https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks</a><br>【2】<a href="https://gist.github.com/stefansundin/d465f1e331fc5c632088" target="_blank" rel="external">https://gist.github.com/stefansundin/d465f1e331fc5c632088</a></p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1546,7 +1615,7 @@ mkdir /home/work/dsp/disconf-rd/war
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-count">53</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1560,7 +1629,7 @@ mkdir /home/work/dsp/disconf-rd/war
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-count">135</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

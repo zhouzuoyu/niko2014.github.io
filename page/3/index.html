@@ -204,6 +204,254 @@
             
             
               
+                <a class="post-title-link" href="/2016/03/01/java/dist/disconf_1_server/" itemprop="url">
+                  disconf - 【1】 server 搭建
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-03-01T00:00:00+08:00" content="2016-03-01">
+              2016-03-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/03/01/java/dist/disconf_1_server/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/01/java/dist/disconf_1_server/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>disconf是分布式配置管理服务平台，目前已经在 百度、滴滴出行、银联、网易、拉勾网、苏宁易购等公司使用，专注于解决分布式环境下的配置管理。</p>
+<h1 id="部署web-server："><a href="#部署web-server：" class="headerlink" title="部署web server："></a>部署web server：</h1><hr>
+<p>要使用disconf，首先需要搭建disconf服务端先，不过先把项目clone下来：</p>
+<pre><code>git clone https://github.com/knightliao/disconf
+</code></pre><h2 id="准备配置文件"><a href="#准备配置文件" class="headerlink" title="准备配置文件"></a>准备配置文件</h2><pre><code>mkdir /home/work/dsp/disconf-rd/online-resources
+mkdir /home/work/dsp/disconf-rd/war
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd  $DISCONF_HOME/disconf-web/</div><div class="line">cp  profile/rd/application-demo.properties /home/work/dsp/disconf-rd/online-resources/application.properties</div><div class="line">cp  profile/rd/jdbc-mysql.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/redis-config.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/zoo.properties /home/work/dsp/disconf-rd/online-resources/</div></pre></td></tr></table></figure>
+<h2 id="build-amp-deploy"><a href="#build-amp-deploy" class="headerlink" title="build &amp; deploy"></a>build &amp; deploy</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ONLINE_CONFIG_PATH=/home/work/dsp/disconf-rd/online-resources</div><div class="line">WAR_ROOT_PATH=/home/work/dsp/disconf-rd/war</div><div class="line">export ONLINE_CONFIG_PATH</div><div class="line">export WAR_ROOT_PATH</div><div class="line">cd disconf-web</div><div class="line">sh deploy/deploy.sh</div></pre></td></tr></table></figure>
+<h2 id="准备mysql"><a href="#准备mysql" class="headerlink" title="准备mysql"></a>准备mysql</h2><p>修改mysql用户和密码：</p>
+<pre><code>vim /home/work/dsp/disconf-rd/online-resources/jdbc-mysql.properties
+</code></pre><p>初始化数据库：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; source 0-init_table.sql</div><div class="line">mysql&gt; source 1-init_data.sql</div><div class="line">mysql&gt; source 201512/20151225.sql</div></pre></td></tr></table></figure></p>
+<h2 id="准备Redis"><a href="#准备Redis" class="headerlink" title="准备Redis"></a>准备Redis</h2><p>默认配置，启动就行了。参考官方文档：<a href="http://redis.io/download" target="_blank" rel="external">http://redis.io/download</a></p>
+<h2 id="准备zookeeper"><a href="#准备zookeeper" class="headerlink" title="准备zookeeper"></a>准备zookeeper</h2><p>默认的disconf的zookeeper客户端配置是三个实例的，如果只是为了体验disconf，可以改成standalone的配置。<br>修改zookeeper服务器的<code>clientPort</code>，使和disconf的zkClient配置一致：</p>
+<p>vim $ZK_HOME/conf/zoo.cfg</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">##############</div><div class="line">clientPort=8581</div><div class="line">##############</div></pre></td></tr></table></figure>
+<p>其他同理（127.0.0.1:8582,127.0.0.1:8583…）。</p>
+<h2 id="准备tomcat"><a href="#准备tomcat" class="headerlink" title="准备tomcat"></a>准备tomcat</h2><p>vim $TOMCAT_HOME/conf/server.xml<br>在Host结点下增加：</p>
+<pre><code>&lt;Context path=&quot;&quot; docBase=&quot;/home/work/dsp/disconf-rd/war&quot;&gt;&lt;/Context&gt;
+</code></pre><p>访问端口设为<code>8015</code>。</p>
+<h2 id="准备nginx"><a href="#准备nginx" class="headerlink" title="准备nginx"></a>准备nginx</h2><p>vim /path/nginx.conf</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">upstream disconf &#123;</div><div class="line">    server 127.0.0.1:8015;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line"></div><div class="line">    listen   8081;</div><div class="line">    server_name localhost;</div><div class="line">    access_log /home/work/var/logs/disconf/access.log;</div><div class="line">    error_log /home/work/var/logs/disconf/error.log;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root /home/work/dsp/disconf-rd/war/html;</div><div class="line">        # niko , use alias if root not working</div><div class="line">        # alias /home/work/dsp/disconf-rd/war/html/;</div><div class="line">        if ($query_string) &#123;</div><div class="line">            expires max;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location ~ ^/(api|export) &#123;</div><div class="line">        proxy_pass_header Server;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line">        proxy_set_header X-Real-IP $remote_addr;</div><div class="line">        proxy_set_header X-Scheme $scheme;</div><div class="line">        proxy_pass http://disconf;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>记得要</p>
+<pre><code>mkdir /home/work/var/logs/disconf/ -p
+</code></pre><p>如果没有该目录，无法访问页面。</p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>完成以上的搭建后，访问<code>http://localhost:8081/main.html</code>，就可以看到管理页面了（账号密码是<code>admin/admin</code>）。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/knightliao/disconf" target="_blank" rel="external">https://github.com/knightliao/disconf</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/02/22/git/git-prevent-push-master-by-hook/" itemprop="url">
+                  Git钩子Script之客户端`pre-push`
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-02-22T00:00:00+08:00" content="2016-02-22">
+              2016-02-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/02/22/git/git-prevent-push-master-by-hook/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/22/git/git-prevent-push-master-by-hook/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>有个童鞋说，老是会忘记当前分支和误推了master，有没有办法防止这种低级错误。好吧，发生这种事，其实是那个repo没有设置服务器钩子脚本，来防止客户端的推送操作（我们用的不是gitlab，没有那种功能，暂时是人为终端控制）。<code>%&gt;_&lt;%</code>，我们要实现童鞋想要的功能，需要使用到 git hook scripts，git hook scripts又分为客户端和服务器端两种：</p>
+<p><code>client side</code></p>
+<ul>
+<li>pre-commit</li>
+<li>prepare-commit-msg</li>
+<li>commit-msg</li>
+<li>post-commit</li>
+<li>post-merge</li>
+<li>pre-push<br>…</li>
+</ul>
+<p><code>server side</code></p>
+<ul>
+<li>pre-receive</li>
+<li>update</li>
+<li>post-receive</li>
+</ul>
+<p>博客后面的链接【1】可以了解所有的script，这里需要的是叫做<code>pre-push</code>的script。</p>
+<h1 id="pre-push"><a href="#pre-push" class="headerlink" title="pre-push"></a>pre-push</h1><p>首先，我们把工作目录切到git repo的根目录，然后编写<code>.git/hooks/pre-push</code>文件：</p>
+<pre><code>vim .git/hooks/pre-push
+</code></pre><p>文件内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"># Prevents force-pushing to master.</div><div class="line"># Based on: https://gist.github.com/pixelhandler/5718585</div><div class="line"># Install:</div><div class="line"># cd path/to/git/repo</div><div class="line"># curl -fL -o .git/hooks/pre-push https://gist.githubusercontent.com/stefansundin/d465f1e331fc5c632088/raw/pre-push</div><div class="line"># chmod +x .git/hooks/pre-push</div><div class="line"></div><div class="line">BRANCH=`git rev-parse --abbrev-ref HEAD`</div><div class="line">PUSH_COMMAND=`ps -ocommand= -p $PPID`</div><div class="line"></div><div class="line">if [[ &quot;$BRANCH&quot; == &quot;master&quot; &amp;&amp; &quot;$PUSH_COMMAND&quot; =~ push|force|delete|-f ]]; then</div><div class="line">  echo &quot;Prevented force-push to $BRANCH. This is a very dangerous command.&quot;</div><div class="line">  echo &quot;If you really want to do this, use --no-verify to bypass this pre-push hook.&quot;</div><div class="line">  exit 1</div><div class="line">fi</div><div class="line"></div><div class="line">exit 0</div></pre></td></tr></table></figure>
+<p>这段script也很容易理解。</p>
+<h2 id="执行结果："><a href="#执行结果：" class="headerlink" title="执行结果："></a>执行结果：</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ chmod u+x .git/hooks/pre-push</div><div class="line">$ git push</div><div class="line">Prevented force-push to master. This is a very dangerous command.</div><div class="line">If you really want to do this, use --no-verify to bypass this pre-push hook.</div><div class="line">error: failed to push some refs to &apos;git@git.xxx.net:user/repo.git&apos;</div></pre></td></tr></table></figure>
+<p>如上，如果执行<code>git push</code>，我们的echo提示出现了，说明script起作用了。<br>如果我们想跳过<code>pre-push</code>钩子，可以使用<code>--no-verify</code>参数。<br>或者把<code>.git/hooks/pre-push</code>改个名字。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" target="_blank" rel="external">https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks</a><br>【2】<a href="https://gist.github.com/stefansundin/d465f1e331fc5c632088" target="_blank" rel="external">https://gist.github.com/stefansundin/d465f1e331fc5c632088</a></p>
+<p>#</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/02/11/linux/shadowsocks_share/" itemprop="url">
                   共享 shadowsocks
                 </a>
@@ -1095,433 +1343,6 @@ cd synergy-1.7.5-stable
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/12/26/git/git_cmd/" itemprop="url">
-                  git 常用命令清单
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-12-26T00:00:00+08:00" content="2015-12-26">
-              2015-12-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/26/git/git_cmd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/26/git/git_cmd/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>这个清单是基于<a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单 - 阮一峰</a>的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。</p>
-<h1 id="常用-Git-命令清单"><a href="#常用-Git-命令清单" class="headerlink" title="常用 Git 命令清单"></a>常用 Git 命令清单</h1><blockquote>
-<p>我每天使用 Git ，但是很多命令记不住。<br>　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。</p>
-</blockquote>
-<p><img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015120901.png" alt=""></p>
-<blockquote>
-<p>下面是我整理的常用 Git 命令清单。几个专用名词的译名如下。<br>Workspace：工作区<br>Index / Stage：暂存区<br>Repository：仓库区（或本地仓库）<br>Remote：远程仓库</p>
-</blockquote>
-<h1 id="安装配置-niko"><a href="#安装配置-niko" class="headerlink" title="安装配置 - niko"></a>安装配置 - niko</h1><h2 id="ssh-key-简要流程"><a href="#ssh-key-简要流程" class="headerlink" title="ssh key 简要流程"></a>ssh key 简要流程</h2><ol>
-<li>ssh-keygen -t rsa -C “foo@gmail.com”，选择生成位置（~/.ssh/foo_rsa）。</li>
-<li><p>ssh-agent -s<br>若提示 <code>Could not open a connection to your authentication agent.</code>, 使用：</p>
-<p> eval <code>ssh-agent -s</code></p>
-</li>
-<li><p>ssh-add ~/.ssh/foo_rsa</p>
-</li>
-<li>clip &lt; ~/.ssh/foo_rsa.pub</li>
-<li>添加到远程服务器的ssh_keys；</li>
-<li>git clone …</li>
-</ol>
-<h3 id="设置ssh配置"><a href="#设置ssh配置" class="headerlink" title="设置ssh配置"></a>设置ssh配置</h3><p>vim ~/.ssh/config</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Host dev</div><div class="line">    HostName dev.example.com</div><div class="line">    Port 22000</div><div class="line">    User fooey&lt;/p&gt;</div><div class="line">Host github.com</div><div class="line">    IdentityFile ~/.ssh/github.key</div><div class="line">Host oschina.net</div><div class="line">    IdentityFile ~/.ssh/id_rsa_osc</div><div class="line">Host github.com</div><div class="line">    IdentityFile ~/.ssh/id_rsa_github</div></pre></td></tr></table></figure>
-<div style="display:none"><br><a href="http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/" target="_blank" rel="external">http://nerderati.com/2011/03/17/simplify-your-life-with-an-ssh-config-file/</a><br></div>
-
-<h1 id="一、新建代码库"><a href="#一、新建代码库" class="headerlink" title="一、新建代码库"></a>一、新建代码库</h1><ul>
-<li><p>在当前目录新建一个Git代码库<br>$ git init</p>
-</li>
-<li><p>新建一个目录，将其初始化为Git代码库<br>$ git init [project-name]</p>
-</li>
-<li><p>下载一个项目和它的整个代码历史<br>$ git clone [url]</p>
-</li>
-</ul>
-<h1 id="二、git-配置"><a href="#二、git-配置" class="headerlink" title="二、git 配置"></a>二、git 配置</h1><p>　　Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。</p>
-<ul>
-<li><p>显示当前的Git配置<br>$ git config –list</p>
-</li>
-<li><p>编辑Git配置文件<br>$ git config -e [–global]</p>
-</li>
-<li><p>设置提交代码时的用户信息<br>$ git config [–global] user.name “[name]”<br>$ git config [–global] user.email “[email address]”</p>
-</li>
-<li><p>push pull 策略</p>
-</li>
-</ul>
-<p>ref ： <a href="http://blog.angular.in/git-pushmo-ren-fen-zhi/" target="_blank" rel="external">http://blog.angular.in/git-pushmo-ren-fen-zhi/</a></p>
-<p><code>push.default</code> 未设置：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">warning: push.default is unset; its implicit value is changing in</div><div class="line">Git 2.0 from &apos;matching&apos; to &apos;simple&apos;. To squelch this message</div><div class="line">and maintain the current behavior after the default changes, use:</div><div class="line"></div><div class="line">  git config --global push.default matching</div><div class="line"></div><div class="line">To squelch this message and adopt the new behavior now, use:</div><div class="line"></div><div class="line">  git config --global push.default simple</div><div class="line"></div><div class="line">When push.default is set to &apos;matching&apos;, git will push local branches</div><div class="line">to the remote branches that already exist with the same name.</div><div class="line"></div><div class="line">In Git 2.0, Git will default to the more conservative &apos;simple&apos;</div><div class="line">behavior, which only pushes the current branch to the corresponding</div><div class="line">remote branch that &apos;git pull&apos; uses to update the current branch.</div><div class="line"></div><div class="line">See &apos;git help config&apos; and search for &apos;push.default&apos; for further information.</div><div class="line">(the &apos;simple&apos; mode was introduced in Git 1.7.11. Use the similar mode</div><div class="line">&apos;current&apos; instead of &apos;simple&apos; if you sometimes use older versions of Git)</div></pre></td></tr></table></figure>
-<p>git config –global push.default ‘option’</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">option：</div><div class="line"></div><div class="line">nothing - push操作无效，除非显式指定远程分支，例如git push origin develop（我觉得。。。可以给那些不愿学git的同事配上此项）。</div><div class="line"></div><div class="line">current - push当前分支到远程同名分支，如果远程同名分支不存在则自动创建同名分支。</div><div class="line"></div><div class="line">upstream - push当前分支到它的upstream分支上（这一项其实用于经常从本地分支push/pull到同一远程仓库的情景，这种模式叫做central workflow）。</div><div class="line"></div><div class="line">simple - simple和upstream是相似的，只有一点不同，simple必须保证本地分支和它的远程 upstream分支同名，否则会拒绝push操作。</div><div class="line"></div><div class="line">matching - push所有本地和远程两端都存在的同名分支。</div></pre></td></tr></table></figure>
-<h1 id="三、增加-删除文件"><a href="#三、增加-删除文件" class="headerlink" title="三、增加/删除文件"></a>三、增加/删除文件</h1><ul>
-<li><p>添加指定文件到暂存区<br>$ git add [file1] [file2] …</p>
-</li>
-<li><p>添加指定目录到暂存区，包括子目录<br>$ git add [dir]</p>
-</li>
-<li><p>添加当前目录的所有文件到暂存区<br>git add .<br>git add –all (对删除文件有效)</p>
-</li>
-<li><p>删除工作区文件，并且将这次删除放入暂存区<br>git rm [file1] [file2] …</p>
-</li>
-<li><p>停止追踪指定文件，但该文件会保留在工作区<br>git rm <code>--cached</code> [file]</p>
-</li>
-<li><p>取消放入暂存区<br>use “git reset HEAD <file>…” to unstage</file></p>
-</li>
-<li><p>改名文件，并且将这个改名放入暂存区<br>git mv [file-original] [file-renamed]</p>
-</li>
-<li><p>取消改名<br>git mv [file-renamed] [file-original]</p>
-</li>
-</ul>
-<h1 id="四、代码提交"><a href="#四、代码提交" class="headerlink" title="四、代码提交"></a>四、代码提交</h1><hr>
-<ul>
-<li><p>提交暂存区到仓库区<br>git commit -m [message]</p>
-</li>
-<li><p>提交暂存区的指定文件到仓库区<br>git commit [file1] [file2] … -m [message]</p>
-</li>
-<li><p>提交工作区自上次commit之后的变化，直接到仓库区<br>git commit -a</p>
-</li>
-<li><p>提交时显示所有diff信息<br>git commit -v</p>
-</li>
-<li><p>使用一次新的commit，替代上一次提交</p>
-</li>
-<li>重做上一次commit，并包括指定文件的新变化</li>
-<li>如果代码没有任何新变化，则用来改写上一次commit的提交信息<br>$ git commit <code>--amend</code> -m [message]<br>$ git commit –amend   …</li>
-</ul>
-<h1 id="五、分支"><a href="#五、分支" class="headerlink" title="五、分支"></a>五、分支</h1><ul>
-<li><p>列出所有本地分支<br>$ git branch</p>
-</li>
-<li><p>列出所有远程分支<br>$ git branch -r</p>
-</li>
-<li><p>列出所有本地分支和远程分支<br>$ git branch -a</p>
-</li>
-<li><p>新建一个分支，但依然停留在当前分支<br>$ git branch [branch-name]</p>
-</li>
-<li><p>新建一个分支，并切换到该分支<br>$ git checkout -b [branch]</p>
-</li>
-<li><p>新建一个分支，指向指定commit<br>$ git branch [branch] [commit]</p>
-</li>
-<li><p>新建一个分支，与指定的远程分支建立追踪关系<br>$ git branch –track [branch] [remote-branch]</p>
-</li>
-<li><p>切换到指定分支，并更新工作区<br>$ git checkout [branch-name]</p>
-</li>
-<li><p>建立追踪关系，在现有分支与指定的远程分支之间<br>$ git branch –set-upstream [branch] [remote-branch]</p>
-</li>
-<li><p>合并指定分支到当前分支<br>$ git merge [branch]</p>
-</li>
-<li><p>选择一个commit，合并进当前分支<br>$ git <code>cherry-pick</code> [commit]</p>
-</li>
-<li><p>终止(abort) merge 操作：<br>$ git reset –hard HEAD<br><a href="http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge" target="_blank" rel="external">http://stackoverflow.com/questions/101752/i-ran-into-a-merge-conflict-how-can-i-abort-the-merge</a></p>
-</li>
-<li><p>删除分支<br>$ git branch -d [branch-name]</p>
-</li>
-<li><p>删除远程分支<br>git push origin –delete <branchname><br>git push origin –delete<br>git branch -dr</branchname></p>
-</li>
-</ul>
-<h1 id="六、标签"><a href="#六、标签" class="headerlink" title="六、标签"></a>六、标签</h1><ul>
-<li><p>列出所有tag<br>$ git tag</p>
-</li>
-<li><p>新建一个tag在当前commit<br>git tag [tag]<br>注释：<br>git tag -a v1.4 -m ‘my version 1.4’</p>
-</li>
-<li><p>新建一个tag在指定commit<br>$ git tag [tag] [commit]</p>
-</li>
-<li><p>查看tag信息<br>$ git show [tag]</p>
-</li>
-<li><p>提交指定tag<br>$ git push [remote] [tag]</p>
-</li>
-<li><p>提交所有tag<br>$ git push [remote] –tags</p>
-</li>
-<li><p>新建一个分支，指向某个tag<br>$ git checkout -b [branch] [tag]</p>
-</li>
-</ul>
-<h1 id="七、查看信息"><a href="#七、查看信息" class="headerlink" title="七、查看信息"></a>七、查看信息</h1><ul>
-<li><p>显示有变更的文件<br>$ git status</p>
-</li>
-<li><p>GUI 审查代码<br>git difftool</p>
-</li>
-<li><p>显示当前分支的版本历史<br>$ git log</p>
-</li>
-<li><p>显示commit历史，以及每次commit发生变更的文件<br>$ git log –stat</p>
-</li>
-<li><p>显示某个文件的版本历史，包括文件改名<br>$ git log –follow [file]<br>$ git whatchanged [file]</p>
-</li>
-<li><p>显示指定文件相关的每一次diff<br>$ git log -p [file]</p>
-</li>
-<li><p>华丽的分支log<br>$ git log –graph –decorate –pretty=oneline –abbrev-commit develop  origin/develop  temp-branch</p>
-</li>
-<li><p>显示指定文件是什么人在什么时间修改过<br><code>git blame</code> [file]</p>
-</li>
-<li><p>显示暂存区和工作区的差异<br>git diff</p>
-</li>
-<li><p>显示暂存区和上一个commit的差异<br>$ git diff <code>--cached</code> []</p>
-</li>
-<li><p>显示工作区与当前分支最新commit之间的差异<br>$ git diff <code>HEAD</code></p>
-</li>
-<li><p>显示两次提交之间的差异<br>$ git diff [first-branch]…[second-branch]</p>
-</li>
-<li><p>显示某次提交的元数据和内容变化<br>$ git show [commit]</p>
-</li>
-<li><p>显示某次提交发生变化的文件<br>$ git show <code>--name-only</code> [commit]</p>
-</li>
-<li><p>显示某次提交时，某个文件的内容<br>$ git show [commit]:[filename]</p>
-</li>
-<li><p>显示当前分支的最近几次提交<br>git reflog</p>
-<blockquote>
-<p>Reference logs, or “reflogs”, record when the tips of branches and other references were updated in the local repository. Reflogs are useful in various Git commands, to specify the old value of a reference.</p>
-</blockquote>
-</li>
-</ul>
-<p>reflog可以看到被删除的记录(如)，而git log不能。</p>
-<h1 id="八、远程同步"><a href="#八、远程同步" class="headerlink" title="八、远程同步"></a>八、远程同步</h1><hr>
-<ul>
-<li>下载远程仓库的所有变动<br>$ git fetch [remote]</li>
-</ul>
-<blockquote>
-<p>Download objects and refs from another repository<br>用”git fetch”” 来执行”git pull”前半部分的工作， 但是这条命令并不会把抓下来的修改合并到当前分支里。</p>
-</blockquote>
-<ul>
-<li><p>显示所有远程仓库<br>$ git remote -v</p>
-</li>
-<li><p>显示某个远程仓库的信息<br>$ git remote show [remote]</p>
-</li>
-<li><p>增加一个新的远程仓库，并命名<br>$ git remote add [shortname] [url]</p>
-</li>
-<li><p>取回远程仓库的变化，并与本地分支合并<br>$ git pull [remote] [branch]</p>
-</li>
-<li><p>上传本地指定分支到远程仓库<br>$ git push [remote] [branch]</p>
-</li>
-<li><p>推送本地指定的分支名到远程仓库 - niko<br>$ git push origin develop:develop_remote<br>$ git push <remote> <local branch="" name="">:<remote branch="" to="" push="" into=""></remote></local></remote></p>
-</li>
-<li><p>强行推送当前分支到远程仓库，即使有冲突<br>$ git push [remote] –force</p>
-</li>
-<li><p>推送所有分支到远程仓库<br>$ git push [remote] –all</p>
-</li>
-<li><p>with rebase<br>git pull –rebase</p>
-</li>
-</ul>
-<h1 id="九、撤销"><a href="#九、撤销" class="headerlink" title="九、撤销"></a>九、撤销</h1><ul>
-<li><p>恢复暂存区的指定文件到工作区<br>$ git checkout [file]</p>
-</li>
-<li><p>恢复某个commit的指定文件到工作区<br>$ git checkout [commit] [file]</p>
-</li>
-<li><p>恢复上一个commit的所有文件到工作区<br>$ git checkout .</p>
-</li>
-<li><p>取消commit<br>$ git reset –soft HEAD~</p>
-</li>
-<li><p>重置暂存区的指定文件，与上一次commit保持一致，但工作区不变<br>$ git reset [file]<br>REF: <a href="http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit" target="_blank" rel="external">http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit</a></p>
-</li>
-<li><p>重置暂存区与工作区，与上一次commit保持一致<br>$ git <code>reset --hard</code></p>
-</li>
-<li><p>重置当前分支的指针为指定commit，同时重置暂存区，但工作区不变<br>$ git reset [commit]</p>
-</li>
-<li><p>重置当前分支的HEAD为指定commit，同时重置暂存区和工作区，与指定commit一致<br>$ git reset <code>--hard</code> [commit]</p>
-</li>
-<li><p>重置当前HEAD为指定commit，但保持暂存区和工作区不变<br>$ git reset <code>--keep</code> [commit]</p>
-</li>
-<li><p>undo reset<br>git reflog<br>git reset HEAD@{1}<br><a href="http://stackoverflow.com/questions/2510276/undoing-git-reset" target="_blank" rel="external">undo reset</a></p>
-</li>
-<li><p>新建一个commit，用来撤销指定commit</p>
-</li>
-<li><p>后者的所有变化都将被前者抵消，并且应用到当前分支<br>$ git <code>revert [commit]</code></p>
-</li>
-<li><p>恢复删除的分支<br>// TODO<br><a href="http://stackoverflow.com/questions/16793637/recover-deleted-branch-git" target="_blank" rel="external">http://stackoverflow.com/questions/16793637/recover-deleted-branch-git</a><br><a href="https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html" target="_blank" rel="external">https://confluence.atlassian.com/bbkb/how-to-restore-a-deleted-branch-765757540.html</a></p>
-</li>
-<li><p>TODO rebase<br>If you prefer to skip this patch,<br><a href="https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/" target="_blank" rel="external">https://help.github.com/articles/resolving-merge-conflicts-after-a-git-rebase/</a></p>
-</li>
-</ul>
-<h1 id="十、其他"><a href="#十、其他" class="headerlink" title="十、其他"></a>十、其他</h1><ul>
-<li><p>生成一个可供发布的压缩包<br>git archive<br>via：ruanyifeng.com</p>
-</li>
-<li><p>git rebase<br>使分支历史看起来像没有经过合并一样。</p>
-</li>
-<li><p>分支上一次合并的信息 - niko<br>git show –summary <code>git merge-base A B</code></p>
-</li>
-</ul>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><hr>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/12/23/books/self_ctrl/self_ctrl_5/" itemprop="url">
-                  【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-12-23T00:00:00+08:00" content="2015-12-23">
-              2015-12-23
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/books/" itemprop="url" rel="index">
-                    <span itemprop="name">books</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/23/books/self_ctrl/self_ctrl_5/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/23/books/self_ctrl/self_ctrl_5/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><hr>
-<p><img src="/images/book_self_ctrl_5.png" alt=""></p>
-<p>##</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1564,7 +1385,7 @@ cd synergy-1.7.5-stable
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">51</span>
+              <span class="site-state-item-count">53</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1578,7 +1399,7 @@ cd synergy-1.7.5-stable
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">134</span>
+              <span class="site-state-item-count">135</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

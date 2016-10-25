@@ -125,6 +125,50 @@
     </entry>
     
     <entry>
+      <title><![CDATA[使用`dropbox`服务]]></title>
+      <url>http://niko2014.github.io/2016/05/20/linux/install/dropbox-install/</url>
+      <content type="html"><![CDATA[<p>随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.</p>
+<h1 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h1><p>首先在<a href="https://www.dropbox.com/install-linux" target="_blank" rel="external">官网</a>下载ubuntu安装包<code>dropbox_2015.10.28_amd64.deb</code>, 安装完成之后, 需要启动dropbox :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">proxychains dropbox start</div><div class="line">ProxyChains-3.1 (http://proxychains.sf.net)</div><div class="line">Starting Dropbox...</div><div class="line">The Dropbox daemon is not installed!</div><div class="line">Run &quot;dropbox start -i&quot; to install the daemon</div></pre></td></tr></table></figure>
+<p>如上, 提示需要安装daemon程序, 继续按着指引做:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dropbox start -i</div></pre></td></tr></table></figure>
+<p>如果没有翻墙, 可能遇到这样的错误:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Trouble connecting to Dropbox servers. Maybe your internet connection is down, or you need to set your http_proxy environment variable.</div></pre></td></tr></table></figure>
+<p>为了继续下载, 本地搭建一个翻墙的http代理, 并export到环境变量:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">export https_proxy=http://127.0.0.1:8123</div></pre></td></tr></table></figure>
+<p>然后重新<code>dropbox start -i</code>:</p>
+<p><img src="/images/linux/tools/dropbox/dropbox-downloading.png" alt=""></p>
+<h1 id="安装完之后-可以使用dropbox-proxy设置数据同步的代理"><a href="#安装完之后-可以使用dropbox-proxy设置数据同步的代理" class="headerlink" title="安装完之后, 可以使用dropbox proxy设置数据同步的代理:"></a>安装完之后, 可以使用<code>dropbox proxy</code>设置数据同步的代理:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox help proxy</div><div class="line"></div><div class="line">dropbox proxy MODE [TYPE] [HOST] [PORT] [USERNAME] [PASSWORD]</div><div class="line"></div><div class="line">Set proxy settings for Dropbox.</div><div class="line"></div><div class="line">MODE - one of &quot;none&quot;, &quot;auto&quot;, &quot;manual&quot;</div><div class="line">TYPE - one of &quot;http&quot;, &quot;socks4&quot;, &quot;socks5&quot; (only valid with &quot;manual&quot; mode)</div><div class="line">HOST - proxy hostname (only valid with &quot;manual&quot; mode)</div><div class="line">PORT - proxy port (only valid with &quot;manual&quot; mode)</div><div class="line">USERNAME - (optional) proxy username (only valid with &quot;manual&quot; mode)</div><div class="line">PASSWORD - (optional) proxy password (only valid with &quot;manual&quot; mode)</div></pre></td></tr></table></figure>
+<h1 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h1><p>启动后, 输入账号密码进行登录:</p>
+<p><img src="/home/niko/mount/hsb_ssd_1/niko/dev/code/git_repos/HexoBlog/hexo-hello/source/images/linux/tools/dropbox/dropbox-login.png" alt=""></p>
+<p>由于dropbox采用和nautilus整合的方式, 只要我们在文件管理器修改了同步文件夹(默认是<code>/home/username/Dropbox</code>)的数据, dropbox会自动同步到云端.</p>
+<h1 id="问题-gnome下icon有时候不显示"><a href="#问题-gnome下icon有时候不显示" class="headerlink" title="问题: gnome下icon有时候不显示"></a>问题: gnome下icon有时候不显示</h1><p>最简单粗暴的方式, 重启一下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox stop</div><div class="line">Dropbox daemon stopped.</div><div class="line">niko@niko-ub1404:~$ dropbox start</div><div class="line">Starting Dropbox...Done!</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/201727/how-can-i-make-dropbox-display-an-icon-in-gnome-shell" target="_blank" rel="external">How can I make dropbox display an icon in Gnome Shell?</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[为 spring boot 程序创建 service]]></title>
+      <url>http://niko2014.github.io/2016/05/10/linux/tools/app-as-service-upstart/</url>
+      <content type="html"><![CDATA[<h1 id="把应用做成一个service"><a href="#把应用做成一个service" class="headerlink" title="把应用做成一个service"></a>把应用做成一个service</h1><p>我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。<br>为了方便管理，可以考虑制作成一个service。步骤如下：</p>
+<h2 id="创建-upstart-配置文件"><a href="#创建-upstart-配置文件" class="headerlink" title="创建 upstart 配置文件"></a>创建 upstart 配置文件</h2><p>首先用<code>mvn package</code>打包成jar类型的spring-boot程序， 然后 <code>sudo vim /etc/init/hellosb.conf</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">start on filesystem</div><div class="line">exec /usr/bin/java -jar /path_to/program.jar</div></pre></td></tr></table></figure>
+<p>多行的话使用<code>script</code>标记：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># myprogram.conf</div><div class="line">start on filesystem</div><div class="line">script</div><div class="line">    /usr/bin/java -jar /path_to/program</div><div class="line">    echo &quot;Another command&quot;</div><div class="line">end script</div></pre></td></tr></table></figure>
+<h2 id="service-启动"><a href="#service-启动" class="headerlink" title="service 启动"></a>service 启动</h2><pre><code>sudo ln -s /etc/init/myprogram.conf /etc/init.d/myprogram
+</code></pre><p>建立链接后，使用service就可以用自动补全功能了：</p>
+<pre><code>sudo service myprogram start
+</code></pre><p>上面只是一个简单的启动功能，upstart的配置文件远比这强大，可以做更细节的处理（下图是job的状态变迁图）。</p>
+<p><img src="http://www.ibm.com/developerworks/cn/linux/1407_liuming_init2/image003.jpg" alt="job 状态变迁"></p>
+<h1 id="更进一步"><a href="#更进一步" class="headerlink" title="更进一步"></a>更进一步</h1><p>若想要深入了解，可以查看官方文档和学习一下其他程序（nginx等）的upstart脚本：<a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">Upstart Intro, Cookbook and Best Practises</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">http://upstart.ubuntu.com/cookbook/</a><br><a href="http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart" target="_blank" rel="external">http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart</a><br><a href="http://upstart.ubuntu.com/getting-started.html" target="_blank" rel="external">http://upstart.ubuntu.com/getting-started.html</a><br><a href="http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service" target="_blank" rel="external">http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service</a></p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[【api】elasticsearch - 部分更新文档]]></title>
       <url>http://niko2014.github.io/2016/05/08/search/es/es-partial-update/</url>
       <content type="html"><![CDATA[<h1 id="document-的部分更新"><a href="#document-的部分更新" class="headerlink" title="document 的部分更新"></a>document 的部分更新</h1><p>对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。</p>
@@ -337,7 +381,8 @@
 <td>kill window</td>
 </tr>
 <tr>
-<td></td>
+<td>page-up</td>
+<td>进入滚动模式, 按<code>esc</code>退出滚动</td>
 </tr>
 </tbody>
 </table>
@@ -448,7 +493,9 @@ dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-7 &quot;[&apos
 dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-8 &quot;[&apos;&lt;Primary&gt;8&apos;]&quot;
 dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-9 &quot;[&apos;&lt;Primary&gt;9&apos;]&quot;
 dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apos;&lt;Primary&gt;0&apos;]&quot;
-</code></pre><h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
+</code></pre><p>当然还有移动窗口（把当前窗口移动到某个工作区）的快捷键设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-1  &quot;[&apos;&lt;Alt&gt;1&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-2  &quot;[&apos;&lt;Alt&gt;2&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-3  &quot;[&apos;&lt;Alt&gt;3&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-4  &quot;[&apos;&lt;Alt&gt;4&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-5  &quot;[&apos;&lt;Alt&gt;5&apos;]&quot;</div></pre></td></tr></table></figure>
+<h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
 <p>接下来是工作区的分类, 主要关注每个工作区放置什么工具. 有了这些分类, 切换工具几乎不用时间思考和寻找了.<br>以下是我常用的分类:</p>
 <table>
 <thead>
@@ -1708,6 +1755,23 @@ app.description=${app.name} is a Spring Boot application
     </entry>
     
     <entry>
+      <title><![CDATA[使用 Java 8 函数接口避免 Null Check]]></title>
+      <url>http://niko2014.github.io/2015/10/01/java/j8/java8_null_check/</url>
+      <content type="html"><![CDATA[<p><script><br>  (function() {<br>    var cx = ‘005735843669583756565:phrkilwibwg’;<br>    var gcse = document.createElement(‘script’);<br>    gcse.type = ‘text/javascript’;<br>    gcse.async = true;<br>    gcse.src = ‘<a href="https://cse.google.com/cse.js?cx=">https://cse.google.com/cse.js?cx=</a>‘ + cx;<br>    var s = document.getElementsByTagName(‘script’)[0];<br>    s.parentNode.insertBefore(gcse, s);<br>  })();<br></script></p>
+<p><gcse:search></gcse:search></p>
+<h1 id="使用-Optional"><a href="#使用-Optional" class="headerlink" title="使用 Optional"></a>使用 <code>Optional</code></h1><hr>
+<p>Optional是核心类库的新成员，用来替换null。相信大家对NPE已经司空见惯，在代码里也有不少 null check，null 这个东西也是颇有争议的， 而Optional可以消除我们这种厌恶感，鼓励我们适当时候去检查null值，防止程序崩溃。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例 :"></a>示例 :</h2><p>Shop.java</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class Shop &#123;</div><div class="line">    private Integer provinceId;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (shop.getProvinceId() != null) &#123;</div><div class="line">    ProvinceEntity productEntity = provinceJpaRepository.findOne(shop.getProvinceId());</div><div class="line">    if (productEntity != null) &#123;</div><div class="line">        shop.setProvinceName(productEntity.getName());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
+<p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
+<h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[JVM 常用GC算法简介]]></title>
       <url>http://niko2014.github.io/2015/10/01/java/jvm/jvm_gc_algo_introduce/</url>
       <content type="html"><![CDATA[<p>在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.</p>
@@ -1755,23 +1819,6 @@ app.description=${app.name} is a Spring Boot application
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
 <p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
 ]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[使用 Java 8 函数接口避免 Null Check]]></title>
-      <url>http://niko2014.github.io/2015/10/01/java/j8/java8_null_check/</url>
-      <content type="html"><![CDATA[<p><script><br>  (function() {<br>    var cx = ‘005735843669583756565:phrkilwibwg’;<br>    var gcse = document.createElement(‘script’);<br>    gcse.type = ‘text/javascript’;<br>    gcse.async = true;<br>    gcse.src = ‘<a href="https://cse.google.com/cse.js?cx=">https://cse.google.com/cse.js?cx=</a>‘ + cx;<br>    var s = document.getElementsByTagName(‘script’)[0];<br>    s.parentNode.insertBefore(gcse, s);<br>  })();<br></script></p>
-<p><gcse:search></gcse:search></p>
-<h1 id="使用-Optional"><a href="#使用-Optional" class="headerlink" title="使用 Optional"></a>使用 <code>Optional</code></h1><hr>
-<p>Optional是核心类库的新成员，用来替换null。相信大家对NPE已经司空见惯，在代码里也有不少 null check，null 这个东西也是颇有争议的， 而Optional可以消除我们这种厌恶感，鼓励我们适当时候去检查null值，防止程序崩溃。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例 :"></a>示例 :</h2><p>Shop.java</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class Shop &#123;</div><div class="line">    private Integer provinceId;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>不使用 Java8 的 Null Check：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (shop.getProvinceId() != null) &#123;</div><div class="line">    ProvinceEntity productEntity = provinceJpaRepository.findOne(shop.getProvinceId());</div><div class="line">    if (productEntity != null) &#123;</div><div class="line">        shop.setProvinceName(productEntity.getName());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>使用 Java8 的 Null Check：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
-<p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
-<h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>]]></content>
     </entry>
     
     <entry>
