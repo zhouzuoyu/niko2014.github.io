@@ -1,0 +1,257 @@
+2016-10-26 17:52:06.590 [main] INFO  c.a.o.c.i.spring.support.PropertyPlaceholderConfigurer - Loading properties file from class path resource [canal.properties]
+2016-10-26 17:52:06.593 [main] INFO  c.a.o.c.i.spring.support.PropertyPlaceholderConfigurer - Loading properties file from class path resource [example/instance.properties]
+2016-10-26 17:52:06.650 [main] WARN  org.springframework.beans.TypeConverterDelegate - PropertyEditor [com.sun.beans.editors.EnumEditor] found through deprecated global PropertyEditorManager fallback - consider using a more isolated form of registration, e.g. on the BeanWrapper/BeanFactory!
+2016-10-26 17:52:06.716 [main] INFO  c.a.otter.canal.instance.spring.CanalInstanceWithSpring - start CannalInstance for 1-example 
+2016-10-26 17:52:06.727 [main] INFO  c.a.otter.canal.instance.core.AbstractCanalInstance - start successful....
+2016-10-26 17:52:06.834 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position mysql-bin.000001:64836481:
+2016-10-26 17:52:06.961 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:06.962 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:06.964 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:52:06.968 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140314 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140314, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140314
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:52:18.341 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:52:18.359 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:18.359 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:18.359 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:52:18.363 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140321 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140321, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140321
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:52:37.605 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:52:37.623 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:37.625 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:37.626 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:52:37.629 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140325 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140325, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140325
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:52:49.808 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:52:49.825 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:49.825 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:52:49.826 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:52:49.837 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140329 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140329, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140329
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:53:08.461 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:53:08.477 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:08.477 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:08.478 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:53:08.480 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140335 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140335, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140335
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:53:21.259 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:53:21.277 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:21.277 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:21.278 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:53:21.280 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140339 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140339, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140339
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:53:37.591 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:53:37.608 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:37.608 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:37.608 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:53:37.611 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140345 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140345, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140345
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:53:55.895 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:53:55.912 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:55.912 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:53:55.913 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:53:55.916 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140349 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140349, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140349
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:54:08.341 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:54:08.358 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:54:08.359 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:54:08.359 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:54:08.363 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140355 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140355, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140355
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:54:22.989 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position
+2016-10-26 17:54:23.011 [destination = example , address = /192.168.7.90:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - ERROR ## parse this event has an error , last position : [EntryPosition[included=false,journalName=mysql-bin.000001,position=64837513,timestamp=1477448456000]]
+com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:54:23.011 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - dump address /192.168.7.90:3306 has an error, retrying. caused by 
+com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+2016-10-26 17:54:23.011 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR com.alibaba.otter.canal.common.alarm.LogAlarmHandler - destination:example[com.alibaba.otter.canal.parse.exception.CanalParseException: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: parse row data failed.
+Caused by: com.alibaba.otter.canal.parse.exception.CanalParseException: column size is not match for table:`highsunbuy`.`seller`,21 vs 20
+]
+2016-10-26 17:54:23.014 [destination = example , address = /192.168.7.90:3306 , EventParser] ERROR c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - disconnect address /192.168.7.90:3306 has an error, retrying., caused by 
+java.io.IOException: KILL DUMP 140359 failure:java.io.IOException: ErrorPacket [errorNumber=1094, fieldCount=-1, message=Unknown thread id: 140359, sqlState=HY000, sqlStateMarker=#]
+ with command: KILL CONNECTION 140359
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlUpdateExecutor.update(MysqlUpdateExecutor.java:49)
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:104)
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60)
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at com.alibaba.otter.canal.parse.driver.mysql.MysqlConnector.disconnect(MysqlConnector.java:106) ~[canal.parse.driver-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection.disconnect(MysqlConnection.java:60) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at com.alibaba.otter.canal.parse.inbound.AbstractEventParser$3.run(AbstractEventParser.java:271) ~[canal.parse-1.0.22-SNAPSHOT.jar:na]
+	at java.lang.Thread.run(Thread.java:745) [na:1.8.0_66]
+2016-10-26 17:54:27.507 [Thread-3] INFO  c.a.otter.canal.instance.core.AbstractCanalInstance - stop CannalInstance for null-example 
+2016-10-26 17:54:27.511 [Thread-3] INFO  c.a.otter.canal.instance.core.AbstractCanalInstance - stop successful....

@@ -204,6 +204,143 @@
             
             
               
+                <a class="post-title-link" href="/2016/03/28/linux/tools/ssd_4k_trim/" itemprop="url">
+                  linux下ssd的4k对齐和trim
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-03-28T00:00:00+08:00" content="2016-03-28">
+              2016-03-28
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/03/28/linux/tools/ssd_4k_trim/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/28/linux/tools/ssd_4k_trim/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="4K-对齐"><a href="#4K-对齐" class="headerlink" title="4K 对齐"></a>4K 对齐</h1><h2 id="为什么要4k对齐呢"><a href="#为什么要4k对齐呢" class="headerlink" title="为什么要4k对齐呢?"></a>为什么要4k对齐呢?</h2><p>主要是为了提高性能和延长寿命, 尤其是运行在window系统和NTFS格式的.</p>
+<blockquote>
+<p>從Windows NT開始，微軟導入了「NTFS」這個格式，自此取代了長久以來一直使用的FAT╱FAT32，一直到XP所使用的NTFS 5.X版本以來，硬碟分割區都是從第63個扇區開始（請注意這裡的扇區指的是傳統硬碟喔，不過XP並不會認SSD，所以一律都是以此方式來分割），也就是會保留512Byte＊63=31.5KB的空間大小才開始第一個分區，因此假如你的SSD沒有做過對齊的話，每128個叢集就會跨越兩個block，如果系統剛好操作到跨越兩個block之間的叢集時，就要同時擦除那是不是SSD就得同時操作兩個page來搬移寫入呢？這樣效能一定會下降，因此從Vista開始，就支援將NTFS磁區的起始點設定為4的倍數，這樣一來就不會在出現性能下降的情形，而將分割區設定為4可以整除的數字開始，就稱為「對齊」。</p>
+</blockquote>
+<p>下面是没有对齐的:</p>
+<p><img src="/images/linux/kha7bnwQpeg5sBhVVLPA_unaligned.png" alt=""></p>
+<p>下图是对齐之后的:</p>
+<p><img src="/images/linux/pVxPJVszQR2MpN0SMBuj_aligned.png" alt=""></p>
+<p>更多内容可以参考<a href="http://www.techbang.com/posts/10651-ssd-tuning-practice-3-4k-alignment-upgrade-ssd-performance-cheat-secretly-reported-63-issues-cover-story" target="_blank" rel="external">这个</a></p>
+<h2 id="如何查看是否4k对齐呢"><a href="#如何查看是否4k对齐呢" class="headerlink" title="如何查看是否4k对齐呢 ?"></a>如何查看是否4k对齐呢 ?</h2><pre><code>sudo fdisk -l
+</code></pre><p>查看<code>Primary分区</code>的start栏是否能被8整除, <code>Extended</code>分区可能不能整除8, 不用担心. 如果是ext4, 那是自动对齐的.</p>
+<h2 id="进行-4k-对齐"><a href="#进行-4k-对齐" class="headerlink" title="进行 4k 对齐"></a>进行 4k 对齐</h2><p>window下面可以用系统自带工具或<code>DiskGenius</code>进行分区, linux下使用<code>gparted</code>等.</p>
+<h1 id="trim"><a href="#trim" class="headerlink" title="trim"></a>trim</h1><hr>
+<p>首先我们需要了解一下什么是trim ?</p>
+<blockquote>
+<p>一般来说, 存储设备只知道哪些地方存了数据，但不知道这个数据到底还有没有用（因为文件删除之后，数据实际上可能还留在数据块中），数据有没有用只有操作系统才知道。</p>
+<p>对于物理存储设备来说，“写入空白数据块”和“覆盖已有内容的数据块”所需要的操作是完全相同的。</p>
+</blockquote>
+<p>上面的结论对机械硬盘成立, 但SSD却不是.</p>
+<blockquote>
+<p>由于硬件方面的限制，SSD单独对某个页面进行读/写的操作，但擦除操作却只能对整个块进行，也就是说，一旦擦除就必须一次性擦除整个块。</p>
+<p>在SSD中，数据存储的最小单位是页面（page），一个页面的大小一般是4KB，若干个页面又被组合成块（block），一个块的大小一般是512KB。由于硬件方面的限制，SSD单独对某个页面进行读/写的操作，但擦除操作却只能对整个块进行，也就是说，一旦擦除就必须一次性擦除整个块。</p>
+<p>想想看，如果操作系统要让SSD改写某个页面的数据，SSD需要执行怎样的操作呢：<br>将要改写的目标页面所在的整个块的数据读取到缓存。w<br>在缓存中修改目标页面的数据。<br>对整个块执行擦除操作。<br>将缓存中的数据重新写入整个块中。</p>
+</blockquote>
+<p>这就意味着，如果我要修改某个4KB大小的页面，就必须把512KB大小的整个块都折腾一遍，大家应该可以想象出这将带来何等巨大的性能和寿命上的损失。</p>
+<blockquote>
+<p>SSD中提供了一个TRIM命令，操作系统在删除文件时可以通过向SSD发送TRIM命令告诉它哪些数据块中的数据已经不再使用了。SSD在收到TRIM命令后，通常会在定期的垃圾收集操作中重新组织这些区块，为将来写入数据做好准备，不过每一款SSD在底层对TRIM命令的执行机制都不尽相同，但无论如何，通过TRIM能够显著改善SSD的性能和寿命。当然，大家可能已经发现了，有了TRIM，删除的文件数据会被SSD自动回收，这意味着以往在传统硬盘上能够使用的一些数据恢复（反删除）软件，在SSD上可能就不再管用了。</p>
+</blockquote>
+<h2 id="启用trim"><a href="#启用trim" class="headerlink" title="启用trim"></a>启用trim</h2><h2 id="方法一-discard"><a href="#方法一-discard" class="headerlink" title="方法一: discard"></a>方法一: discard</h2><pre><code>vim /etc/fstab
+</code></pre><p>为SSD的每个分区option中加上<code>discard</code>选项, 每当系统删除文件时, 就会通知ssd进行trim. 可知, 当删除大量文件时, 性能也会有所下降的.<br>更多内容可参考<a href="https://patrick-nagel.net/blog/archives/337" target="_blank" rel="external">这里</a></p>
+<h2 id="方法二-使用-cron-按计划执行-fstrim"><a href="#方法二-使用-cron-按计划执行-fstrim" class="headerlink" title="方法二: 使用 cron 按计划执行 fstrim"></a>方法二: 使用 cron 按计划执行 fstrim</h2><pre><code>sudo vim /etc/cron.daily/trim
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#!/bin/sh</div><div class="line">LOG=/var/log/trim.log</div><div class="line">echo &quot;*** $(date -R) ***&quot; &gt;&gt; $LOG</div><div class="line">fstrim -v / &gt;&gt; $LOG</div></pre></td></tr></table></figure>
+<pre><code>sudo chmod +x /etc/cron.daily/trim
+</code></pre><p>我的<code>/</code>目录时我要trim的ssd分区, 这个根据情况来设置.</p>
+<p>至于cron.daily的具体执行时间, 是在6:25, 如下(<code>cat /etc/crontab</code>):</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ cat /etc/crontab</div><div class="line"># /etc/crontab: system-wide crontab</div><div class="line"># Unlike any other crontab you don&apos;t have to run the `crontab&apos;</div><div class="line"># command to install the new version when you edit this file</div><div class="line"># and files in /etc/cron.d. These files also have username fields,</div><div class="line"># that none of the other crontabs do.</div><div class="line"></div><div class="line">SHELL=/bin/sh</div><div class="line">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</div><div class="line"></div><div class="line"># m h dom mon dow user	command</div><div class="line">17 *	* * *	root    cd / &amp;&amp; run-parts --report /etc/cron.hourly</div><div class="line">25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.daily )</div><div class="line">47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.weekly )</div><div class="line">52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.monthly )</div></pre></td></tr></table></figure>
+<h1 id="查看-fstrim-结果"><a href="#查看-fstrim-结果" class="headerlink" title="查看 fstrim 结果"></a>查看 fstrim 结果</h1><p>每天可以从日志中查看trim结果, <code>tail /var/log/trim.log</code>, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">*** Fri, 12 Aug 2016 08:26:23 +0800 ***</div><div class="line">/: 426609340416 bytes were trimmed</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>[1] Ubuntu 固态硬盘 4K 对齐及启用 Trim - <a href="http://www.slblog.net/2013/07/enable-trim-and-perform-4k-alignment-in-ubuntu/" target="_blank" rel="external">http://www.slblog.net/2013/07/enable-trim-and-perform-4k-alignment-in-ubuntu/</a><br>[2] 【无聊科普】固态硬盘（SSD）为什么需要TRIM？ - <a href="http://www.guokr.com/blog/483475/" target="_blank" rel="external">http://www.guokr.com/blog/483475/</a><br>[3] Ubuntu 固态硬盘 4K对齐及启用 Trim，及其验证方法 - <a href="http://www.cnblogs.com/welhzh/p/4261348.html" target="_blank" rel="external">http://www.cnblogs.com/welhzh/p/4261348.html</a><br>[4] <a href="http://pcedu.pconline.com.cn/504/5047738_all.html" target="_blank" rel="external">你以为数据都被删除了？谈彻底删除文件 </a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/03/01/java/dist/disconf_1_server/" itemprop="url">
                   disconf - 【1】 server 搭建
                 </a>
@@ -1244,105 +1381,6 @@ cd synergy-1.7.5-stable
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/12/30/books/self_ctrl/self_ctrl_6/" itemprop="url">
-                  【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-12-30T00:00:00+08:00" content="2015-12-30">
-              2015-12-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/books/" itemprop="url" rel="index">
-                    <span itemprop="name">books</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/30/books/self_ctrl/self_ctrl_6/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><hr>
-<p><img src="/images/book_self_ctrl_6.png" alt=""></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1385,7 +1423,7 @@ cd synergy-1.7.5-stable
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">53</span>
+              <span class="site-state-item-count">54</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1399,7 +1437,7 @@ cd synergy-1.7.5-stable
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">135</span>
+              <span class="site-state-item-count">136</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
