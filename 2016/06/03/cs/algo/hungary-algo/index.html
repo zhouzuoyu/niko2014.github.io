@@ -1,0 +1,713 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="去发现更大的世界！" />
+
+
+
+  <meta name="keywords" content="algorithm," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="上一篇博客 稳定匹配问题 - Gale &amp;amp; Shapley 我们介绍了稳定匹配的问题和Gale-Shapley算法, 这次我们尝试用二分图和匈牙利算法来解决问题.
+二分图相关概念
+首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人, E为边集合, 边的两端分别在X和Y集合中.我们规定G的子图Gs的边集合任意两条都不是同一顶点, 则">
+<meta property="og:type" content="article">
+<meta property="og:title" content="稳定匹配问题 (2) - 匈牙利算法">
+<meta property="og:url" content="http://niko2014.github.io/2016/06/03/cs/algo/hungary-algo/index.html">
+<meta property="og:site_name" content="niko">
+<meta property="og:description" content="上一篇博客 稳定匹配问题 - Gale &amp;amp; Shapley 我们介绍了稳定匹配的问题和Gale-Shapley算法, 这次我们尝试用二分图和匈牙利算法来解决问题.
+二分图相关概念
+首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人, E为边集合, 边的两端分别在X和Y集合中.我们规定G的子图Gs的边集合任意两条都不是同一顶点, 则">
+<meta property="og:image" content="http://niko2014.github.io/images/cs/algo/bin-graph-01.png">
+<meta property="og:image" content="http://niko2014.github.io/images/cs/algo/bin-graph-02.png">
+<meta property="og:updated_time" content="2016-11-02T01:57:16.607Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="稳定匹配问题 (2) - 匈牙利算法">
+<meta name="twitter:description" content="上一篇博客 稳定匹配问题 - Gale &amp;amp; Shapley 我们介绍了稳定匹配的问题和Gale-Shapley算法, 这次我们尝试用二分图和匈牙利算法来解决问题.
+二分图相关概念
+首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人, E为边集合, 边的两端分别在X和Y集合中.我们规定G的子图Gs的边集合任意两条都不是同一顶点, 则">
+<meta name="twitter:image" content="http://niko2014.github.io/images/cs/algo/bin-graph-01.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always'
+  };
+</script>
+
+
+
+  <title> 稳定匹配问题 (2) - 匈牙利算法 | niko </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                稳定匹配问题 (2) - 匈牙利算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-06-03T00:00:00+08:00" content="2016-06-03">
+              2016-06-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/03/cs/algo/hungary-algo/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/03/cs/algo/hungary-algo/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>上一篇博客 <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/">稳定匹配问题 - Gale &amp; Shapley</a> 我们介绍了稳定匹配的问题和<code>Gale-Shapley</code>算法, 这次我们尝试用二分图和匈牙利算法来解决问题.</p>
+<h1 id="二分图相关概念"><a href="#二分图相关概念" class="headerlink" title="二分图相关概念"></a>二分图相关概念</h1><hr>
+<p>首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人, E为边集合, 边的两端分别在X和Y集合中.<br>我们规定G的子图Gs的边集合任意两条都不是同一顶点, 则Gs是一个匹配. 如图所示:</p>
+<p><img src="/images/cs/algo/bin-graph-01.png" alt=""></p>
+<p>如果加上黑色边表示男女互相喜欢, 如下:</p>
+<p><img src="/images/cs/algo/bin-graph-02.png" alt=""></p>
+<p>绿色边表示配对的结果, 称为匹配边, 其他称为非匹配边.<br>当匹配边最多时, 则称为该图的最大匹配.<br>接着介绍匈牙利算法.</p>
+<h1 id="匈牙利算法"><a href="#匈牙利算法" class="headerlink" title="匈牙利算法"></a>匈牙利算法</h1><hr>
+<p>接着是了解匈牙利算法, 在此之前, 我们先要知道几个概念:</p>
+<p><code>增广路</code>（augmenting path）:<br>从一个未匹配的点出发, 通过<code>交替路</code>(依次经过非匹配边、匹配边、非匹配边…依次交替的路径), 若途径其他未匹配点, 那么称为该交替路为增广路.<br>增广路有一个重要特点：非匹配边比匹配边多一条。所以取反(把增广路中的匹配边和非匹配边的身份交换)之后, 匹配边就比非匹配边多一条, 如此不断寻找增广路, 知道找不到增广路径时, 算法就结束了, 得到的就是最大匹配. 匈牙利算法就是这么做的.</p>
+<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><hr>
+<p>实现主要用到两个类: <code>MatchRecord</code>和<code>HungaryAlgorithm</code>.</p>
+<p><code>MatchRecord</code> 作为匹配过程的辅助记录, 比如边和点的关系/增广路等等, 如注释:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MatchRecord</span> </span>&#123;</div><div class="line">    <span class="comment">// 男生/女生的人数</span></div><div class="line">    <span class="keyword">int</span> count;</div><div class="line">    <span class="comment">// 表示边 (用x和y坐标定位), 数值1表示两点存在边连接</span></div><div class="line">    <span class="keyword">int</span> edge[][];</div><div class="line">    <span class="comment">// 是否在当前增广路</span></div><div class="line">    <span class="keyword">boolean</span> onPath[];</div><div class="line">    <span class="comment">// 已找到的增广路</span></div><div class="line">    <span class="keyword">int</span> augmentPath[];</div><div class="line">    <span class="comment">// 最大匹配的结果数</span></div><div class="line">    <span class="keyword">int</span> maxMatch = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MatchRecord</span><span class="params">(<span class="keyword">int</span> count)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.count = count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnPath</span><span class="params">(<span class="keyword">boolean</span>[] onPath)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.onPath = onPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEdge</span><span class="params">(<span class="keyword">int</span>[][] edge)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.edge = edge;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] getAugmentPath() &#123;</div><div class="line">        <span class="keyword">return</span> augmentPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAugmentPath</span><span class="params">(<span class="keyword">int</span>[] augmentPath)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.augmentPath = augmentPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getMaxMatch</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> maxMatch;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getEdge</span><span class="params">(<span class="keyword">int</span> xi, <span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.edge[xi][yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">notOnPath</span><span class="params">(<span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> ! onPath[yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnPath</span><span class="params">(<span class="keyword">int</span> yi, <span class="keyword">boolean</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.onPath[yi] = <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAugmentPath</span><span class="params">(<span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.augmentPath[yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAugmentPath</span><span class="params">(<span class="keyword">int</span> yi, <span class="keyword">int</span> xi)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.augmentPath[yi] = xi;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] aug = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="keyword">this</span>.getCount()];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span class="number">0</span>; idx &lt; aug.length; idx++) &#123;</div><div class="line">            aug[idx] = -<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.setOnPath(<span class="keyword">new</span> <span class="keyword">boolean</span>[<span class="keyword">this</span>.getCount()]);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">maxMatchInc</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.maxMatch++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>HungaryAlgorithm</code>, 主要是执行匹配过程, 通过深度搜索来查找匹配:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HungaryAlgorithm</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        MatchRecord rec = init();</div><div class="line">        <span class="keyword">int</span> count = rec.getCount();</div><div class="line">        HungaryAlgorithm hungary = <span class="keyword">new</span> HungaryAlgorithm();</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> xi = <span class="number">0</span>; xi &lt; count; xi++) &#123;</div><div class="line">            <span class="keyword">if</span> (hungary.findAugmentPath(rec, xi)) &#123;</div><div class="line">                rec.maxMatchInc();</div><div class="line">            &#125;</div><div class="line">            rec.reset();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">boolean</span> found = rec.getMaxMatch() == count;</div><div class="line">        <span class="keyword">if</span> (found) &#123;</div><div class="line">            print(rec);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// TODO 设置测试数据</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MatchRecord <span class="title">init</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> count = <span class="number">3</span>;</div><div class="line">        <span class="keyword">int</span>[][] edge = <span class="keyword">new</span> <span class="keyword">int</span>[][]&#123;</div><div class="line">                &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</div><div class="line">                &#123;<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>&#125;,</div><div class="line">                &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>&#125;</div><div class="line">        &#125;;</div><div class="line">        <span class="keyword">int</span>[] augment = <span class="keyword">new</span> <span class="keyword">int</span>[count];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span class="number">0</span>; idx &lt; augment.length; idx++) &#123;</div><div class="line">            augment[idx] = -<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//</span></div><div class="line">        MatchRecord rec = <span class="keyword">new</span> MatchRecord(count);</div><div class="line">        rec.setEdge(edge);</div><div class="line">        rec.setOnPath(<span class="keyword">new</span> <span class="keyword">boolean</span>[count]);</div><div class="line">        rec.setAugmentPath(augment);</div><div class="line">        <span class="keyword">return</span> rec;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">findAugmentPath</span><span class="params">(MatchRecord matchRecord, <span class="keyword">int</span> xi)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> yi = <span class="number">0</span>; yi &lt; matchRecord.getCount(); yi++) &#123;</div><div class="line">            <span class="keyword">if</span> (matchRecord.getEdge(xi, yi) == <span class="number">1</span> &amp;&amp; matchRecord.notOnPath(yi)) &#123;</div><div class="line">                matchRecord.setOnPath(yi, <span class="keyword">true</span>);</div><div class="line">                <span class="keyword">if</span> (matchRecord.getAugmentPath(yi) == -<span class="number">1</span></div><div class="line">                        || findAugmentPath(matchRecord, matchRecord.getAugmentPath(yi))) &#123;</div><div class="line">                    matchRecord.setAugmentPath(yi, xi);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(MatchRecord rec)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] aug = rec.getAugmentPath();</div><div class="line">        System.out.println(<span class="string">"匹配结果: "</span>);</div><div class="line">        System.out.println(<span class="string">"y  --  x"</span>);</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> yi : aug) &#123;</div><div class="line">            System.out.println(<span class="string">""</span> + yi + <span class="string">" &lt;--&gt; "</span> + aug[yi]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最终输出结果:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">匹配结果:</div><div class="line">y  --  x</div><div class="line">0 &lt;--&gt; 0</div><div class="line">2 &lt;--&gt; 1</div><div class="line">1 &lt;--&gt; 2</div></pre></td></tr></table></figure>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>以上就是匈牙利算法, 不过上面我们解决的仍是无权匹配的问题, 下篇博客我们将讨论有权匹配的问题和相关算法.</p>
+<div style="display: none;"><br>最大匹配数：最大匹配的匹配边的数目<br>最小点覆盖数：选取最少的点，使任意一条边至少有一个端点被选择<br>最大独立数：选取最多的点，使任意所选两点均不相连<br>最小路径覆盖数：对于一个 DAG（有向无环图），选取最少条路径，使得每个顶点属于且仅属于一条路径。路径长可以为 0（即单个点）。<br>定理1：最大匹配数 = 最小点覆盖数（这是 Konig 定理）<br>定理2：最大匹配数 = 最大独立数<br>定理3：最小路径覆盖数 = 顶点数 - 最大匹配数<br></div>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://zh.wikipedia.org/wiki/%E5%8C%88%E7%89%99%E5%88%A9%E7%AE%97%E6%B3%95" target="_blank" rel="external">匈牙利算法</a><br><a href="https://zh.wikipedia.org/wiki/%E5%8C%B9%E9%85%8D_(%E5%9B%BE%E8%AE%BA" target="_blank" rel="external">图论(匹配</a>)<br><a href="https://www.renfei.org/blog/bipartite-matching.html" target="_blank" rel="external">https://www.renfei.org/blog/bipartite-matching.html</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/algorithm/" rel="tag">#algorithm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/" rel="next" title="稳定匹配问题 (1) - Gale & Shapley">
+                <i class="fa fa-chevron-left"></i> 稳定匹配问题 (1) - Gale & Shapley
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/01/linux/manage/remove-deb/" rel="prev" title="卸载删除已安装的 `.deb` 包">
+                卸载删除已安装的 `.deb` 包 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/06/03/cs/algo/hungary-algo/"
+                   data-title="稳定匹配问题 (2) - 匈牙利算法" data-url="http://niko2014.github.io/2016/06/03/cs/algo/hungary-algo/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">niko</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">58</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">49</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">136</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#二分图相关概念"><span class="nav-number">1.</span> <span class="nav-text">二分图相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#匈牙利算法"><span class="nav-number">2.</span> <span class="nav-text">匈牙利算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#算法实现"><span class="nav-number">3.</span> <span class="nav-text">算法实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">4.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

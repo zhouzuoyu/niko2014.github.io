@@ -204,6 +204,460 @@
             
             
               
+                <a class="post-title-link" href="/2016/01/26/linux/tools/cheat-cmd/" itemprop="url">
+                  man的铺助工具——cheat
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-26T00:00:00+08:00" content="2016-01-26">
+              2016-01-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/26/linux/tools/cheat-cmd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/26/linux/tools/cheat-cmd/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="man"><a href="#man" class="headerlink" title="man"></a>man</h1><p>相信使用Linux的小伙伴, 想要查询一个命令的用法时, 都会使用<code>man</code>命令数据库，或者试一试命令自带的<code>--help</code>参数。<br>但是使用<code>man</code>有个不好的地方，就是信息太多太全了，对我们来说，需要的可能只是某个用法，而且例子是比较少的，有时man的效率确实比较低。<br>所以我的习惯是，写博客和笔记，并附有许多常用的例子。<br>其实，还有一个常用工具，可以满足需求的——<code>cheat</code>。</p>
+<h1 id="cheat-命令"><a href="#cheat-命令" class="headerlink" title="cheat 命令"></a>cheat 命令</h1><p>首先，看一下效果，以tar为例：</p>
+<p><img src="/images/linux/linux-python-cheat-tar.png" alt=""></p>
+<h1 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h1><p>cheat是python写的，可以用pip安装。</p>
+<pre><code>pip install cheat
+</code></pre><h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><hr>
+<p><a href="https://github.com/chrisallenlane/cheat" target="_blank" rel="external">github 地址</a></p>
+<p>#</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/01/13/linux/synergy/" itemprop="url">
+                  synergy 安装和使用 （一套键鼠掌握世界）
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-13T15:03:30+08:00" content="2016-01-13">
+              2016-01-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/13/linux/synergy/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/linux/synergy/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>由于有两台电脑，四个显示器，在使用的时候，难免要切换，但笔记本的触控板和键盘实在太难用～<code>%&gt;_&lt;%</code> 但是机械键盘和鼠标只有一套，怎么办呢？<br>还好之前看一些大牛的工作环境时，看到有一个工具叫synergy，用来同步鼠标和键盘，可以随意在多台电脑中切换。</p>
+<h1 id="通过apt-get-安装"><a href="#通过apt-get-安装" class="headerlink" title="通过apt-get 安装"></a>通过apt-get 安装</h1><p>因为我常用的操作系统是ubuntu和kali，当然是直接apt-get。</p>
+<pre><code>apt-get install synergy
+</code></pre><p>安装后，两台ubuntu（synergy版本1.4.12）之间操作没问题，然而在kali上是1.4.16版本，有不兼容的问题。于是找了下源，并没有找到对应的仓库，干脆就两边使用最新的源码install好了。</p>
+<h1 id="通过源码安装"><a href="#通过源码安装" class="headerlink" title="通过源码安装"></a>通过源码安装</h1><p>首先，安装依赖</p>
+<pre><code>sudo apt-get install cmake make g++ xorg-dev libqt4-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev libssl-dev
+</code></pre><p>访问<a href="https://github.com/symless/synergy/releases" target="_blank" rel="external">synergy on github</a>，git clone或者直接<a href="https://github.com/symless/synergy/archive/v1.7.5-stable.tar.gz" target="_blank" rel="external">下载</a>，然后：</p>
+<pre><code>tar xzvf v1.7.5-stable.tar.gz
+cd synergy-1.7.5-stable
+./hm conf -g1
+./hm build
+</code></pre><p>搞定。kali上也是如此操作，因为也是基于Debian。</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>跟着上面的操作，工作目录还在<code>synergy-1.7.5-stable</code>，执行<code>bin/synergy</code></p>
+<p>1，开启服务器（服务器即是你鼠标和键盘连接的那台电脑），synergy 会有个向导，选择服务器模式；<br>2，点击<code>Configure Server</code>，拖拽显示右上角的显示到格子中，想要的放置位置，这里要注意显示器的name需要填写正确，这个name就是client（或server）的名称，client若对不上，会被server拒绝连接的（name在<code>Edit - Settings</code>中设置）。</p>
+<p><img src="/images/synergy_server_conf.png" alt=""><br><img src="/images/synergy_name_settings.png" alt=""></p>
+<p>3，主界面点击start，界面可以看到log，包括客户端的连接。<br>4，启动server后，其他主机同样<code>bin/synergy</code>启动，选择client模式，接着设置一下自己的name，填写server的IP，点击<code>Start</code>。<br>5，Okay，这时可以发现，一套键鼠可以操控多台计算机啦，尽情地享受多屏多机的快感吧，工作效率杠杠的。    :-D</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/01/12/java/spring/spring_transaction_manager/" itemprop="url">
+                  【spring】事务提交后进行某些操作
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-12T13:03:30+08:00" content="2016-01-12">
+              2016-01-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/12/java/spring/spring_transaction_manager/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/12/java/spring/spring_transaction_manager/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>在工作中，我们经常会有这样的需求。当修改了某些东西后，需要通知其他服务模块或系统进行某些处理。<br>这个如果硬编码的话，是一种很不优雅的方法：<br>首先，它的灵活性很差，当需求变更时，无可避免的要修改业务操作的代码，容易出bug，不符合<code>开关</code>原则（虽然不是讨论设计模式）。<br>其次，主业务操作（数据修改）部分和后续的通知处理应该是隔离的，后续的通知是否成功，对业务操作都不应有影响，或者在功能和时间上尽可能不影响主业务操作。</p>
+<p>那么如果不用硬编码，事件（消息）驱动的方式是常用的一种方法，这样我们就可以把后续通知的相关处理和主业务操作解耦开来，就算要进行拓展也是很安全和方便的。</p>
+<h2 id="spring-的-TransactionSynchronizationManager"><a href="#spring-的-TransactionSynchronizationManager" class="headerlink" title="spring 的 TransactionSynchronizationManager"></a>spring 的 TransactionSynchronizationManager</h2><p>在spring中，TransactionSynchronizationManager有一个事务提交后的回调支持，我们可以视线注册需要在事务commit后才进行的某些操作，如<code>afterCommit()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 这里是上下文</div><div class="line">TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() &#123;</div><div class="line">        @Override</div><div class="line">        public void suspend() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void resume() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void flush() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCommit(boolean readOnly) &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCompletion() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCommit() &#123;</div><div class="line">            log.info(&apos;afterCommit()&apos;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCompletion(int status) &#123;</div><div class="line">        &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>因为TransactionSynchronization是interface，所以TransactionSynchronization的实现是一个匿名内部类，相当于一个闭包，可以访问上下文的变量等，方便我们进行某些操作。</p>
+<h2 id="运行细节-源码"><a href="#运行细节-源码" class="headerlink" title="运行细节 ( 源码 )"></a>运行细节 ( 源码 )</h2><p>接下来看一下TransactionSynchronizationManager的实现，它的成员中，有个ThreadLocal副本，保存了不同线程已注册的同步操作：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static final ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations =</div><div class="line">			new NamedThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt;(&quot;Transaction synchronizations&quot;);</div></pre></td></tr></table></figure>
+<p>在spring运行过程中，事务相关的操作会通过TransactionInterceptor执行invocation：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	public Object invoke(final MethodInvocation invocation) throws Throwable &#123;</div><div class="line">		// Work out the target class: may be &#123;@code null&#125;.</div><div class="line">		// The TransactionAttributeSource should be passed the target class</div><div class="line">		// as well as the method, which may be from an interface.</div><div class="line">		Class&lt;?&gt; targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);</div><div class="line"></div><div class="line">		// Adapt to TransactionAspectSupport&apos;s invokeWithinTransaction...</div><div class="line">		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() &#123;</div><div class="line">			@Override</div><div class="line">			public Object proceedWithInvocation() throws Throwable &#123;</div><div class="line">				return invocation.proceed();</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">    protected Object invokeWithinTransaction(Method method, Class&lt;?&gt; targetClass, final InvocationCallback invocation)</div><div class="line">			throws Throwable &#123;</div><div class="line">            ...</div><div class="line">            ...</div><div class="line">			commitTransactionAfterReturning(txInfo);</div><div class="line">			return retVal;</div><div class="line">		&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>invokeWithinTransaction()是父类TransactionAspectSupport的方法，并会调用commitTransactionAfterReturning(TransactionInfo txInfo))来提交事务：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionInterceptor.java</div><div class="line"></div><div class="line">   protected void commitTransactionAfterReturning(TransactionInfo txInfo) &#123;</div><div class="line">	if (txInfo != null &amp;&amp; txInfo.hasTransaction()) &#123;</div><div class="line">		if (logger.isTraceEnabled()) &#123;</div><div class="line">			logger.trace(&quot;Completing transaction for [&quot; + txInfo.getJoinpointIdentification() + &quot;]&quot;);</div><div class="line">		&#125;</div><div class="line">		txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// AbstractPlatformTransactionManager.java</div><div class="line"></div><div class="line">@Override</div><div class="line">public final void commit(TransactionStatus status) throws TransactionException &#123;</div><div class="line">    ...</div><div class="line">	processCommit(defStatus);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>processCommit()这个方法中很详细的介绍了提交事务的处理细节，包括beforeCommit() / beforeCompletion() / afterCommit() / afterCompletion()在事务提交时的调用和发生异常时的处理方法，还可以看到如isNewTransaction、globalRollbackOnly等对事务处理的影响。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private void processCommit(DefaultTransactionStatus status) throws TransactionException &#123;</div><div class="line">    try &#123;</div><div class="line">        boolean beforeCompletionInvoked = false;</div><div class="line">        try &#123;</div><div class="line">            prepareForCommit(status);</div><div class="line">            triggerBeforeCommit(status);</div><div class="line">            triggerBeforeCompletion(status);</div><div class="line">            beforeCompletionInvoked = true;</div><div class="line">            boolean globalRollbackOnly = false;</div><div class="line">            if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) &#123;</div><div class="line">                globalRollbackOnly = status.isGlobalRollbackOnly();</div><div class="line">            &#125;</div><div class="line">            if (status.hasSavepoint()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Releasing transaction savepoint&quot;);</div><div class="line">                &#125;</div><div class="line">                status.releaseHeldSavepoint();</div><div class="line">            &#125;</div><div class="line">            else if (status.isNewTransaction()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Initiating transaction commit&quot;);</div><div class="line">                &#125;</div><div class="line">                doCommit(status);</div><div class="line">            &#125;</div><div class="line">            // Throw UnexpectedRollbackException if we have a global rollback-only</div><div class="line">            // marker but still didn&apos;t get a corresponding exception from commit.</div><div class="line">            if (globalRollbackOnly) &#123;</div><div class="line">                throw new UnexpectedRollbackException(</div><div class="line">                        &quot;Transaction silently rolled back because it has been marked as rollback-only&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        catch (UnexpectedRollbackException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_ROLLED_BACK);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (TransactionException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            if (isRollbackOnCommitFailure()) &#123;</div><div class="line">                doRollbackOnCommitException(status, ex);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                triggerAfterCompletion(status, TransactionSynchronization.STATUS_UNKNOWN);</div><div class="line">            &#125;</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (RuntimeException ex) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, ex);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (Error err) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, err);</div><div class="line">            throw err;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // Trigger afterCommit callbacks, with an exception thrown there</div><div class="line">        // propagated to callers but the transaction still considered as committed.</div><div class="line">        try &#123;</div><div class="line">            triggerAfterCommit(status);</div><div class="line">        &#125;</div><div class="line">        finally &#123;</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_COMMITTED);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        cleanupAfterCompletion(status);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到triggerAfterCommit()在doCommit(status)，不管是否抛出异常都会执行afterCompletion()，这个细节在平时开发也要留意，做好异常的处理。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   private void triggerAfterCommit(DefaultTransactionStatus status) &#123;</div><div class="line">	if (status.isNewSynchronization()) &#123;</div><div class="line">		if (status.isDebug()) &#123;</div><div class="line">			logger.trace(&quot;Triggering afterCommit synchronization&quot;);</div><div class="line">		&#125;</div><div class="line">		TransactionSynchronizationUtils.triggerAfterCommit();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>终于，前面我们注册在TransactionSynchronizationManager的TransactionSynchronization，在这里被get出来执行，如果注册了多个通知操作，会被按顺序执行，因为这个Set的实现是LinkedHashSet。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionSynchronizationUtils</div><div class="line">   public static void triggerAfterCommit() &#123;</div><div class="line">	invokeAfterCommit(TransactionSynchronizationManager.getSynchronizations());</div><div class="line">&#125;</div><div class="line"></div><div class="line">   public static void invokeAfterCommit(List&lt;TransactionSynchronization&gt; synchronizations) &#123;</div><div class="line">	if (synchronizations != null) &#123;</div><div class="line">		for (TransactionSynchronization synchronization : synchronizations) &#123;</div><div class="line">			synchronization.afterCommit();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>至今为止，以上讨论的是弱一致性的业务场景，一致性要求比较高的，需要分布式事务或者其他的手段来实现。<br>而且需要注意的，afterCommit()中的操作是同步的，和业务操作在同一个响应时间内的，所以，尽量不要做一些耗时的操作。<br>afterCommit()中，除了直接发送消息到队列，也可以使用本地队列来优化，用来存储和异步发送消息，这样会快很多。</p>
+<p>``</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/01/05/java/spring/spring-transactional-aop/" itemprop="url">
+                  【spring】自我调用中transaction的常见问题
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-05T20:25:08+08:00" content="2016-01-05">
+              2016-01-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/05/java/spring/spring-transactional-aop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><hr>
+<p>最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。<br>既然如此只好debug一下，接着很快便知道了。</p>
+<h2 id="代码大概是这样的"><a href="#代码大概是这样的" class="headerlink" title="代码大概是这样的"></a>代码大概是这样的</h2><hr>
+<p><a href="https://github.com/niko2014/blog-demo/tree/master/java/starter-jpa-transaction-self-invoke" target="_blank" rel="external">示例代码</a>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodMain() throws Exception &#123;</div><div class="line">        int status = 5;</div><div class="line">        methodA(status);</div><div class="line">        try &#123;</div><div class="line">            methodB(status);        // 位置A</div><div class="line">//            memberOrderCopyService.methodB(status);     // 位置B</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        methodC(status);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodA(Integer status) &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(1L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)</div><div class="line">    public void methodB(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(2L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">        th();</div><div class="line">    &#125;</div><div class="line">    public void methodC(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(3L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    private void th() throws Exception &#123;</div><div class="line">        throw new Exception(&quot;test&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>如上，methodB()中有一个持久化的操作，在那之后有可能会抛异常(th()方法)。<br>实习生的想法是，methodB()加一个注解@Transactional(rollbackFor)，想让methodB执行失败时回滚事务。<br>然而，这种是对spring aop不了解导致的错误。</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><hr>
+<p>我对实习生说了这个错误之后，他却坚持这样是有效的。。没办法，只好以理服人。断点debug，翻源码。</p>
+<p><img src="/images/spring-tx-aop/error_debug_01.png" alt=""></p>
+<p>如上图，可看到methodB()的调用栈，发现methodMaster()是经过拦截器后调用的（Cglib生成代理对象的情况下，AOP拦截和回调可在<code>DynamicAdvisedInterceptor.intercept()</code>方法中找到，如下）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Override</div><div class="line">public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line">    try &#123;</div><div class="line">        if (this.advised.exposeProxy) &#123;</div><div class="line">            // Make invocation available if necessary.</div><div class="line">            oldProxy = AopContext.setCurrentProxy(proxy);</div><div class="line">            setProxyContext = true;</div><div class="line">        &#125;</div><div class="line">        // May be null. Get as late as possible to minimize the time we</div><div class="line">        // &quot;own&quot; the target, in case it comes from a pool...</div><div class="line">        target = getTarget();</div><div class="line">        if (target != null) &#123;</div><div class="line">            targetClass = target.getClass();</div><div class="line">        &#125;</div><div class="line">        List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line">        Object retVal;</div><div class="line">        // Check whether we only have one InvokerInterceptor: that is,</div><div class="line">        // no real advice, but just reflective invocation of the target.</div><div class="line">        if (chain.isEmpty() &amp;&amp; Modifier.isPublic(method.getModifiers())) &#123;</div><div class="line">            // We can skip creating a MethodInvocation: just invoke the target directly.</div><div class="line">            // Note that the final invoker must be an InvokerInterceptor, so we know</div><div class="line">            // it does nothing but a reflective operation on the target, and no hot</div><div class="line">            // swapping or fancy proxying.</div><div class="line">            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</div><div class="line">            retVal = methodProxy.invoke(target, argsToUse);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // We need to create a method invocation...</div><div class="line">            retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();</div><div class="line">        &#125;</div><div class="line">        retVal = processReturnType(proxy, target, method, retVal);</div><div class="line">        return retVal;</div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        if (target != null) &#123;</div><div class="line">            releaseTarget(target);</div><div class="line">        &#125;</div><div class="line">        if (setProxyContext) &#123;</div><div class="line">            // Restore old proxy.</div><div class="line">            AopContext.setCurrentProxy(oldProxy);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在在来看methodB()：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_self_invoke.png" alt=""></p>
+<p>很明显，methodB是在methodMaster()中调用的，<code>TransactionInterceptor</code>并没有拦截，因此@Transactional是无效的。</p>
+<p>现在来对比一下，切换启用位置B代码（使用<code>memberOrderCopyService.methodB(status)</code>）的执行情况：</p>
+<p><img src="/images/spring-tx-aop/error_debug_03_of_copy_service.png" alt=""></p>
+<p>从上图可知，此时memberOrderCopyService.methodB()和原先的memberOrderService.methodMaster()都经过了TransactionInterceptor，然后通过代理invoke，这种是正确的，当有异常出现，事务也会正常回滚。</p>
+<p>其实，这是一个简单的问题，通过推理也可以猜到，而且如果内部每个方法都用拦截器，会是一个很大的性能问题。</p>
+<div style="display:none"><br>    FastClassBySpringCGLIB<br>    EnhancerBySpringCGLIB<br>    其实如果用Aspect也可以实现类似Transactional的功能，<br>    下次有空写一个<code>Aspect 和 Transactional</code>的对比。<br></div>
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/12/30/books/self_ctrl/self_ctrl_6/" itemprop="url">
                   【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
                 </a>
@@ -1103,535 +1557,6 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/30/git/git_flow/" itemprop="url">
-                  Git 分支管理
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-30T15:03:30+08:00" content="2015-11-30">
-              2015-11-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/30/git/git_flow/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/30/git/git_flow/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="为什么要用分支"><a href="#为什么要用分支" class="headerlink" title="为什么要用分支"></a>为什么要用分支</h2><hr>
-<p>记得刚加入现在团队的时候，和boss搭了GOGS（类似的还有gitlab），到最近完成v0.1版本，一直都是用一个分支了。最近团队加入了几个新成员，产品那边也有大量的新需求和迭代。若还不进行分支管理，必定一定会陷入混乱（如果你问为什么？看了后面的分支管理模型，你就会恍然大悟）。</p>
-<p>这也让我想起在第一家公司实习的时候，有一个team，用了git，后来发现，只是用来更新和提交，真是高射炮打蚊子。就算是后来人员扩充了之后，仍然没有分支管理，当时觉得不可思议。他们的产品迭代速度很慢，质量也很差，我觉得这跟他们的代码管理也有一点关系。</p>
-<h2 id="一个通用模型"><a href="#一个通用模型" class="headerlink" title="一个通用模型"></a>一个通用模型</h2><hr>
-<p>关于分支的管理和工程实践上，最广为认知的是Vincent Driessen在2010年发表的一篇博客：<a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">《一种成功的Git分支管理模型》</a>，这篇博客总结了一种通用的分支管理模型，这个模型可以覆盖大部分的场景和研发流程。或许你没看过这篇博客，但如果你参与过团队分支管理策略的制定，你一定可以找到共鸣。</p>
-<p>博客中有一张图很清晰地描述了这个模型和各种场景：<br><img src="/images/git-model@2x.png" alt=""></p>
-<p>我记得在第一次实习时，团队中用的是svn，那时还没看过这篇博客，不过那时我们根据研发流程和需求场景制定出来的svn分支管理策略和这个类似，只是一个简化版，没有做太细。有一部分原因是因为svn的分支功能确实sucks，团队也不想浪费太多精力和成本。据说现在他们也换为git了，因为并行开发的功能太多了，svn终于让他们“心力交瘁”。</p>
-<h3 id="git-flow"><a href="#git-flow" class="headerlink" title="git-flow"></a>git-flow</h3><hr>
-<p>git的分支管理非常强大和方便，而git-flow可以让我们简化分支管理的操作。git-flow是git的一个扩展集，按<code>Vincent Driessen</code>的分支模型提供高层的操作，具体可参考<a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">这篇指南</a>。</p>
-<p>（现在想起当年用svn的分支管理，仍隐隐觉得蛋疼。那一堆堆tree-conflict（尤其是目录）历历在目，还好后来转到git）</p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
-<li>修改配置<br>git flow config<br>或者，修改配置文件：<br>vim your_repo/.git/config</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
-<p>分支管理是一门管理艺术，一味地盲目模仿不切实际，只会增加混乱和成本，在执行上也会遇到各种阻碍，所以针对自身团队和业务特点，找到最适合自己的管理策略。不过若你的产品需要快速的更新和迭代，你一定要试一下git。</p>
-<!--
-1. 小张和小何在开发两个大功能（`A-v0.1`和`B-v0.1`），小张先完成了A，然后部署生产了，小何继续B开发。
-小何过了两天也完成了B，然后提交代码，自动化部署B后，发现A功能出问题了，原来小张在这两天在进行A功能小优化（`A-v0.1.1`），还未完成就“被”部署上去了。
-这个故事告诉我们，需要把必须将正式（master）和开发（develop）的代码分开。
-
-2. 现在代码分成了两个分支，小张小何都在develop开发。小张完成`A-v0.2`，要部署。合并的代码发现有小何的代码，于是问小何，小何说`我在做B-v0.2`，还没做完，你不可以合并。
-所以问题还是没有解决，产品汪质问小张，为什么还不部署，这个功能很急的，小何表示压力很大。
-这次，小张小何约定，从develop分支再建立分支，叫做feature分支，用来。
-
-3...  场景太多了， 不写了
--->
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
-<ol>
-<li><a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">git-flow 备忘清单</a></li>
-<li><a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">A successful Git branching model » nvie.com</a></li>
-</ol>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/29/linux/solarized_colors/" itemprop="url">
-                  github 上的配色项目 - solarized
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-29T00:00:00+08:00" content="2015-11-29">
-              2015-11-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/29/linux/solarized_colors/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/29/linux/solarized_colors/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
-<h3 id="for-vim"><a href="#for-vim" class="headerlink" title="for vim"></a>for vim</h3><hr>
-<p>vim的配置非常简单，有两种方式：</p>
-<h4 id="1-手工安装"><a href="#1-手工安装" class="headerlink" title="1. 手工安装"></a>1. 手工安装</h4><p>下载：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 任意目录下载源码</div><div class="line">git clone git://github.com/altercation/vim-colors-solarized.git</div><div class="line">cd vim-colors-solarized/colors</div><div class="line">mv solarized.vim ~/.vim/colors/</div></pre></td></tr></table></figure>
-<p>修改vimrc</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">syntax enable</div><div class="line">set background=dark</div><div class="line">colorscheme solarized</div></pre></td></tr></table></figure>
-<p>如果不喜欢dark，可以换成<code>set background=light</code>主题。</p>
-<h4 id="2-使用pathogen插件管理"><a href="#2-使用pathogen插件管理" class="headerlink" title="2. 使用pathogen插件管理"></a>2. 使用pathogen插件管理</h4><p>使用pathogen可以很好的管理插件， 解决vim文件分散、管理麻烦的问题，这也是官方推荐的方式。</p>
-<p>安装pathogen</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/.vim/</div><div class="line">mkdir autoload</div><div class="line">cd autoload/</div><div class="line">wget https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim</div></pre></td></tr></table></figure>
-<p>启用pathogen</p>
-<pre><code>vim ~/.vimrc
-// 增加以下内容， 注意需要在`filetype plugin indent on `之前。
-call pathogen#infect()
-or
-execute pathogen#infect()
-</code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
-<pre><code>cd ~/.vim/bundle
-git clone git://github.com/altercation/vim-colors-solarized.git
-</code></pre><p>然后跟方式一的<code>修改vimrc</code>步骤一样执行。</p>
-<h4 id="效果图："><a href="#效果图：" class="headerlink" title="效果图："></a>效果图：</h4><p>虽然官方文档有很多案例图，还是贴一下个人的效果图：</p>
-<p><img src="/images/solarized_vim_show.png" alt=""></p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>如果你希望保留之前terminal的透明度，可以在<code>～/.vimrc</code>增加以下配置：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
-<h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
-<p>// TODO</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/11/01/java/spring/spring-boot_config_order/" itemprop="url">
-                  spring配置加载顺序
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-11-01T00:00:00+08:00" content="2015-11-01">
-              2015-11-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/11/01/java/spring/spring-boot_config_order/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/01/java/spring/spring-boot_config_order/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="spring的配置加载顺序"><a href="#spring的配置加载顺序" class="headerlink" title="spring的配置加载顺序"></a>spring的配置加载顺序</h1><p>Spring使用了特定的配置属性加载顺序，为了让后者可以覆写前者的配置，而前者提供一些默认的约定配置。具体的加载顺序是：</p>
-<ul>
-<li>Command line arguments.</li>
-<li>Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)</li>
-<li>JNDI attributes from java:comp/env.</li>
-<li>Java System properties (System.getProperties()).</li>
-<li>OS environment variables.</li>
-<li><p>A RandomValuePropertySource that only has properties in <code>random.*.</code></p>
-</li>
-<li><p>Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)</p>
-</li>
-<li>Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)</li>
-<li>Application properties outside of your packaged jar (application.properties and YAML variants).</li>
-<li>Application properties packaged inside your jar (application.properties and YAML variants).</li>
-<li>@PropertySource annotations on your @Configuration classes.</li>
-<li>Default properties (specified using SpringApplication.setDefaultProperties).</li>
-</ul>
-<h1 id="配置覆写测试和验证"><a href="#配置覆写测试和验证" class="headerlink" title="配置覆写测试和验证"></a>配置覆写测试和验证</h1><p>使用starter-web来测试：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Controller</div><div class="line">@EnableAutoConfiguration</div><div class="line">public class SampleController &#123;</div><div class="line"></div><div class="line">    @Value(&quot;$&#123;myname&#125;&quot;)</div><div class="line">    String myName;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    String home() &#123;</div><div class="line">        return &quot;Hello, &quot; + myName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line">        SpringApplication.run(SampleController.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>测试用命令行传入：</p>
-<pre><code>java -jar target/app.jar --myname=&quot;niko&quot;
-</code></pre><p>测试shell环境变量</p>
-<pre><code>export SPRING_APPLICATION_JSON=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
-java -jar target/app.jar
-</code></pre><p>测试使用系统变量</p>
-<pre><code>java -jar target/app.jar -Dspring.application.json=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
-</code></pre><p>测试<code>application.properties</code>和<code>application-dev.properties</code>：<br>application.properties：</p>
-<pre><code>spring.profiles.active=dev
-myname=application.properties
-</code></pre><p>application-dev.properties：</p>
-<pre><code>myname=application-dev.properties
-</code></pre><h1 id="其他细节"><a href="#其他细节" class="headerlink" title="其他细节"></a>其他细节</h1><h2 id="application-properties-的查找顺序"><a href="#application-properties-的查找顺序" class="headerlink" title="application.properties 的查找顺序"></a>application.properties 的查找顺序</h2><p>Spring会加载配置文件<code>application.properties</code>从以下位置：</p>
-<ul>
-<li>A <code>/config</code> subdirectory of the current directory.</li>
-<li>The current directory</li>
-<li>A classpath <code>/config</code> package</li>
-<li>The classpath root</li>
-</ul>
-<p>如果你不喜欢<code>application</code>这个name，可以传入<code>--spring.config.name=othername</code>来设置，或者是使用<code>--spring.config.location=classpath:/default.properties,classpath:/override.properties</code>。<br>值得注意的是，<code>spring.config.location</code>声明的加载优先级是从低到高，即是会先加载<code>classpath:/override.properties</code>。</p>
-<h2 id="占位符使用"><a href="#占位符使用" class="headerlink" title="占位符使用"></a>占位符使用</h2><p><code>application.properties</code></p>
-<pre><code>app.name=MyApp
-app.description=${app.name} is a Spring Boot application
-</code></pre><p>这个就算是<code>app.name</code>的声明顺序倒过来也是okay的。</p>
-<p>&gt;</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/10/30/git/git-stash/" itemprop="url">
-                  git stash 使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-10-30T00:00:00+08:00" content="2015-10-30">
-              2015-10-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/10/30/git/git-stash/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/30/git/git-stash/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="git-stash-干嘛滴"><a href="#git-stash-干嘛滴" class="headerlink" title="git stash 干嘛滴"></a>git stash 干嘛滴</h1><p>假如你正在开发feature-01，但是依赖的一个模块代码修改了，你必须pull代码，然而你又不想commit，这时可以使用<code>git stash</code>来保存当前未commit的代码更改。</p>
-<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p>假设仓库已经有stash-01.txt空文件，vim stash-01.txt，你加了一行文本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">I am developing feature-01</div></pre></td></tr></table></figure>
-<p>这时同学A说，你必须pull代码，然后你微笑着用<code>git stash</code>保存当前未commit的代码：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 80ccebf add stash file<br>HEAD is now at 80ccebf add stash file</p>
-</blockquote>
-<p>之后<code>git status</code>再次确认了当前状态是干净的：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch develop</div><div class="line">Your branch is up-to-date with &apos;origin/develop&apos;.</div><div class="line">nothing to commit, working directory clean</div></pre></td></tr></table></figure>
-<p>这时候可以放心的pull了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (2/2), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   80ccebf..d2b1d0b  develop    -&gt; origin/develop</div><div class="line">Updating 80ccebf..d2b1d0b</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
-<p>这个pull操作可能修改了多个文件，很可能涉及到你刚才stash的文件，这时会发生什么呢？我们接着看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash pop</div><div class="line">Auto-merging git-stash/stash-01.txt</div><div class="line">CONFLICT (content): Merge conflict in git-stash/stash-01.txt</div></pre></td></tr></table></figure>
-<p>Ohhh，冲突了，这是当然的啦。就算是commit之后再pull也是会冲突，只要merge一下就好了。</p>
-<p><img src="/images/git/git-stash-pop-merge.png" alt=""></p>
-<p>这时你检查了一下，发现其实已经完成feature-01了，所以commit and push了。</p>
-<p>之后，你开始了feature-02的开发，同样你加了一行：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">common lib modified</div><div class="line">I am developing feature-01</div><div class="line">I am developing feature-02</div></pre></td></tr></table></figure>
-<p>这时，同学A又让你pull代码，所以你又再次微笑着：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 425394b feature-01 done<br>HEAD is now at 425394b feature-01 done</p>
-<p>$ git pull</p>
-<p>$ git stash pop</p>
-<p>$ git merge</p>
-</blockquote>
-<p>这时候你被打断，没有commit feature-02，后来继续开发feature-03了，接着第三次pull来了：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 7ed8d8d 2th, common lib2 modified<br>HEAD is now at 7ed8d8d 2th, common lib2 modified</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (3/3), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   7ed8d8d..a73e880  develop    -&gt; origin/develop</div><div class="line">Updating 7ed8d8d..a73e880</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
-<p><img src="/images/git/git-stash-merge-not-commited-2nd.png" alt=""></p>
-<p>上图， 可以发现，刚才未提交的merge结果（同学A竟然把2nd写错了⊙﹏⊙），相同的位置现在需要重新merge，这时赶紧commit &amp; push。</p>
-<pre><code>$ git commit -m &quot;Add: feature-02 and 03 done&quot;
-</code></pre><p>如果刚才不是同一个文件，可以stash多次，这个堆栈可以这样查看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash list</div><div class="line">stash@&#123;0&#125;: WIP on develop: 7ed8d8d 2th, common lib2 modified</div><div class="line">stash@&#123;1&#125;: WIP on develop: 425394b feature-01 done</div><div class="line">stash@&#123;2&#125;: WIP on develop: 80ccebf add stash file</div></pre></td></tr></table></figure>
-<p>发现pop出来的stash还存在着，还可以切回去某一次stash：</p>
-<pre><code>$ git stash apply stash@{0}
-</code></pre><p>当然，你可能面临冲突，谨慎使用，看场景～～</p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1674,7 +1599,7 @@ app.description=${app.name} is a Spring Boot application
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">54</span>
+              <span class="site-state-item-count">58</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

@@ -204,6 +204,809 @@
             
             
               
+                <a class="post-title-link" href="/2015/08/22/shadowsocks/" itemprop="url">
+                  （随笔）shadowsocks 科学上网工具
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-08-22T00:00:00+08:00" content="2015-08-22">
+              2015-08-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/08/22/shadowsocks/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/22/shadowsocks/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近网络比较“不稳定”，上google也是断断续续的，<br>三个科学上网工具 —— 红杏/VPN/shadowsocks， 已经跪了两个，只剩shadowsocks了，中国的程序员效率降低了一半以上。<br>看来平时的”冗余容错”很重要啊，几百块花得值了，T_T, 虽然两个工具暂时不能用，还好现在还能通过shadowsocks上网。</p>
+<h2 id="简单原理"><a href="#简单原理" class="headerlink" title="简单原理"></a>简单原理</h2><p>当前的gfw的特征检测对shadowsocks还是没什么特别好的办法，我们可以看一下shadowsocks原理:</p>
+<p><img src="/images/what-is-shadowsocks.png" alt=""></p>
+<p>如上图，sslocal是你本机的一个代理，ss server是部署在国外（vps）。<br>shadowsocks使用的是socks5协议， 该协议处于OSI的会话层层，在传输层之上。<br>所以数据在ss local和ss server做了加密解密，在gfw的特征检查下就是个普通的tcp包，因此允许通过。</p>
+<hr>
+<h3 id="小事件"><a href="#小事件" class="headerlink" title="小事件"></a>小事件</h3><p>BTW, 在github上看到一个留言：</p>
+<p><img src="/images/shadowsocks_clowwindy.jpg" alt=""></p>
+<p>随便逛了一下，clowwindy大神（任职知乎）的项目还真全删了，twitter也设成私密模式了。<br>根据各大科学上网工具的公告，我也理解最近是特殊时期。<br>最后想说的和能说的是，感谢clowwindy。</p>
+<hr>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<p>页面已被访问<span id="busuanzi_value_site_pv"></span>次</p>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p>[1] <a href="https://tumutanzi.com/archives/13005" target="_blank" rel="external">https://tumutanzi.com/archives/13005</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/07/18/linux/monit/" itemprop="url">
+                  monit 监控
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-07-18T00:00:00+08:00" content="2015-07-18">
+              2015-07-18
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/07/18/linux/monit/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/18/linux/monit/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>Monit 是一个开源的非常实用的进程管理和监控工具，如Linux下的apache、nginx、MySql、FTP等服务都可以使用。</p>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><hr>
+<pre><code># for RedHat/CentOS/Fedora/
+yum install monit
+# for Ubuntu/Debian/Linux Mint
+sudo apt-get install monit
+</code></pre><h2 id="configure"><a href="#configure" class="headerlink" title="configure"></a>configure</h2><hr>
+<pre><code>安装完后，配置文件目录如下所示：
+</code></pre><p><img src="/images/etc-monit.png" alt=""></p>
+<pre><code># 这个是monit的配置文件，里边记录了log位置、deamon数、监控脚本等配置。
+sudo vim /etc/monit/monitrc
+</code></pre><p>翻到最后，可以发现有个<code>include</code>指令，后面跟你的监控脚本的位置，这样可以避免全部脚本写在同一个地方。</p>
+<pre><code>include /etc/monit/include/*
+</code></pre><h2 id="for-tomcat"><a href="#for-tomcat" class="headerlink" title="for tomcat"></a>for tomcat</h2><hr>
+<p>这里以tomcat为例，写一个monit脚本，实现停机时的邮件提醒和自动重启：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set alert alertwho@foo.com</div><div class="line"></div><div class="line">set mailserver mail.×××.com</div><div class="line">  port 25</div><div class="line">  username &quot;mail&quot; password &quot;pwd&quot;</div><div class="line">  using tlsv1</div><div class="line">  with timeout 30 seconds</div><div class="line"></div><div class="line">check host tomcat with address localhost</div><div class="line">  stop program &quot;/.../bin/catalina.sh stop&quot;</div><div class="line">  start program &quot;/.../bin/catalina.sh restart&quot;</div><div class="line">  if failed port 8080 and protocol http</div><div class="line">  # then start 重启</div><div class="line">  then alert</div></pre></td></tr></table></figure>
+<p>mail server 的语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">SET MAILSERVER &lt;hostname|ip-address [PORT number] [USERNAME string]</div><div class="line"> [PASSWORD string] [using SSLAUTO|SSLV2|SSLV3|TLSV1|TLSV11|TLSV12]</div><div class="line"> [CERTMD5 checksum]&gt;, ...</div><div class="line">   [with TIMEOUT X SECONDS]</div><div class="line">   [using HOSTNAME hostname]</div></pre></td></tr></table></figure>
+<p>其他语法都很易懂。<br>monit监控tomcat的方式其实有两种，一种是检查pid文件，另一种就是上面的port检查。</p>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><h2 id="others"><a href="#others" class="headerlink" title="others"></a>others</h2><p><a href="http://www.tecmint.com/command-line-tools-to-monitor-linux-performance/" target="_blank" rel="external">20 Command Line Tools to Monitor Linux Performance</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/07/01/linux/tools/vim_cmd/" itemprop="url">
+                  vim 大法好 - 命令指南
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-07-01T00:00:00+08:00" content="2015-07-01">
+              2015-07-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/07/01/linux/tools/vim_cmd/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/01/linux/tools/vim_cmd/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="基本模式"><a href="#基本模式" class="headerlink" title="基本模式"></a>基本模式</h1><ul>
+<li>命令模式</li>
+</ul>
+<p>进入vim后, 默认就是命令模式.</p>
+<ul>
+<li><code>input</code>模式</li>
+</ul>
+<p>命令模式下, 输入<code>i</code>进入input模式, <code>esc</code>返回命令模式.</p>
+<h1 id="文本操作"><a href="#文本操作" class="headerlink" title="文本操作"></a>文本操作</h1><hr>
+<p><code>文本选择</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V</td>
+<td>selects entire lines</td>
+</tr>
+<tr>
+<td>v</td>
+<td>selects range of text</td>
+</tr>
+<tr>
+<td>ctrl-v</td>
+<td>列选择</td>
+</tr>
+<tr>
+<td>gv</td>
+<td>重新选择上次选择的区块</td>
+</tr>
+</tbody>
+</table>
+<p><code>选择 / 复制 / 粘贴 ...</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v(V for lines) -&gt; y  (yank)</td>
+<td>选择-&gt;复制</td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+</tr>
+<tr>
+<td>v -&gt; d  (delete)</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl + shift + v</td>
+<td>paster from clipboard in <code>input</code> mode</td>
+</tr>
+<tr>
+<td>ctrl + ;</td>
+<td>弹出clipboard菜单, 选择一个粘贴 (<code>input</code> mode)</td>
+</tr>
+</tbody>
+</table>
+<p><code>输入</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u</td>
+<td>undo</td>
+</tr>
+<tr>
+<td>ctrl + r</td>
+<td>redo</td>
+</tr>
+<tr>
+<td>ctrl-p or ctrl-n</td>
+<td>使用当前session中的pattern来自动完成</td>
+</tr>
+<tr>
+<td>a</td>
+<td>在光标后开始编辑</td>
+</tr>
+<tr>
+<td>o</td>
+<td>当前行后面插入一个新行</td>
+</tr>
+<tr>
+<td>O</td>
+<td>当前行前面插入一个新行</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>选择一个词</td>
+</tr>
+<tr>
+<td>ctrl-v + 大写I + 字符 + esc</td>
+<td>列选择插入</td>
+</tr>
+<tr>
+<td>v + gU</td>
+<td>(变大写)</td>
+</tr>
+<tr>
+<td>v + gu</td>
+<td>gu (变小写)</td>
+</tr>
+<tr>
+<td>ye</td>
+<td>复制当前光标到单词结尾的部分</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><code>缩进</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v or V</td>
+<td>区块缩进前需要选择文本</td>
+</tr>
+<tr>
+<td>5&gt;</td>
+<td>表示右缩进5个tab</td>
+</tr>
+<tr>
+<td><code>4&lt;</code></td>
+<td>同理, 左向4个tab</td>
+</tr>
+</tbody>
+</table>
+<p><code>浏览 / 移动</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ctrl + e</td>
+<td>向下滚屏，保持光标</td>
+</tr>
+<tr>
+<td>ctrl + y</td>
+<td>向上滚屏, 保持光标</td>
+</tr>
+<tr>
+<td>ctrl + d</td>
+<td>向下, 不保持光标</td>
+</tr>
+<tr>
+<td>ctrl + u</td>
+<td>向上, 不保持光标</td>
+</tr>
+<tr>
+<td>0 或 ^</td>
+<td>跳至行头</td>
+</tr>
+<tr>
+<td>$</td>
+<td>跳至行尾</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移至档尾（最后一行的第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移至档首（第一行之第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>ctrl+f</td>
+<td>下翻页</td>
+</tr>
+<tr>
+<td>ctrl+b</td>
+<td>上翻页</td>
+</tr>
+<tr>
+<td>w</td>
+<td>移至次一个字（word）字首。当然是指英文单字。</td>
+</tr>
+<tr>
+<td>W</td>
+<td>同上，但会忽略一些标点符号。</td>
+</tr>
+<tr>
+<td>)</td>
+<td>移至下一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>(</td>
+<td>移至上一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>}</td>
+<td>移至下一个段落（paragraph）首。</td>
+</tr>
+<tr>
+<td>{</td>
+<td>移至上一个段落（paragraph）首。</td>
+</tr>
+</tbody>
+</table>
+<p><code>查找 / 替换</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/ + your-search-string</td>
+<td>搜索, 可以使用正则, 注意转义</td>
+</tr>
+<tr>
+<td>ggn</td>
+<td></td>
+</tr>
+<tr>
+<td>GN</td>
+<td>最后一个</td>
+</tr>
+<tr>
+<td>/ + ↑或↓</td>
+<td>搜索历史</td>
+</tr>
+<tr>
+<td>:%s/源字符串/目的字符串/g</td>
+<td>全局替换， <code>%</code>表示所有行</td>
+</tr>
+<tr>
+<td>:4s/源字符串/目的字符串/g</td>
+<td>替换从第4行</td>
+</tr>
+<tr>
+<td>:1,4s/源字符串/目的字符串/g</td>
+<td>替换从第1行到第4行</td>
+</tr>
+</tbody>
+</table>
+<h1 id="多窗口"><a href="#多窗口" class="headerlink" title="多窗口"></a>多窗口</h1><hr>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:vsp file_path</td>
+<td>新增窗口垂直打开</td>
+</tr>
+<tr>
+<td>:sv</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, s</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, v</td>
+<td>垂直, 复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl w + up/down</td>
+<td>切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, w</td>
+<td>循环切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, h/j/k/l</td>
+<td>按方向切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, H/J/K/L</td>
+<td>按方向移动窗口</td>
+</tr>
+<tr>
+<td>ctrl w , q 或 c</td>
+<td>关闭窗口</td>
+</tr>
+</tbody>
+</table>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:set noautoindent</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number!</td>
+<td>切换</td>
+</tr>
+<tr>
+<td>:set number&amp;</td>
+<td>Set option to default value</td>
+</tr>
+<tr>
+<td>:set number?</td>
+<td>Show value of option</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>更多请参看另一博客，将会记录常见的配置及相关命令。</p>
+<h2 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h2><p>1.<br><code>:!command</code><br>如：</p>
+<pre><code>:!ls -al
+</code></pre><p>执行一个命令, 但不退出vim.</p>
+<p>2.<br><code>:r !command</code><br>将shell命令command的结果插入到当前行的下一行</p>
+<p>这个命令比较常用, 比如输入当前目录:</p>
+<pre><code>:r !pwd
+</code></pre><p>3.<br><code>:起始行号,结束行号 !command</code><br>将起始行号和结束行号指定的范围中的内容输入到shell命令command处理，并将处理结果替换起始行号和结束行号指定的范围中的内容</p>
+<p>4.<br><code>:起始行号,结束行号 w !command</code><br>将起始行号和结束行号所指定的范围的内容作为命令command的输入。不会改变当前编辑的文件的内容</p>
+<h2 id="编辑root权限的文件"><a href="#编辑root权限的文件" class="headerlink" title="编辑root权限的文件"></a>编辑root权限的文件</h2><p>这个功能也经常用到, 比如编辑某个root的文件(readonly)时, 忘记了sudo, 当改了很多内容才发现, 怎么办呢 ?</p>
+<pre><code>:w !sudo tee %
+</code></pre><p>若是sudo不能解决的, 先写到临时文件:</p>
+<pre><code>:w! ~/tempfile.ext
+</code></pre><h2 id="其他-待续…"><a href="#其他-待续…" class="headerlink" title="其他, 待续…"></a>其他, 待续…</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>[1] <a href="http://vimgifs.com/" target="_blank" rel="external">http://vimgifs.com/</a><br>[2] <a href="http://vimcasts.org/episodes/working-with-windows/" target="_blank" rel="external">http://vimcasts.org/episodes/working-with-windows/</a><br>[3] <a href="http://blog.csdn.net/topgun_chenlingyun/article/details/8013115" target="_blank" rel="external">http://blog.csdn.net/topgun_chenlingyun/article/details/8013115</a><br>[4] <a href="http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions" target="_blank" rel="external">http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/05/30/java/log_why_use_isDebug/" itemprop="url">
+                  log 为什么使用isDebugEnable()和isTraceEnabled()
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-05-30T00:00:00+08:00" content="2015-05-30">
+              2015-05-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/05/30/java/log_why_use_isDebug/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/05/30/java/log_why_use_isDebug/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>今天看源码，发现许多框架的log部分都会有log.isTraceEnabled()之类的判断，然后再进行调用trace()打印日志。<br>我不禁想，为什么不直接使用log.trace(),结果不是一样吗。但细细想来，肯定有原因的。</p>
+<p>再看看if(isTraceEnabled()){}中的内容，有些打印日志的字符是比较多的，如果不判断直接调用的话，势必造成大量的资源消耗，如字符串拼接和对象toString()的操作。如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (log.isTraceEnabled()) &#123;</div><div class="line">    log.trace(&quot;attempting to get session; create = &quot; + create +</div><div class="line">            &quot;; session is null = &quot; + (this.session == null) +</div><div class="line">            &quot;; session has id = &quot; + (this.session != null &amp;&amp; session.getId() != null));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>原因就是这样～～</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2015/05/01/java/spring/spring-aop/" itemprop="url">
                   spring aop 简介 & JDK 动态代理
                 </a>
@@ -804,7 +1607,7 @@ source ./foo_env/bin/active
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">54</span>
+              <span class="site-state-item-count">58</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

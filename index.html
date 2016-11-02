@@ -204,6 +204,269 @@
             
             
               
+                <a class="post-title-link" href="/2016/11/02/git/git-wrong-push/" itemprop="url">
+                  git 推错分支的处理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-11-02T19:00:00+08:00" content="2016-11-02">
+              2016-11-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/02/git/git-wrong-push/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/02/git/git-wrong-push/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>人的状态总有低落的时候, 平时很谨慎的人也有可能出错, 在git使用时, 经常会有合并了错误分支并推送的情况. 这种情况如何处理呢 ?</p>
+<h1 id="reset-毁尸灭迹法"><a href="#reset-毁尸灭迹法" class="headerlink" title="reset 毁尸灭迹法"></a>reset 毁尸灭迹法</h1><hr>
+<p>使用<code>git reset</code>来抹除刚才的stupid操作, 强制推送后不让别人”发现”. 但是前提是那个分支还没其他人推代码上去, 不然还是会被发现, 而且会把别人的commit删掉, 所以请谨慎使用 (适合分支只有一个人用的情况) :</p>
+<p>实操:<br>假设有以下的commit :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit 116aac11f0ee0a155837f0d6a68931fe405a6ed4</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:37:57 2016 +0800</div><div class="line"></div><div class="line">    wrong commit.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<p>然后被推送到 remote server:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git push --set-upstream origin niko_blog_test</div><div class="line">Counting objects: 28, done.</div><div class="line">Delta compression using up to 4 threads.</div><div class="line">Compressing objects: 100% (6/6), done.</div><div class="line">Writing objects: 100% (8/8), 674 bytes | 0 bytes/s, done.</div><div class="line">Total 8 (delta 3), reused 0 (delta 0)</div><div class="line">To gogs@192.168.7.92:foo-org/foo.git</div><div class="line"> * [new branch]      niko_blog_test -&gt; niko_blog_test</div><div class="line">Branch niko_blog_test set up to track remote branch niko_blog_test from origin.</div></pre></td></tr></table></figure>
+<p>推送后查看服务器的 git commit log:</p>
+<p><img src="/images/git/git-remote-wrong-commit-01.png" alt=""></p>
+<p>然后到了我们的主题, 清除掉remote上面的错误 commit <code>116aac11f0ee0a155837f0d6a68931fe405a6ed4</code>, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git reset --hard f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">$ git push -f</div><div class="line">Total 0 (delta 0), reused 0 (delta 0)</div><div class="line">To gogs@192.168.7.92:foo-org/foo.git</div><div class="line"> + 116aac1...f000b1a niko_blog_test -&gt; niko_blog_test (forced update)</div></pre></td></tr></table></figure>
+<p>这时再查看服务器上的commit log, 可以发现<code>116aac11f0ee0a155837f0d6a68931fe405a6ed4</code>的commit已经被删除了:</p>
+<p><img src="/images/git/git-remote-wrong-commit-02.png" alt=""></p>
+<h2 id="一个高级用法-删除最后一个commit"><a href="#一个高级用法-删除最后一个commit" class="headerlink" title="一个高级用法: 删除最后一个commit"></a>一个高级用法: 删除最后一个commit</h2><hr>
+<p>假设有一个在<code>mathnet</code>的remote的分支master, 当前指向<code>dd61ab32</code>的commit, 可以这样做:</p>
+<pre><code>$ git push mathnet +dd61ab32^:master
+</code></pre><p>其中, <code>x^</code>表示<code>the parent of x</code><br><code>+</code>表示<code>a forced non-fastforward push</code></p>
+<p>不过, 我还是喜欢前一个做法, 更适用一点.</p>
+<h1 id="revert-警示后人法"><a href="#revert-警示后人法" class="headerlink" title="revert 警示后人法"></a>revert 警示后人法</h1><hr>
+<p>使用 <code>git revert</code> 建立新的commit来回滚, 假设现在服务器和本地的 <code>git log</code>是:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<p>其中<code>ceaa73fd804aefc406f6384c9c0fffaedafbcb79</code>是要revert错误commit.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git revert ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div></pre></td></tr></table></figure>
+<p>此时的gitlog :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">commit 4b9fe2c1ad02640fa63cfb18df409086b7681caf</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 17:13:38 2016 +0800</div><div class="line"></div><div class="line">    Revert &quot;Add: txt-02.&quot;</div><div class="line"></div><div class="line">    This reverts commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79.</div><div class="line"></div><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<p>可见, 多了一个commit, 文本修改如下 ( 正确reverted ) , 此时再推上remote server即可.</p>
+<p><img src="/images/git/git-wrong-push-01.png" alt=""></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://christoph.ruegg.name/blog/git-howto-revert-a-commit-already-pushed-to-a-remote-reposit.html" target="_blank" rel="external">http://christoph.ruegg.name/blog/git-howto-revert-a-commit-already-pushed-to-a-remote-reposit.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/11/02/git/git-cherry-pick/" itemprop="url">
+                  git cherry-pick 使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-11-02T16:00:00+08:00" content="2016-11-02">
+              2016-11-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/02/git/git-cherry-pick/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/02/git/git-cherry-pick/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>工作中, 我们经常会需要从其他分支获取一些重要的修改, 但只是部分commit, 不能用merge, 这时<code>cherry-pick</code>就派上用场了.<br><code>cherry-pick</code>可以把其他分支的某些commit合并到当前分支, 具体使用和注意事项请看下面的实操.</p>
+<h1 id="cherry-pick-实操"><a href="#cherry-pick-实操" class="headerlink" title="cherry-pick 实操"></a>cherry-pick 实操</h1><hr>
+<p>假设有一个分支<code>origin/niko_blog_test</code>, 他的<code>git log</code>如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<p><strong>基于<code>f000b1ac4bf9dbd57d107895f349f448a3af05cc</code>的commit建立分支<code>niko_blog_test-2</code>:</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">git checkout -b niko_blog_test-2 f000b1ac4bf9dbd57d107895f349f448a3af05cc</div></pre></td></tr></table></figure>
+<p>查看git log:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<h2 id="开始cherry-pick"><a href="#开始cherry-pick" class="headerlink" title="开始cherry-pick"></a>开始cherry-pick</h2><hr>
+<p>我们要把<code>niko_blog_test</code>的两个最新commit, pick到<code>niko_blog_test-2</code>中, 操作如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git cherry-pick ceaa73f 42a8708</div><div class="line">error: could not apply ceaa73f... Add: txt-02.</div><div class="line">hint: after resolving the conflicts, mark the corrected paths</div><div class="line">hint: with &apos;git add &lt;paths&gt;&apos; or &apos;git rm &lt;paths&gt;&apos;</div><div class="line">hint: and commit the result with &apos;git commit&apos;</div></pre></td></tr></table></figure>
+<p>提示冲突, 进行合并:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git mergetool</div></pre></td></tr></table></figure>
+<p>此时状态:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch niko_blog_test-2</div><div class="line">You are currently cherry-picking commit ceaa73f.</div><div class="line">  (all conflicts fixed: run &quot;git cherry-pick --continue&quot;)</div><div class="line">  (use &quot;git cherry-pick --abort&quot; to cancel the cherry-pick operation)</div><div class="line"></div><div class="line">Changes to be committed:</div><div class="line"></div><div class="line">        modified:   README.txt</div></pre></td></tr></table></figure>
+<p>进行commit操作.</p>
+<p>然后继续记性cherry-pick:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git cherry-pick --continue</div><div class="line">error: could not apply 42a8708... Add: txt-01.</div><div class="line">hint: after resolving the conflicts, mark the corrected paths</div><div class="line">hint: with &apos;git add &lt;paths&gt;&apos; or &apos;git rm &lt;paths&gt;&apos;</div><div class="line">hint: and commit the result with &apos;git commit&apos;</div></pre></td></tr></table></figure>
+<p>又提示冲突, 这里要手动解决了.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git mergetool</div></pre></td></tr></table></figure>
+<p><img src="/images/git/git-cherry-pick-01.png" alt=""></p>
+<p>冲突解决后, 此时状态:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch niko_blog_test-2</div><div class="line">You are currently cherry-picking commit 42a8708.</div><div class="line">  (all conflicts fixed: run &quot;git cherry-pick --continue&quot;)</div><div class="line">  (use &quot;git cherry-pick --abort&quot; to cancel the cherry-pick operation)</div><div class="line"></div><div class="line">Changes to be committed:</div><div class="line"></div><div class="line">        modified:   README.txt</div></pre></td></tr></table></figure>
+<p>进行commit操作.</p>
+<p>再<code>git cherry-pick --continue</code>会打印空内容, 表示cherry-pick结束.</p>
+<p>此时再查看log:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit e68a53fef3229c6536b44781d2cb8322aa4202e1</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">    cherry-picking commit 42a8708.</div><div class="line"></div><div class="line">    Conflicts:</div><div class="line">        hsb-common/README.txt</div><div class="line"></div><div class="line">commit 9d7a471f646742da9b68e663fee41be62a0e17b7</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">    cherry-picking commit ceaa73f.</div><div class="line"></div><div class="line">    Conflicts:</div><div class="line">        hsb-common/README.txt</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<p>可以看到<code>f000b1ac4bf9dbd57d107895f349f448a3af05cc</code>之后多了两个commit, README.txt的内容也过来了.</p>
+<p>其实, 上面的操作之所以很曲折, 是因为顺序错了, 哇哈哈哈 !!!只要按commit时间顺序来, 就不会有这么多的冲突问题, 如下所示.</p>
+<h1 id="cherry-pick-实操-按时间顺序"><a href="#cherry-pick-实操-按时间顺序" class="headerlink" title="cherry-pick 实操 - 按时间顺序"></a>cherry-pick 实操 - 按时间顺序</h1><hr>
+<p>重来的话, 我们reset到<code>f000b1ac4bf9dbd57d107895f349f448a3af05cc</code>版本:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git reset --hard f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">HEAD is now at f000b1a hello</div><div class="line"></div><div class="line">$ git log</div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<h2 id="开始cherry-pick-1"><a href="#开始cherry-pick-1" class="headerlink" title="开始cherry-pick"></a>开始cherry-pick</h2><hr>
+<p>这次, 我们按照正确的顺序来:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git cherry-pick 42a8708 ceaa73f</div><div class="line">[niko_blog_test-2 fdae77f] Add: txt-01.</div><div class="line"> 1 file changed, 2 insertions(+), 1 deletion(-)</div><div class="line">[niko_blog_test-2 3e02126] Add: txt-02.</div><div class="line"> 1 file changed, 2 insertions(+), 1 deletion(-)</div></pre></td></tr></table></figure>
+<p>因为不会冲突, 直接用分支<code>niko_blog_test</code>的commit log, 如 git log 所示:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git log</div><div class="line">commit 3e02126c34fd3909b34228368ffb98c400b436c9</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit fdae77ffb6583fc44a82ab36cb26f005f335bacb</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
+<p>顺序对了, 是不是简单很多啦? 所以一定要注意顺序的问题. 嘻嘻……</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://git-scm.com/docs/git-cherry-pick" target="_blank" rel="external">git-cherry-pick</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/07/02/cs/protocol/CORS_nginx/" itemprop="url">
                   跨域之CORS简介
                 </a>
@@ -408,6 +671,248 @@
 <h1 id="P-purge"><a href="#P-purge" class="headerlink" title="-P purge"></a><code>-P</code> purge</h1><p>如果要完全移除<code>xmind</code>程序和配置, 可使用<code>-P</code>:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sudo dpkg -P xmind</div><div class="line">[sudo] password for niko:</div><div class="line">(Reading database ... 175311 files and directories currently installed.)</div><div class="line">Removing xmind (3.6.51) ...</div><div class="line">Purging configuration files for xmind (3.6.51) ...</div></pre></td></tr></table></figure>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/06/03/cs/algo/hungary-algo/" itemprop="url">
+                  稳定匹配问题 (2) - 匈牙利算法
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-06-03T00:00:00+08:00" content="2016-06-03">
+              2016-06-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/03/cs/algo/hungary-algo/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/03/cs/algo/hungary-algo/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>上一篇博客 <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/">稳定匹配问题 - Gale &amp; Shapley</a> 我们介绍了稳定匹配的问题和<code>Gale-Shapley</code>算法, 这次我们尝试用二分图和匈牙利算法来解决问题.</p>
+<h1 id="二分图相关概念"><a href="#二分图相关概念" class="headerlink" title="二分图相关概念"></a>二分图相关概念</h1><hr>
+<p>首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人, E为边集合, 边的两端分别在X和Y集合中.<br>我们规定G的子图Gs的边集合任意两条都不是同一顶点, 则Gs是一个匹配. 如图所示:</p>
+<p><img src="/images/cs/algo/bin-graph-01.png" alt=""></p>
+<p>如果加上黑色边表示男女互相喜欢, 如下:</p>
+<p><img src="/images/cs/algo/bin-graph-02.png" alt=""></p>
+<p>绿色边表示配对的结果, 称为匹配边, 其他称为非匹配边.<br>当匹配边最多时, 则称为该图的最大匹配.<br>接着介绍匈牙利算法.</p>
+<h1 id="匈牙利算法"><a href="#匈牙利算法" class="headerlink" title="匈牙利算法"></a>匈牙利算法</h1><hr>
+<p>接着是了解匈牙利算法, 在此之前, 我们先要知道几个概念:</p>
+<p><code>增广路</code>（augmenting path）:<br>从一个未匹配的点出发, 通过<code>交替路</code>(依次经过非匹配边、匹配边、非匹配边…依次交替的路径), 若途径其他未匹配点, 那么称为该交替路为增广路.<br>增广路有一个重要特点：非匹配边比匹配边多一条。所以取反(把增广路中的匹配边和非匹配边的身份交换)之后, 匹配边就比非匹配边多一条, 如此不断寻找增广路, 知道找不到增广路径时, 算法就结束了, 得到的就是最大匹配. 匈牙利算法就是这么做的.</p>
+<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><hr>
+<p>实现主要用到两个类: <code>MatchRecord</code>和<code>HungaryAlgorithm</code>.</p>
+<p><code>MatchRecord</code> 作为匹配过程的辅助记录, 比如边和点的关系/增广路等等, 如注释:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MatchRecord</span> </span>&#123;</div><div class="line">    <span class="comment">// 男生/女生的人数</span></div><div class="line">    <span class="keyword">int</span> count;</div><div class="line">    <span class="comment">// 表示边 (用x和y坐标定位), 数值1表示两点存在边连接</span></div><div class="line">    <span class="keyword">int</span> edge[][];</div><div class="line">    <span class="comment">// 是否在当前增广路</span></div><div class="line">    <span class="keyword">boolean</span> onPath[];</div><div class="line">    <span class="comment">// 已找到的增广路</span></div><div class="line">    <span class="keyword">int</span> augmentPath[];</div><div class="line">    <span class="comment">// 最大匹配的结果数</span></div><div class="line">    <span class="keyword">int</span> maxMatch = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MatchRecord</span><span class="params">(<span class="keyword">int</span> count)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.count = count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnPath</span><span class="params">(<span class="keyword">boolean</span>[] onPath)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.onPath = onPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEdge</span><span class="params">(<span class="keyword">int</span>[][] edge)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.edge = edge;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] getAugmentPath() &#123;</div><div class="line">        <span class="keyword">return</span> augmentPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAugmentPath</span><span class="params">(<span class="keyword">int</span>[] augmentPath)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.augmentPath = augmentPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getMaxMatch</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> maxMatch;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getEdge</span><span class="params">(<span class="keyword">int</span> xi, <span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.edge[xi][yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">notOnPath</span><span class="params">(<span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> ! onPath[yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnPath</span><span class="params">(<span class="keyword">int</span> yi, <span class="keyword">boolean</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.onPath[yi] = <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAugmentPath</span><span class="params">(<span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.augmentPath[yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAugmentPath</span><span class="params">(<span class="keyword">int</span> yi, <span class="keyword">int</span> xi)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.augmentPath[yi] = xi;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] aug = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="keyword">this</span>.getCount()];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span class="number">0</span>; idx &lt; aug.length; idx++) &#123;</div><div class="line">            aug[idx] = -<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.setOnPath(<span class="keyword">new</span> <span class="keyword">boolean</span>[<span class="keyword">this</span>.getCount()]);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">maxMatchInc</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.maxMatch++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>HungaryAlgorithm</code>, 主要是执行匹配过程, 通过深度搜索来查找匹配:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HungaryAlgorithm</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        MatchRecord rec = init();</div><div class="line">        <span class="keyword">int</span> count = rec.getCount();</div><div class="line">        HungaryAlgorithm hungary = <span class="keyword">new</span> HungaryAlgorithm();</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> xi = <span class="number">0</span>; xi &lt; count; xi++) &#123;</div><div class="line">            <span class="keyword">if</span> (hungary.findAugmentPath(rec, xi)) &#123;</div><div class="line">                rec.maxMatchInc();</div><div class="line">            &#125;</div><div class="line">            rec.reset();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">boolean</span> found = rec.getMaxMatch() == count;</div><div class="line">        <span class="keyword">if</span> (found) &#123;</div><div class="line">            print(rec);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// TODO 设置测试数据</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MatchRecord <span class="title">init</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> count = <span class="number">3</span>;</div><div class="line">        <span class="keyword">int</span>[][] edge = <span class="keyword">new</span> <span class="keyword">int</span>[][]&#123;</div><div class="line">                &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</div><div class="line">                &#123;<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>&#125;,</div><div class="line">                &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>&#125;</div><div class="line">        &#125;;</div><div class="line">        <span class="keyword">int</span>[] augment = <span class="keyword">new</span> <span class="keyword">int</span>[count];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span class="number">0</span>; idx &lt; augment.length; idx++) &#123;</div><div class="line">            augment[idx] = -<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//</span></div><div class="line">        MatchRecord rec = <span class="keyword">new</span> MatchRecord(count);</div><div class="line">        rec.setEdge(edge);</div><div class="line">        rec.setOnPath(<span class="keyword">new</span> <span class="keyword">boolean</span>[count]);</div><div class="line">        rec.setAugmentPath(augment);</div><div class="line">        <span class="keyword">return</span> rec;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">findAugmentPath</span><span class="params">(MatchRecord matchRecord, <span class="keyword">int</span> xi)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> yi = <span class="number">0</span>; yi &lt; matchRecord.getCount(); yi++) &#123;</div><div class="line">            <span class="keyword">if</span> (matchRecord.getEdge(xi, yi) == <span class="number">1</span> &amp;&amp; matchRecord.notOnPath(yi)) &#123;</div><div class="line">                matchRecord.setOnPath(yi, <span class="keyword">true</span>);</div><div class="line">                <span class="keyword">if</span> (matchRecord.getAugmentPath(yi) == -<span class="number">1</span></div><div class="line">                        || findAugmentPath(matchRecord, matchRecord.getAugmentPath(yi))) &#123;</div><div class="line">                    matchRecord.setAugmentPath(yi, xi);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(MatchRecord rec)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] aug = rec.getAugmentPath();</div><div class="line">        System.out.println(<span class="string">"匹配结果: "</span>);</div><div class="line">        System.out.println(<span class="string">"y  --  x"</span>);</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> yi : aug) &#123;</div><div class="line">            System.out.println(<span class="string">""</span> + yi + <span class="string">" &lt;--&gt; "</span> + aug[yi]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最终输出结果:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">匹配结果:</div><div class="line">y  --  x</div><div class="line">0 &lt;--&gt; 0</div><div class="line">2 &lt;--&gt; 1</div><div class="line">1 &lt;--&gt; 2</div></pre></td></tr></table></figure>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>以上就是匈牙利算法, 不过上面我们解决的仍是无权匹配的问题, 下篇博客我们将讨论有权匹配的问题和相关算法.</p>
+<div style="display: none;"><br>最大匹配数：最大匹配的匹配边的数目<br>最小点覆盖数：选取最少的点，使任意一条边至少有一个端点被选择<br>最大独立数：选取最多的点，使任意所选两点均不相连<br>最小路径覆盖数：对于一个 DAG（有向无环图），选取最少条路径，使得每个顶点属于且仅属于一条路径。路径长可以为 0（即单个点）。<br>定理1：最大匹配数 = 最小点覆盖数（这是 Konig 定理）<br>定理2：最大匹配数 = 最大独立数<br>定理3：最小路径覆盖数 = 顶点数 - 最大匹配数<br></div>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://zh.wikipedia.org/wiki/%E5%8C%88%E7%89%99%E5%88%A9%E7%AE%97%E6%B3%95" target="_blank" rel="external">匈牙利算法</a><br><a href="https://zh.wikipedia.org/wiki/%E5%8C%B9%E9%85%8D_(%E5%9B%BE%E8%AE%BA" target="_blank" rel="external">图论(匹配</a>)<br><a href="https://www.renfei.org/blog/bipartite-matching.html" target="_blank" rel="external">https://www.renfei.org/blog/bipartite-matching.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="url">
+                  稳定匹配问题 (1) - Gale & Shapley
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-06-02T00:00:00+08:00" content="2016-06-02">
+              2016-06-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="稳定匹配"><a href="#稳定匹配" class="headerlink" title="稳定匹配"></a>稳定匹配</h1><hr>
+<p>在1962年Gale和Shapley发表了一篇论文: <a href="http://cramton.umd.edu/market-design/gale-shapley-college-admissions.pdf" target="_blank" rel="external">College Admissions and the Stability of Marriage</a>，首次提出了<a href="https://zh.wikipedia.org/wiki/%E7%A9%A9%E5%AE%9A%E5%A9%9A%E5%A7%BB%E5%95%8F%E9%A1%8C" target="_blank" rel="external">婚姻匹配问题(维基百科)</a>, 使婚姻和大学招生成为稳定匹配的典型例子.</p>
+<h1 id="什么是稳定匹配"><a href="#什么是稳定匹配" class="headerlink" title="什么是稳定匹配"></a>什么是稳定匹配</h1><hr>
+<p>以婚姻匹配为例, 假设在当前匹配结果中存在两对(m1, v1)和(m2, v2), 在喜好排名中, m1更喜欢w2, m2也更喜欢w1, 这时我们可以称当前匹配是不稳定的.</p>
+<h1 id="如何实现稳定匹配呢"><a href="#如何实现稳定匹配呢" class="headerlink" title="如何实现稳定匹配呢 ?"></a>如何实现稳定匹配呢 ?</h1><hr>
+<p>要找到一种稳定匹配, 可使用<code>Gale-Shapley</code>提出的算法( 用反证法证明其有效性 ), 但有个前提是让男生主动求婚, 主要过程如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">function stableMatching &#123;</div><div class="line">    Initialize all m ∈ M and w ∈ W to free</div><div class="line">    while ∃ free man m who still has a woman w to propose to &#123;</div><div class="line">       w = first woman on m’s list to whom m has not yet proposed</div><div class="line">       if w is free</div><div class="line">         (m, w) become engaged</div><div class="line">       else some pair (m&apos;, w) already exists</div><div class="line">         if w prefers m to m&apos;</div><div class="line">            m&apos; becomes free</div><div class="line">           (m, w) become engaged</div><div class="line">         else</div><div class="line">           (m&apos;, w) remain engaged</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><hr>
+<p><code>Person.java</code>, 用来表示male或female.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Integer SINGLE = -<span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="keyword">private</span> Integer nextAskId = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 当前伴侣id</span></div><div class="line">    <span class="keyword">private</span> Integer currentPartnerId = SINGLE;</div><div class="line">    <span class="comment">// 伴侣id在心中的排名</span></div><div class="line">    <span class="keyword">private</span> Map&lt;Integer, Integer&gt; partnerIdToRank = <span class="keyword">new</span> LinkedHashMap&lt;Integer, Integer&gt;();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">addRank</span><span class="params">(Integer personId, Integer rank)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.partnerIdToRank.put(personId, rank);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getRankOf</span><span class="params">(Integer partnerId)</span> </span>&#123;</div><div class="line">        Integer rank = <span class="keyword">this</span>.partnerIdToRank.get(partnerId);</div><div class="line">        <span class="keyword">return</span> rank == <span class="keyword">null</span> ? Integer.MAX_VALUE : rank;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//======================================================================</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setId</span><span class="params">(Integer id)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.id = id;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getNextPerfectId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> nextAskId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setNextAskId</span><span class="params">(Integer nextAskId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.nextAskId = nextAskId;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getCurrentPartnerId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> currentPartnerId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setCurrentPartnerId</span><span class="params">(Integer currentPartnerId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.currentPartnerId = currentPartnerId;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>GaleShapley.java</code>, 主要是算法过程:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GaleShapley</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        List&lt;Person&gt; males = <span class="keyword">new</span> LinkedList&lt;Person&gt;();</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">0</span>).setName(<span class="string">"Mr.A"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>).addRank(<span class="number">0</span>, <span class="number">3</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">1</span>).setName(<span class="string">"Mr.B"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">0</span>, <span class="number">2</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">2</span>).setName(<span class="string">"Mr.C"</span>).addRank(<span class="number">0</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">3</span>).setName(<span class="string">"Mr.D"</span>).addRank(<span class="number">3</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line"></div><div class="line">        List&lt;Person&gt; females = <span class="keyword">new</span> LinkedList&lt;Person&gt;();</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">0</span>).setName(<span class="string">"Miss.A"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">1</span>).setName(<span class="string">"Miss.B"</span>).addRank(<span class="number">0</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>).addRank(<span class="number">2</span>, <span class="number">3</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">2</span>).setName(<span class="string">"Miss.C"</span>).addRank(<span class="number">3</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">3</span>).setName(<span class="string">"Miss.D"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>));</div><div class="line"></div><div class="line">        <span class="keyword">new</span> GaleShapley().stableMatch(males, females);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stableMatch</span><span class="params">(List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (males == <span class="keyword">null</span> || females == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (males.size() != females.size()) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        Person freeMale = getFreeMale(males);</div><div class="line">        <span class="keyword">while</span> (freeMale != <span class="keyword">null</span>) &#123;</div><div class="line">            Integer femaleId = freeMale.getNextPerfectId();</div><div class="line">            Person female = females.get(femaleId);</div><div class="line">            <span class="keyword">if</span> (isSingle(female)) &#123;</div><div class="line">                <span class="comment">// 还是单身</span></div><div class="line">                freeMale.setCurrentPartnerId(female.getId());</div><div class="line">                female.setCurrentPartnerId(freeMale.getId());</div><div class="line"></div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="comment">// 选择更好的</span></div><div class="line">                Integer curMaleId = female.getCurrentPartnerId();</div><div class="line">                Integer curMalePartnerRank = female.getRankOf(curMaleId);</div><div class="line">                Integer freeMaleRank = female.getRankOf(freeMale.getId());</div><div class="line">                <span class="keyword">if</span> (freeMaleRank &lt; curMalePartnerRank) &#123;</div><div class="line">                    males.get(curMaleId).setCurrentPartnerId(Person.SINGLE);</div><div class="line">                    freeMale.setCurrentPartnerId(female.getId());</div><div class="line">                    female.setCurrentPartnerId(freeMale.getId());</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            freeMale.setNextAskId(freeMale.getNextPerfectId() + <span class="number">1</span>);</div><div class="line">            <span class="comment">// 继续为 freeMale 找对象</span></div><div class="line">            freeMale = getFreeMale(males);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        print(males, females);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">        males.forEach(m -&gt; &#123;</div><div class="line">            Person female = females.get(m.getCurrentPartnerId());</div><div class="line">            <span class="keyword">if</span> (female != <span class="keyword">null</span>) &#123;</div><div class="line">                System.out.println(m.getName() + <span class="string">"  &lt;--&gt;  "</span> + female.getName());</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                System.out.println(m.getName() + <span class="string">"  still  SINGLE"</span>);</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Person <span class="title">getFreeMale</span><span class="params">(List&lt;Person&gt; males)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (Person male : males) &#123;</div><div class="line">            <span class="keyword">if</span> (isSingle(male)) &#123;</div><div class="line">                <span class="keyword">return</span> male;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isSingle</span><span class="params">(Person p)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> Person.SINGLE.equals(p.getCurrentPartnerId());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行main()中的用例, 得出结果:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Mr.A  &lt;--&gt;  Miss.B</div><div class="line">Mr.B  &lt;--&gt;  Miss.A</div><div class="line">Mr.C  &lt;--&gt;  Miss.D</div><div class="line">Mr.D  &lt;--&gt;  Miss.C</div></pre></td></tr></table></figure>
+<h1 id="有多少稳定匹配结果"><a href="#有多少稳定匹配结果" class="headerlink" title="有多少稳定匹配结果"></a>有多少稳定匹配结果</h1><hr>
+<p>上面讨论的前提是男士主动求婚, 而且是先有一个队伍顺序, 如果改变一下这些条件, <code>Gale-Shapley</code>算法可能得到的是另外一种稳定匹配结果.<br>那么, 如何获得所有的稳定匹配结果呢 ?</p>
+<h1 id="使用穷举法"><a href="#使用穷举法" class="headerlink" title="使用穷举法"></a>使用穷举法</h1><p>我们需要对每个male进行穷举, 覆盖所有的male求婚顺序, 这样的问题用递归很方便.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">allStableMatch</span><span class="params">(Integer maleId, List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (maleId.intValue()  == males.size()) &#123;</div><div class="line">        <span class="keyword">if</span> (isStableMatch(males, females)) &#123;</div><div class="line">            print(males, females);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    Person male = males.get(maleId);</div><div class="line">    <span class="comment">// 试所有女的favor舞伴</span></div><div class="line">    male.getPartnerIdToRank().entrySet().forEach((favor) -&gt; &#123;</div><div class="line">        Person female = females.get(favor.getKey());</div><div class="line">        <span class="keyword">if</span> (isSingle(female) &amp;&amp; female.like(maleId)) &#123;</div><div class="line">            male.setCurrentPartnerId(female.getId());</div><div class="line">            female.setCurrentPartnerId(male.getId());</div><div class="line">            allStableMatch(maleId + <span class="number">1</span>, males, females);</div><div class="line">            male.setCurrentPartnerId(Person.SINGLE);</div><div class="line">            female.setCurrentPartnerId(Person.SINGLE);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试用例 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">public static void main(String[] args) &#123;</div><div class="line">    List&lt;Person&gt; males = new LinkedList&lt;Person&gt;();</div><div class="line">    males.add(new Person().setId(0).setName(&quot;Mr.A&quot;).addRank(0).addRank(2).addRank(1));</div><div class="line">    males.add(new Person().setId(1).setName(&quot;Mr.B&quot;).addRank(1).addRank(2).addRank(0));</div><div class="line">    males.add(new Person().setId(2).setName(&quot;Mr.C&quot;).addRank(0).addRank(1).addRank(2));</div><div class="line"></div><div class="line">    List&lt;Person&gt; females = new LinkedList&lt;Person&gt;();</div><div class="line">    females.add(new Person().setId(0).setName(&quot;Miss.A&quot;).addRank(2).addRank(0).addRank(1));</div><div class="line">    females.add(new Person().setId(1).setName(&quot;Miss.B&quot;).addRank(0).addRank(2).addRank(1));</div><div class="line">    females.add(new Person().setId(2).setName(&quot;Miss.C&quot;).addRank(1).addRank(0).addRank(2));</div><div class="line"></div><div class="line">    new GaleShapleyAllCompose().allStableMatch(0, males, females);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最终可以找出两个匹配结果, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">Mr.A  &lt;--&gt;  Miss.C</div><div class="line">Mr.B  &lt;--&gt;  Miss.B</div><div class="line">Mr.C  &lt;--&gt;  Miss.A</div><div class="line"></div><div class="line"></div><div class="line">Mr.A  &lt;--&gt;  Miss.B</div><div class="line">Mr.B  &lt;--&gt;  Miss.C</div><div class="line">Mr.C  &lt;--&gt;  Miss.A</div></pre></td></tr></table></figure>
+<h1 id="二分图和匈牙利算法"><a href="#二分图和匈牙利算法" class="headerlink" title="二分图和匈牙利算法"></a>二分图和匈牙利算法</h1><p>其实这个问题还可以用二部图和匈牙利算法来处理, 详细内容请看下一篇博客.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://cramton.umd.edu/market-design/gale-shapley-college-admissions.pdf" target="_blank" rel="external">College Admissions and the Stability of Marriage</a><br><a href="https://en.wikipedia.org/wiki/Stable_marriage_problem" target="_blank" rel="external">https://en.wikipedia.org/wiki/Stable_marriage_problem</a></p>
 
             
           </span>
@@ -952,473 +1457,6 @@ vi conf/example/instance.properties
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/08/search/es/es-partial-update/" itemprop="url">
-                  【api】elasticsearch - 部分更新文档
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-08T00:00:00+08:00" content="2016-05-08">
-              2016-05-08
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/search/" itemprop="url" rel="index">
-                    <span itemprop="name">search</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/08/search/es/es-partial-update/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/08/search/es/es-partial-update/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="document-的部分更新"><a href="#document-的部分更新" class="headerlink" title="document 的部分更新"></a>document 的部分更新</h1><p>对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。</p>
-<p>但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考虑version的话， 为何不在服务器完成， 提供一个部分更新的api， 让用户根据场景合理使用api， 比之前的做法可以节省一个请求。</p>
-<p>所以说， elasticsearch还是很人性化的， 它提供了这个api， 不过在其内部来说， api实现还是遵循了<code>retrieve-change-reindex</code>的步骤, 操作在shard中完成。</p>
-<h1 id="更新的安全问题"><a href="#更新的安全问题" class="headerlink" title="更新的安全问题"></a>更新的安全问题</h1><p>那么如果有多个客户端同时更新， 那么并发安全的问题es如何处理呢？<br>前面提到了， es内部是<code>retrieve-change-reindex</code>的步骤， 在<code>retrieve</code>阶段， es会获取当前的<code>_version</code>， 并在后面的<code>reindex</code>阶段使用。<br>如果其他进程修改了document， <code>_version</code>将会和update request中的不同， 从而更新将会失败。</p>
-<p>这个类似乐观锁的策略， 如果需要重试的话， 可以使用<code>retry_on_conflict</code>设置重试次数，比如：</p>
-<p><code>.../_update?retry_on_conflict=5</code></p>
-<p>不过， 这个重试使用的场景在计数器上用的较多， 因为这个更新的顺序是不那么重要的。</p>
-<h1 id="REST-api"><a href="#REST-api" class="headerlink" title="REST api"></a>REST api</h1><p>言归正传， 接下来，介绍以下api的使用吧。</p>
-<p>假设有个<code>blog</code>的document， 其中有个field叫做<code>tags</code>， 如果要部分更新这个<code>tags</code>：</p>
-<p>最简单的方式是使用<code>doc</code>参数， 和已有document合并， 已有的field会被覆盖， 新的field将会新增到document， REST api 如下：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   "doc" : &#123;</div><div class="line">      "tags" : [ "testing" ],</div><div class="line">      "views": 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果成功， 会收到这样的response：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span> :   <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_id"</span> :      <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_type"</span> :    <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_version"</span> : <span class="number">3</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>再获取一次这个文档， 检查一下是否真的只更新了<code>tags</code>这个field：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span>:    <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_type"</span>:     <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_id"</span>:       <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_version"</span>:  <span class="number">3</span>,</div><div class="line">   <span class="attr">"found"</span>:     <span class="literal">true</span>,</div><div class="line">   <span class="attr">"_source"</span>: &#123;</div><div class="line">      <span class="attr">"title"</span>:  <span class="string">"My first blog entry"</span>,</div><div class="line">      <span class="attr">"text"</span>:   <span class="string">"Starting to get the hang of this..."</span>,</div><div class="line">      <span class="attr">"tags"</span>: [ <span class="string">"testing"</span> ],</div><div class="line">      <span class="attr">"views"</span>:  <span class="number">0</span></div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="java-api"><a href="#java-api" class="headerlink" title="java api"></a>java api</h1><p>如果使用 java api 的话：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;website&quot;, &quot;blog&quot;, &quot;1&quot;)</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;tags&quot;, new String[]&#123;&quot;testing&quot;&#125;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h1 id="spring-data-elasticsearch-api"><a href="#spring-data-elasticsearch-api" class="headerlink" title="spring data elasticsearch api"></a>spring data elasticsearch api</h1><p>如果使用spring-data-elasticsearch的<code>ElasticsearchTemplate</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line">UpdateRequest updateRequest = <span class="keyword">new</span> UpdateRequest();</div><div class="line">updateRequest</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">                .startObject()</div><div class="line">                .field(field, value)</div><div class="line">                .endObject());</div><div class="line">UpdateQuery updateQuery = <span class="keyword">new</span> UpdateQueryBuilder()</div><div class="line">        <span class="comment">//.withIndexName(indexName).withType(objectType)</span></div><div class="line">        .withClass(clz)</div><div class="line">        .withId(String.valueOf(id))</div><div class="line">        .withUpdateRequest(updateRequest)</div><div class="line">        .build();</div><div class="line">elasticsearchTemplate.update(updateQuery);</div><div class="line">elasticsearchTemplate.refresh(indexName, <span class="keyword">true</span>);</div></pre></td></tr></table></figure>
-<p>使用这个api时可能会有这样的疑惑， UpdateQuery中有指定indexName和objectType， 但是<code>@Document</code>的Class中也有声明， 那么使用哪个呢？</p>
-<p>我们可以看看<code>elasticsearchTemplate.update(updateQuery)</code>的源码:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   @Override</div><div class="line">public UpdateResponse update(UpdateQuery query) &#123;</div><div class="line">	return this.prepareUpdate(query).execute().actionGet();</div><div class="line">&#125;</div><div class="line"></div><div class="line">   private UpdateRequestBuilder prepareUpdate(UpdateQuery query) &#123;</div><div class="line">   		String indexName = isNotBlank(query.getIndexName()) ? query.getIndexName() : getPersistentEntityFor(query.getClazz()).getIndexName();</div><div class="line">   		String type = isNotBlank(query.getType()) ? query.getType() : getPersistentEntityFor(query.getClazz()).getIndexType();</div><div class="line">   		Assert.notNull(indexName, &quot;No index defined for Query&quot;);</div><div class="line">   		Assert.notNull(type, &quot;No type define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getId(), &quot;No Id define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getUpdateRequest(), &quot;No IndexRequest define for Query&quot;);</div><div class="line">   		UpdateRequestBuilder updateRequestBuilder = client.prepareUpdate(indexName, type, query.getId());</div><div class="line"></div><div class="line">   		...</div><div class="line">   	&#125;</div></pre></td></tr></table></figure>
-<p>由上可知， <code>query.getIndexName()</code>和<code>query.getIndexName()</code>会被优先使用， 如果未指定， 会从document的Class注解中获取。<br>如果为了提高性能, 能写上也好, 不过最好统一管理这两个名称, 方便以后修改变更.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/06/java/se/ThreadLocalRandom/" itemprop="url">
-                  ThreadLocalRandom - 为多线程而生
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-06T00:00:00+08:00" content="2016-05-06">
-              2016-05-06
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/06/java/se/ThreadLocalRandom/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/06/java/se/ThreadLocalRandom/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>今天要说的 <code>ThreadLocalRandom</code> 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用</p>
-<ol>
-<li>创建<code>java.util.Random</code>实例</li>
-<li>使用Math.random(), 其实内部也是创建了一个<code>java.util.Random</code></li>
-</ol>
-<p>使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.<br>但是, 如果在多线程下使用Random, 会导致多线程的竞争开销, 也会降低Random的随机性, 于是便有了<code>ThreadLocalRandom</code>.</p>
-<h1 id="ThreadLocalRandom"><a href="#ThreadLocalRandom" class="headerlink" title="ThreadLocalRandom"></a><code>ThreadLocalRandom</code></h1><hr>
-<p>那么, 对于前面的问题, <code>ThreadLocalRandom</code>对这些做了哪些工作呢 ?</p>
-<p>假设使用以下代码获取随机数 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">int randomInt = ThreadLocalRandom.current().nextInt();</div></pre></td></tr></table></figure>
-<h2 id="ThreadLocalRandom-current"><a href="#ThreadLocalRandom-current" class="headerlink" title="ThreadLocalRandom.current():"></a><code>ThreadLocalRandom.current()</code>:</h2><hr>
-<p>我们来看一下<code>ThreadLocalRandom</code>的内部实现:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static ThreadLocalRandom current() &#123;</div><div class="line">    if (UNSAFE.getInt(Thread.currentThread(), PROBE) == 0)</div><div class="line">        localInit();</div><div class="line">    return instance;</div><div class="line">&#125;</div><div class="line"></div><div class="line">static final void localInit() &#123;</div><div class="line">    int p = probeGenerator.addAndGet(PROBE_INCREMENT);</div><div class="line">    int probe = (p == 0) ? 1 : p; // skip 0</div><div class="line">    long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));</div><div class="line">    Thread t = Thread.currentThread();</div><div class="line">    UNSAFE.putLong(t, SEED, seed);</div><div class="line">    UNSAFE.putInt(t, PROBE, probe);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>其中, <code>SEED</code>和<code>PROBE</code>可以参考下面定义:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class&lt;?&gt; tk = Thread.class;</div><div class="line">SEED = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSeed&quot;));</div><div class="line">PROBE = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomProbe&quot;));</div><div class="line">SECONDARY = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSecondarySeed&quot;));</div></pre></td></tr></table></figure>
-<p><code>Thread.java</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@sun.misc.Contended(&quot;tlr&quot;)</div><div class="line">int threadLocalRandomProbe;</div></pre></td></tr></table></figure>
-<p><code>UNSAFE.getInt(Thread.currentThread(), PROBE)</code>就是获取<code>Thread</code>对象中offset偏移地址对应的field <code>threadLocalRandomProbe</code>的值, <code>threadLocalRandomProbe</code> 是<code>nonzero if threadLocalRandomSeed initialized</code>.<br>所以, 如果<code>PROBE</code>值为零, 将进行localInit(), 当前Thread对象的threadLocalRandomSeed 和 threadLocalRandomProbe将会被赋值. (<code>@sun.misc.Contended(&quot;tlr&quot;)</code>是为了解决伪共享的问题, 将另起一篇博客介绍)</p>
-<h2 id="nextInt"><a href="#nextInt" class="headerlink" title="nextInt()"></a><code>nextInt()</code></h2><hr>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public int nextInt() &#123;</div><div class="line">    return mix32(nextSeed());</div><div class="line">&#125;</div><div class="line"></div><div class="line">final long nextSeed() &#123;</div><div class="line">    Thread t; long r; // read and update per-thread seed</div><div class="line">    UNSAFE.putLong(t = Thread.currentThread(), SEED,</div><div class="line">                   r = UNSAFE.getLong(t, SEED) + GAMMA);</div><div class="line">    return r;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>注意:</code><br><code>SEED</code>是field的偏移量<br><code>GAMMA</code>是seed的increment<br>这里会更新当前Thread的SEED, 最终mix32()生成int随机数.</p>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
-<p>从上可知<code>ThreadLocalRandom</code>的工作方式, 它为每个线程分配了一个SEED(被Thread对象持有), 故而减少了多线程下的竞争开销, 也使随机性更加好.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://www.jdon.com/concurrent/concurrent-random.html" target="_blank" rel="external">http://www.jdon.com/concurrent/concurrent-random.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/05/books/procrastination/procrastination-12/" itemprop="url">
-                  【书：拖延心理学】（12） 作战武器 - 明确目标和可行性的计划
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-05T00:00:00+08:00" content="2016-05-05">
-              2016-05-05
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/books/" itemprop="url" rel="index">
-                    <span itemprop="name">books</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/05/books/procrastination/procrastination-12/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/05/books/procrastination/procrastination-12/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h1><p><img src="/images/books/tech-less/procrastination-12-01.png" alt=""></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="url">
-                  Levenshtein 距离
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-04T00:00:00+08:00" content="2016-05-04">
-              2016-05-04
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/cs/" itemprop="url" rel="index">
-                    <span itemprop="name">cs</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="Levenshtein-距离"><a href="#Levenshtein-距离" class="headerlink" title="Levenshtein 距离"></a>Levenshtein 距离</h1><p>什么是<code>Levenshtein</code>距离?<br><code>Levenshtein距离</code>是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。</p>
-<blockquote>
-<p>Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。<br>指两个字串之间，由一个转成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。</p>
-</blockquote>
-<p>比如将kitten一字转成sitting, 有三步：</p>
-<p>sitten （k→s）<br>sittin （e→i）<br>sitting （→g）</p>
-<h1 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h1><ul>
-<li>相似度检测</li>
-<li>拼写检查</li>
-<li>文本搜索 (Lucene/Solr)</li>
-<li>NLP</li>
-<li>等等</li>
-</ul>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><hr>
-<p>如果用朴素的递归方法实现, 需要O(3^n)的时间复杂度, 明显我们要进行一些优化, 动态规划是比较常用的方法.</p>
-<p>假设字符串target有1~m个字符, 字符串str1有1~n个:</p>
-<h2 id="定义最优子问题"><a href="#定义最优子问题" class="headerlink" title="定义最优子问题"></a>定义最优子问题</h2><p>通过插入/删除/替换操作, 把str1转换为target字符串.<br>要想找到最短编辑距离, 即是<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数</p>
-<h2 id="确定状态转换方程"><a href="#确定状态转换方程" class="headerlink" title="确定状态转换方程"></a>确定状态转换方程</h2><p>我们将<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数, 定义为状态d[i, j].</p>
-<h2 id="确定决策并写出状态转移方程"><a href="#确定决策并写出状态转移方程" class="headerlink" title="确定决策并写出状态转移方程"></a>确定决策并写出状态转移方程</h2><p>当target[j]等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = d[i, j] + 0;</div></pre></td></tr></table></figure></p>
-<p>当target[j]不等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = min(</div><div class="line">    d[i, j-1] + 1,</div><div class="line">    d[i-1, j] + 1,</div><div class="line">    d[i-1, j-1] + 1</div><div class="line">    )</div></pre></td></tr></table></figure></p>
-<h2 id="寻找边界条件"><a href="#寻找边界条件" class="headerlink" title="寻找边界条件"></a>寻找边界条件</h2><p>当target是空字符串时, d[i, 0] = str1的长度<br>当str1是空字符串时, d[0, j] = target的长度</p>
-<p>经过这几步, 就可以开始写代码实现了. 以下给出的是状态递推DP算法, 除此以外, 仍可以使用带记忆的递归算法.</p>
-<h1 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h1><figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getEditDistance</span><span class="params">(<span class="keyword">char</span>[] target, <span class="keyword">char</span>[] str1)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span>[][] distance = <span class="keyword">new</span> <span class="keyword">int</span>[str1.length + <span class="number">1</span>][target.length + <span class="number">1</span>];</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">        distance[i][<span class="number">0</span>] = i;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        distance[<span class="number">0</span>][j] = j;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (str1[i - <span class="number">1</span>] == target[j - <span class="number">1</span> ]) &#123;</div><div class="line">                distance[i][j] = distance[i - <span class="number">1</span>][j - <span class="number">1</span>];</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">int</span> distanceInsert = distance[i][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceDelete = distance[i - <span class="number">1</span>][j] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceEdit = distance[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                distance[i][j] = Math.min(</div><div class="line">                        Math.min(distanceInsert, distanceDelete),</div><div class="line">                        distanceEdit);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> distance[str1.length][target.length];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>以<code>snowy</code>和<code>sunny</code>字符串做测试, 计算过程如下:</p>
-<p><img src="/images/cs/dp_edit_distance_01.png" alt=""></p>
-<p>有三个值的, 分别是<code>insert</code>/<code>delete</code>/<code>edit</code>的计算距离, 最后得出最短编辑距离是<code>3</code>.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://zh.wikipedia.org/wiki/%E8%90%8A%E6%96%87%E6%96%AF%E5%9D%A6%E8%B7%9D%E9%9B%A2" target="_blank" rel="external">莱文斯坦距离</a><br>[算法的乐趣 - C3 动态规划]</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1461,7 +1499,7 @@ vi conf/example/instance.properties
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">54</span>
+              <span class="site-state-item-count">58</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

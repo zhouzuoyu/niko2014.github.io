@@ -204,6 +204,514 @@
             
             
               
+                <a class="post-title-link" href="/2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="url">
+                  java thread 内存模型
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-06T00:00:00+08:00" content="2016-04-06">
+              2016-04-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/06/java/concurrent/java_thread_memory_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: <a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a>)</p>
+<h1 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h1><hr>
+<p>首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书<code>&lt;深入理解Java虚拟机&gt;</code>中有一幅图, 描述两者的关系:</p>
+<p><img src="/images/java/main_working_memory.png" alt=""></p>
+<p>如果要快速地理解他们之间的关系, 可以类比CPU/高速缓存/内存的关系(对应线程/工作内存/主内存).</p>
+<p>映射到底层来看, 主内存在物理硬件内存中, 工作内存可能会存在于寄存器或高速缓存.</p>
+<h1 id="线程操作术语和框架"><a href="#线程操作术语和框架" class="headerlink" title="线程操作术语和框架"></a>线程操作术语和框架</h1><hr>
+<p>以下操作都是原子的:</p>
+<ul>
+<li><code>lock</code></li>
+</ul>
+<p>锁定一个变量为某个线程独占</p>
+<ul>
+<li><code>unlock</code></li>
+</ul>
+<p>释放已lock的变量</p>
+<ul>
+<li><code>read</code></li>
+</ul>
+<p>从主内存读取variable到工作内存</p>
+<ul>
+<li><code>load</code></li>
+</ul>
+<p>把read到的variable放入工作内存的变量副本</p>
+<ul>
+<li><code>use</code></li>
+</ul>
+<p>把工作内存的变量传递给执行引擎</p>
+<ul>
+<li><code>assign</code></li>
+</ul>
+<p>执行引擎通过此操作值赋给工作内存的变量</p>
+<ul>
+<li><code>store</code></li>
+</ul>
+<p>把工作内存的一个变量值送到主内存中</p>
+<ul>
+<li><code>write</code></li>
+</ul>
+<p>把store送到主内存的值写到主内存变量中</p>
+<p>以上八个操作更详细的介绍可以从这个<a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">JVM Specs 文档</a>中查阅.</p>
+<h1 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h1><hr>
+<p>有了以上8种基本操作, 可以观察到, 这些操作的一些pattern组合是有意义的, 一些是不合法无意义的. 因此我们还需要一些规则来限定这些操作的顺序和组合, 如下:</p>
+<h2 id="变量规则"><a href="#变量规则" class="headerlink" title="变量规则"></a>变量规则</h2><ul>
+<li>不允许丢失最近的<code>assign</code>, 必须把工作内存的变化同步回主内存</li>
+<li>不允许线程没有发生<code>assign</code>就把内容同步回主内存.</li>
+<li>新线程创建时工作内存是空的, 而且需从主内存获取(即use/store前必须已经assign/load)</li>
+<li>read+load和store+write是成对按顺序出现的, 从主内存read了, 工作内存就必须接受; store了主内存, 主内存就必须write</li>
+</ul>
+<h2 id="lock-规则"><a href="#lock-规则" class="headerlink" title="lock 规则"></a>lock 规则</h2><ul>
+<li>同一时刻只能有一个线程进行lock操作, 但同一线程可以lock多次, 同时unlock也需要执行相同的次数.</li>
+<li>不允许lock未被lock的以及被其他线程lock住的变量</li>
+</ul>
+<h2 id="lock和变量互动规则"><a href="#lock和变量互动规则" class="headerlink" title="lock和变量互动规则"></a>lock和变量互动规则</h2><ul>
+<li>unlock时, 必须把内容同步会主内存</li>
+<li>当lock某个变量时, 会清空工作内存中的该变量的值, 当执行引擎使用到该变量时, 从主内存进行load或assign.</li>
+</ul>
+<h1 id="先行发生原则"><a href="#先行发生原则" class="headerlink" title="先行发生原则"></a>先行发生原则</h1><hr>
+<p>观察上面这些规则的设计, 可以发现是比较严谨繁琐的. 但写代码时, 我们判断是否<code>线程安全</code>的方法用的是<code>先行发生(happens-before)原则</code>. 如果程序不在该规则及其推导中, 那么就不是线程安全的. 以下是<a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5" target="_blank" rel="external">主要规则</a>:</p>
+<ul>
+<li>一个线程内, 代码按控制流顺序执行</li>
+<li>监视器上的unlock先于器lock操作</li>
+<li>volatile的write先于随后的read</li>
+<li>start()的调用先于此线程的所有action</li>
+<li>所有action先于该线程的join()返回</li>
+<li>对象初始化操作先于其他action</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a><br><a href="http://gvsmirnov.ru/blog/tech/2014/02/10/jmm-under-the-hood.html" target="_blank" rel="external">Java Memory Model Under The Hood</a><br><a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">VM Spec Threads and Locks</a><br><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html" target="_blank" rel="external">Chapter 17. Threads and Locks</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="url">
+                  Java 并发之 CAS
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-05T00:00:00+08:00" content="2016-04-05">
+              2016-04-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/05/java/concurrent/CAS_ABA_Java/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/05/java/concurrent/CAS_ABA_Java/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个<code>原子操作</code>. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于<code>CPU提供的原子操作</code>指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现<code>无锁队列</code>.</p>
+<p>从CAS的机制可以发现, 这和<code>乐观锁</code>很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种<code>悲观的策略</code>, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
+<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
+<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
+<ol>
+<li>一个进程P1读取值的时候是A</li>
+<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
+<li>另一个进程P2把A改成了B, 然后又改回了A</li>
+<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
+</ol>
+<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/04/04/linux/android/honor6_root_rom/" itemprop="url">
+                  荣耀6刷入CM11
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-04T00:03:03+08:00" content="2016-04-04">
+              2016-04-04
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/04/linux/android/honor6_root_rom/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/04/linux/android/honor6_root_rom/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <h1 id="刷入过程"><a href="#刷入过程" class="headerlink" title="刷入过程"></a>刷入过程</h1><h2 id="0-准备"><a href="#0-准备" class="headerlink" title="0. 准备"></a>0. 准备</h2><ul>
+<li>下载recovery和SU：<a href="http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113</a></li>
+<li>下载ROM：<a href="http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056</a></li>
+<li>保证1G的TF卡空闲空间</li>
+</ul>
+<h2 id="1-解锁"><a href="#1-解锁" class="headerlink" title="1. 解锁"></a>1. 解锁</h2><p>官网解锁说明：<a href="https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step" target="_blank" rel="external">https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step</a><br>获取解锁码：<a href="https://www.emui.com/plugin.php?id=unlock" target="_blank" rel="external">https://www.emui.com/plugin.php?id=unlock</a></p>
+<h2 id="2-第三方recovery和root"><a href="#2-第三方recovery和root" class="headerlink" title="2. 第三方recovery和root"></a>2. 第三方recovery和root</h2><p>adb 连接手机，刷入recovery（ClockworkMod）：</p>
+<pre><code>fastboot flash recovery cwm-6.0.5.1_2015xxxx_h60_l0x.img
+（cwm-6.0.5.1_2015xxxx_h60_l0x.img 太长了，最好改个名）
+</code></pre><p>进入recovery，安装SuperSU。</p>
+<h2 id="3-ROM"><a href="#3-ROM" class="headerlink" title="3. ROM"></a>3. ROM</h2><p>我的是H60-L01,<code>20150822</code>这个版本已经可以使用<code>cm-11-20150822-UNOFFICIAL-h60_l02.zip</code>ROM了，有些教程会让你改<code>META-INF/com/google/android/updater-script</code>来跳过机型验证，这个版本的ROM并不需要。<br>由于我改了<code>updater-script</code>导致无法刷入，然而重新启动后，卡在开机画面无法继续。我必须拷贝原ROM到TF卡，再重新进入recovery。</p>
+<p>然而，坑爹的是，荣耀6按住电源键10秒可以重启，没有强制关机的方法。而进入recovery必须在关机状态下，按住<code>电源和音量+</code>键。</p>
+<p>所以准备拔电源了，但是荣耀拔电源是在苦逼，掀了后盖后缺少螺丝刀，于是去午睡准备晚上接着搞。<br>午休时迷迷糊糊灵光一现，能不能在重启的时候，有那几秒，快速进入recovery模式呢？哈哈，问题解决！插入TF卡，5分钟不到，就刷入了CM11。比起之前的EMUI，这流畅度简直让人上天啊。<br>好困，午休就这么过去了～～</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC" target="_blank" rel="external">http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2016/04/01/linux/defy_to_cm_android44/" itemprop="url">
+                  motorola defy 刷到 android 4.4
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-01T00:10:39+08:00" content="2016-04-01">
+              2016-04-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/01/linux/defy_to_cm_android44/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/01/linux/defy_to_cm_android44/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>motorola defy，相信是很多人的回忆，他伴随我走过了大学四年，只要我在手里，就感觉是会到了大学校园，教室的最后一排。然而现在很多App已经不能安装了，因为系统仍然是2.x版本，所以需要升级到<code>4.x</code>才能重生。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>我的机子是android 2.3版本的，已root。<br>所以需要的工具只是：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">终端模拟器.apk</div><div class="line">cm-11-20160330-NIGHTLY-mb52x.zip</div><div class="line">defy_bootstrap_ext3.img</div><div class="line">resize.zip</div></pre></td></tr></table></figure>
+<p>模拟器需要先安装，后面三个文件要放到SD卡根目录。</p>
+<h2 id="开搞"><a href="#开搞" class="headerlink" title="开搞"></a>开搞</h2><p>这次的刷机比以前简单多了，首先，安装完终端模拟器，进入终端使用<code>su</code>命令获取root权限：</p>
+<p>把img写入<code>/dev/block/mmcblk1p21</code>  ：</p>
+<pre><code>cat /sdcard/defy_bootstrap_ext3.img &gt; /dev/block/mmcblk1p21
+</code></pre><p>重启，若无反应，拔电池重新开机：</p>
+<p><img src="/images/defy_android44_recovery_home.jpg" alt=""></p>
+<p>从图标可以看出，对应了手机底部的几个物理按键，选择<code>recovery</code>：</p>
+<p>然后点击<code>install</code>， 进入sdcard选择<code>resize.zip</code>，滑动按钮到右边进行install：</p>
+<p>重启：</p>
+<p>再次进入recovery和install，这次选择<code>cm-11-20160330-NIGHTLY-mb52x.zip</code>，这次文件比较大，会比上次时间长一点，完成后选择<code>reboot system</code>：</p>
+<p>这次进入home界面时，选择<code>Continue</code>进入系统，系统会有2～3分钟的loading动画进行初始化操作，然后就进入用户界面的初始设置，升级complete：</p>
+<p><img src="/images/defy_android44_installed.jpg" alt=""></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p><a href="http://tieba.baidu.com/p/3600016194" target="_blank" rel="external">http://tieba.baidu.com/p/3600016194</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/03/28/linux/tools/ssd_4k_trim/" itemprop="url">
                   linux下ssd的4k对齐和trim
                 </a>
@@ -927,460 +1435,6 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/26/linux/tools/cheat-cmd/" itemprop="url">
-                  man的铺助工具——cheat
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-26T00:00:00+08:00" content="2016-01-26">
-              2016-01-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/26/linux/tools/cheat-cmd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/26/linux/tools/cheat-cmd/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="man"><a href="#man" class="headerlink" title="man"></a>man</h1><p>相信使用Linux的小伙伴, 想要查询一个命令的用法时, 都会使用<code>man</code>命令数据库，或者试一试命令自带的<code>--help</code>参数。<br>但是使用<code>man</code>有个不好的地方，就是信息太多太全了，对我们来说，需要的可能只是某个用法，而且例子是比较少的，有时man的效率确实比较低。<br>所以我的习惯是，写博客和笔记，并附有许多常用的例子。<br>其实，还有一个常用工具，可以满足需求的——<code>cheat</code>。</p>
-<h1 id="cheat-命令"><a href="#cheat-命令" class="headerlink" title="cheat 命令"></a>cheat 命令</h1><p>首先，看一下效果，以tar为例：</p>
-<p><img src="/images/linux/linux-python-cheat-tar.png" alt=""></p>
-<h1 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h1><p>cheat是python写的，可以用pip安装。</p>
-<pre><code>pip install cheat
-</code></pre><h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><hr>
-<p><a href="https://github.com/chrisallenlane/cheat" target="_blank" rel="external">github 地址</a></p>
-<p>#</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/13/linux/synergy/" itemprop="url">
-                  synergy 安装和使用 （一套键鼠掌握世界）
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-13T15:03:30+08:00" content="2016-01-13">
-              2016-01-13
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/13/linux/synergy/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/linux/synergy/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>由于有两台电脑，四个显示器，在使用的时候，难免要切换，但笔记本的触控板和键盘实在太难用～<code>%&gt;_&lt;%</code> 但是机械键盘和鼠标只有一套，怎么办呢？<br>还好之前看一些大牛的工作环境时，看到有一个工具叫synergy，用来同步鼠标和键盘，可以随意在多台电脑中切换。</p>
-<h1 id="通过apt-get-安装"><a href="#通过apt-get-安装" class="headerlink" title="通过apt-get 安装"></a>通过apt-get 安装</h1><p>因为我常用的操作系统是ubuntu和kali，当然是直接apt-get。</p>
-<pre><code>apt-get install synergy
-</code></pre><p>安装后，两台ubuntu（synergy版本1.4.12）之间操作没问题，然而在kali上是1.4.16版本，有不兼容的问题。于是找了下源，并没有找到对应的仓库，干脆就两边使用最新的源码install好了。</p>
-<h1 id="通过源码安装"><a href="#通过源码安装" class="headerlink" title="通过源码安装"></a>通过源码安装</h1><p>首先，安装依赖</p>
-<pre><code>sudo apt-get install cmake make g++ xorg-dev libqt4-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev libssl-dev
-</code></pre><p>访问<a href="https://github.com/symless/synergy/releases" target="_blank" rel="external">synergy on github</a>，git clone或者直接<a href="https://github.com/symless/synergy/archive/v1.7.5-stable.tar.gz" target="_blank" rel="external">下载</a>，然后：</p>
-<pre><code>tar xzvf v1.7.5-stable.tar.gz
-cd synergy-1.7.5-stable
-./hm conf -g1
-./hm build
-</code></pre><p>搞定。kali上也是如此操作，因为也是基于Debian。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>跟着上面的操作，工作目录还在<code>synergy-1.7.5-stable</code>，执行<code>bin/synergy</code></p>
-<p>1，开启服务器（服务器即是你鼠标和键盘连接的那台电脑），synergy 会有个向导，选择服务器模式；<br>2，点击<code>Configure Server</code>，拖拽显示右上角的显示到格子中，想要的放置位置，这里要注意显示器的name需要填写正确，这个name就是client（或server）的名称，client若对不上，会被server拒绝连接的（name在<code>Edit - Settings</code>中设置）。</p>
-<p><img src="/images/synergy_server_conf.png" alt=""><br><img src="/images/synergy_name_settings.png" alt=""></p>
-<p>3，主界面点击start，界面可以看到log，包括客户端的连接。<br>4，启动server后，其他主机同样<code>bin/synergy</code>启动，选择client模式，接着设置一下自己的name，填写server的IP，点击<code>Start</code>。<br>5，Okay，这时可以发现，一套键鼠可以操控多台计算机啦，尽情地享受多屏多机的快感吧，工作效率杠杠的。    :-D</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/12/java/spring/spring_transaction_manager/" itemprop="url">
-                  【spring】事务提交后进行某些操作
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-12T13:03:30+08:00" content="2016-01-12">
-              2016-01-12
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/12/java/spring/spring_transaction_manager/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/12/java/spring/spring_transaction_manager/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>在工作中，我们经常会有这样的需求。当修改了某些东西后，需要通知其他服务模块或系统进行某些处理。<br>这个如果硬编码的话，是一种很不优雅的方法：<br>首先，它的灵活性很差，当需求变更时，无可避免的要修改业务操作的代码，容易出bug，不符合<code>开关</code>原则（虽然不是讨论设计模式）。<br>其次，主业务操作（数据修改）部分和后续的通知处理应该是隔离的，后续的通知是否成功，对业务操作都不应有影响，或者在功能和时间上尽可能不影响主业务操作。</p>
-<p>那么如果不用硬编码，事件（消息）驱动的方式是常用的一种方法，这样我们就可以把后续通知的相关处理和主业务操作解耦开来，就算要进行拓展也是很安全和方便的。</p>
-<h2 id="spring-的-TransactionSynchronizationManager"><a href="#spring-的-TransactionSynchronizationManager" class="headerlink" title="spring 的 TransactionSynchronizationManager"></a>spring 的 TransactionSynchronizationManager</h2><p>在spring中，TransactionSynchronizationManager有一个事务提交后的回调支持，我们可以视线注册需要在事务commit后才进行的某些操作，如<code>afterCommit()</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 这里是上下文</div><div class="line">TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() &#123;</div><div class="line">        @Override</div><div class="line">        public void suspend() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void resume() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void flush() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCommit(boolean readOnly) &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void beforeCompletion() &#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCommit() &#123;</div><div class="line">            log.info(&apos;afterCommit()&apos;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void afterCompletion(int status) &#123;</div><div class="line">        &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>因为TransactionSynchronization是interface，所以TransactionSynchronization的实现是一个匿名内部类，相当于一个闭包，可以访问上下文的变量等，方便我们进行某些操作。</p>
-<h2 id="运行细节-源码"><a href="#运行细节-源码" class="headerlink" title="运行细节 ( 源码 )"></a>运行细节 ( 源码 )</h2><p>接下来看一下TransactionSynchronizationManager的实现，它的成员中，有个ThreadLocal副本，保存了不同线程已注册的同步操作：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static final ThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt; synchronizations =</div><div class="line">			new NamedThreadLocal&lt;Set&lt;TransactionSynchronization&gt;&gt;(&quot;Transaction synchronizations&quot;);</div></pre></td></tr></table></figure>
-<p>在spring运行过程中，事务相关的操作会通过TransactionInterceptor执行invocation：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class TransactionInterceptor extends TransactionAspectSupport implements MethodInterceptor, Serializable &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">	public Object invoke(final MethodInvocation invocation) throws Throwable &#123;</div><div class="line">		// Work out the target class: may be &#123;@code null&#125;.</div><div class="line">		// The TransactionAttributeSource should be passed the target class</div><div class="line">		// as well as the method, which may be from an interface.</div><div class="line">		Class&lt;?&gt; targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);</div><div class="line"></div><div class="line">		// Adapt to TransactionAspectSupport&apos;s invokeWithinTransaction...</div><div class="line">		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() &#123;</div><div class="line">			@Override</div><div class="line">			public Object proceedWithInvocation() throws Throwable &#123;</div><div class="line">				return invocation.proceed();</div><div class="line">			&#125;</div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">    protected Object invokeWithinTransaction(Method method, Class&lt;?&gt; targetClass, final InvocationCallback invocation)</div><div class="line">			throws Throwable &#123;</div><div class="line">            ...</div><div class="line">            ...</div><div class="line">			commitTransactionAfterReturning(txInfo);</div><div class="line">			return retVal;</div><div class="line">		&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>invokeWithinTransaction()是父类TransactionAspectSupport的方法，并会调用commitTransactionAfterReturning(TransactionInfo txInfo))来提交事务：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionInterceptor.java</div><div class="line"></div><div class="line">   protected void commitTransactionAfterReturning(TransactionInfo txInfo) &#123;</div><div class="line">	if (txInfo != null &amp;&amp; txInfo.hasTransaction()) &#123;</div><div class="line">		if (logger.isTraceEnabled()) &#123;</div><div class="line">			logger.trace(&quot;Completing transaction for [&quot; + txInfo.getJoinpointIdentification() + &quot;]&quot;);</div><div class="line">		&#125;</div><div class="line">		txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// AbstractPlatformTransactionManager.java</div><div class="line"></div><div class="line">@Override</div><div class="line">public final void commit(TransactionStatus status) throws TransactionException &#123;</div><div class="line">    ...</div><div class="line">	processCommit(defStatus);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>processCommit()这个方法中很详细的介绍了提交事务的处理细节，包括beforeCommit() / beforeCompletion() / afterCommit() / afterCompletion()在事务提交时的调用和发生异常时的处理方法，还可以看到如isNewTransaction、globalRollbackOnly等对事务处理的影响。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private void processCommit(DefaultTransactionStatus status) throws TransactionException &#123;</div><div class="line">    try &#123;</div><div class="line">        boolean beforeCompletionInvoked = false;</div><div class="line">        try &#123;</div><div class="line">            prepareForCommit(status);</div><div class="line">            triggerBeforeCommit(status);</div><div class="line">            triggerBeforeCompletion(status);</div><div class="line">            beforeCompletionInvoked = true;</div><div class="line">            boolean globalRollbackOnly = false;</div><div class="line">            if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) &#123;</div><div class="line">                globalRollbackOnly = status.isGlobalRollbackOnly();</div><div class="line">            &#125;</div><div class="line">            if (status.hasSavepoint()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Releasing transaction savepoint&quot;);</div><div class="line">                &#125;</div><div class="line">                status.releaseHeldSavepoint();</div><div class="line">            &#125;</div><div class="line">            else if (status.isNewTransaction()) &#123;</div><div class="line">                if (status.isDebug()) &#123;</div><div class="line">                    logger.debug(&quot;Initiating transaction commit&quot;);</div><div class="line">                &#125;</div><div class="line">                doCommit(status);</div><div class="line">            &#125;</div><div class="line">            // Throw UnexpectedRollbackException if we have a global rollback-only</div><div class="line">            // marker but still didn&apos;t get a corresponding exception from commit.</div><div class="line">            if (globalRollbackOnly) &#123;</div><div class="line">                throw new UnexpectedRollbackException(</div><div class="line">                        &quot;Transaction silently rolled back because it has been marked as rollback-only&quot;);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        catch (UnexpectedRollbackException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_ROLLED_BACK);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (TransactionException ex) &#123;</div><div class="line">            // can only be caused by doCommit</div><div class="line">            if (isRollbackOnCommitFailure()) &#123;</div><div class="line">                doRollbackOnCommitException(status, ex);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                triggerAfterCompletion(status, TransactionSynchronization.STATUS_UNKNOWN);</div><div class="line">            &#125;</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (RuntimeException ex) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, ex);</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">        catch (Error err) &#123;</div><div class="line">            if (!beforeCompletionInvoked) &#123;</div><div class="line">                triggerBeforeCompletion(status);</div><div class="line">            &#125;</div><div class="line">            doRollbackOnCommitException(status, err);</div><div class="line">            throw err;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // Trigger afterCommit callbacks, with an exception thrown there</div><div class="line">        // propagated to callers but the transaction still considered as committed.</div><div class="line">        try &#123;</div><div class="line">            triggerAfterCommit(status);</div><div class="line">        &#125;</div><div class="line">        finally &#123;</div><div class="line">            triggerAfterCompletion(status, TransactionSynchronization.STATUS_COMMITTED);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        cleanupAfterCompletion(status);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>可以看到triggerAfterCommit()在doCommit(status)，不管是否抛出异常都会执行afterCompletion()，这个细节在平时开发也要留意，做好异常的处理。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   private void triggerAfterCommit(DefaultTransactionStatus status) &#123;</div><div class="line">	if (status.isNewSynchronization()) &#123;</div><div class="line">		if (status.isDebug()) &#123;</div><div class="line">			logger.trace(&quot;Triggering afterCommit synchronization&quot;);</div><div class="line">		&#125;</div><div class="line">		TransactionSynchronizationUtils.triggerAfterCommit();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>终于，前面我们注册在TransactionSynchronizationManager的TransactionSynchronization，在这里被get出来执行，如果注册了多个通知操作，会被按顺序执行，因为这个Set的实现是LinkedHashSet。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   // TransactionSynchronizationUtils</div><div class="line">   public static void triggerAfterCommit() &#123;</div><div class="line">	invokeAfterCommit(TransactionSynchronizationManager.getSynchronizations());</div><div class="line">&#125;</div><div class="line"></div><div class="line">   public static void invokeAfterCommit(List&lt;TransactionSynchronization&gt; synchronizations) &#123;</div><div class="line">	if (synchronizations != null) &#123;</div><div class="line">		for (TransactionSynchronization synchronization : synchronizations) &#123;</div><div class="line">			synchronization.afterCommit();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>至今为止，以上讨论的是弱一致性的业务场景，一致性要求比较高的，需要分布式事务或者其他的手段来实现。<br>而且需要注意的，afterCommit()中的操作是同步的，和业务操作在同一个响应时间内的，所以，尽量不要做一些耗时的操作。<br>afterCommit()中，除了直接发送消息到队列，也可以使用本地队列来优化，用来存储和异步发送消息，这样会快很多。</p>
-<p>``</p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/05/java/spring/spring-transactional-aop/" itemprop="url">
-                  【spring】自我调用中transaction的常见问题
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-05T20:25:08+08:00" content="2016-01-05">
-              2016-01-05
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/05/java/spring/spring-transactional-aop/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><hr>
-<p>最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。<br>既然如此只好debug一下，接着很快便知道了。</p>
-<h2 id="代码大概是这样的"><a href="#代码大概是这样的" class="headerlink" title="代码大概是这样的"></a>代码大概是这样的</h2><hr>
-<p><a href="https://github.com/niko2014/blog-demo/tree/master/java/starter-jpa-transaction-self-invoke" target="_blank" rel="external">示例代码</a>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodMain() throws Exception &#123;</div><div class="line">        int status = 5;</div><div class="line">        methodA(status);</div><div class="line">        try &#123;</div><div class="line">            methodB(status);        // 位置A</div><div class="line">//            memberOrderCopyService.methodB(status);     // 位置B</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        methodC(status);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class)</div><div class="line">    public void methodA(Integer status) &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(1L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)</div><div class="line">    public void methodB(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(2L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">        th();</div><div class="line">    &#125;</div><div class="line">    public void methodC(Integer status) throws Exception &#123;</div><div class="line">        MemberOrder mo = memberOrderRepository.findOne(3L);</div><div class="line">        mo.setStatus(status);</div><div class="line">        memberOrderRepository.save(mo);</div><div class="line">    &#125;</div><div class="line">    private void th() throws Exception &#123;</div><div class="line">        throw new Exception(&quot;test&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>如上，methodB()中有一个持久化的操作，在那之后有可能会抛异常(th()方法)。<br>实习生的想法是，methodB()加一个注解@Transactional(rollbackFor)，想让methodB执行失败时回滚事务。<br>然而，这种是对spring aop不了解导致的错误。</p>
-<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><hr>
-<p>我对实习生说了这个错误之后，他却坚持这样是有效的。。没办法，只好以理服人。断点debug，翻源码。</p>
-<p><img src="/images/spring-tx-aop/error_debug_01.png" alt=""></p>
-<p>如上图，可看到methodB()的调用栈，发现methodMaster()是经过拦截器后调用的（Cglib生成代理对象的情况下，AOP拦截和回调可在<code>DynamicAdvisedInterceptor.intercept()</code>方法中找到，如下）。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Override</div><div class="line">public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line">    try &#123;</div><div class="line">        if (this.advised.exposeProxy) &#123;</div><div class="line">            // Make invocation available if necessary.</div><div class="line">            oldProxy = AopContext.setCurrentProxy(proxy);</div><div class="line">            setProxyContext = true;</div><div class="line">        &#125;</div><div class="line">        // May be null. Get as late as possible to minimize the time we</div><div class="line">        // &quot;own&quot; the target, in case it comes from a pool...</div><div class="line">        target = getTarget();</div><div class="line">        if (target != null) &#123;</div><div class="line">            targetClass = target.getClass();</div><div class="line">        &#125;</div><div class="line">        List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line">        Object retVal;</div><div class="line">        // Check whether we only have one InvokerInterceptor: that is,</div><div class="line">        // no real advice, but just reflective invocation of the target.</div><div class="line">        if (chain.isEmpty() &amp;&amp; Modifier.isPublic(method.getModifiers())) &#123;</div><div class="line">            // We can skip creating a MethodInvocation: just invoke the target directly.</div><div class="line">            // Note that the final invoker must be an InvokerInterceptor, so we know</div><div class="line">            // it does nothing but a reflective operation on the target, and no hot</div><div class="line">            // swapping or fancy proxying.</div><div class="line">            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);</div><div class="line">            retVal = methodProxy.invoke(target, argsToUse);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // We need to create a method invocation...</div><div class="line">            retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();</div><div class="line">        &#125;</div><div class="line">        retVal = processReturnType(proxy, target, method, retVal);</div><div class="line">        return retVal;</div><div class="line">    &#125;</div><div class="line">    finally &#123;</div><div class="line">        if (target != null) &#123;</div><div class="line">            releaseTarget(target);</div><div class="line">        &#125;</div><div class="line">        if (setProxyContext) &#123;</div><div class="line">            // Restore old proxy.</div><div class="line">            AopContext.setCurrentProxy(oldProxy);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>现在在来看methodB()：</p>
-<p><img src="/images/spring-tx-aop/error_debug_03_self_invoke.png" alt=""></p>
-<p>很明显，methodB是在methodMaster()中调用的，<code>TransactionInterceptor</code>并没有拦截，因此@Transactional是无效的。</p>
-<p>现在来对比一下，切换启用位置B代码（使用<code>memberOrderCopyService.methodB(status)</code>）的执行情况：</p>
-<p><img src="/images/spring-tx-aop/error_debug_03_of_copy_service.png" alt=""></p>
-<p>从上图可知，此时memberOrderCopyService.methodB()和原先的memberOrderService.methodMaster()都经过了TransactionInterceptor，然后通过代理invoke，这种是正确的，当有异常出现，事务也会正常回滚。</p>
-<p>其实，这是一个简单的问题，通过推理也可以猜到，而且如果内部每个方法都用拦截器，会是一个很大的性能问题。</p>
-<div style="display:none"><br>    FastClassBySpringCGLIB<br>    EnhancerBySpringCGLIB<br>    其实如果用Aspect也可以实现类似Transactional的功能，<br>    下次有空写一个<code>Aspect 和 Transactional</code>的对比。<br></div>
-
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1423,7 +1477,7 @@ cd synergy-1.7.5-stable
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">54</span>
+              <span class="site-state-item-count">58</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
