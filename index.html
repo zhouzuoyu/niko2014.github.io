@@ -70,7 +70,7 @@
 <link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="niko, java, linux" />
 
 
 
@@ -187,6 +187,14 @@
           <a href="/" rel="section">
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
           </a>
         </li>
       
@@ -344,52 +352,17 @@
       
         
           
-            <p>在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.</p>
-<h1 id="可回收判断方法"><a href="#可回收判断方法" class="headerlink" title="可回收判断方法"></a>可回收判断方法</h1><hr>
-<p>在介绍回收算法前, 我们需要了解一下, 如何进行对象可回收的判断, 常见的有两种方法:</p>
-<h2 id="1-引用计数"><a href="#1-引用计数" class="headerlink" title="1 引用计数:"></a>1 引用计数:</h2><p>这个方法简单高效, 但是很难解决对象循环引用的问题</p>
-<h2 id="2-引用树-可达性分析"><a href="#2-引用树-可达性分析" class="headerlink" title="2 引用树 (可达性分析) :"></a>2 引用树 (可达性分析) :</h2><p>主流商用语言的主流实现中, 都是通过可达性分析(Reachability Analysis)实现的, 也有人称为引用树.<br>这个方法以<code>GC Roots</code>为起点, 当一个对象不能通过起点到达, 则说明次对象是可回收的.</p>
-<p><code>GC Roots</code>包括以下几种:</p>
-<ul>
-<li>虚拟机栈(栈帧中的本地变量表)引用的对象</li>
-<li>方法区中类静态属性引用的对象</li>
-<li>方法区中常常量引用的对象</li>
-<li>本地方法栈中JNI(Native方法)引用的对象</li>
-</ul>
-<p>当然, Java 引用再细说还分为<code>强引用 软引用 弱引用 虚引用</code>, 他们有特定的回收规则, 这里不再赘述.</p>
-<h1 id="mark-sweep-标记-清除算法"><a href="#mark-sweep-标记-清除算法" class="headerlink" title="mark-sweep 标记-清除算法"></a>mark-sweep 标记-清除算法</h1><hr>
-<p>首先介绍<code>标记-清除</code>算法, 顾名思义, 该算法分为两个阶段:</p>
-<ul>
-<li><p>标记<br>标记出需要回收的对象</p>
-</li>
-<li><p>清除<br>在标记完成后, 统一回收所有被标记的对象</p>
-</li>
-</ul>
-<p>用图来表示会直观一点, 我们首先定义以下图例:</p>
-<p><img src="/images/java/jvm-gc-algo-define-01.png" alt=""></p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-mark-sweep-01.png" alt=""></p>
-<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>从这个回收过程看, 我们也可以发现有以下缺点:</p>
-<ul>
-<li>内存碎片问题<br>大量不连续的内存碎片, 如果碎片过多, 在需要分配大对象时, 无法满足连续的内存需求, 会导致提前触发GC.</li>
-</ul>
-<h1 id="copying-复制算法"><a href="#copying-复制算法" class="headerlink" title="copying 复制算法"></a>copying 复制算法</h1><hr>
-<p>为了解决低存活率内存区的效率问题, 出现了一种”复制”算法.<br>该算法将内存分为大小相同的两部分, 只使用其中的一块, 当其内存快用完时, 将存活对象复制到另外一块, 并将使用内存切换到另外另外一块, 同时原来的整个内存块进行回收. 这种方法不用考虑内存碎片问题, 简单高效(只需移动堆顶指针, 按序分配内存).</p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-copy-01.png" alt=""></p>
-<h2 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h2><p>内存缩小到了原来的一半.</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>新生代的回收:</p>
-<p>因为新生代的对象98%都是朝生夕死(根据IBM的研究), 比如Hotspot虚拟机, 有一个大的eden内存区和两个survivor区, 运行时使用eden和其中一块survivor, 默认<code>8:1</code>的eden:survivor比例.<br>即是有10%的内存会被用作第二块survivor内存. 当然, 如果survivor空间不足时, 会有其他内存如老年代进行担保, 而且survivor也并不需要很大内存.</p>
-<h1 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h1><hr>
-<p>针对老年代, mark-compact (标记整理) 算法是比较适合的.<br>标记过程和<code>标记-清除</code>算法一样, 不过回收的时候, 是会让存活对象往一端移动, 再清理掉存货对象边界外的内存.</p>
-<p>算法工作过程如下:</p>
-<p><img src="/images/java/jvm-gc-algo-mark-compact-01.png" alt=""></p>
-<h1 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h1><hr>
-<p>该算法主要思想是, 根据对象存活周期和其他特点的不同, 去选择适当的收集算法, 这个策略也在前面提到过了.<br>比如新生代存活比例小, 选择复制算法; 而老年代的存活比例高, 则采用”标记-清除”或”标记-整理”; 分代收集也算是顶层的指导策略了.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
+          在对Java内存区域进行回收时, 我们会涉及到不同的算法, 这些算法或多或少都有自身的优缺点, 正因如此, 它们有着自己的用武之地(适合的内存区), 能在适合自己的场景下发挥长处.
+可回收判断方法
+在介绍回收算法前, 我们需要了解一下, 如何进行对象可回收的判断, 常见的有两种方法:
+1 引用计数:
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -507,22 +480,17 @@
       
         
           
-            <link rel="icon" href="http://niko2014.github.io/favicon.ico">
-
-<p>hexo blog 没有提供置顶的功能, 但hexo作为一个优秀的开源项目, 代码架构和组织还是很清晰的, 有问题可以直接阅读或修改代码, 下面就通过修改代码来为hexo增加置顶功能.</p>
-<h1 id="修改index页的生成代码-generator-js"><a href="#修改index页的生成代码-generator-js" class="headerlink" title="修改index页的生成代码 generator.js"></a>修改index页的生成代码 <code>generator.js</code></h1><p>vim $SITE_HOME/node_modules/hexo-generator-index/lib/generator.js</p>
-<p>增加以下排序代码:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">posts.data = posts.data.sort(function(a, b) &#123;</div><div class="line">    if(a.top &amp;&amp; b.top) &#123; // 两篇文章top都有定义</div><div class="line">        if(a.top == b.top) return b.date - a.date; // 若top值一样则按照文章日期降序排</div><div class="line">        else return b.top - a.top; // 否则按照top值降序排</div><div class="line">    &#125;</div><div class="line">    else if(a.top &amp;&amp; !b.top) &#123; // 以下是只有一篇文章top有定义，那么将有top的排在前面（这里用异或操作居然不行233）</div><div class="line">        return -1;</div><div class="line">    &#125;</div><div class="line">    else if(!a.top &amp;&amp; b.top) &#123;</div><div class="line">        return 1;</div><div class="line">    &#125;</div><div class="line">    else return b.date - a.date; // 都没定义按照文章日期降序排</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>修改后的最终文件内容:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&apos;use strict&apos;;</div><div class="line"></div><div class="line">var pagination = require(&apos;hexo-pagination&apos;);</div><div class="line"></div><div class="line">module.exports = function(locals)&#123;</div><div class="line">  var config = this.config;</div><div class="line">  var posts = locals.posts.sort(&apos;-date&apos;);</div><div class="line">  var paginationDir = config.pagination_dir || &apos;page&apos;;</div><div class="line"></div><div class="line">    // niko</div><div class="line">    posts.data = posts.data.sort(function(a, b) &#123;</div><div class="line">            if(a.top &amp;&amp; b.top) &#123; // 两篇文章top都有定义</div><div class="line">                        if(a.top == b.top) return b.date - a.date; // 若top值一样则按照文章日期降序排</div><div class="line">                        else return b.top - a.top; // 否则按照top值降序排</div><div class="line">                    &#125;</div><div class="line">            else if(a.top &amp;&amp; !b.top) &#123; // 以下是只有一篇文章top有定义，那么将有top的排在前面（这里用异或操作居然不行233）</div><div class="line">                        return -1;</div><div class="line">                    &#125;</div><div class="line">            else if(!a.top &amp;&amp; b.top) &#123;</div><div class="line">                        return 1;</div><div class="line">                    &#125;</div><div class="line">            else return b.date - a.date; // 都没定义按照文章日期降序排</div><div class="line">    &#125;);</div><div class="line">    // niko</div><div class="line"></div><div class="line">  return pagination(&apos;&apos;, posts, &#123;</div><div class="line">    perPage: config.index_generator.per_page,</div><div class="line">    layout: [&apos;index&apos;, &apos;archive&apos;],</div><div class="line">    format: paginationDir + &apos;/%d/&apos;,</div><div class="line">    data: &#123;</div><div class="line">      __index: true</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<h1 id="测试置顶"><a href="#测试置顶" class="headerlink" title="测试置顶"></a>测试置顶</h1><p>找一篇你想置顶的博客, 在front-matter增加<code>top: 1</code>, top的value越大, 排在越前面, 如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">title: JVM 常用GC算法简介</div><div class="line">date: 2015-10-01 00:00:00</div><div class="line">tags:</div><div class="line">- jvm</div><div class="line">- java</div><div class="line">categories:</div><div class="line">- java</div><div class="line">top: 1</div></pre></td></tr></table></figure>
-<p>okay, 启动你的 hexo server, 就可以看到置顶博客了:</p>
-<p><img src="/images/others/hexo/hexo-next-top-01.png" alt=""></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://haozhe.site/2016/09/17/hexo%E5%8D%9A%E5%AE%A2%E8%AE%BE%E7%BD%AE%E7%BD%AE%E9%A1%B6/" target="_blank" rel="external">http://haozhe.site/2016/09/17/hexo%E5%8D%9A%E5%AE%A2%E8%AE%BE%E7%BD%AE%E7%BD%AE%E9%A1%B6/</a></p>
-
           
+
+hexo blog 没有提供置顶的功能, 但hexo作为一个优秀的开源项目, 代码架构和组织还是很清晰的, 有问题可以直接阅读或修改代码, 下面就通过修改代码来为hexo增加置顶功能.
+修改index页的生成代码 generator.jsvim $SITE_HOME/node_modules/h
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/08/others/hexo/hexo_add_top-function/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -640,20 +608,18 @@
       
         
           
-            <p>因为有bug, 今天更新了<code>hexo-theme-next</code>, 升级到 5.0.1 版本, 发现 TOC 文章目录老是会自动折叠, 翻了下文档, 没有找到相关设置, 算了反正是js和css, 自己动手还快一点.</p>
-<h1 id="找到隐藏的css样式"><a href="#找到隐藏的css样式" class="headerlink" title="找到隐藏的css样式"></a>找到隐藏的css样式</h1><hr>
-<p>打开chrome的F12调试模式, 查看被隐藏的node, 如下:</p>
-<p><img src="/images/others/hexo/hexo-toc-modify-01.png" alt=""></p>
-<p>如上图所示, 子列表<code>&lt;ol class=&quot;nav-child&quot;&gt;</code>被隐藏了, class <code>nav-child</code> 如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">.post-toc .nav .nav-child &#123;</div><div class="line">    display: none;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="修改css样式"><a href="#修改css样式" class="headerlink" title="修改css样式"></a>修改css样式</h1><hr>
-<p>既然已经找到被隐藏使用的class, 那么接下来只要注释掉即可 (文件位置是<code>.../themes/hexo-theme-next-5.0.1/source/css/_common/components/sidebar/sidebar-toc.styl</code>) :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">.post-toc .nav .nav-child &#123;</div><div class="line">    /*display: none;*/</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>重启 hexo server, 发现可以TOC全部展开了:</p>
-<p><img src="/images/others/hexo/hexo-toc-modify-02.png" alt=""></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+          因为有bug, 今天更新了hexo-theme-next, 升级到 5.0.1 版本, 发现 TOC 文章目录老是会自动折叠, 翻了下文档, 没有找到相关设置, 算了反正是js和css, 自己动手还快一点.
+找到隐藏的css样式
+打开chrome的F12调试模式, 查看被隐藏的node, 如下:
 
-          
+
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/08/others/hexo/hexo_cancel_collapsing/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -771,60 +737,16 @@
       
         
           
-            <p>canal 作为数据平台的一个重要环节, 若存在单点故障, 对整体后端的影响是非常大的. 实践和经验告诉我们, 关键重要的服务都要进行failover, 以保证系统的可用性. 下面就来介绍一下 canal 搭配 zookeeper 的 HA 方案.</p>
-<h1 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h1><hr>
-<p>下载并解压<code>canal.deployer-1.0.22.tar.gz</code></p>
-<p>改名为<code>canal.deployer-1.0.22-master</code>, 作为第一个提供服务的 canal server</p>
-<p>再复制一份为<code>canal.deployer-1.0.22-standby</code>, 作为 canal master <code>failover</code> 的备援机.</p>
-<h2 id="canal-master-设置"><a href="#canal-master-设置" class="headerlink" title="canal master 设置"></a>canal master 设置</h2><p>vim canal.deployer-1.0.22_master/conf/canal.properties</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">canal.zkServers=127.0.0.1:2181</div><div class="line">canal.instance.global.spring.xml = classpath:spring/default-instance.xml</div></pre></td></tr></table></figure>
-<p>vim canal.deployer-1.0.22_master/conf/example/instance.properties</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">canal.instance.mysql.slaveId = 1234</div><div class="line">canal.instance.master.journal.name = mysql-bin.000117</div><div class="line">canal.instance.master.position = 154</div></pre></td></tr></table></figure>
-<h2 id="canal-standby-配置"><a href="#canal-standby-配置" class="headerlink" title="canal standby 配置"></a>canal standby 配置</h2><p>vim canal.deployer-1.0.22_standby/conf/canal.properties</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">canal.id=2</div><div class="line">canal.zkServers=127.0.0.1:2181</div><div class="line">canal.port= 11112</div><div class="line">canal.instance.global.spring.xml = classpath:spring/default-instance.xml</div></pre></td></tr></table></figure>
-<p>vim canal.deployer-1.0.22_standby/conf/example/instance.properties</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">canal.instance.mysql.slaveId = 1235</div><div class="line">canal.instance.master.journal.name = mysql-bin.000117</div><div class="line">canal.instance.master.position = 154</div></pre></td></tr></table></figure>
-<h1 id="启动-zookeeper"><a href="#启动-zookeeper" class="headerlink" title="启动 zookeeper"></a>启动 zookeeper</h1><p><code>bin/zkServer.sh start</code>, 具体配置略过.</p>
-<h1 id="启动-canal"><a href="#启动-canal" class="headerlink" title="启动 canal"></a>启动 canal</h1><h2 id="启动-canal-master"><a href="#启动-canal-master" class="headerlink" title="启动 canal master"></a>启动 canal master</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ bin/startup.sh</div><div class="line">$ cat logs/example/example.log</div><div class="line"></div><div class="line">2016-11-06 23:11:00.218 [main] INFO  c.a.o.c.i.spring.support.PropertyPlaceholderConfigurer - Loading properties file from class path resource [canal.properties]</div><div class="line">2016-11-06 23:11:00.221 [main] INFO  c.a.o.c.i.spring.support.PropertyPlaceholderConfigurer - Loading properties file from class path resource [example/instance.properties]</div><div class="line">2016-11-06 23:11:00.266 [main] WARN  org.springframework.beans.TypeConverterDelegate - PropertyEditor [com.sun.beans.editors.EnumEditor] found through deprecated global PropertyEditorManager fallback - consider using a more isolated form of registration, e.g. on the BeanWrapper/BeanFactory!</div><div class="line">2016-11-06 23:11:00.333 [main] INFO  c.a.otter.canal.instance.spring.CanalInstanceWithSpring - start CannalInstance for 1-example</div><div class="line">2016-11-06 23:11:00.344 [main] INFO  c.a.otter.canal.instance.core.AbstractCanalInstance - start successful....</div><div class="line">2016-11-06 23:11:00.359 [destination = example , address = /127.0.0.1:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position mysql-bin.000001:1684:</div></pre></td></tr></table></figure>
-<p>查看example下的日志, 可知canal正在提供服务.</p>
-<h2 id="启动-canal-standby"><a href="#启动-canal-standby" class="headerlink" title="启动 canal standby"></a>启动 canal standby</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ bin/startup.sh</div><div class="line">$ cat logs/canal/canal.log</div><div class="line"></div><div class="line">2016-11-06 23:13:22.311 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## start the canal server.</div><div class="line">log4j:WARN No appenders could be found for logger (org.I0Itec.zkclient.ZkEventThread).</div><div class="line">log4j:WARN Please initialize the log4j system properly.</div><div class="line">2016-11-06 23:13:22.442 [main] INFO  com.alibaba.otter.canal.deployer.CanalController - ## start the canal server[192.168.59.1:11112]</div><div class="line">2016-11-06 23:13:22.569 [main] INFO  com.alibaba.otter.canal.deployer.CanalLauncher - ## the canal server is running now ......</div></pre></td></tr></table></figure>
-<p>启动后, 发现并没有example的log, 因为当前只有 canal master 在提供服务：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ ll logs/</div><div class="line">total 12</div><div class="line">drwxrwxrwx 3 niko niko 4096 Nov  6 23:13 ./</div><div class="line">drwxrwxrwx 6 niko niko 4096 Nov  6 10:44 ../</div><div class="line">drwxrwxr-x 2 niko niko 4096 Nov  6 23:13 canal/</div></pre></td></tr></table></figure>
-<h1 id="查看zookeeper中的running节点"><a href="#查看zookeeper中的running节点" class="headerlink" title="查看zookeeper中的running节点"></a>查看zookeeper中的running节点</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">[zk: localhost:2181(CONNECTED) ] get /otter/canal/destinations/example/running</div><div class="line">&#123;&quot;active&quot;:true,&quot;address&quot;:&quot;192.168.156.1:11111&quot;,&quot;cid&quot;:1&#125;</div></pre></td></tr></table></figure>
-<p>此时<code>cid</code>为1, master canal 正在 serving.</p>
-<h1 id="client-消费数据"><a href="#client-消费数据" class="headerlink" title="client 消费数据"></a>client 消费数据</h1><p>canal client <a href="https://github.com/alibaba/canal/blob/master/example/src/main/java/com/alibaba/otter/canal/example/ClusterCanalClientTest.java" target="_blank" rel="external">代码</a>:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">CanalConnector connector = CanalConnectors.newClusterConnector(&quot;127.0.0.1:2181&quot;, destination, &quot;&quot;, &quot;&quot;);</div><div class="line">......</div></pre></td></tr></table></figure>
-<p>连接 canal server 后, 从日志可以看到更改的数据 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:java.library.path=.::/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:java.io.tmpdir=/tmp</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:java.compiler=&lt;NA&gt;</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:os.name=Linux</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:os.arch=amd64</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:os.version=3.13.0-96-generic</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:user.name=niko</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:user.home=/home/niko</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Client environment:user.dir=/home/niko/mount/hsb_ssd_1/niko/dev/code/git_repos/java/MavenProj/OpenSources/canal/official/example</div><div class="line">2016-11-07 09:02:12.527 [main] INFO  org.apache.zookeeper.ZooKeeper - Initiating client connection, connectString=127.0.0.1:2181 sessionTimeout=90000 watcher=com.alibaba.otter.canal.common.zookeeper.ZkClientx@351d00c0</div><div class="line">2016-11-07 09:02:12.557 [main-SendThread(a.niko:2181)] INFO  org.apache.zookeeper.ClientCnxn - Opening socket connection to server a.niko/127.0.0.1:2181. Will not attempt to authenticate using SASL (unknown error)</div><div class="line">2016-11-07 09:02:12.709 [main-SendThread(a.niko:2181)] INFO  org.apache.zookeeper.ClientCnxn - Socket connection established to a.niko/127.0.0.1:2181, initiating session</div><div class="line">2016-11-07 09:02:12.732 [main-SendThread(a.niko:2181)] INFO  org.apache.zookeeper.ClientCnxn - Session establishment complete on server a.niko/127.0.0.1:2181, sessionid = 0x1583c459dd40002, negotiated timeout = 40000</div><div class="line"></div><div class="line">****************************************************</div><div class="line">* Batch Id: [1] ,count : [3] , memsize : [219] , Time : 2016-11-07 09:02:40</div><div class="line">* Start : [mysql-bin.000117:219:1478480560000(2016-11-07 09:02:40)]</div><div class="line">* End : [mysql-bin.000117:473:1478480560000(2016-11-07 09:02:40)]</div><div class="line">****************************************************</div><div class="line"></div><div class="line">================&gt; binlog[mysql-bin.000117:219] , executeTime : 1478480560000 , delay : 788ms</div><div class="line"> BEGIN ----&gt; Thread id: 8</div><div class="line">----------------&gt; binlog[mysql-bin.000117:365] , name[foo,city] , eventType : UPDATE , executeTime : 1478480560000 , delay : 791ms</div><div class="line">id : 1    type=int(11)</div><div class="line">province_id : 1    type=int(11)</div><div class="line">name : 北京市3    type=varchar(50)    update=true</div><div class="line">----------------</div><div class="line"> END ----&gt; transaction id: 28</div><div class="line">================&gt; binlog[mysql-bin.000117:473] , executeTime : 1478480560000 , delay : 8353ms</div></pre></td></tr></table></figure>
-<p>连接后, 在zookeeper可以看到 client 的信息:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[zk: localhost:2181(CONNECTED) 0] get /otter/canal/destinations/example/1001/running</div><div class="line">&#123;&quot;active&quot;:true,&quot;address&quot;:&quot;192.168.156.1:41823&quot;,&quot;clientId&quot;:1001&#125;</div><div class="line">cZxid = 0xb2</div><div class="line">ctime = Mon Nov 07 09:02:13 HKT 2016</div><div class="line">mZxid = 0xb3</div><div class="line">mtime = Mon Nov 07 09:02:13 HKT 2016</div><div class="line">pZxid = 0xb2</div><div class="line">cversion = 0</div><div class="line">dataVersion = 1</div><div class="line">aclVersion = 0</div><div class="line">ephemeralOwner = 0x1583c459dd40002</div><div class="line">dataLength = 63</div><div class="line">numChildren = 0</div></pre></td></tr></table></figure>
-<p>数据消费成功后，canal server 会在zookeeper中记录下当前最后一次消费成功的 binlog 位置, 以便下次重启client时，可从这个位点继续进行消费.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[zk: localhost:2181(CONNECTED) 1] get /otter/canal/destinations/example/1001/cursor</div><div class="line">&#123;&quot;@type&quot;:&quot;com.alibaba.otter.canal.protocol.position.LogPosition&quot;,&quot;identity&quot;:&#123;&quot;slaveId&quot;:-1,&quot;sourceAddress&quot;:&#123;&quot;address&quot;:&quot;127.0.0.1&quot;,&quot;port&quot;:3306&#125;&#125;,&quot;postion&quot;:&#123;&quot;included&quot;:false,&quot;journalName&quot;:&quot;mysql-bin.000117&quot;,&quot;position&quot;:473,&quot;timestamp&quot;:1478480560000&#125;&#125;</div></pre></td></tr></table></figure>
-<h1 id="master-canal-宕机测试"><a href="#master-canal-宕机测试" class="headerlink" title="master canal 宕机测试"></a>master canal 宕机测试</h1><p>停掉 canal master :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ bin/stop.sh</div><div class="line">niko-ub1404: stopping canal 7662 ...</div><div class="line">Oook! cost:1</div></pre></td></tr></table></figure>
-<p>停掉canal server后, 可以看到 client的log发生变化 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">......</div><div class="line">================&gt; binlog[mysql-bin.000117:473] , executeTime : 1478480560000 , delay : 8353ms</div><div class="line">2016-11-07 09:13:14.485 [Thread-2] WARN  c.alibaba.otter.canal.client.impl.ClusterCanalConnector - something goes wrong when getWithoutAck data from server:null</div><div class="line">com.alibaba.otter.canal.protocol.exception.CanalClientException: java.io.IOException: Connection reset by peer</div><div class="line">	at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.getWithoutAck(SimpleCanalConnector.java:281)</div><div class="line">	at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.getWithoutAck(SimpleCanalConnector.java:252)</div><div class="line">	at com.alibaba.otter.canal.client.impl.ClusterCanalConnector.getWithoutAck(ClusterCanalConnector.java:180)</div><div class="line">	at com.alibaba.otter.canal.example.AbstractCanalClientTest.process(AbstractCanalClientTest.java:113)</div><div class="line">	at com.alibaba.otter.canal.example.AbstractCanalClientTest$2.run(AbstractCanalClientTest.java:80)</div><div class="line">	at java.lang.Thread.run(Thread.java:745)</div><div class="line">Caused by: java.io.IOException: Connection reset by peer</div><div class="line">	at sun.nio.ch.FileDispatcherImpl.read0(Native Method)</div><div class="line">	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:39)</div><div class="line">	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223)</div><div class="line">	at sun.nio.ch.IOUtil.read(IOUtil.java:197)</div><div class="line">	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:380)</div><div class="line">	at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.read(SimpleCanalConnector.java:376)</div><div class="line">	at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.readNextPacket(SimpleCanalConnector.java:366)</div><div class="line">	at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.receiveMessages(SimpleCanalConnector.java:286)</div><div class="line">	at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.getWithoutAck(SimpleCanalConnector.java:279)</div><div class="line">	... 5 more</div><div class="line"></div><div class="line">2016-11-07 09:13:20.001 [Thread-2] INFO  c.alibaba.otter.canal.client.impl.ClusterCanalConnector - restart the connector for next round retry.</div><div class="line"></div><div class="line">****************************************************</div><div class="line">* Batch Id: [1] ,count : [1] , memsize : [31] , Time : 2016-11-07 09:13:20</div><div class="line">* Start : [mysql-bin.000117:473:1478480560000(2016-11-07 09:02:40)]</div><div class="line">* End : [mysql-bin.000117:473:1478480560000(2016-11-07 09:02:40)]</div><div class="line">****************************************************</div><div class="line">----------------</div><div class="line"> END ----&gt; transaction id: 28</div><div class="line">================&gt; binlog[mysql-bin.000117:473] , executeTime : 1478480560000 , delay : 640062ms</div></pre></td></tr></table></figure>
-<p>随着 canal server 的切换, client 会从zookeeper获取最新的 canal server 地址, 并与之建立连接, 继续消费数据.</p>
-<p>接下来再查看当前running节点 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[zk: localhost:2181(CONNECTED) 3] get /otter/canal/destinations/example/running</div><div class="line">&#123;&quot;active&quot;:true,&quot;address&quot;:&quot;192.168.156.1:11112&quot;,&quot;cid&quot;:2&#125;</div><div class="line">cZxid = 0xbc</div><div class="line">ctime = Mon Nov 07 09:13:19 HKT 2016</div><div class="line">mZxid = 0xbc</div><div class="line">mtime = Mon Nov 07 09:13:19 HKT 2016</div><div class="line">pZxid = 0xbc</div><div class="line">cversion = 0</div><div class="line">dataVersion = 0</div><div class="line">aclVersion = 0</div><div class="line">ephemeralOwner = 0x1583c459dd40001</div><div class="line">dataLength = 55</div><div class="line">numChildren = 0</div></pre></td></tr></table></figure>
-<p>可以看到<code>cid</code>是<code>2</code>, canal standby 正在提供服务, zookeeper 这里切换完成.</p>
-<p>这时候再修改数据库数据, 测试验证 canal standby 是否能够正常工作:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">================&gt; binlog[mysql-bin.000117:473] , executeTime : 1478480560000 , delay : 640062ms</div><div class="line"></div><div class="line">****************************************************</div><div class="line">* Batch Id: [2] ,count : [3] , memsize : [219] , Time : 2016-11-07 09:21:52</div><div class="line">* Start : [mysql-bin.000117:569:1478481712000(2016-11-07 09:21:52)]</div><div class="line">* End : [mysql-bin.000117:823:1478481712000(2016-11-07 09:21:52)]</div><div class="line">****************************************************</div><div class="line"></div><div class="line">================&gt; binlog[mysql-bin.000117:569] , executeTime : 1478481712000 , delay : 634ms</div><div class="line"> BEGIN ----&gt; Thread id: 8</div><div class="line">----------------&gt; binlog[mysql-bin.000117:715] , name[foo,city] , eventType : UPDATE , executeTime : 1478481712000 , delay : 634ms</div><div class="line">id : 1    type=int(11)</div><div class="line">province_id : 1    type=int(11)</div><div class="line">name : 北京市4    type=varchar(50)    update=true</div><div class="line">----------------</div><div class="line"> END ----&gt; transaction id: 41</div><div class="line">================&gt; binlog[mysql-bin.000117:823] , executeTime : 1478481712000 , delay : 634ms</div></pre></td></tr></table></figure>
-<p>可以看到, canal standby 推送了数据变更给 client, 此时再查看logs/example也会发现有日志出来了:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">canal.deployer-1.0.22-SNAPSHOT_standby$ cat logs/example/example.log</div><div class="line">2016-11-07 09:13:19.772 [pool-1-thread-1] INFO  c.a.o.c.i.spring.support.PropertyPlaceholderConfigurer - Loading properties file from class path resource [canal.properties]</div><div class="line">2016-11-07 09:13:19.776 [pool-1-thread-1] INFO  c.a.o.c.i.spring.support.PropertyPlaceholderConfigurer - Loading properties file from class path resource [example/instance.properties]</div><div class="line">2016-11-07 09:13:19.819 [pool-1-thread-1] WARN  org.springframework.beans.TypeConverterDelegate - PropertyEditor [com.sun.beans.editors.EnumEditor] found through deprecated global PropertyEditorManager fallback - consider using a more isolated form of registration, e.g. on the BeanWrapper/BeanFactory!</div><div class="line">2016-11-07 09:13:19.907 [pool-1-thread-1] INFO  c.a.otter.canal.instance.spring.CanalInstanceWithSpring - start CannalInstance for 1-example</div><div class="line">2016-11-07 09:13:19.921 [pool-1-thread-1] INFO  c.a.otter.canal.instance.core.AbstractCanalInstance - start successful....</div><div class="line">2016-11-07 09:13:19.980 [destination = example , address = /127.0.0.1:3306 , EventParser] WARN  c.a.otter.canal.parse.inbound.mysql.MysqlEventParser - prepare to find start position just last position</div></pre></td></tr></table></figure>
-<p>可知新的canal实例已经被启动并接管服务了.</p>
-<h1 id="异常场景"><a href="#异常场景" class="headerlink" title="异常场景"></a>异常场景</h1><p>当然, 有一些异常场景我们要注意一下:</p>
-<h2 id="释放时间"><a href="#释放时间" class="headerlink" title="释放时间"></a>释放时间</h2><p>如果canal server的jvm异常crash，running节点(EPHEMERAL type) 的释放是在对应的zookeeper session失效后，</p>
-<p><a href="https://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html#ch_zkSessions" target="_blank" rel="external"></a></p>
-<h2 id="canal-server-网络中断"><a href="#canal-server-网络中断" class="headerlink" title="canal server 网络中断"></a>canal server 网络中断</h2><p>如果 canal server 所在的网络断了, zookeeper将会认为session失效, 进而释放running节点, 而canal server的jvm其实并没有退出.</p>
-<p>为了避免瞬间runing失效导致的instance重新分布，canal 有一个策略：</p>
-<blockquote>
-<p>canal server在收到running节点释放后，延迟一段时间抢占running，原本running节点的拥有者可以不需要等待延迟，优先取得running节点，可以保证假死状态下尽可能不无谓的释放资源。 目前延迟时间的默认值为5秒，即running节点针对假死状态的保护期为5秒.</p>
-</blockquote>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://github.com/alibaba/canal/wiki/AdminGuide" target="_blank" rel="external">https://github.com/alibaba/canal/wiki/AdminGuide</a></p>
+          canal 作为数据平台的一个重要环节, 若存在单点故障, 对整体后端的影响是非常大的. 实践和经验告诉我们, 关键重要的服务都要进行failover, 以保证系统的可用性. 下面就来介绍一下 canal 搭配 zookeeper 的 HA 方案.
+环境搭建
+下载并解压canal.deployer-
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/07/java/opsrc/canal/canal_zookeeper_ha/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -942,37 +864,16 @@
       
         
           
-            <p>人的状态总有低落的时候, 平时很谨慎的人也有可能出错, 在git使用时, 经常会有合并了错误分支并推送的情况. 这种情况如何处理呢 ?</p>
-<h1 id="reset-毁尸灭迹法"><a href="#reset-毁尸灭迹法" class="headerlink" title="reset 毁尸灭迹法"></a>reset 毁尸灭迹法</h1><hr>
-<p>使用<code>git reset</code>来抹除刚才的stupid操作, 强制推送后不让别人”发现”. 但是前提是那个分支还没其他人推代码上去, 不然还是会被发现, 而且会把别人的commit删掉, 所以请谨慎使用 (适合分支只有一个人用的情况) :</p>
-<p>实操:<br>假设有以下的commit :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit 116aac11f0ee0a155837f0d6a68931fe405a6ed4</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:37:57 2016 +0800</div><div class="line"></div><div class="line">    wrong commit.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p>然后被推送到 remote server:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git push --set-upstream origin niko_blog_test</div><div class="line">Counting objects: 28, done.</div><div class="line">Delta compression using up to 4 threads.</div><div class="line">Compressing objects: 100% (6/6), done.</div><div class="line">Writing objects: 100% (8/8), 674 bytes | 0 bytes/s, done.</div><div class="line">Total 8 (delta 3), reused 0 (delta 0)</div><div class="line">To gogs@192.168.7.92:foo-org/foo.git</div><div class="line"> * [new branch]      niko_blog_test -&gt; niko_blog_test</div><div class="line">Branch niko_blog_test set up to track remote branch niko_blog_test from origin.</div></pre></td></tr></table></figure>
-<p>推送后查看服务器的 git commit log:</p>
-<p><img src="/images/git/git-remote-wrong-commit-01.png" alt=""></p>
-<p>然后到了我们的主题, 清除掉remote上面的错误 commit <code>116aac11f0ee0a155837f0d6a68931fe405a6ed4</code>, 如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git reset --hard f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">$ git push -f</div><div class="line">Total 0 (delta 0), reused 0 (delta 0)</div><div class="line">To gogs@192.168.7.92:foo-org/foo.git</div><div class="line"> + 116aac1...f000b1a niko_blog_test -&gt; niko_blog_test (forced update)</div></pre></td></tr></table></figure>
-<p>这时再查看服务器上的commit log, 可以发现<code>116aac11f0ee0a155837f0d6a68931fe405a6ed4</code>的commit已经被删除了:</p>
-<p><img src="/images/git/git-remote-wrong-commit-02.png" alt=""></p>
-<h2 id="一个高级用法-删除最后一个commit"><a href="#一个高级用法-删除最后一个commit" class="headerlink" title="一个高级用法: 删除最后一个commit"></a>一个高级用法: 删除最后一个commit</h2><hr>
-<p>假设有一个在<code>mathnet</code>的remote的分支master, 当前指向<code>dd61ab32</code>的commit, 可以这样做:</p>
-<pre><code>$ git push mathnet +dd61ab32^:master
-</code></pre><p>其中, <code>x^</code>表示<code>the parent of x</code><br><code>+</code>表示<code>a forced non-fastforward push</code></p>
-<p>不过, 我还是喜欢前一个做法, 更适用一点.</p>
-<h1 id="revert-警示后人法"><a href="#revert-警示后人法" class="headerlink" title="revert 警示后人法"></a>revert 警示后人法</h1><hr>
-<p>使用 <code>git revert</code> 建立新的commit来回滚, 假设现在服务器和本地的 <code>git log</code>是:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p>其中<code>ceaa73fd804aefc406f6384c9c0fffaedafbcb79</code>是要revert的错误commit.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git revert ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div></pre></td></tr></table></figure>
-<p>此时的gitlog :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">commit 4b9fe2c1ad02640fa63cfb18df409086b7681caf</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 17:13:38 2016 +0800</div><div class="line"></div><div class="line">    Revert &quot;Add: txt-02.&quot;</div><div class="line"></div><div class="line">    This reverts commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79.</div><div class="line"></div><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p>可见, 多了一个commit, 文本修改如下 ( 正确reverted ) , 此时再推上remote server即可.</p>
-<p><img src="/images/git/git-wrong-push-01.png" alt=""></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://christoph.ruegg.name/blog/git-howto-revert-a-commit-already-pushed-to-a-remote-reposit.html" target="_blank" rel="external">http://christoph.ruegg.name/blog/git-howto-revert-a-commit-already-pushed-to-a-remote-reposit.html</a></p>
+          人的状态总有低落的时候, 平时很谨慎的人也有可能出错, 在git使用时, 经常会有合并了错误分支并推送的情况. 这种情况如何处理呢 ?
+reset 毁尸灭迹法
+使用git reset来抹除刚才的stupid操作, 强制推送后不让别人”发现”. 但是前提是那个分支还没其他人推代码上去, 不然还是会被发
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/02/git/git-wrong-push/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1090,48 +991,16 @@
       
         
           
-            <p>工作中, 我们经常会需要从其他分支获取一些重要的修改, 但只是部分commit, 不能用merge, 这时<code>cherry-pick</code>就派上用场了.<br><code>cherry-pick</code>可以把其他分支的某些commit合并到当前分支, 具体使用和注意事项请看下面的实操.</p>
-<h1 id="cherry-pick-实操"><a href="#cherry-pick-实操" class="headerlink" title="cherry-pick 实操"></a>cherry-pick 实操</h1><hr>
-<p>假设有一个分支<code>origin/niko_blog_test</code>, 他的<code>git log</code>如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p><strong>基于<code>f000b1ac4bf9dbd57d107895f349f448a3af05cc</code>的commit建立分支<code>niko_blog_test-2</code>:</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">git checkout -b niko_blog_test-2 f000b1ac4bf9dbd57d107895f349f448a3af05cc</div></pre></td></tr></table></figure>
-<p>查看git log:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<h2 id="开始cherry-pick"><a href="#开始cherry-pick" class="headerlink" title="开始cherry-pick"></a>开始cherry-pick</h2><hr>
-<p>我们要把<code>niko_blog_test</code>的两个最新commit, pick到<code>niko_blog_test-2</code>中, 操作如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git cherry-pick ceaa73f 42a8708</div><div class="line">error: could not apply ceaa73f... Add: txt-02.</div><div class="line">hint: after resolving the conflicts, mark the corrected paths</div><div class="line">hint: with &apos;git add &lt;paths&gt;&apos; or &apos;git rm &lt;paths&gt;&apos;</div><div class="line">hint: and commit the result with &apos;git commit&apos;</div></pre></td></tr></table></figure>
-<p>提示冲突, 进行合并:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git mergetool</div></pre></td></tr></table></figure>
-<p>此时状态:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch niko_blog_test-2</div><div class="line">You are currently cherry-picking commit ceaa73f.</div><div class="line">  (all conflicts fixed: run &quot;git cherry-pick --continue&quot;)</div><div class="line">  (use &quot;git cherry-pick --abort&quot; to cancel the cherry-pick operation)</div><div class="line"></div><div class="line">Changes to be committed:</div><div class="line"></div><div class="line">        modified:   README.txt</div></pre></td></tr></table></figure>
-<p>进行commit操作.</p>
-<p>然后继续记性cherry-pick:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git cherry-pick --continue</div><div class="line">error: could not apply 42a8708... Add: txt-01.</div><div class="line">hint: after resolving the conflicts, mark the corrected paths</div><div class="line">hint: with &apos;git add &lt;paths&gt;&apos; or &apos;git rm &lt;paths&gt;&apos;</div><div class="line">hint: and commit the result with &apos;git commit&apos;</div></pre></td></tr></table></figure>
-<p>又提示冲突, 这里要手动解决了.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git mergetool</div></pre></td></tr></table></figure>
-<p><img src="/images/git/git-cherry-pick-01.png" alt=""></p>
-<p>冲突解决后, 此时状态:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch niko_blog_test-2</div><div class="line">You are currently cherry-picking commit 42a8708.</div><div class="line">  (all conflicts fixed: run &quot;git cherry-pick --continue&quot;)</div><div class="line">  (use &quot;git cherry-pick --abort&quot; to cancel the cherry-pick operation)</div><div class="line"></div><div class="line">Changes to be committed:</div><div class="line"></div><div class="line">        modified:   README.txt</div></pre></td></tr></table></figure>
-<p>进行commit操作.</p>
-<p>再<code>git cherry-pick --continue</code>会打印空内容, 表示cherry-pick结束.</p>
-<p>此时再查看log:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit e68a53fef3229c6536b44781d2cb8322aa4202e1</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">    cherry-picking commit 42a8708.</div><div class="line"></div><div class="line">    Conflicts:</div><div class="line">        hsb-common/README.txt</div><div class="line"></div><div class="line">commit 9d7a471f646742da9b68e663fee41be62a0e17b7</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">    cherry-picking commit ceaa73f.</div><div class="line"></div><div class="line">    Conflicts:</div><div class="line">        hsb-common/README.txt</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p>可以看到<code>f000b1ac4bf9dbd57d107895f349f448a3af05cc</code>之后多了两个commit, README.txt的内容也过来了.</p>
-<p>其实, 上面的操作之所以很曲折, 是因为顺序错了, 哇哈哈哈 !!!只要按commit时间顺序来, 就不会有这么多的冲突问题, 如下所示.</p>
-<h1 id="cherry-pick-实操-按时间顺序"><a href="#cherry-pick-实操-按时间顺序" class="headerlink" title="cherry-pick 实操 - 按时间顺序"></a>cherry-pick 实操 - 按时间顺序</h1><hr>
-<p>重来的话, 我们reset到<code>f000b1ac4bf9dbd57d107895f349f448a3af05cc</code>版本:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git reset --hard f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">HEAD is now at f000b1a hello</div><div class="line"></div><div class="line">$ git log</div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<h2 id="开始cherry-pick-1"><a href="#开始cherry-pick-1" class="headerlink" title="开始cherry-pick"></a>开始cherry-pick</h2><hr>
-<p>这次, 我们按照正确的顺序来:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git cherry-pick 42a8708 ceaa73f</div><div class="line">[niko_blog_test-2 fdae77f] Add: txt-01.</div><div class="line"> 1 file changed, 2 insertions(+), 1 deletion(-)</div><div class="line">[niko_blog_test-2 3e02126] Add: txt-02.</div><div class="line"> 1 file changed, 2 insertions(+), 1 deletion(-)</div></pre></td></tr></table></figure>
-<p>因为不会冲突, 直接用分支<code>niko_blog_test</code>的commit log, 如 git log 所示:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git log</div><div class="line">commit 3e02126c34fd3909b34228368ffb98c400b436c9</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit fdae77ffb6583fc44a82ab36cb26f005f335bacb</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p>顺序对了, 是不是简单很多啦? 所以一定要注意顺序的问题. 嘻嘻……</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://git-scm.com/docs/git-cherry-pick" target="_blank" rel="external">git-cherry-pick</a></p>
+          工作中, 我们经常会需要从其他分支获取一些重要的修改, 但只是部分commit, 不能用merge, 这时cherry-pick就派上用场了.cherry-pick可以把其他分支的某些commit合并到当前分支, 具体使用和注意事项请看下面的实操.
+cherry-pick 实操
+假设有一个分支ori
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/02/git/git-cherry-pick/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1249,41 +1118,16 @@
       
         
           
-            <p>最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..</p>
-<h1 id="Cross-Origin-Resource-Sharing-CORS"><a href="#Cross-Origin-Resource-Sharing-CORS" class="headerlink" title="Cross-Origin Resource Sharing (CORS)"></a>Cross-Origin Resource Sharing (CORS)</h1><hr>
-<p>Cross-Origin Resource Sharing (CORS), 是浏览器跨源服务器进行资源共享的一个标准, 是解决跨越访问的方法之一.</p>
-<p>那什么是跨域呢?</p>
-<p>举个例子, 如果你的网页处于<code>a.niko</code>域名下, 若使用ajax访问<code>b.niko</code>下的资源, 就会有跨域的问题. 如果<code>b.niko</code>不允许<code>a.niko</code>的资源请求, 那么这个请求将会失败.</p>
-<h1 id="实例演示"><a href="#实例演示" class="headerlink" title="实例演示"></a>实例演示</h1><p>首先建立nginx实验环境, 来模拟跨域的问题, 编辑nginx的配置, 建立两个server :</p>
-<p><code>a.niko</code> 服务器</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name  a.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:3000;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>b.niko</code> 服务器</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name b.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:8080;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>当然<code>/etc/hosts</code>记得加入这两个域名.</p>
-<p>接着打开<code>a.niko</code>的页面, 页面中的js会使用ajax请求<code>b.niko</code>的某一资源, 这时浏览器会提示不允许跨域请求, 如下:</p>
-<p><img src="/images/cs/protocol/cors-fail-001.png" alt=""></p>
-<h1 id="使用CORS解决跨域"><a href="#使用CORS解决跨域" class="headerlink" title="使用CORS解决跨域"></a>使用CORS解决跨域</h1><p>如果要解决这个问题, 只需要在服务器的响应头加一个header: <code>Access-Control-Allow-Origin</code>.</p>
-<p>在nginx中是这样设置:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen 80 ;</div><div class="line">        server_name b.niko ;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                proxy_pass http://127.0.0.1:8080;</div><div class="line">                add_header &apos;Access-Control-Allow-Origin&apos; &apos;http://a.niko&apos;;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>其中的值填写Origin域名, <code>*</code>号表示所有.</p>
-<p>然后刷新页面, 查看跨域请求的结果:</p>
-<p><img src="/images/cs/protocol/cors-success-001.png" alt=""></p>
-<p>如上, 跨域请求成功, 可以看<code>Origin</code>和<code>Access-Control-Allow-Origin</code> header.</p>
-<h1 id="为什么POST前有一个OPTIONS请求"><a href="#为什么POST前有一个OPTIONS请求" class="headerlink" title="为什么POST前有一个OPTIONS请求"></a>为什么POST前有一个OPTIONS请求</h1><p>这次改为POST方法试一下, 使用<code>ajax-POST</code>请求<code>b.niko</code>的资源, 观察请求:</p>
-<p><img src="/images/cs/protocol/cors-post-options-001.png" alt=""></p>
-<p>你会看到第一个发出去的是<code>OPTIONS</code>方法的请求, 而不是<code>POST</code>.</p>
-<p>为什么呢?</p>
-<p>这个<code>OPTIONS</code>请求其实叫做是<code>CORS preflight request</code>， 作用是在真正的请求发往服务器前， 向服务器确认是否有权限去做这个请求。</p>
-<p>根据CORS的规范， <code>Content-Type</code>非<code>application/x-www-form-urlencoded, multipart/form-data, or text/plain</code> 的POST请求会进行<code>preflight</code>.</p>
-<p>下面的链接会有更详细的介绍哪些请求会进行preflight:<br><a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">Types of CORS requests</a></p>
-<p>如果需要对这个<code>OPTIONS</code>请求进行特殊处理, nginx设置如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">location / &#123;</div><div class="line">     if ($request_method = &apos;OPTIONS&apos;) &#123;</div><div class="line">        add_header &apos;Access-Control-Allow-Origin&apos; &apos;*&apos;;</div><div class="line">        add_header &apos;Access-Control-Allow-Methods&apos; &apos;GET, POST, OPTIONS&apos;;</div><div class="line">        #</div><div class="line">        # Custom headers and headers various browsers *should* be OK with but aren&apos;t</div><div class="line">        #</div><div class="line">        add_header &apos;Access-Control-Allow-Headers&apos; &apos;DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type&apos;;</div><div class="line">        #</div><div class="line">        # Tell client that this pre-flight info is valid for 20 days</div><div class="line">        #</div><div class="line">        add_header &apos;Access-Control-Max-Age&apos; 1728000;</div><div class="line">        add_header &apos;Content-Type&apos; &apos;text/plain charset=UTF-8&apos;;</div><div class="line">        add_header &apos;Content-Length&apos; 0;</div><div class="line">        return 200;</div><div class="line">     &#125;</div><div class="line">     ...</div><div class="line">     ...</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p>如上， response的header除了<code>Access-Control-Allow-Origin</code>, 还有其他跨域相关的header（<code>Access-Control-Allow-Origin</code> / <code>Access-Control-Allow-Methods</code> / <code>Access-Control-Allow-Headers</code>等等）, 用以告诉客户端请求跨域访问时的条件和规则, 相关说明可查阅<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">CORS规范文档</a>。</p>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>我们都知道， 上面的场景是属于能够控制跨域服务器的情况， 因此可以通过CORS解决跨域问题。<br>否则， 只能通过JSONP和代理等其他方式来实现, 有兴趣的童鞋可以了解一下, 这里不再赘述.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS</a><br><a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">http://www.html5rocks.com/en/tutorials/cors/</a><br><a href="http://www.itnose.net/detail/6501161.html" target="_blank" rel="external">http://www.itnose.net/detail/6501161.html</a></p>
+          最近由于申请到了新的服务器域名,  需要慢慢把一些服务和应用的旧域名逐渐迁到新的域名来,  迁移工作涉及到前端以及后台API,  更多可能是一些运维设置和跨域的问题,  接下来要老生常谈一下CORS, 就当复习吧..
+Cross-Origin Resource Sharing (CORS)
+Cros
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/02/cs/protocol/CORS_nginx/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1401,22 +1245,15 @@
       
         
           
-            <p>下面以删除<code>xmind</code>deb包为例, 简述移除过程:</p>
-<h1 id="查询你要删除的包信息"><a href="#查询你要删除的包信息" class="headerlink" title="查询你要删除的包信息:"></a>查询你要删除的包信息:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dpkg -l | grep xmind</div><div class="line">ii  xmind                                                 3.6.51                                              amd64        Professional &amp; Powerful Mind Mapping Software</div></pre></td></tr></table></figure>
-<p><code>ii</code> 表示<code>installed ok installed</code>.</p>
-<h1 id="r-移除"><a href="#r-移除" class="headerlink" title="-r 移除"></a><code>-r</code> 移除</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dpkg -r xmind</div><div class="line">dpkg: error: requested operation requires superuser privilege</div><div class="line">niko@ubuntu14:/usr/lib/xmind$ sudo dpkg -r xmind</div><div class="line">(Reading database ... 178948 files and directories currently installed.)</div><div class="line">Removing xmind (3.6.51) ...</div><div class="line">Processing triggers for shared-mime-info (1.2-0ubuntu3) ...</div><div class="line">Processing triggers for man-db (2.6.7.1-1) ...</div><div class="line">Processing triggers for fontconfig (2.11.0-0ubuntu4) ...</div><div class="line">Processing triggers for gnome-menus (3.10.1-0ubuntu2) ...</div><div class="line">Processing triggers for desktop-file-utils (0.22-1ubuntu1) ...</div><div class="line">Processing triggers for bamfdaemon (0.5.1+14.04.20140409-0ubuntu1) ...</div><div class="line">Rebuilding /usr/share/applications/bamf-2.index...</div><div class="line">Processing triggers for mime-support (3.54ubuntu1) ...</div></pre></td></tr></table></figure>
-<p>再次查询</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dpkg -l | grep xmind</div><div class="line">rc  xmind                                                 3.6.51                                              amd64        Professional &amp; Powerful Mind Mapping Software</div></pre></td></tr></table></figure>
-<p>为什么删除了仍然可以查询到呢?</p>
-<p>我们留意到<code>ii</code>已经变成了<code>rc</code>, 表示<code>removed ok config-files</code>,<br>即<code>-r</code>没有移除配置文件, 已安装的包状态是存在<code>/var/lib/dpkg/status</code>中.</p>
-<p>比如, 可以查看一下<code>xmind</code>的信息:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Package: xmind</div><div class="line">Status: deinstall ok config-files</div><div class="line">Priority: optional</div><div class="line">Section: non-free/editors</div><div class="line">Installed-Size: 148888</div><div class="line">Maintainer: XMind Ltd. &lt;dev@xmind.net&gt;</div><div class="line">Architecture: amd64</div><div class="line">Version: 3.6.51</div><div class="line">Config-Version: 3.6.51</div><div class="line">Depends: default-jre (&gt;= 2:1.7-0) | java7-runtime | java8-runtime, libgtk2.0-0 (&gt;= 2.8.0), libwebkitgtk-1.0-0, lame, libc6 (&gt;= 2.7), libglib2.0-0 (&gt;= 2.12.0)</div><div class="line">Conffiles:</div><div class="line"> /etc/XMind.ini 3553ecb1eb8875b4be37733ce8f29839</div><div class="line">Description: Professional &amp; Powerful Mind Mapping Software</div><div class="line"> XMind, is an open source brainstorming and mind mapping software tool</div><div class="line"> developed by XMind Ltd. It helps people to capture ideas, organize to</div><div class="line"> various charts, and share them for collaboration. Supporting mind maps,</div><div class="line"> fishbone diagrams, tree diagrams, org-charts, logic charts, and even</div><div class="line"> matrix. Often used for knowledge management, meeting minutes, task</div><div class="line"> management, and GTD. XMind is compatible with Freemind/Mindmanager.</div><div class="line"> XMind is dual licensed under 2 open source licenses: the Eclipse Public</div><div class="line"> License v1.0 (EPL) and the GNU Lesser General Public License v3 (LGPL).</div><div class="line"> XMind Plus/Pro is released under the terms of the XMIND PROPRIETARY LICENSE</div><div class="line"> AGREEMENT, which is available at http://www.xmind.net/license/xpla/ .</div></pre></td></tr></table></figure>
-<p>状态是<code>Status: deinstall ok config-files</code>.</p>
-<h1 id="P-purge"><a href="#P-purge" class="headerlink" title="-P purge"></a><code>-P</code> purge</h1><p>如果要完全移除<code>xmind</code>程序和配置, 可使用<code>-P</code>:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sudo dpkg -P xmind</div><div class="line">[sudo] password for niko:</div><div class="line">(Reading database ... 175311 files and directories currently installed.)</div><div class="line">Removing xmind (3.6.51) ...</div><div class="line">Purging configuration files for xmind (3.6.51) ...</div></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+          下面以删除xminddeb包为例, 简述移除过程:
+查询你要删除的包信息:$ dpkg -l | grep xmindii  xmind                                                 3.6.51                           
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/01/linux/manage/remove-deb/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1534,31 +1371,16 @@
       
         
           
-            <p>上一篇博客 <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/">稳定匹配问题 - Gale &amp; Shapley</a> 我们介绍了稳定匹配的问题和<code>Gale-Shapley</code>算法, 这次我们尝试用二分图和匈牙利算法来解决问题.</p>
-<h1 id="二分图相关概念"><a href="#二分图相关概念" class="headerlink" title="二分图相关概念"></a>二分图相关概念</h1><hr>
-<p>首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人, E为边集合, 边的两端分别在X和Y集合中.<br>我们规定G的子图Gs的边集合任意两条都不是同一顶点, 则Gs是一个匹配. 如图所示:</p>
-<p><img src="/images/cs/algo/bin-graph-01.png" alt=""></p>
-<p>如果加上黑色边表示男女互相喜欢, 如下:</p>
-<p><img src="/images/cs/algo/bin-graph-02.png" alt=""></p>
-<p>绿色边表示配对的结果, 称为匹配边, 其他称为非匹配边.<br>当匹配边最多时, 则称为该图的最大匹配.<br>接着介绍匈牙利算法.</p>
-<h1 id="匈牙利算法"><a href="#匈牙利算法" class="headerlink" title="匈牙利算法"></a>匈牙利算法</h1><hr>
-<p>接着是了解匈牙利算法, 在此之前, 我们先要知道几个概念:</p>
-<p><code>增广路</code>（augmenting path）:<br>从一个未匹配的点出发, 通过<code>交替路</code>(依次经过非匹配边、匹配边、非匹配边…依次交替的路径), 若途径其他未匹配点, 那么称为该交替路为增广路.<br>增广路有一个重要特点：非匹配边比匹配边多一条。所以取反(把增广路中的匹配边和非匹配边的身份交换)之后, 匹配边就比非匹配边多一条, 如此不断寻找增广路, 知道找不到增广路径时, 算法就结束了, 得到的就是最大匹配. 匈牙利算法就是这么做的.</p>
-<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><hr>
-<p>实现主要用到两个类: <code>MatchRecord</code>和<code>HungaryAlgorithm</code>.</p>
-<p><code>MatchRecord</code> 作为匹配过程的辅助记录, 比如边和点的关系/增广路等等, 如注释:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MatchRecord</span> </span>&#123;</div><div class="line">    <span class="comment">// 男生/女生的人数</span></div><div class="line">    <span class="keyword">int</span> count;</div><div class="line">    <span class="comment">// 表示边 (用x和y坐标定位), 数值1表示两点存在边连接</span></div><div class="line">    <span class="keyword">int</span> edge[][];</div><div class="line">    <span class="comment">// 是否在当前增广路</span></div><div class="line">    <span class="keyword">boolean</span> onPath[];</div><div class="line">    <span class="comment">// 已找到的增广路</span></div><div class="line">    <span class="keyword">int</span> augmentPath[];</div><div class="line">    <span class="comment">// 最大匹配的结果数</span></div><div class="line">    <span class="keyword">int</span> maxMatch = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MatchRecord</span><span class="params">(<span class="keyword">int</span> count)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.count = count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnPath</span><span class="params">(<span class="keyword">boolean</span>[] onPath)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.onPath = onPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEdge</span><span class="params">(<span class="keyword">int</span>[][] edge)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.edge = edge;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] getAugmentPath() &#123;</div><div class="line">        <span class="keyword">return</span> augmentPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAugmentPath</span><span class="params">(<span class="keyword">int</span>[] augmentPath)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.augmentPath = augmentPath;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getMaxMatch</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> maxMatch;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getEdge</span><span class="params">(<span class="keyword">int</span> xi, <span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.edge[xi][yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">notOnPath</span><span class="params">(<span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> ! onPath[yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOnPath</span><span class="params">(<span class="keyword">int</span> yi, <span class="keyword">boolean</span> b)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.onPath[yi] = <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAugmentPath</span><span class="params">(<span class="keyword">int</span> yi)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.augmentPath[yi];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAugmentPath</span><span class="params">(<span class="keyword">int</span> yi, <span class="keyword">int</span> xi)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.augmentPath[yi] = xi;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] aug = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="keyword">this</span>.getCount()];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span class="number">0</span>; idx &lt; aug.length; idx++) &#123;</div><div class="line">            aug[idx] = -<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">this</span>.setOnPath(<span class="keyword">new</span> <span class="keyword">boolean</span>[<span class="keyword">this</span>.getCount()]);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">maxMatchInc</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.maxMatch++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>HungaryAlgorithm</code>, 主要是执行匹配过程, 通过深度搜索来查找匹配:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HungaryAlgorithm</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        MatchRecord rec = init();</div><div class="line">        <span class="keyword">int</span> count = rec.getCount();</div><div class="line">        HungaryAlgorithm hungary = <span class="keyword">new</span> HungaryAlgorithm();</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> xi = <span class="number">0</span>; xi &lt; count; xi++) &#123;</div><div class="line">            <span class="keyword">if</span> (hungary.findAugmentPath(rec, xi)) &#123;</div><div class="line">                rec.maxMatchInc();</div><div class="line">            &#125;</div><div class="line">            rec.reset();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">boolean</span> found = rec.getMaxMatch() == count;</div><div class="line">        <span class="keyword">if</span> (found) &#123;</div><div class="line">            print(rec);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// TODO 设置测试数据</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MatchRecord <span class="title">init</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> count = <span class="number">3</span>;</div><div class="line">        <span class="keyword">int</span>[][] edge = <span class="keyword">new</span> <span class="keyword">int</span>[][]&#123;</div><div class="line">                &#123;<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</div><div class="line">                &#123;<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>&#125;,</div><div class="line">                &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>&#125;</div><div class="line">        &#125;;</div><div class="line">        <span class="keyword">int</span>[] augment = <span class="keyword">new</span> <span class="keyword">int</span>[count];</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> idx = <span class="number">0</span>; idx &lt; augment.length; idx++) &#123;</div><div class="line">            augment[idx] = -<span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//</span></div><div class="line">        MatchRecord rec = <span class="keyword">new</span> MatchRecord(count);</div><div class="line">        rec.setEdge(edge);</div><div class="line">        rec.setOnPath(<span class="keyword">new</span> <span class="keyword">boolean</span>[count]);</div><div class="line">        rec.setAugmentPath(augment);</div><div class="line">        <span class="keyword">return</span> rec;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">findAugmentPath</span><span class="params">(MatchRecord matchRecord, <span class="keyword">int</span> xi)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> yi = <span class="number">0</span>; yi &lt; matchRecord.getCount(); yi++) &#123;</div><div class="line">            <span class="keyword">if</span> (matchRecord.getEdge(xi, yi) == <span class="number">1</span> &amp;&amp; matchRecord.notOnPath(yi)) &#123;</div><div class="line">                matchRecord.setOnPath(yi, <span class="keyword">true</span>);</div><div class="line">                <span class="keyword">if</span> (matchRecord.getAugmentPath(yi) == -<span class="number">1</span></div><div class="line">                        || findAugmentPath(matchRecord, matchRecord.getAugmentPath(yi))) &#123;</div><div class="line">                    matchRecord.setAugmentPath(yi, xi);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(MatchRecord rec)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] aug = rec.getAugmentPath();</div><div class="line">        System.out.println(<span class="string">"匹配结果: "</span>);</div><div class="line">        System.out.println(<span class="string">"y  --  x"</span>);</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> yi : aug) &#123;</div><div class="line">            System.out.println(<span class="string">""</span> + yi + <span class="string">" &lt;--&gt; "</span> + aug[yi]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>最终输出结果:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">匹配结果:</div><div class="line">y  --  x</div><div class="line">0 &lt;--&gt; 0</div><div class="line">2 &lt;--&gt; 1</div><div class="line">1 &lt;--&gt; 2</div></pre></td></tr></table></figure>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>以上就是匈牙利算法, 不过上面我们解决的仍是无权匹配的问题, 下篇博客我们将讨论有权匹配的问题和相关算法.</p>
-<div style="display: none;"><br>最大匹配数：最大匹配的匹配边的数目<br>最小点覆盖数：选取最少的点，使任意一条边至少有一个端点被选择<br>最大独立数：选取最多的点，使任意所选两点均不相连<br>最小路径覆盖数：对于一个 DAG（有向无环图），选取最少条路径，使得每个顶点属于且仅属于一条路径。路径长可以为 0（即单个点）。<br>定理1：最大匹配数 = 最小点覆盖数（这是 Konig 定理）<br>定理2：最大匹配数 = 最大独立数<br>定理3：最小路径覆盖数 = 顶点数 - 最大匹配数<br></div>
+          上一篇博客 稳定匹配问题 - Gale &amp; Shapley 我们介绍了稳定匹配的问题和Gale-Shapley算法, 这次我们尝试用二分图和匈牙利算法来解决问题.
+二分图相关概念
+首先了解一下二分图的相关概念, 假设有一个图G(V, E), V为顶点集合, 分为X和Y, 分别代表男人和女人,
+          ...
 
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://zh.wikipedia.org/wiki/%E5%8C%88%E7%89%99%E5%88%A9%E7%AE%97%E6%B3%95" target="_blank" rel="external">匈牙利算法</a><br><a href="https://zh.wikipedia.org/wiki/%E5%8C%B9%E9%85%8D_(%E5%9B%BE%E8%AE%BA" target="_blank" rel="external">图论(匹配</a>)<br><a href="https://www.renfei.org/blog/bipartite-matching.html" target="_blank" rel="external">https://www.renfei.org/blog/bipartite-matching.html</a></p>
-
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/06/03/cs/algo/hungary-algo/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1606,8 +1428,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="url">
-                  稳定匹配问题 (1) - Gale & Shapley
+                <a class="post-title-link" href="/2016/06/02/search/es/es-relations/" itemprop="url">
+                  【设计】elasticsearch - 处理关系型数据
                 </a>
               
             
@@ -1634,8 +1456,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/cs/" itemprop="url" rel="index">
-                    <span itemprop="name">cs</span>
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
                   </a>
                 </span>
 
@@ -1650,8 +1472,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="commentsCount"></span>
+                <a href="/2016/06/02/search/es/es-relations/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/search/es/es-relations/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -1676,33 +1498,14 @@
       
         
           
-            <h1 id="稳定匹配"><a href="#稳定匹配" class="headerlink" title="稳定匹配"></a>稳定匹配</h1><hr>
-<p>在1962年Gale和Shapley发表了一篇论文: <a href="http://cramton.umd.edu/market-design/gale-shapley-college-admissions.pdf" target="_blank" rel="external">College Admissions and the Stability of Marriage</a>，首次提出了<a href="https://zh.wikipedia.org/wiki/%E7%A9%A9%E5%AE%9A%E5%A9%9A%E5%A7%BB%E5%95%8F%E9%A1%8C" target="_blank" rel="external">婚姻匹配问题(维基百科)</a>, 使婚姻和大学招生成为稳定匹配的典型例子.</p>
-<h1 id="什么是稳定匹配"><a href="#什么是稳定匹配" class="headerlink" title="什么是稳定匹配"></a>什么是稳定匹配</h1><hr>
-<p>以婚姻匹配为例, 假设在当前匹配结果中存在两对(m1, v1)和(m2, v2), 在喜好排名中, m1更喜欢w2, m2也更喜欢w1, 这时我们可以称当前匹配是不稳定的.</p>
-<h1 id="如何实现稳定匹配呢"><a href="#如何实现稳定匹配呢" class="headerlink" title="如何实现稳定匹配呢 ?"></a>如何实现稳定匹配呢 ?</h1><hr>
-<p>要找到一种稳定匹配, 可使用<code>Gale-Shapley</code>提出的算法( 用反证法证明其有效性 ), 但有个前提是让男生主动求婚, 主要过程如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">function stableMatching &#123;</div><div class="line">    Initialize all m ∈ M and w ∈ W to free</div><div class="line">    while ∃ free man m who still has a woman w to propose to &#123;</div><div class="line">       w = first woman on m’s list to whom m has not yet proposed</div><div class="line">       if w is free</div><div class="line">         (m, w) become engaged</div><div class="line">       else some pair (m&apos;, w) already exists</div><div class="line">         if w prefers m to m&apos;</div><div class="line">            m&apos; becomes free</div><div class="line">           (m, w) become engaged</div><div class="line">         else</div><div class="line">           (m&apos;, w) remain engaged</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><hr>
-<p><code>Person.java</code>, 用来表示male或female.</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Integer SINGLE = -<span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="keyword">private</span> Integer nextAskId = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 当前伴侣id</span></div><div class="line">    <span class="keyword">private</span> Integer currentPartnerId = SINGLE;</div><div class="line">    <span class="comment">// 伴侣id在心中的排名</span></div><div class="line">    <span class="keyword">private</span> Map&lt;Integer, Integer&gt; partnerIdToRank = <span class="keyword">new</span> LinkedHashMap&lt;Integer, Integer&gt;();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">addRank</span><span class="params">(Integer personId, Integer rank)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.partnerIdToRank.put(personId, rank);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getRankOf</span><span class="params">(Integer partnerId)</span> </span>&#123;</div><div class="line">        Integer rank = <span class="keyword">this</span>.partnerIdToRank.get(partnerId);</div><div class="line">        <span class="keyword">return</span> rank == <span class="keyword">null</span> ? Integer.MAX_VALUE : rank;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//======================================================================</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setId</span><span class="params">(Integer id)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.id = id;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getNextPerfectId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> nextAskId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setNextAskId</span><span class="params">(Integer nextAskId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.nextAskId = nextAskId;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getCurrentPartnerId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> currentPartnerId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setCurrentPartnerId</span><span class="params">(Integer currentPartnerId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.currentPartnerId = currentPartnerId;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>GaleShapley.java</code>, 主要是算法过程:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GaleShapley</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        List&lt;Person&gt; males = <span class="keyword">new</span> LinkedList&lt;Person&gt;();</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">0</span>).setName(<span class="string">"Mr.A"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>).addRank(<span class="number">0</span>, <span class="number">3</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">1</span>).setName(<span class="string">"Mr.B"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">0</span>, <span class="number">2</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">2</span>).setName(<span class="string">"Mr.C"</span>).addRank(<span class="number">0</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">3</span>).setName(<span class="string">"Mr.D"</span>).addRank(<span class="number">3</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line"></div><div class="line">        List&lt;Person&gt; females = <span class="keyword">new</span> LinkedList&lt;Person&gt;();</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">0</span>).setName(<span class="string">"Miss.A"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">1</span>).setName(<span class="string">"Miss.B"</span>).addRank(<span class="number">0</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>).addRank(<span class="number">2</span>, <span class="number">3</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">2</span>).setName(<span class="string">"Miss.C"</span>).addRank(<span class="number">3</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">3</span>).setName(<span class="string">"Miss.D"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>));</div><div class="line"></div><div class="line">        <span class="keyword">new</span> GaleShapley().stableMatch(males, females);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stableMatch</span><span class="params">(List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (males == <span class="keyword">null</span> || females == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (males.size() != females.size()) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        Person freeMale = getFreeMale(males);</div><div class="line">        <span class="keyword">while</span> (freeMale != <span class="keyword">null</span>) &#123;</div><div class="line">            Integer femaleId = freeMale.getNextPerfectId();</div><div class="line">            Person female = females.get(femaleId);</div><div class="line">            <span class="keyword">if</span> (isSingle(female)) &#123;</div><div class="line">                <span class="comment">// 还是单身</span></div><div class="line">                freeMale.setCurrentPartnerId(female.getId());</div><div class="line">                female.setCurrentPartnerId(freeMale.getId());</div><div class="line"></div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="comment">// 选择更好的</span></div><div class="line">                Integer curMaleId = female.getCurrentPartnerId();</div><div class="line">                Integer curMalePartnerRank = female.getRankOf(curMaleId);</div><div class="line">                Integer freeMaleRank = female.getRankOf(freeMale.getId());</div><div class="line">                <span class="keyword">if</span> (freeMaleRank &lt; curMalePartnerRank) &#123;</div><div class="line">                    males.get(curMaleId).setCurrentPartnerId(Person.SINGLE);</div><div class="line">                    freeMale.setCurrentPartnerId(female.getId());</div><div class="line">                    female.setCurrentPartnerId(freeMale.getId());</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            freeMale.setNextAskId(freeMale.getNextPerfectId() + <span class="number">1</span>);</div><div class="line">            <span class="comment">// 继续为 freeMale 找对象</span></div><div class="line">            freeMale = getFreeMale(males);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        print(males, females);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">        males.forEach(m -&gt; &#123;</div><div class="line">            Person female = females.get(m.getCurrentPartnerId());</div><div class="line">            <span class="keyword">if</span> (female != <span class="keyword">null</span>) &#123;</div><div class="line">                System.out.println(m.getName() + <span class="string">"  &lt;--&gt;  "</span> + female.getName());</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                System.out.println(m.getName() + <span class="string">"  still  SINGLE"</span>);</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Person <span class="title">getFreeMale</span><span class="params">(List&lt;Person&gt; males)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (Person male : males) &#123;</div><div class="line">            <span class="keyword">if</span> (isSingle(male)) &#123;</div><div class="line">                <span class="keyword">return</span> male;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isSingle</span><span class="params">(Person p)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> Person.SINGLE.equals(p.getCurrentPartnerId());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>执行main()中的用例, 得出结果:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Mr.A  &lt;--&gt;  Miss.B</div><div class="line">Mr.B  &lt;--&gt;  Miss.A</div><div class="line">Mr.C  &lt;--&gt;  Miss.D</div><div class="line">Mr.D  &lt;--&gt;  Miss.C</div></pre></td></tr></table></figure>
-<h1 id="有多少稳定匹配结果"><a href="#有多少稳定匹配结果" class="headerlink" title="有多少稳定匹配结果"></a>有多少稳定匹配结果</h1><hr>
-<p>上面讨论的前提是男士主动求婚, 而且是先有一个队伍顺序, 如果改变一下这些条件, <code>Gale-Shapley</code>算法可能得到的是另外一种稳定匹配结果.<br>那么, 如何获得所有的稳定匹配结果呢 ?</p>
-<h1 id="使用穷举法"><a href="#使用穷举法" class="headerlink" title="使用穷举法"></a>使用穷举法</h1><p>我们需要对每个male进行穷举, 覆盖所有的male求婚顺序, 这样的问题用递归很方便.</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">allStableMatch</span><span class="params">(Integer maleId, List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (maleId.intValue()  == males.size()) &#123;</div><div class="line">        <span class="keyword">if</span> (isStableMatch(males, females)) &#123;</div><div class="line">            print(males, females);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    Person male = males.get(maleId);</div><div class="line">    <span class="comment">// 试所有女的favor舞伴</span></div><div class="line">    male.getPartnerIdToRank().entrySet().forEach((favor) -&gt; &#123;</div><div class="line">        Person female = females.get(favor.getKey());</div><div class="line">        <span class="keyword">if</span> (isSingle(female) &amp;&amp; female.like(maleId)) &#123;</div><div class="line">            male.setCurrentPartnerId(female.getId());</div><div class="line">            female.setCurrentPartnerId(male.getId());</div><div class="line">            allStableMatch(maleId + <span class="number">1</span>, males, females);</div><div class="line">            male.setCurrentPartnerId(Person.SINGLE);</div><div class="line">            female.setCurrentPartnerId(Person.SINGLE);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>测试用例 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">public static void main(String[] args) &#123;</div><div class="line">    List&lt;Person&gt; males = new LinkedList&lt;Person&gt;();</div><div class="line">    males.add(new Person().setId(0).setName(&quot;Mr.A&quot;).addRank(0).addRank(2).addRank(1));</div><div class="line">    males.add(new Person().setId(1).setName(&quot;Mr.B&quot;).addRank(1).addRank(2).addRank(0));</div><div class="line">    males.add(new Person().setId(2).setName(&quot;Mr.C&quot;).addRank(0).addRank(1).addRank(2));</div><div class="line"></div><div class="line">    List&lt;Person&gt; females = new LinkedList&lt;Person&gt;();</div><div class="line">    females.add(new Person().setId(0).setName(&quot;Miss.A&quot;).addRank(2).addRank(0).addRank(1));</div><div class="line">    females.add(new Person().setId(1).setName(&quot;Miss.B&quot;).addRank(0).addRank(2).addRank(1));</div><div class="line">    females.add(new Person().setId(2).setName(&quot;Miss.C&quot;).addRank(1).addRank(0).addRank(2));</div><div class="line"></div><div class="line">    new GaleShapleyAllCompose().allStableMatch(0, males, females);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>最终可以找出两个匹配结果, 如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">Mr.A  &lt;--&gt;  Miss.C</div><div class="line">Mr.B  &lt;--&gt;  Miss.B</div><div class="line">Mr.C  &lt;--&gt;  Miss.A</div><div class="line"></div><div class="line"></div><div class="line">Mr.A  &lt;--&gt;  Miss.B</div><div class="line">Mr.B  &lt;--&gt;  Miss.C</div><div class="line">Mr.C  &lt;--&gt;  Miss.A</div></pre></td></tr></table></figure>
-<h1 id="二分图和匈牙利算法"><a href="#二分图和匈牙利算法" class="headerlink" title="二分图和匈牙利算法"></a>二分图和匈牙利算法</h1><p>其实这个问题还可以用二部图和匈牙利算法来处理, 详细内容请看下一篇博客.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://cramton.umd.edu/market-design/gale-shapley-college-admissions.pdf" target="_blank" rel="external">College Admissions and the Stability of Marriage</a><br><a href="https://en.wikipedia.org/wiki/Stable_marriage_problem" target="_blank" rel="external">https://en.wikipedia.org/wiki/Stable_marriage_problem</a></p>
+          不同于关系型数据库， 我们使用es， 一般出于性能、弹性、近实时搜索、大数据量的分析等目的。然而， 在构建es数据模型时， 免不了会涉及到关系型数据的问题。关系型的数据在实际应用中广泛存在， 关系型数据库对此比较在行， 比如ACID支持、join查询等。es并不擅长这些，es的使用场景， 不是作为关
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/06/02/search/es/es-relations/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1781,10 +1584,10 @@
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 

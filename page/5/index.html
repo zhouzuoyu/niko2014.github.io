@@ -70,7 +70,7 @@
 <link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="niko, java, linux" />
 
 
 
@@ -187,6 +187,14 @@
           <a href="/" rel="section">
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
           </a>
         </li>
       
@@ -344,11 +352,17 @@
       
         
           
-            <h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><hr>
-<p><img src="/images/book_self_ctrl_5.png" alt=""></p>
-<p>##</p>
+          笔记
+
+##
 
           
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/12/23/books/self_ctrl/self_ctrl_5/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -466,52 +480,15 @@
       
         
           
-            <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过执行以下命令，可以在1分钟内对系统资源使用情况有个大致的了解。</p>
-<p>其中一些命令需要安装sysstat包，有一些由procps包提供。这些命令的输出，有助于快速定位性能瓶颈，检查出所有资源（CPU、内存、磁盘IO等）的利用率（utilization）、饱和度（saturation）和错误（error）度量，也就是所谓的<a href="http://www.brendangregg.com/usemethod.html" target="_blank" rel="external">USE方法</a>。</p>
-<p>下面我们来逐一介绍下这些命令，有关这些命令更多的参数和说明，请参照命令的手册。</p>
-<h2 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ uptime</div><div class="line">23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02</div></pre></td></tr></table></figure>
-<p>分别表示1分钟、5分钟、15分钟的平均负载情况</p>
-<h2 id="dmesg-tail"><a href="#dmesg-tail" class="headerlink" title="dmesg | tail"></a>dmesg | tail</h2><p>该命令会输出系统日志，可以帮助排查性能问题（如内核的oom kill和一次TCP丢包等）。</p>
-<h2 id="vmstat-1"><a href="#vmstat-1" class="headerlink" title="vmstat 1"></a>vmstat 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">niko@ubuntu:~$ vmstat 1</div><div class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</div><div class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</div><div class="line"> 2  0   4176 2746396 160728 1916384    0    0    15    85   12   47  9  7 84  0  0</div><div class="line"> 0  0   4176 2746228 160728 1916416    0    0     0     0 2129 4270  3  4 93  0  0</div><div class="line"> 1  0   4176 2746420 160748 1916468    0    0     0   372 1865 3960  4  5 91  0  0</div><div class="line"> 0  0   4176 2744964 160748 1916416    0    0     0     0 2000 4256  2  4 93  0  0</div><div class="line"> 1  0   4176 2745316 160748 1916420    0    0     0     0 2032 4288  2  4 94  0  0</div><div class="line"> 0  0   4176 2745052 160748 1916420    0    0     0     0 2070 4496  1  5 94  0  0</div><div class="line"> 0  0   4176 2744984 160748 1916420    0    0     0     0 2099 4202  2  5 93  0  0</div></pre></td></tr></table></figure>
-<p>vmstat(8) 命令，每行会输出一些系统核心指标，这些指标可以让我们更详细的了解系统状态。后面跟的参数1，表示每秒输出一次统计信息，表头提示了每一列的含义，这几介绍一些和性能调优相关的列：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">FIELD DESCRIPTION FOR VM MODE</div><div class="line">   Procs</div><div class="line">       r: The number of runnable processes (running or waiting for run time).</div><div class="line">       b: The number of processes in uninterruptible sleep.</div><div class="line"></div><div class="line">   Memory</div><div class="line">       swpd: the amount of virtual memory used.</div><div class="line">       free: the amount of idle memory.</div><div class="line">       buff: the amount of memory used as buffers.</div><div class="line">       cache: the amount of memory used as cache.</div><div class="line">       inact: the amount of inactive memory.  (-a option)</div><div class="line">       active: the amount of active memory.  (-a option)</div><div class="line"></div><div class="line">   Swap</div><div class="line">       si: Amount of memory swapped in from disk (/s).</div><div class="line">       so: Amount of memory swapped to disk (/s).</div><div class="line"></div><div class="line">   IO</div><div class="line">       bi: Blocks received from a block device (blocks/s).</div><div class="line">       bo: Blocks sent to a block device (blocks/s).</div><div class="line"></div><div class="line">   System</div><div class="line">       in: The number of interrupts per second, including the clock.</div><div class="line">       cs: The number of context switches per second.</div></pre></td></tr></table></figure>
-<p>r：等待在CPU资源的进程数。这个数据比平均负载更加能够体现CPU负载情况，数据中不包含等待IO的进程。如果这个数值大于机器CPU核数，那么机器的CPU资源已经饱和。<br>free：系统可用内存数（以千字节为单位），如果剩余内存不足，也会导致系统性能问题。下文介绍到的free命令，可以更详细的了解系统内存的使用情况。</p>
-<p>si, so：交换区写入和读取的数量。如果这个数据不为0，说明系统已经在使用交换区（swap），机器物理内存已经不足。</p>
-<p>us, sy, id, wa, st：这些都代表了CPU时间的消耗，它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen，一般被其他虚拟机消耗）。</p>
-<p>上述这些CPU时间，可以让我们很快了解CPU是否出于繁忙状态。一般情况下，如果用户时间和系统时间相加非常大，CPU出于忙于执行指令。如果IO等待时间很长，那么系统的瓶颈可能在磁盘IO。</p>
-<p>示例命令的输出可以看见，大量CPU时间消耗在用户态，也就是用户应用程序消耗了CPU时间。这不一定是性能问题，需要结合r队列，一起分析。</p>
-<h2 id="mpstat-P-ALL-1"><a href="#mpstat-P-ALL-1" class="headerlink" title="mpstat -P ALL 1"></a>mpstat -P ALL 1</h2><p>显示每个CPU的使用情况：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">niko@ubuntu:~$ mpstat -P ALL 1</div><div class="line">Linux 3.13.0-39-generic (ubuntu) 	03/18/2016 	_x86_64_	(4 CPU)</div><div class="line"></div><div class="line">01:18:13 PM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle</div><div class="line">01:18:14 PM  all    8.70    0.00   18.84    0.58    0.00    1.45    0.00    0.00    0.00   70.43</div><div class="line">01:18:14 PM    0    7.06    0.00   16.47    0.00    0.00    2.35    0.00    0.00    0.00   74.12</div><div class="line">01:18:14 PM    1    7.78    0.00   18.89    1.11    0.00    2.22    0.00    0.00    0.00   70.00</div><div class="line">01:18:14 PM    2   11.76    0.00   17.65    2.35    0.00    1.18    0.00    0.00    0.00   67.06</div><div class="line">01:18:14 PM    3    8.24    0.00   21.18    0.00    0.00    0.00    0.00    0.00    0.00   70.59</div></pre></td></tr></table></figure>
-<h2 id="pidstat-1"><a href="#pidstat-1" class="headerlink" title="pidstat 1"></a>pidstat 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ pidstat 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)</div><div class="line">07:41:02 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</div><div class="line">07:41:03 PM     0         9    0.00    0.94    0.00    0.94     1  rcuos/0</div><div class="line">07:41:03 PM     0      4214    5.66    5.66    0.00   11.32    15  mesos-slave</div><div class="line">07:41:03 PM     0      4354    0.94    0.94    0.00    1.89     8  java</div><div class="line">07:41:03 PM     0      6521 1596.23    1.89    0.00 1598.11    27  java</div><div class="line">07:41:03 PM     0      6564 1571.70    7.55    0.00 1579.25    28  java</div><div class="line">07:41:03 PM 60004     60154    0.94    4.72    0.00    5.66     9  pidstat</div><div class="line">07:41:03 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command</div><div class="line">07:41:04 PM     0      4214    6.00    2.00    0.00    8.00    15  mesos-slave</div><div class="line">07:41:04 PM     0      6521 1590.00    1.00    0.00 1591.00    27  java</div><div class="line">07:41:04 PM     0      6564 1573.00   10.00    0.00 1583.00    28  java</div><div class="line">07:41:04 PM   108      6718    1.00    0.00    0.00    1.00     0  snmp-pass</div><div class="line">07:41:04 PM 60004     60154    1.00    4.00    0.00    5.00     9  pidstat</div><div class="line">^C</div></pre></td></tr></table></figure>
-<p>pidstat命令输出进程的CPU占用率，该命令会持续输出，并且不会覆盖之前的数据，可以方便观察系统动态。如上的输出，可以看见两个JAVA进程占用了将近1600%的CPU时间，既消耗了大约16个CPU核心的运算资源。</p>
-<h2 id="iostat-xz-1"><a href="#iostat-xz-1" class="headerlink" title="iostat -xz 1"></a>iostat -xz 1</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ iostat -xz 1</div><div class="line"></div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)</div><div class="line"></div><div class="line">avg-cpu:  %user   %nice %system %iowait  %steal   %idle</div><div class="line">          73.96    0.00    3.73    0.03    0.06   22.21</div><div class="line"></div><div class="line">Device:   rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util</div><div class="line">xvda        0.00     0.23    0.21    0.18     4.52     2.08    34.37     0.00    9.98   13.80    5.42   2.44   0.09</div><div class="line">xvdb        0.01     0.00    1.02    8.94   127.97   598.53   145.79     0.00    0.43    1.78    0.28   0.25   0.25</div><div class="line">xvdc        0.01     0.00    1.02    8.86   127.79   595.94   146.50     0.00    0.45    1.82    0.30   0.27   0.26</div><div class="line">dm-0        0.00     0.00    0.69    2.32    10.47    31.69    28.01     0.01    3.23    0.71    3.98   0.13   0.04</div><div class="line">dm-1        0.00     0.00    0.00    0.94     0.01     3.78     8.00     0.33  345.84    0.04  346.81   0.01   0.00</div><div class="line">dm-2        0.00     0.00    0.09    0.07     1.35     0.36    22.50     0.00    2.55    0.23    5.62   1.78   0.03</div><div class="line">[...]</div><div class="line">^C</div></pre></td></tr></table></figure>
-<p>iostat命令主要用于查看机器磁盘IO情况。该命令输出的列，主要含义是：</p>
-<p>r/s, w/s, rkB/s, wkB/s：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。</p>
-<p>await：IO操作的平均等待时间，单位是毫秒。这是应用程序在和磁盘交互时，需要消耗的时间，包括IO等待和实际操作的耗时。如果这个数值过大，可能是硬件设备遇到了瓶颈或者出现故障。</p>
-<p>avgqu-sz：向设备发出的请求平均数量。如果这个数值大于1，可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）。</p>
-<p>%util：设备利用率。这个数值表示设备的繁忙程度，经验值是如果超过60，可能会影响IO性能（可以参照IO操作平均等待时间）。如果到达100%，说明硬件设备已经饱和。<br>如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。</p>
-<h2 id="free-m"><a href="#free-m" class="headerlink" title="free -m"></a><code>free</code> -m</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ free -m</div><div class="line">             total       used       free     shared    buffers     cached</div><div class="line">Mem:        245998      24545     221453         83         59        541</div><div class="line">-/+ buffers/cache:      23944     222053</div><div class="line">Swap:            0          0          0</div></pre></td></tr></table></figure>
-<p>free命令可以查看系统内存的使用情况，-m参数表示按照兆字节展示。最后两列分别表示用于IO缓存的内存数，和用于文件系统页缓存的内存数。需要注意的是，第二行-/+ buffers/cache，看上去缓存占用了大量内存空间。这是Linux系统的内存使用策略，尽可能的利用内存，如果应用程序需要内存，这部分内存会立即被回收并分配给应用程序。因此，这部分内存一般也被当成是可用内存。</p>
-<p>如果可用内存非常少，系统可能会动用交换区（如果配置了的话），这样会增加IO开销（可以在iostat命令中提现），降低系统性能。</p>
-<h2 id="网络吞吐"><a href="#网络吞吐" class="headerlink" title="网络吞吐"></a>网络吞吐</h2><p><code>sar -n DEV 1</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sar -n DEV 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)</div><div class="line">12:16:48 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</div><div class="line">12:16:49 AM      eth0  18763.00   5032.00  20686.42    478.30      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM        lo     14.00     14.00      1.36      1.36      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</div><div class="line">12:16:49 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</div><div class="line">12:16:50 AM      eth0  19763.00   5101.00  21999.10    482.56      0.00      0.00      0.00      0.00</div><div class="line">12:16:50 AM        lo     20.00     20.00      3.25      3.25      0.00      0.00      0.00      0.00</div><div class="line">12:16:50 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</div><div class="line">^C</div></pre></td></tr></table></figure>
-<p>sar命令在这里可以查看网络设备的吞吐率。在排查性能问题时，可以通过网络设备的吞吐量，判断网络设备是否已经饱和。如示例输出中，eth0网卡设备，吞吐率大概在22 Mbytes/s，既176 Mbits/sec，没有达到1Gbit/sec的硬件上限。</p>
-<p><code>sar -n TCP,ETCP 1</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sar -n TCP,ETCP 1</div><div class="line">Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)</div><div class="line">12:17:19 AM  active/s passive/s    iseg/s    oseg/s</div><div class="line">12:17:20 AM      1.00      0.00  10233.00  18846.00</div><div class="line">12:17:19 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s</div><div class="line">12:17:20 AM      0.00      0.00      0.00      0.00      0.00</div><div class="line">12:17:20 AM  active/s passive/s    iseg/s    oseg/s</div><div class="line">12:17:21 AM      1.00      0.00   8359.00   6039.00</div><div class="line">12:17:20 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s</div><div class="line">12:17:21 AM      0.00      0.00      0.00      0.00      0.00</div><div class="line">^C</div></pre></td></tr></table></figure>
-<p>sar命令在这里用于查看TCP连接状态，其中包括：</p>
-<p>active/s：每秒本地发起的TCP连接数，既通过connect调用创建的TCP连接；<br>passive/s：每秒远程发起的TCP连接数，即通过accept调用创建的TCP连接；<br>retrans/s：每秒TCP重传数量；</p>
-<p>atmptf/s<br>     The number of times per second TCP connections have made a direct transition to the CLOSED state from either the SYN-SENT state or the SYN-RCVD state, plus the number of times  per  second  TCP  connections<br>     have made a direct transition to the LISTEN state from the SYN-RCVD state [tcpAttemptFails].</p>
-<p>estres/s<br>     The number of times per second TCP connections have made a direct transition to the CLOSED state from either the ESTABLISHED state or the CLOSE-WAIT state [tcpEstabResets].</p>
-<p>retrans/s<br>     The total number of segments retransmitted per second - that is, the number of TCP segments transmitted containing one or more previously transmitted octets [tcpRetransSegs].</p>
-<p>isegerr/s<br>     The total number of segments received in error (e.g., bad TCP checksums) per second [tcpInErrs].</p>
-<p>TCP连接数可以用来判断性能问题是否由于建立了过多的连接，进一步可以判断是主动发起的连接，还是被动接受的连接。TCP重传可能是因为网络环境恶劣，或者服务器压力过大导致丢包。</p>
-<h2 id="top"><a href="#top" class="headerlink" title="top"></a><code>top</code></h2><p>top命令包含了前面好几个命令的检查的内容。比如系统负载情况（uptime）、系统内存使用情况（free）、系统CPU使用情况（vmstat）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，top命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。</p>
-<p>但是，top命令相对于前面一些命令，输出是一个瞬间值，如果不持续盯着，可能会错过一些线索。这时可能需要暂停top命令刷新，来记录和比对数据。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>排查Linux服务器性能问题还有很多工具，上面介绍的一些命令，可以帮助我们快速的定位问题。例如前面的示例输出，多个证据证明有JAVA进程占用了大量CPU资源，之后的性能调优就可以针对应用程序进行。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
-<p>【1】原文：<a href="http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html" target="_blank" rel="external">Netflix性能工程团队的这篇博文</a><br>【2】 <a href="http://www.infoq.com/cn/news/2015/12/linux-performance?utm_campaign=rightbar_v2&amp;utm_source=infoq&amp;utm_medium=news_link&amp;utm_content=link_text" target="_blank" rel="external">金灵杰 译 InfoQ</a></p>
+          概述通过执行以下命令，可以在1分钟内对系统资源使用情况有个大致的了解。
+其中一些命令需要安装sysstat包，有一些由procps包提供。这些命令的输出，有助于快速定位性能瓶颈，检查出所有资源（CPU、内存、磁盘IO等）的利用率（utilization）、饱和度（saturation）和错误（err
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/12/20/linux/ten-cmd-linux-performance/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -629,19 +606,14 @@
       
         
           
-            <h1 id="install-vmware-on-ubuntu"><a href="#install-vmware-on-ubuntu" class="headerlink" title="install vmware on ubuntu"></a>install vmware on ubuntu</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">download VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle</div><div class="line">chmod u+x ./VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle</div><div class="line">./VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle</div></pre></td></tr></table></figure>
-<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="super-键被宿主机拦截"><a href="#super-键被宿主机拦截" class="headerlink" title="super 键被宿主机拦截"></a>super 键被宿主机拦截</h2><p><a href="http://askubuntu.com/questions/485303/how-do-i-stop-ubuntu-from-intercepting-the-super-key-when-running-vmware" target="_blank" rel="external">解决方法</a>是:</p>
-<blockquote>
-<p>Pressing the Super key invokes the Unity Dash.<br>Pressing and holding the Super key invokes the keyboard shortcut overlay.<br>I suspect you are doing the later, based on your description.<br>Nevertheless, you could change the key used to invoke the Unity Dash using Unity Tweak Tool. This way, VMware will get your key-press signal immediately, when you press Super.</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">Install Unity Tweak Tool</div><div class="line"></div><div class="line">sudo apt-get install unity-tweak-tool</div><div class="line"></div><div class="line">Launch Unity Tewak Tool.</div><div class="line"></div><div class="line">In the Unity section, select Additional.</div><div class="line"></div><div class="line">Click on &lt;Super&gt; next to Show the launcher.</div><div class="line"></div><div class="line">Select a different key (or key-combination) to invoke the launcher.</div></pre></td></tr></table></figure>
-<h2 id="cached-Memory"><a href="#cached-Memory" class="headerlink" title="cached Memory"></a>cached Memory</h2><p>有同学反应, 在关闭vmware后, free内存并没有增加, 大概是下面这样: </p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">top - 11:59:35 up  3:14, 13 users,  load average: 0.49, 0.52, 0.51</div><div class="line">Tasks: 264 total,   3 running, 261 sleeping,   0 stopped,   0 zombie</div><div class="line">%Cpu(s):  4.8 us,  2.9 sy,  0.0 ni, 92.0 id,  0.2 wa,  0.1 hi,  0.0 si,  0.0 st</div><div class="line">KiB Mem:  16380532 total, 12103952 used,  4276580 free,  3168896 buffers</div><div class="line">KiB Swap:  8386556 total,        0 used,  8386556 free.  5171564 cached Mem</div><div class="line"></div><div class="line">  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                        </div><div class="line"> 6520 niko      20   0 4635876 971856  35672 S   4.6  5.9  15:55.71 java                                           </div><div class="line">10006 niko      20   0 2750752 365712 101492 S   1.7  2.2   0:58.00 et</div></pre></td></tr></table></figure>
-<p>如上, 我的是16G内存的机子, 但是显示使用了12G, 刚才关闭了5G的vmware虚拟机, 但是内存仍在<code>cached Mem</code>中.</p>
-<p>其实, 当你执行复制文件时, 也是这样的, 不用担心, 相关内容请看另一篇博客.<br>// TODO</p>
-<p>#</p>
+          install vmware on ubuntudownload VMware-Workstation-Full-10.0.6-2700073.x86_64.bundlechmod u+x ./VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle.
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/12/19/linux/install/install_vmware_on_ubuntu/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -759,51 +731,16 @@
       
         
           
-            <p>工作中我们经常会用到监听目录的功能, 当目录中有文件增加删除等操作时, 执行某些任务. 如果是Java来写, 怎么做呢 ?</p>
-<h1 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h1><p>实现这个功能, 我们要使用到<code>WatchService</code>和<code>Path</code>这两个东西, 首先创建一个WatchService:</p>
-<pre><code>WatchService watcher = FileSystems.getDefault().newWatchService();
-</code></pre><p>接着就可以注册这个WatchService到某个Path了:</p>
-<pre><code>Path dir = ...;
-WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-`ENTRY_CREATE`等事件定义在`StandardWatchEventKinds`中.
-</code></pre><p>注册后, 我们使用<code>WatchService.take()</code>就可以获取目录变更的事件了, 若没有, 则wait .</p>
-<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><p>接下来就是写一个工具类<code>WatchDirUtils</code>, 用来接收和注册监听请求及回调.</p>
-<p>相对于<code>WatchDirUtils</code>, 客户端的需求无非就两个, 一个是要监听的目录, 另一个是变更时的Callback. 我们可以封装成一个类.</p>
-<p>我们暂且定义<code>WatchPath</code>和<code>WatchCallback</code>两个接口:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchPath &#123;</div><div class="line">    public java.nio.file.Path getPath();</div><div class="line">&#125;</div><div class="line">public interface WatchCallback &#123;</div><div class="line">    public void handle(WatchEvent&lt;?&gt; event);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>然后, 定义一个<code>WatchRequest</code>接口, 继承<code>WatchPath</code>和<code>WatchCallback</code>, 同时要求返回是否递归监听.<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchRequest extends WatchPath, WatchCallback &#123;</div><div class="line">    public boolean isRecursive();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>接口定义好了, 接下来就是实现了, 我们新建一个<code>DebugWatchRequest</code>实现类,</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class DebugWatchRequest implements WatchRequest &#123;</div><div class="line">    ...</div><div class="line">    @Override</div><div class="line">    public void handle(WatchEvent&lt;Path&gt; ev) &#123;</div><div class="line">        Path name = ev.context();</div><div class="line">        Path child = dir.resolve(name);</div><div class="line">        System.out.format(&quot;%s: %s\n&quot;, event.kind().name(), child);</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>封装好了watch请求, 只需要定义一个静态方法, 把请求传入即可.</p>
-<pre><code>WatchDirUtils.register(new DebugWatchRequest(Path dir));
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static void register(WatchRequest watchRequest) throws IOException &#123;</div><div class="line">        if (started.compareAndSet(false, true)) &#123;</div><div class="line">            init();</div><div class="line">        &#125;</div><div class="line">        if (serviceDown.get()) &#123;</div><div class="line">            throw new Exception(&quot;watch service down.&quot;);</div><div class="line">        &#125;</div><div class="line">        try &#123;</div><div class="line">            Path dir = watchRequest.getPath();</div><div class="line">            if (watchRequest.isRecursive()) &#123;</div><div class="line">                System.out.format(&quot;Scanning %s ...\n&quot;, dir);</div><div class="line">                registerRecursive(dir, watchRequest);</div><div class="line">                System.out.println(&quot;Done.&quot;);</div><div class="line">            &#125; else &#123;</div><div class="line">                registerNonRecursive(watchRequest);</div><div class="line">            &#125;</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>当该方法第一次被调用时, 会进行初始化:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static void init() throws IOException &#123;</div><div class="line">        watcher = FileSystems.getDefault().newWatchService();</div><div class="line">        keysToWatchRequest = new ConcurrentHashMap&lt;&gt;();</div><div class="line">        trace = true;</div><div class="line"></div><div class="line">        // 启动线程来处理事件</div><div class="line">        ExecutorService exec = Executors.newSingleThreadExecutor();</div><div class="line">        exec.execute(new EventProcessor());</div><div class="line"></div><div class="line">        serviceDown.set(false);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>初始化包括新建watcher, 还有keysToWatchRequest(<br>在前面的介绍中, 我们已经知道, register某个目录后, 会有一个WatchKey返回, 所以需要有一个Map来关联WatchKey和Callback ).</p>
-<p>最后启动一个线程来从watcher获取变更的事件, 并调用对应的Callback去handle该事件.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// EventProcessor</div><div class="line"></div><div class="line">private static class EventProcessor implements Runnable &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            while (!Thread.interrupted()) &#123;</div><div class="line">                // wait for key to be signalled</div><div class="line">                WatchKey key;</div><div class="line">                try &#123;</div><div class="line">                    key = watcher.take();</div><div class="line">                &#125; catch (InterruptedException x) &#123;</div><div class="line">                    serviceDown();</div><div class="line">                    return;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                WatchRequest watchRequest = keysToWatchRequest.get(key);</div><div class="line">                if (watchRequest == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no cb) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">                Path dir = watchRequest.getPath();</div><div class="line">                if (dir == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no path) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                for (WatchEvent&lt;?&gt; event: key.pollEvents()) &#123;</div><div class="line">                    WatchEvent.Kind kind = event.kind();</div><div class="line">                    // TBD - provide example of how OVERFLOW event is handled</div><div class="line">                    if (kind == OVERFLOW) &#123;</div><div class="line">                        continue;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    // handle</div><div class="line">                    watchRequest.handle(event);</div><div class="line"></div><div class="line">                    // Context for directory entry event is the file name of entry</div><div class="line">                    WatchEvent&lt;Path&gt; ev = cast(event);</div><div class="line">                    Path name = ev.context();</div><div class="line">                    Path child = dir.resolve(name);</div><div class="line"></div><div class="line">                    // if directory is created, and watching recursively, then</div><div class="line">                    // register it and its sub-directories</div><div class="line">                    if (watchRequest.isRecursive() &amp;&amp; (kind == ENTRY_CREATE)) &#123;</div><div class="line">                        try &#123;</div><div class="line">                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) &#123;</div><div class="line">                                registerRecursive(child, new DebugWatchRequest(child).setIsRecursive(true));</div><div class="line">                            &#125;</div><div class="line">                        &#125; catch (IOException x) &#123;</div><div class="line">                            // ignore to keep sample readbale</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                // reset key and remove from set if directory no longer accessible</div><div class="line">                boolean valid = key.reset();</div><div class="line">                if (!valid) &#123;</div><div class="line">                    keysToWatchRequest.remove(key);</div><div class="line"></div><div class="line">                    // all directories are inaccessible</div><div class="line">                    if (keysToWatchRequest.isEmpty()) &#123;</div><div class="line">                        break;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            serviceDown();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private void serviceDown() &#123;</div><div class="line">            serviceDown.set(true);</div><div class="line">            // TODO REPORT IT</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h1 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h1><p>这个demo实现了一个简单的目录watch功能, 还有许多地方需要改进. 比如:</p>
-<ul>
-<li><strong>InterruptedException等异常 及 客户端自定义通知方</strong></li>
-</ul>
-<p>当发生interrupt时, 应该停止服务释放资源, 进行记录日志并通过一些report通知给中控或相关人员, 关闭WatchService等 不过也应支持一下客户端自定义通知方式.<br>同时,  OVERFLOW等异常也要有对应的处理方式, 这个WatchService也不能100%保证可靠, 可以采取一些定时扫描的其他措施来弥补.</p>
-<ul>
-<li><strong>事件的处理和Callback的调用效率</strong></li>
-</ul>
-<p>目前的事件处理线程是只有一个的, 而且Callback的handle()时同步调用的.</p>
-<p><strong> 那能够改成异步的呢 ? </strong></p>
-<p>这个要看情况.<br>如果这个回调操作是次要业务, 那就不能使用异步. 因为如果一瞬间促发了许多回调, 那么这些回调同时运行, 极有可能迅速占用系统功能, 影响主业务, 甚至崩溃.<br>使用异步是有一定风险的, 不过开多几个线程还是可以考虑的.</p>
-<ul>
-<li><strong>支持多个WatchCallback</strong></li>
-</ul>
-<p>这个demo支持一个WatchKey对应一个Callback, 当有新的到来时, 就会覆盖旧的, 这个明显不太好. 不过要支持多个WatchCallback也很容易修改.</p>
-<ul>
-<li><strong>增加取消注册的功能</strong></li>
-</ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://docs.oracle.com/javase/tutorial/essential/io/notification.html" target="_blank" rel="external">https://docs.oracle.com/javase/tutorial/essential/io/notification.html</a></p>
+          工作中我们经常会用到监听目录的功能, 当目录中有文件增加删除等操作时, 执行某些任务. 如果是Java来写, 怎么做呢 ?
+实现方式实现这个功能, 我们要使用到WatchService和Path这两个东西, 首先创建一个WatchService:
+WatchService watcher = Fil
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/12/01/java/utils/java_dir_watchdog/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -921,39 +858,16 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
       
         
           
-            <h2 id="为什么要用分支"><a href="#为什么要用分支" class="headerlink" title="为什么要用分支"></a>为什么要用分支</h2><hr>
-<p>记得刚加入现在团队的时候，和boss搭了GOGS（类似的还有gitlab），到最近完成v0.1版本，一直都是用一个分支了。最近团队加入了几个新成员，产品那边也有大量的新需求和迭代。若还不进行分支管理，必定一定会陷入混乱（如果你问为什么？看了后面的分支管理模型，你就会恍然大悟）。</p>
-<p>这也让我想起在第一家公司实习的时候，有一个team，用了git，后来发现，只是用来更新和提交，真是高射炮打蚊子。就算是后来人员扩充了之后，仍然没有分支管理，当时觉得不可思议。他们的产品迭代速度很慢，质量也很差，我觉得这跟他们的代码管理也有一点关系。</p>
-<h2 id="一个通用模型"><a href="#一个通用模型" class="headerlink" title="一个通用模型"></a>一个通用模型</h2><hr>
-<p>关于分支的管理和工程实践上，最广为认知的是Vincent Driessen在2010年发表的一篇博客：<a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">《一种成功的Git分支管理模型》</a>，这篇博客总结了一种通用的分支管理模型，这个模型可以覆盖大部分的场景和研发流程。或许你没看过这篇博客，但如果你参与过团队分支管理策略的制定，你一定可以找到共鸣。</p>
-<p>博客中有一张图很清晰地描述了这个模型和各种场景：<br><img src="/images/git-model@2x.png" alt=""></p>
-<p>我记得在第一次实习时，团队中用的是svn，那时还没看过这篇博客，不过那时我们根据研发流程和需求场景制定出来的svn分支管理策略和这个类似，只是一个简化版，没有做太细。有一部分原因是因为svn的分支功能确实sucks，团队也不想浪费太多精力和成本。据说现在他们也换为git了，因为并行开发的功能太多了，svn终于让他们“心力交瘁”。</p>
-<h3 id="git-flow"><a href="#git-flow" class="headerlink" title="git-flow"></a>git-flow</h3><hr>
-<p>git的分支管理非常强大和方便，而git-flow可以让我们简化分支管理的操作。git-flow是git的一个扩展集，按<code>Vincent Driessen</code>的分支模型提供高层的操作，具体可参考<a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">这篇指南</a>。</p>
-<p>（现在想起当年用svn的分支管理，仍隐隐觉得蛋疼。那一堆堆tree-conflict（尤其是目录）历历在目，还好后来转到git）</p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
-<li>修改配置<br>git flow config<br>或者，修改配置文件：<br>vim your_repo/.git/config</li>
-</ul>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
-<p>分支管理是一门管理艺术，一味地盲目模仿不切实际，只会增加混乱和成本，在执行上也会遇到各种阻碍，所以针对自身团队和业务特点，找到最适合自己的管理策略。不过若你的产品需要快速的更新和迭代，你一定要试一下git。</p>
-<!--
-1. 小张和小何在开发两个大功能（`A-v0.1`和`B-v0.1`），小张先完成了A，然后部署生产了，小何继续B开发。
-小何过了两天也完成了B，然后提交代码，自动化部署B后，发现A功能出问题了，原来小张在这两天在进行A功能小优化（`A-v0.1.1`），还未完成就“被”部署上去了。
-这个故事告诉我们，需要把必须将正式（master）和开发（develop）的代码分开。
+          为什么要用分支
+记得刚加入现在团队的时候，和boss搭了GOGS（类似的还有gitlab），到最近完成v0.1版本，一直都是用一个分支了。最近团队加入了几个新成员，产品那边也有大量的新需求和迭代。若还不进行分支管理，必定一定会陷入混乱（如果你问为什么？看了后面的分支管理模型，你就会恍然大悟）。
+这也
+          ...
 
-2. 现在代码分成了两个分支，小张小何都在develop开发。小张完成`A-v0.2`，要部署。合并的代码发现有小何的代码，于是问小何，小何说`我在做B-v0.2`，还没做完，你不可以合并。
-所以问题还是没有解决，产品汪质问小张，为什么还不部署，这个功能很急的，小何表示压力很大。
-这次，小张小何约定，从develop分支再建立分支，叫做feature分支，用来。
-
-3...  场景太多了， 不写了
--->
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
-<ol>
-<li><a href="http://danielkummer.github.io/git-flow-cheatsheet/index.zh_CN.html" target="_blank" rel="external">git-flow 备忘清单</a></li>
-<li><a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="external">A successful Git branching model » nvie.com</a></li>
-</ol>
-
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/11/30/git/git_flow/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1071,35 +985,14 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
       
         
           
-            <h2 id="Solarized"><a href="#Solarized" class="headerlink" title="Solarized"></a>Solarized</h2><p>Solarized是github上比较完整的支持多平台终端及GUI的配色项目，<br>支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，<br>当然支持大量编程语言或文件的语法。<br>如果感兴趣的，赶紧google “solarized your-tool “试试吧，<br>或者进入<a href="http://ethanschoonover.com/solarized" target="_blank" rel="external">官网</a>了解更多。</p>
-<h3 id="for-vim"><a href="#for-vim" class="headerlink" title="for vim"></a>for vim</h3><hr>
-<p>vim的配置非常简单，有两种方式：</p>
-<h4 id="1-手工安装"><a href="#1-手工安装" class="headerlink" title="1. 手工安装"></a>1. 手工安装</h4><p>下载：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 任意目录下载源码</div><div class="line">git clone git://github.com/altercation/vim-colors-solarized.git</div><div class="line">cd vim-colors-solarized/colors</div><div class="line">mv solarized.vim ~/.vim/colors/</div></pre></td></tr></table></figure>
-<p>修改vimrc</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">syntax enable</div><div class="line">set background=dark</div><div class="line">colorscheme solarized</div></pre></td></tr></table></figure>
-<p>如果不喜欢dark，可以换成<code>set background=light</code>主题。</p>
-<h4 id="2-使用pathogen插件管理"><a href="#2-使用pathogen插件管理" class="headerlink" title="2. 使用pathogen插件管理"></a>2. 使用pathogen插件管理</h4><p>使用pathogen可以很好的管理插件， 解决vim文件分散、管理麻烦的问题，这也是官方推荐的方式。</p>
-<p>安装pathogen</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/.vim/</div><div class="line">mkdir autoload</div><div class="line">cd autoload/</div><div class="line">wget https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim</div></pre></td></tr></table></figure>
-<p>启用pathogen</p>
-<pre><code>vim ~/.vimrc
-// 增加以下内容， 注意需要在`filetype plugin indent on `之前。
-call pathogen#infect()
-or
-execute pathogen#infect()
-</code></pre><p>这样pathogen就安装好了，接下来就是下载solarized插件了。</p>
-<pre><code>cd ~/.vim/bundle
-git clone git://github.com/altercation/vim-colors-solarized.git
-</code></pre><p>然后跟方式一的<code>修改vimrc</code>步骤一样执行。</p>
-<h4 id="效果图："><a href="#效果图：" class="headerlink" title="效果图："></a>效果图：</h4><p>虽然官方文档有很多案例图，还是贴一下个人的效果图：</p>
-<p><img src="/images/solarized_vim_show.png" alt=""></p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>如果你希望保留之前terminal的透明度，可以在<code>～/.vimrc</code>增加以下配置：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">let g:solarized_termtrans=1</div></pre></td></tr></table></figure>
-<h3 id="for-IntelliJ"><a href="#for-IntelliJ" class="headerlink" title="for IntelliJ"></a>for IntelliJ</h3><hr>
-<p>// TODO</p>
+          SolarizedSolarized是github上比较完整的支持多平台终端及GUI的配色项目，支持Vim、Emacs、Xcode、IntelliJ、NetBeans、Putty、Visual Studio等工具，当然支持大量编程语言或文件的语法。如果感兴趣的，赶紧google “solarized
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/11/29/linux/solarized_colors/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1217,52 +1110,17 @@ git clone git://github.com/altercation/vim-colors-solarized.git
       
         
           
-            <h1 id="spring的配置加载顺序"><a href="#spring的配置加载顺序" class="headerlink" title="spring的配置加载顺序"></a>spring的配置加载顺序</h1><p>Spring使用了特定的配置属性加载顺序，为了让后者可以覆写前者的配置，而前者提供一些默认的约定配置。具体的加载顺序是：</p>
-<ul>
-<li>Command line arguments.</li>
-<li>Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)</li>
-<li>JNDI attributes from java:comp/env.</li>
-<li>Java System properties (System.getProperties()).</li>
-<li>OS environment variables.</li>
-<li><p>A RandomValuePropertySource that only has properties in <code>random.*.</code></p>
-</li>
-<li><p>Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)</p>
-</li>
-<li>Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)</li>
-<li>Application properties outside of your packaged jar (application.properties and YAML variants).</li>
-<li>Application properties packaged inside your jar (application.properties and YAML variants).</li>
-<li>@PropertySource annotations on your @Configuration classes.</li>
-<li>Default properties (specified using SpringApplication.setDefaultProperties).</li>
-</ul>
-<h1 id="配置覆写测试和验证"><a href="#配置覆写测试和验证" class="headerlink" title="配置覆写测试和验证"></a>配置覆写测试和验证</h1><p>使用starter-web来测试：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Controller</div><div class="line">@EnableAutoConfiguration</div><div class="line">public class SampleController &#123;</div><div class="line"></div><div class="line">    @Value(&quot;$&#123;myname&#125;&quot;)</div><div class="line">    String myName;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    String home() &#123;</div><div class="line">        return &quot;Hello, &quot; + myName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line">        SpringApplication.run(SampleController.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>测试用命令行传入：</p>
-<pre><code>java -jar target/app.jar --myname=&quot;niko&quot;
-</code></pre><p>测试shell环境变量</p>
-<pre><code>export SPRING_APPLICATION_JSON=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
-java -jar target/app.jar
-</code></pre><p>测试使用系统变量</p>
-<pre><code>java -jar target/app.jar -Dspring.application.json=&apos;{&quot;myname&quot;: &quot;niko_shell_env&quot;}&apos;
-</code></pre><p>测试<code>application.properties</code>和<code>application-dev.properties</code>：<br>application.properties：</p>
-<pre><code>spring.profiles.active=dev
-myname=application.properties
-</code></pre><p>application-dev.properties：</p>
-<pre><code>myname=application-dev.properties
-</code></pre><h1 id="其他细节"><a href="#其他细节" class="headerlink" title="其他细节"></a>其他细节</h1><h2 id="application-properties-的查找顺序"><a href="#application-properties-的查找顺序" class="headerlink" title="application.properties 的查找顺序"></a>application.properties 的查找顺序</h2><p>Spring会加载配置文件<code>application.properties</code>从以下位置：</p>
-<ul>
-<li>A <code>/config</code> subdirectory of the current directory.</li>
-<li>The current directory</li>
-<li>A classpath <code>/config</code> package</li>
-<li>The classpath root</li>
-</ul>
-<p>如果你不喜欢<code>application</code>这个name，可以传入<code>--spring.config.name=othername</code>来设置，或者是使用<code>--spring.config.location=classpath:/default.properties,classpath:/override.properties</code>。<br>值得注意的是，<code>spring.config.location</code>声明的加载优先级是从低到高，即是会先加载<code>classpath:/override.properties</code>。</p>
-<h2 id="占位符使用"><a href="#占位符使用" class="headerlink" title="占位符使用"></a>占位符使用</h2><p><code>application.properties</code></p>
-<pre><code>app.name=MyApp
-app.description=${app.name} is a Spring Boot application
-</code></pre><p>这个就算是<code>app.name</code>的声明顺序倒过来也是okay的。</p>
-<p>&gt;</p>
+          spring的配置加载顺序Spring使用了特定的配置属性加载顺序，为了让后者可以覆写前者的配置，而前者提供一些默认的约定配置。具体的加载顺序是：
 
-          
+Command line arguments.
+Properties from SPRING_APPLICATION_JSON (inline JSO
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/11/01/java/spring/spring-boot_config_order/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1380,47 +1238,15 @@ app.description=${app.name} is a Spring Boot application
       
         
           
-            <h1 id="git-stash-干嘛滴"><a href="#git-stash-干嘛滴" class="headerlink" title="git stash 干嘛滴"></a>git stash 干嘛滴</h1><p>假如你正在开发feature-01，但是依赖的一个模块代码修改了，你必须pull代码，然而你又不想commit，这时可以使用<code>git stash</code>来保存当前未commit的代码更改。</p>
-<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p>假设仓库已经有stash-01.txt空文件，vim stash-01.txt，你加了一行文本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">I am developing feature-01</div></pre></td></tr></table></figure>
-<p>这时同学A说，你必须pull代码，然后你微笑着用<code>git stash</code>保存当前未commit的代码：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 80ccebf add stash file<br>HEAD is now at 80ccebf add stash file</p>
-</blockquote>
-<p>之后<code>git status</code>再次确认了当前状态是干净的：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git st</div><div class="line">On branch develop</div><div class="line">Your branch is up-to-date with &apos;origin/develop&apos;.</div><div class="line">nothing to commit, working directory clean</div></pre></td></tr></table></figure>
-<p>这时候可以放心的pull了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (2/2), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   80ccebf..d2b1d0b  develop    -&gt; origin/develop</div><div class="line">Updating 80ccebf..d2b1d0b</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
-<p>这个pull操作可能修改了多个文件，很可能涉及到你刚才stash的文件，这时会发生什么呢？我们接着看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash pop</div><div class="line">Auto-merging git-stash/stash-01.txt</div><div class="line">CONFLICT (content): Merge conflict in git-stash/stash-01.txt</div></pre></td></tr></table></figure>
-<p>Ohhh，冲突了，这是当然的啦。就算是commit之后再pull也是会冲突，只要merge一下就好了。</p>
-<p><img src="/images/git/git-stash-pop-merge.png" alt=""></p>
-<p>这时你检查了一下，发现其实已经完成feature-01了，所以commit and push了。</p>
-<p>之后，你开始了feature-02的开发，同样你加了一行：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">common lib modified</div><div class="line">I am developing feature-01</div><div class="line">I am developing feature-02</div></pre></td></tr></table></figure>
-<p>这时，同学A又让你pull代码，所以你又再次微笑着：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 425394b feature-01 done<br>HEAD is now at 425394b feature-01 done</p>
-<p>$ git pull</p>
-<p>$ git stash pop</p>
-<p>$ git merge</p>
-</blockquote>
-<p>这时候你被打断，没有commit feature-02，后来继续开发feature-03了，接着第三次pull来了：</p>
-<blockquote>
-<p>$ git stash<br>Saved working directory and index state WIP on develop: 7ed8d8d 2th, common lib2 modified<br>HEAD is now at 7ed8d8d 2th, common lib2 modified</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git pull</div><div class="line">remote: Counting objects: 4, done.</div><div class="line">remote: Compressing objects: 100% (3/3), done.</div><div class="line">remote: Total 4 (delta 1), reused 0 (delta 0)</div><div class="line">Unpacking objects: 100% (4/4), done.</div><div class="line">From git.foo.net:niko2014/GitExperiment</div><div class="line">   7ed8d8d..a73e880  develop    -&gt; origin/develop</div><div class="line">Updating 7ed8d8d..a73e880</div><div class="line">Fast-forward</div><div class="line"> git-stash/stash-01.txt | 1 +</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure>
-<p><img src="/images/git/git-stash-merge-not-commited-2nd.png" alt=""></p>
-<p>上图， 可以发现，刚才未提交的merge结果（同学A竟然把2nd写错了⊙﹏⊙），相同的位置现在需要重新merge，这时赶紧commit &amp; push。</p>
-<pre><code>$ git commit -m &quot;Add: feature-02 and 03 done&quot;
-</code></pre><p>如果刚才不是同一个文件，可以stash多次，这个堆栈可以这样查看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git stash list</div><div class="line">stash@&#123;0&#125;: WIP on develop: 7ed8d8d 2th, common lib2 modified</div><div class="line">stash@&#123;1&#125;: WIP on develop: 425394b feature-01 done</div><div class="line">stash@&#123;2&#125;: WIP on develop: 80ccebf add stash file</div></pre></td></tr></table></figure>
-<p>发现pop出来的stash还存在着，还可以切回去某一次stash：</p>
-<pre><code>$ git stash apply stash@{0}
-</code></pre><p>当然，你可能面临冲突，谨慎使用，看场景～～</p>
-<p>#</p>
+          git stash 干嘛滴假如你正在开发feature-01，但是依赖的一个模块代码修改了，你必须pull代码，然而你又不想commit，这时可以使用git stash来保存当前未commit的代码更改。
+实例假设仓库已经有stash-01.txt空文件，vim stash-01.txt，你加了一行
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/10/30/git/git-stash/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1538,30 +1364,14 @@ app.description=${app.name} is a Spring Boot application
       
         
           
-            <h2 id="spring-boot-是什么？"><a href="#spring-boot-是什么？" class="headerlink" title="spring-boot 是什么？"></a>spring-boot 是什么？</h2><p>每次开始一个新的spring应用，少不了要细心准备各种文件和基础配置项，配置完还要进行测试，少不了的会有配置遗漏或错误。如果是老手，可能很快的看出问题，或者有保存自己的配置模板，复制一下改一改。但毕竟是有问题的，为什么创建一个spring应用这么麻烦，为什么不向其他语言和框架脚手架等工具借鉴一下呢？正因如此，spring社区也感受到了开发者的痛点，于是退出了spring-boot这个项目。</p>
-<p>spring-boot，目标是减少创建spring应用的工作量，免除繁琐的XML配置而无需生成代码，遵循<code>约定优于配置</code>的哲学，还提供许多常用的特性和功能（如内置服务器、安全、健康检查等），使开发者能够快速的创建工业级配置的spring应用。让你专心做事，不再因为配置而分心烦躁。而且就算在命令行中，也可以迅速地 get things done。</p>
-<p><a href="https://github.com/spring-projects/spring-boot" target="_blank" rel="external">github传送门</a></p>
-<h2 id="快速安装"><a href="#快速安装" class="headerlink" title="快速安装"></a>快速安装</h2><p>首先当然，除了java环境，maven和gradle之一还是要装的，毕竟需要一种构建工具（这里使用maven），spring-boot提供了许多starter和samples进行参考，下面就来体验一下。</p>
-<h3 id="例：spring-web-starter"><a href="#例：spring-web-starter" class="headerlink" title="例：spring web starter"></a>例：spring web starter</h3><p>创建一个maven项目，并继承<code>spring-boot-starter-parent</code>的pom：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/parent&gt;</div></pre></td></tr></table></figure>
-<p>增加对<code>starter-web</code>的依赖：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<p>如果要用jetty而非tomcat，替换掉依赖即可：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;exclusions&gt;</div><div class="line">        &lt;exclusion&gt;</div><div class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;/exclusion&gt;</div><div class="line">    &lt;/exclusions&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-jetty&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<p>新建一个Controller：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@RestController</div><div class="line">@EnableAutoConfiguration</div><div class="line">public class SampleController &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    @ResponseBody</div><div class="line">    String home() &#123;</div><div class="line">        return &quot;Hello World!&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;</div><div class="line">        SpringApplication.run(SampleController.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>运行：</p>
-<pre><code>mvn spring-boot:run
-</code></pre><p>这个是在命令行是使用maven运行，需要安装spring-boot插件（也可以不适用maven插件，运行main()方法亦可）：</p>
-<p><code>pom.xml</code>：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;build&gt;</div><div class="line">    &lt;plugins&gt;</div><div class="line">        &lt;plugin&gt;</div><div class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</div><div class="line">        &lt;/plugin&gt;</div><div class="line">    &lt;/plugins&gt;</div><div class="line">&lt;/build&gt;</div></pre></td></tr></table></figure></p>
-<p>打开浏览器访问<a href="http://localhost:8080/" target="_blank" rel="external">http://localhost:8080/</a>，出现了熟悉的”Hello World!”。</p>
-<p>从上面的sample可以感受到，<code>starter-web</code>为我们简化了许多操作，其实看一下当前的依赖tree就可以知道：</p>
-<p><code>mvn dependency:tree &gt; deps.txt</code></p>
-<p>依赖树：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[INFO] --- maven-dependency-plugin:2.10:tree (default-cli) @ learning-starter-web ---</div><div class="line">[INFO] org.niko.learn.spring.boot:learning-starter-web:jar:1.3.1.RELEASE</div><div class="line">[INFO] \- org.springframework.boot:spring-boot-starter-web:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    +- org.springframework.boot:spring-boot-starter:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework.boot:spring-boot:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework.boot:spring-boot-autoconfigure:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework.boot:spring-boot-starter-logging:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  |  +- ch.qos.logback:logback-classic:jar:1.1.3:compile</div><div class="line">[INFO]    |  |  |  +- ch.qos.logback:logback-core:jar:1.1.3:compile</div><div class="line">[INFO]    |  |  |  \- org.slf4j:slf4j-api:jar:1.7.13:compile</div><div class="line">[INFO]    |  |  +- org.slf4j:jcl-over-slf4j:jar:1.7.13:compile</div><div class="line">[INFO]    |  |  +- org.slf4j:jul-to-slf4j:jar:1.7.13:compile</div><div class="line">[INFO]    |  |  \- org.slf4j:log4j-over-slf4j:jar:1.7.13:compile</div><div class="line">[INFO]    |  +- org.springframework:spring-core:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  \- org.yaml:snakeyaml:jar:1.16:runtime</div><div class="line">[INFO]    +- org.springframework.boot:spring-boot-starter-tomcat:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:8.0.30:compile</div><div class="line">[INFO]    |  +- org.apache.tomcat.embed:tomcat-embed-el:jar:8.0.30:compile</div><div class="line">[INFO]    |  +- org.apache.tomcat.embed:tomcat-embed-logging-juli:jar:8.0.30:compile</div><div class="line">[INFO]    |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:8.0.30:compile</div><div class="line">[INFO]    +- org.springframework.boot:spring-boot-starter-validation:jar:1.3.1.RELEASE:compile</div><div class="line">[INFO]    |  \- org.hibernate:hibernate-validator:jar:5.2.2.Final:compile</div><div class="line">[INFO]    |     +- javax.validation:validation-api:jar:1.1.0.Final:compile</div><div class="line">[INFO]    |     +- org.jboss.logging:jboss-logging:jar:3.3.0.Final:compile</div><div class="line">[INFO]    |     \- com.fasterxml:classmate:jar:1.1.0:compile</div><div class="line">[INFO]    +- com.fasterxml.jackson.core:jackson-databind:jar:2.6.4:compile</div><div class="line">[INFO]    |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.6.4:compile</div><div class="line">[INFO]    |  \- com.fasterxml.jackson.core:jackson-core:jar:2.6.4:compile</div><div class="line">[INFO]    +- org.springframework:spring-web:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  +- org.springframework:spring-aop:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  |  \- aopalliance:aopalliance:jar:1.0:compile</div><div class="line">[INFO]    |  +- org.springframework:spring-beans:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    |  \- org.springframework:spring-context:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]    \- org.springframework:spring-webmvc:jar:4.2.4.RELEASE:compile</div><div class="line">[INFO]       \- org.springframework:spring-expression:jar:4.2.4.RELEASE:compile</div></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>【1】 <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started-first-application.html" target="_blank" rel="external">https://docs.spring.io/spring-boot/docs/current/reference/html/getting-started-first-application.html</a></p>
+          spring-boot 是什么？每次开始一个新的spring应用，少不了要细心准备各种文件和基础配置项，配置完还要进行测试，少不了的会有配置遗漏或错误。如果是老手，可能很快的看出问题，或者有保存自己的配置模板，复制一下改一改。但毕竟是有问题的，为什么创建一个spring应用这么麻烦，为什么不向其他语
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/10/26/java/spring/spring-boot/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1679,17 +1489,17 @@ app.description=${app.name} is a Spring Boot application
       
         
           
-            <h1 id="kill-命令"><a href="#kill-命令" class="headerlink" title="kill 命令"></a>kill 命令</h1><p>使用kill可以用来终止进程，不过先要获取进程PID（可以使用ps/pstree/top/pidof等工具），向该进程发送终止信号，例如：</p>
-<pre><code>kill -9 &lt;PID&gt;
-</code></pre><p><code>-9</code>应该是最多人认识的信号，更多的信号及其说明可使用<code>man 7 kill</code> 或者 <code>kill -l</code>查看：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ kill -l</div><div class="line"></div><div class="line"> 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP</div><div class="line"> 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1</div><div class="line">11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM</div><div class="line">16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP</div><div class="line">21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ</div><div class="line">26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR</div><div class="line">31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1	64) SIGRTMAX</div></pre></td></tr></table></figure>
-<p>使用manual：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ man 7 kill</div><div class="line"></div><div class="line">...</div><div class="line">Signal     Value     Action   Comment</div><div class="line">       ──────────────────────────────────────────────────────────────────────</div><div class="line">       SIGHUP        1       Term    Hangup detected on controlling terminal</div><div class="line">                                     or death of controlling process</div><div class="line">       SIGINT        2       Term    Interrupt from keyboard</div><div class="line">       SIGQUIT       3       Core    Quit from keyboard</div><div class="line">       SIGILL        4       Core    Illegal Instruction</div><div class="line">       SIGABRT       6       Core    Abort signal from abort(3)</div><div class="line">       SIGFPE        8       Core    Floating point exception</div><div class="line">       SIGKILL       9       Term    Kill signal</div><div class="line">       SIGSEGV      11       Core    Invalid memory reference</div><div class="line">       SIGPIPE      13       Term    Broken pipe: write to pipe with no</div><div class="line">                                     readers</div><div class="line">       SIGALRM      14       Term    Timer signal from alarm(2)</div><div class="line">       SIGTERM      15       Term    Termination signal</div><div class="line">       SIGUSR1   30,10,16    Term    User-defined signal 1</div><div class="line">       SIGUSR2   31,12,17    Term    User-defined signal 2</div><div class="line">       SIGCHLD   20,17,18    Ign     Child stopped or terminated</div><div class="line"></div><div class="line">       SIGCONT   19,18,25    Cont    Continue if stopped</div><div class="line">       SIGSTOP   17,19,23    Stop    Stop process</div><div class="line">       SIGTSTP   18,20,24    Stop    Stop typed at terminal</div><div class="line">       SIGTTIN   21,21,26    Stop    Terminal input for background process</div><div class="line">       SIGTTOU   22,22,27    Stop    Terminal output for background process</div></pre></td></tr></table></figure>
-<p>其实，一开始就<code>kill -9</code>不是一个好主意。默认的情况（不指定信号），kill会发送<code>SIGTERM</code>（信号15）给进程，如果一段时间后，仍未退出，才使用<code>SIGKILL</code>杀死进程。</p>
-<p>因此优秀的程序都会注册SIGTERM信号的处理函数，用以做一些进程退出的准备工作，例如释放资源/写回磁盘/打印重要日志等。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+          kill 命令使用kill可以用来终止进程，不过先要获取进程PID（可以使用ps/pstree/top/pidof等工具），向该进程发送终止信号，例如：
+kill -9 &lt;PID&gt;
+-9应该是最多人认识的信号，更多的信号及其说明可使用man 7 kill 或者 kill -l查看：
+$ 
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/10/22/linux/tools/kill_sign/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1768,10 +1578,10 @@ app.description=${app.name} is a Spring Boot application
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 

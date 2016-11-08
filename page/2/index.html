@@ -70,7 +70,7 @@
 <link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="niko, java, linux" />
 
 
 
@@ -191,6 +191,14 @@
         </li>
       
         
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -274,8 +282,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/06/02/search/es/es-relations/" itemprop="url">
-                  【设计】elasticsearch - 处理关系型数据
+                <a class="post-title-link" href="/2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="url">
+                  稳定匹配问题 (1) - Gale & Shapley
                 </a>
               
             
@@ -302,8 +310,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/search/" itemprop="url" rel="index">
-                    <span itemprop="name">search</span>
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
                   </a>
                 </span>
 
@@ -318,8 +326,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/06/02/search/es/es-relations/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/search/es/es-relations/" itemprop="commentsCount"></span>
+                <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -344,64 +352,17 @@
       
         
           
-            <p>不同于关系型数据库， 我们使用es， 一般出于性能、弹性、近实时搜索、大数据量的分析等目的。<br>然而， 在构建es数据模型时， 免不了会涉及到关系型数据的问题。关系型的数据在实际应用中广泛存在， 关系型数据库对此比较在行， 比如ACID支持、join查询等。es并不擅长这些，es的使用场景， 不是作为关系型数据库而存在的。</p>
-<p>当然， 反过来关系型数据库也有不足的地方，比如比较弱的全文搜索、昂贵的join搜索开销、聚合分析等，这些却是es的专业领域。</p>
-<p>es和大部分NoSQL数据库一样， 把数据视为平的, 不能够rollback到index之前的状态。但平的数据模型有他的好处， 比如无锁的快速索引、搜索、大数据量的节点间拓展等， 都非常符合es的使用场景。</p>
-<h1 id="处理关系型数据"><a href="#处理关系型数据" class="headerlink" title="处理关系型数据"></a>处理关系型数据</h1><hr>
-<p>但是， 并不是说关系型不重要，因为即使是在es中，当然无可避免要管理关系型的数据，一般来说，es 主要通过以下的方式或技巧管理：</p>
-<ul>
-<li>应用端join</li>
-<li>反规范化</li>
-<li>嵌套对象</li>
-<li>parent/child 关联</li>
-</ul>
-<p>常见的最终解决方案也来自于这些方法及其混合的使用，接下来分别介绍这些方式：</p>
-<h1 id="应用端join"><a href="#应用端join" class="headerlink" title="应用端join"></a>应用端join</h1><hr>
-<p>我们可以模拟数据库的join， 把操作移到了客户端进行。</p>
-<p>比如有以下数据：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">PUT /my_index/user/1</div><div class="line">&#123;</div><div class="line">  &quot;name&quot;:     &quot;John Smith&quot;,</div><div class="line">  &quot;email&quot;:    &quot;john@smith.com&quot;,</div><div class="line">  &quot;dob&quot;:      &quot;1970/10/24&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line">PUT /my_index/blogpost/2</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;:    &quot;Relationships&quot;,</div><div class="line">  &quot;body&quot;:     &quot;It&apos;s complicated...&quot;,</div><div class="line">  &quot;user&quot;:     1</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果要找用户名为“John”的博客，首先获取user.id：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">GET /my_index/user/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;match&quot;: &#123;</div><div class="line">      &quot;name&quot;: &quot;John&quot;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这时获取到user.id后，再去查询这个user的blogposts：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">GET /my_index/blogpost/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;filtered&quot;: &#123;</div><div class="line">      &quot;filter&quot;: &#123;</div><div class="line">        &quot;terms&quot;: &#123; &quot;user&quot;: [1] &#125;  </div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>可以发现，这里的数据仍旧是规范化的，只不过要在客户端进行join，因此搜索需要进行额外的请求。<br>而且，上面的例子有个问题，由于现实中叫做“John”的user有很多，所以第二次请求的搜索和结果可能很大。<br>因此这种方法适合于第一个entity比较少的情况，最好修改变动比较少。</p>
-<h1 id="反规范化"><a href="#反规范化" class="headerlink" title="反规范化"></a>反规范化</h1><hr>
-<p>如果要获得更好的性能，正如es所追求的，可以在索引的时候反模式化你的数据，使用冗余数据来避免join。</p>
-<p>接着上面的例子，我们可以把name写入到blogpost的document中：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><div class="line"></div><div class="line">PUT /my_index/blogpost/2</div><div class="line">&#123;</div><div class="line">  "title":    "Relationships",</div><div class="line">  "body":     "It's complicated...",</div><div class="line">  "user":     &#123;</div><div class="line">    "id":       1,</div><div class="line">    "name":     "John Smith"</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这时查询就可以用一个请求了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">GET /my_index/blogpost/_search</div><div class="line">&#123;</div><div class="line">  &quot;query&quot;: &#123;</div><div class="line">    &quot;bool&quot;: &#123;</div><div class="line">      &quot;must&quot;: [</div><div class="line">        &#123; &quot;match&quot;: &#123; &quot;title&quot;:     &quot;relationships&quot; &#125;&#125;,</div><div class="line">        &#123; &quot;match&quot;: &#123; &quot;user.name&quot;: &quot;John&quot;          &#125;&#125;</div><div class="line">      ]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这种方式最大的好处就是速度，因为避免了昂贵开销的join操作。</p>
-<p>当然，这种方式也有缺点，一个是index的size会相对大一点，这是当然的，因为你冗余了数据。这个倒不是大问题，因为写到硬盘的数据都是高速压缩的，而且es的易拓展的。</p>
-<p>另一个要关注的问题是，当修改时，冗余数据也需要更新。比如你改了user.name，那么blogpost中的user.name也需要更新。这个业务场景还好，因为一个用户的博客数很少超过几千篇的，使用这些这些批量更新的接口（<a href="https://www.elastic.co/guide/en/elasticsearch/guide/1.x/scan-scroll.html" target="_blank" rel="external">scan-scroll</a>和<a href="https://www.elastic.co/guide/en/elasticsearch/guide/1.x/bulk.html" target="_blank" rel="external">bulk</a>）也不需要一秒。</p>
-<h1 id="嵌套对象"><a href="#嵌套对象" class="headerlink" title="嵌套对象"></a>嵌套对象</h1><hr>
-<p>因为一个document的创建更改删除都是原子操作，那么把紧密的实体关联写入到同一个document也是有好处的。<br>前面我们提到，blogpost中可以冗余一个<code>user</code>的对象，这个<code>user</code>类型其实属于<code>object</code>（和这一节介绍的不一样），它的实现其实是<code>user.id</code>作为一个key，由key-value对的列表组成document来保存，那如果一个数组作为一个field是怎样索引的呢 ？</p>
-<p>假如一个blopost可以有多个comments：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">PUT /my_index/blogpost/1</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;: &quot;Nest eggs&quot;,</div><div class="line">  &quot;body&quot;:  &quot;Making your money work...&quot;,</div><div class="line">  &quot;tags&quot;:  [ &quot;cash&quot;, &quot;shares&quot; ],</div><div class="line">  &quot;comments&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;name&quot;:    &quot;John Smith&quot;,</div><div class="line">      &quot;comment&quot;: &quot;Great article&quot;,</div><div class="line">      &quot;age&quot;:     28,</div><div class="line">      &quot;stars&quot;:   4,</div><div class="line">      &quot;date&quot;:    &quot;2014-09-01&quot;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      &quot;name&quot;:    &quot;Alice White&quot;,</div><div class="line">      &quot;comment&quot;: &quot;More like this please&quot;,</div><div class="line">      &quot;age&quot;:     31,</div><div class="line">      &quot;stars&quot;:   5,</div><div class="line">      &quot;date&quot;:    &quot;2014-10-22&quot;</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>因为没有不指定<code>comments</code>的类型， 它将会是<code>object</code>类型，索引里大概是这样的：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;title&quot;:            [ eggs, nest ],</div><div class="line">  &quot;body&quot;:             [ making, money, work, your ],</div><div class="line">  &quot;tags&quot;:             [ cash, shares ],</div><div class="line">  &quot;comments.name&quot;:    [ alice, john, smith, white ],</div><div class="line">  &quot;comments.comment&quot;: [ article, great, like, more, please, this ],</div><div class="line">  &quot;comments.age&quot;:     [ 28, 31 ],</div><div class="line">  &quot;comments.stars&quot;:   [ 4, 5 ],</div><div class="line">  &quot;comments.date&quot;:    [ 2014-09-01, 2014-10-22 ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这样我们搜索某个comments.name的值时，就无法查询到对应哪个comments了，比如<code>Alice White</code>和<code>31</code>的关联就丢失了。所以我们需要使用一个叫<code>nested</code>的类型，来代替<code>object</code>作为comments的field type，具体操作可参考——<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/nested-mapping.html" target="_blank" rel="external">Nested Object Mapping</a>。</p>
-<p>使用<code>nested</code>类型之后，每一个nestd的对象都会被索引成一个<code>hidden separate document</code>，类似这样：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;comments.name&quot;:    [ john, smith ],</div><div class="line">  &quot;comments.comment&quot;: [ article, great ],</div><div class="line">  &quot;comments.age&quot;:     [ 28 ],</div><div class="line">  &quot;comments.stars&quot;:   [ 4 ],</div><div class="line">  &quot;comments.date&quot;:    [ 2014-09-01 ]</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  &quot;comments.name&quot;:    [ alice, white ],</div><div class="line">  &quot;comments.comment&quot;: [ like, more, please, this ],</div><div class="line">  &quot;comments.age&quot;:     [ 31 ],</div><div class="line">  &quot;comments.stars&quot;:   [ 5 ],</div><div class="line">  &quot;comments.date&quot;:    [ 2014-10-22 ]</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  &quot;title&quot;:            [ eggs, nest ],</div><div class="line">  &quot;body&quot;:             [ making, money, work, your ],</div><div class="line">  &quot;tags&quot;:             [ cash, shares ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>虽然把nested object分开索引了，fields还保持了他们间的联系，可以进行inner object不能做的comment查询。不仅如此，nested document和root document的join非常快，接近同一个document中的速度。<br>这些额外的nested document是隐藏的，不能够直接访问，修改增加删除都需要重新索引整个document。</p>
-<h1 id="parent-child-relationships"><a href="#parent-child-relationships" class="headerlink" title="parent-child relationships"></a>parent-child relationships</h1><hr>
-<p>nested objects, 所有实体在同一document中（json 角度看），但使用 parent-child 的 parent 和 children 是分开的 documents.</p>
-<p>parent-child 对比 nested objects 的好处：</p>
-<ul>
-<li>parent document可以被update而无需重新索引children</li>
-<li>Child documents 可以被 added, changed, or deleted，而不会影响parent和其他children。</li>
-<li>Child documents 可以在搜索结果中被返回</li>
-</ul>
-<p>由于es维护了一个映射：哪些 parents 关联了哪些 children，也多亏了这个映射，使查询时的 joins 速度是比较快的，但是也有一个限制：parent document 及其 children 必须在同一个shard中。</p>
-<p>这个 parent-child 的映射被保存在<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues.html" target="_blank" rel="external">Doc Values</a>（documents到terms的映射）中, 当fully hot in memory时可以快速地执行，当太大时将写回磁盘。</p>
-<p>不过因为 Parent-child 使用了 global ordinals 来加速 joins，不管使用了 in-memory cache 或者 on-disk doc values, 当索引改变时 global ordinals 需要重新构建。shard的parents越多，rebuild所花的时间就越多。刷新后的第一次 parent-child query or aggregation之后，会触发global ordinals构建，这时可能触发一个比较明显的延时，可以使用<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html#eager-global-ordinals" target="_blank" rel="external">eager_global_ordinals</a>来优化查询时间，把开销转移到 refresh time。</p>
-<p>因此 parent-children 比较适合这种场景，parent 有许多 children， 而不是很多 parents 和很少children。</p>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
-<p>上面只是介绍了几种处理关系型数据的方式及优缺点，具体还是要结合实际的应用场景，来选择最适合的方式。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/parent-child-performance.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/parent-child-performance.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/relations.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/relations.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/guide/1.x/relations.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/1.x/relations.html</a><br>preload-fielddata - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html#global-ordinals" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html#global-ordinals</a><br>Doc Values - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues.html</a><br>Inner Objects - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#inner-objects" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#inner-objects</a><br>Complex Core Field Types - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#object-arrays" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/complex-core-fields.html#object-arrays</a><br>Nested datatype - <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html</a><br>Doc Values Intro - <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues-intro.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/docvalues-intro.html</a></p>
+          稳定匹配
+在1962年Gale和Shapley发表了一篇论文: College Admissions and the Stability of Marriage，首次提出了婚姻匹配问题(维基百科), 使婚姻和大学招生成为稳定匹配的典型例子.
+什么是稳定匹配
+以婚姻匹配为例, 假设在当前匹配结果中存在
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/06/02/cs/algo/Gale-Shapley_Stability/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -519,28 +480,15 @@
       
         
           
-            <p>随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.</p>
-<h1 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h1><p>首先在<a href="https://www.dropbox.com/install-linux" target="_blank" rel="external">官网</a>下载ubuntu安装包<code>dropbox_2015.10.28_amd64.deb</code>, 安装完成之后, 需要启动dropbox :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">proxychains dropbox start</div><div class="line">ProxyChains-3.1 (http://proxychains.sf.net)</div><div class="line">Starting Dropbox...</div><div class="line">The Dropbox daemon is not installed!</div><div class="line">Run &quot;dropbox start -i&quot; to install the daemon</div></pre></td></tr></table></figure>
-<p>如上, 提示需要安装daemon程序, 继续按着指引做:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dropbox start -i</div></pre></td></tr></table></figure>
-<p>如果没有翻墙, 可能遇到这样的错误:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Trouble connecting to Dropbox servers. Maybe your internet connection is down, or you need to set your http_proxy environment variable.</div></pre></td></tr></table></figure>
-<p>为了继续下载, 本地搭建一个翻墙的http代理, 并export到环境变量:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">export https_proxy=http://127.0.0.1:8123</div></pre></td></tr></table></figure>
-<p>然后重新<code>dropbox start -i</code>:</p>
-<p><img src="/images/linux/tools/dropbox/dropbox-downloading.png" alt=""></p>
-<h1 id="安装完之后-可以使用dropbox-proxy设置数据同步的代理"><a href="#安装完之后-可以使用dropbox-proxy设置数据同步的代理" class="headerlink" title="安装完之后, 可以使用dropbox proxy设置数据同步的代理:"></a>安装完之后, 可以使用<code>dropbox proxy</code>设置数据同步的代理:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox help proxy</div><div class="line"></div><div class="line">dropbox proxy MODE [TYPE] [HOST] [PORT] [USERNAME] [PASSWORD]</div><div class="line"></div><div class="line">Set proxy settings for Dropbox.</div><div class="line"></div><div class="line">MODE - one of &quot;none&quot;, &quot;auto&quot;, &quot;manual&quot;</div><div class="line">TYPE - one of &quot;http&quot;, &quot;socks4&quot;, &quot;socks5&quot; (only valid with &quot;manual&quot; mode)</div><div class="line">HOST - proxy hostname (only valid with &quot;manual&quot; mode)</div><div class="line">PORT - proxy port (only valid with &quot;manual&quot; mode)</div><div class="line">USERNAME - (optional) proxy username (only valid with &quot;manual&quot; mode)</div><div class="line">PASSWORD - (optional) proxy password (only valid with &quot;manual&quot; mode)</div></pre></td></tr></table></figure>
-<h1 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h1><p>启动后, 输入账号密码进行登录:</p>
-<p><img src="/home/niko/mount/hsb_ssd_1/niko/dev/code/git_repos/HexoBlog/hexo-hello/source/images/linux/tools/dropbox/dropbox-login.png" alt=""></p>
-<p>由于dropbox采用和nautilus整合的方式, 只要我们在文件管理器修改了同步文件夹(默认是<code>/home/username/Dropbox</code>)的数据, dropbox会自动同步到云端.</p>
-<h1 id="问题-gnome下icon有时候不显示"><a href="#问题-gnome下icon有时候不显示" class="headerlink" title="问题: gnome下icon有时候不显示"></a>问题: gnome下icon有时候不显示</h1><p>最简单粗暴的方式, 重启一下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox stop</div><div class="line">Dropbox daemon stopped.</div><div class="line">niko@niko-ub1404:~$ dropbox start</div><div class="line">Starting Dropbox...Done!</div></pre></td></tr></table></figure>
-<p>至于bug, 可能跟这个<a href="https://github.com/rgcjonas/gnome-shell-extension-appindicator/issues/40" target="_blank" rel="external">issue</a>有关.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://askubuntu.com/questions/201727/how-can-i-make-dropbox-display-an-icon-in-gnome-shell" target="_blank" rel="external">How can I make dropbox display an icon in Gnome Shell?</a></p>
+          随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.
+安装过程首先在官网下载ubuntu安装包dropbox_2015.10.28_amd64.deb, 安装完
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/20/linux/install/dropbox-install/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -658,55 +606,14 @@
       
         
           
-            <p>canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.<br>原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成很多重要的业务功能, 比如变更通知/缓存更新/索引同步等等. 事不宜迟, 先体验一下.</p>
-<h1 id="下载并安装"><a href="#下载并安装" class="headerlink" title="下载并安装"></a>下载并安装</h1><hr>
-<p>mysql, version: 5.7.9, 安装略.<br><a href="https://github.com/alibaba/canal" target="_blank" rel="external">canal, version: v1.0.22</a></p>
-<h1 id="mysql-部分的配置"><a href="#mysql-部分的配置" class="headerlink" title="mysql 部分的配置"></a>mysql 部分的配置</h1><hr>
-<h2 id="启用-bin-log"><a href="#启用-bin-log" class="headerlink" title="启用 bin log"></a>启用 bin log</h2><p>sudo vim /etc/mysql/my.cnf</p>
-<p>在[mysqld]的配置节下， 插入：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log-bin=mysql-bin</div><div class="line">binlog-format=ROW</div><div class="line">server-id=1        #配置mysql replaction需要定义，不能和canal的slaveId重复</div></pre></td></tr></table></figure>
-<h2 id="检查是否开启"><a href="#检查是否开启" class="headerlink" title="检查是否开启"></a>检查是否开启</h2><p>show variables like ‘log_%’;</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_bin	ON</div><div class="line">log_bin_basename	/var/lib/mysql/mysql-bin</div><div class="line">log_bin_index	/var/lib/mysql/mysql-bin.index</div><div class="line">log_bin_trust_function_creators	OFF</div><div class="line">log_bin_use_v1_row_events	OFF</div><div class="line">log_error	/var/log/mysqld.log</div><div class="line">log_output	FILE</div><div class="line">log_queries_not_using_indexes	OFF</div><div class="line">log_slave_updates	OFF</div><div class="line">log_slow_admin_statements	OFF</div><div class="line">log_slow_slave_statements	OFF</div><div class="line">log_throttle_queries_not_using_indexes	0</div><div class="line">log_warnings	1</div></pre></td></tr></table></figure>
-<h2 id="查询确认当前binlog模式"><a href="#查询确认当前binlog模式" class="headerlink" title="查询确认当前binlog模式:"></a>查询确认当前binlog模式:</h2><pre><code>SQL查询:
-show variables like &apos;binlog_format&apos;;
-</code></pre><h1 id="canal-部分的配置"><a href="#canal-部分的配置" class="headerlink" title="canal 部分的配置"></a>canal 部分的配置</h1><hr>
-<p>接下来是canal安装配置.</p>
-<h2 id="canal-的MySQL权限"><a href="#canal-的MySQL权限" class="headerlink" title="canal 的MySQL权限"></a>canal 的MySQL权限</h2><p>canal的原理是模拟自己为mysql slave，所以这里一定需要作为 mysql slave 的相关权限.</p>
-<p>创建canal用户及授权:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">CREATE USER canal IDENTIFIED BY &apos;canal&apos;;</div><div class="line">GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO &apos;canal&apos;@&apos;%&apos;;</div><div class="line">FLUSH PRIVILEGES;</div><div class="line">-- GRANT ALL PRIVILEGES ON *.* TO &apos;canal&apos;@&apos;%&apos; ;</div></pre></td></tr></table></figure>
-<h2 id="构建-amp-配置-canal"><a href="#构建-amp-配置-canal" class="headerlink" title="构建 &amp; 配置 canal"></a>构建 &amp; 配置 canal</h2><pre><code>git clone git@github.com:alibaba/canal.git
-cd canal
-mvn clean install -Dmaven.test.skip=true -Denv=release
-mkdir /tmp/canal
-tar zxvf target/canal.deployer-1.0.22-SNAPSHOT.tar.gz -C /tmp/canal
-</code></pre><p>编辑<code>instance.properties</code> :</p>
-<pre><code>cd /tmp/canal/
-vi conf/example/instance.properties
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">#################################################</div><div class="line">## mysql serverId</div><div class="line">canal.instance.mysql.slaveId = 1234</div><div class="line"></div><div class="line"># position info</div><div class="line">canal.instance.master.address = 127.0.0.1:3306</div><div class="line">canal.instance.master.journal.name =</div><div class="line">canal.instance.master.position =</div><div class="line">canal.instance.master.timestamp =</div><div class="line"></div><div class="line">#canal.instance.standby.address =</div><div class="line">#canal.instance.standby.journal.name =</div><div class="line">#canal.instance.standby.position =</div><div class="line">#canal.instance.standby.timestamp =</div><div class="line"></div><div class="line"># username/password</div><div class="line">canal.instance.dbUsername = canal</div><div class="line">canal.instance.dbPassword = canal</div><div class="line">canal.instance.defaultDatabaseName =</div><div class="line">canal.instance.connectionCharset = UTF-8</div><div class="line"></div><div class="line"># table regex</div><div class="line">canal.instance.filter.regex = .*\\..*</div><div class="line"># table black regex</div><div class="line">canal.instance.filter.black.regex =</div><div class="line"></div><div class="line">#################################################</div></pre></td></tr></table></figure>
-<p>怎么来填写这个配置, 首先先要查询master状态 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; show master status;</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">| mysql-bin.000002 |      154 |              |                  |                   |</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure>
-<p>如上, 把 <code>mysql-bin.000002</code>填入<code>canal.instance.master.journal.name</code>,<br><code>154</code> 填入<code>canal.instance.master.position</code>, 即是:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">...</div><div class="line">canal.instance.master.journal.name = mysql-bin.000002</div><div class="line">canal.instance.master.position = 154</div><div class="line">....</div></pre></td></tr></table></figure>
-<h2 id="启动-canal-server"><a href="#启动-canal-server" class="headerlink" title="启动 canal server"></a>启动 canal server</h2><pre><code>vim conf/canal.properties
-</code></pre><p>暂时使用默认配置</p>
-<pre><code>sh bin/startup.sh
-</code></pre><p>启动日志:<br>tail -f logs/canal/canal.log</p>
-<p>具体instance的日志：<br>tail -f logs/example/example.log</p>
-<p>sh bin/stop.sh</p>
-<h1 id="mysqlbinlog-测试"><a href="#mysqlbinlog-测试" class="headerlink" title="mysqlbinlog 测试"></a>mysqlbinlog 测试</h1><p>使用 <a href="http://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html" target="_blank" rel="external">mysqlbinlog</a> 可以查看binlog, 例如:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysqlbinlog -h127.0.0.1 -P33306 -ucanal -pcanal --read-from-remote-server -v --start-position=296 -d dbroute_01 mysql-bin.000003</div></pre></td></tr></table></figure>
-<div style="display: none;"><br>mysqlbinlog -h192.168.7.90 -P3306 -ucanal -pcanal –read-from-remote-server -v –start-position=877194 -d dbroute_01 mysql-bin.000001<br></div>
+          canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成
+          ...
 
-
-
-<h1 id="使用-canal-client-订阅数据"><a href="#使用-canal-client-订阅数据" class="headerlink" title="使用 canal client 订阅数据"></a>使用 canal client 订阅数据</h1><p>canal 客户端的代码程序太长, 这里就不贴了, 在github项目的example包下<a href="https://github.com/alibaba/canal/blob/master/example/src/main/java/com/alibaba/otter/canal/example/SimpleCanalClientTest.java" target="_blank" rel="external">SimpleCanalClientTest.java</a></p>
-<p>因为是使用<code>ROW</code>的binlog, 可以观察到变更的行和列, 而且哪些列更新了都可以获取, 日志示例:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">================&gt; binlog[mysql-bin.000001:65595295] , executeTime :  , delay : 1039ms</div><div class="line"> BEGIN ----&gt; Thread id: 131608</div><div class="line">----------------&gt; binlog[mysql-bin.000001:65595441] , name[test,city] , eventType : UPDATE , executeTime :  , delay : 1040ms</div><div class="line">id : 56    type=int(11)</div><div class="line">province_id : 5    type=int(11)</div><div class="line">name : 包头市    type=varchar(50)    update=true</div><div class="line">code : 229    type=varchar(50)</div><div class="line">----------------</div><div class="line"> END ----&gt; transaction id: 269626487</div><div class="line">================&gt; binlog[mysql-bin.000001:65595556] , executeTime :  , delay : 1040ms</div></pre></td></tr></table></figure>
-<p>使用上面的example, 可以快速入门 canal API, 实现很多重要的业务功能.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://github.com/alibaba/canal/wiki/QuickStart" target="_blank" rel="external">https://github.com/alibaba/canal/wiki/QuickStart</a><br><a href="http://www.ilanni.com/?p=7816" target="_blank" rel="external">http://www.ilanni.com/?p=7816</a><br><a href="http://m.blog.csdn.net/article/details?id=50824271" target="_blank" rel="external">http://m.blog.csdn.net/article/details?id=50824271</a></p>
-
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/12/java/opsrc/canal/canal_quick_start/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -824,21 +731,15 @@ vi conf/example/instance.properties
       
         
           
-            <h1 id="把应用做成一个service"><a href="#把应用做成一个service" class="headerlink" title="把应用做成一个service"></a>把应用做成一个service</h1><p>我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。<br>为了方便管理，可以考虑制作成一个service。步骤如下：</p>
-<h2 id="创建-upstart-配置文件"><a href="#创建-upstart-配置文件" class="headerlink" title="创建 upstart 配置文件"></a>创建 upstart 配置文件</h2><p>首先用<code>mvn package</code>打包成jar类型的spring-boot程序， 然后 <code>sudo vim /etc/init/hellosb.conf</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">start on filesystem</div><div class="line">exec /usr/bin/java -jar /path_to/program.jar</div></pre></td></tr></table></figure>
-<p>多行的话使用<code>script</code>标记：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># myprogram.conf</div><div class="line">start on filesystem</div><div class="line">script</div><div class="line">    /usr/bin/java -jar /path_to/program</div><div class="line">    echo &quot;Another command&quot;</div><div class="line">end script</div></pre></td></tr></table></figure>
-<h2 id="service-启动"><a href="#service-启动" class="headerlink" title="service 启动"></a>service 启动</h2><pre><code>sudo ln -s /etc/init/myprogram.conf /etc/init.d/myprogram
-</code></pre><p>建立链接后，使用service就可以用自动补全功能了：</p>
-<pre><code>sudo service myprogram start
-</code></pre><p>上面只是一个简单的启动功能，upstart的配置文件远比这强大，可以做更细节的处理（下图是job的状态变迁图）。</p>
-<p><img src="http://www.ibm.com/developerworks/cn/linux/1407_liuming_init2/image003.jpg" alt="job 状态变迁"></p>
-<h1 id="更进一步"><a href="#更进一步" class="headerlink" title="更进一步"></a>更进一步</h1><p>若想要深入了解，可以查看官方文档和学习一下其他程序（nginx等）的upstart脚本：<a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">Upstart Intro, Cookbook and Best Practises</a></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">http://upstart.ubuntu.com/cookbook/</a><br><a href="http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart" target="_blank" rel="external">http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart</a><br><a href="http://upstart.ubuntu.com/getting-started.html" target="_blank" rel="external">http://upstart.ubuntu.com/getting-started.html</a><br><a href="http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service" target="_blank" rel="external">http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service</a></p>
+          把应用做成一个service我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。为了方便管理，可以考虑制作成一个service。步骤如下：
+创建 upstart 配置文件首先用m
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/10/linux/tools/app-as-service-upstart/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -956,33 +857,15 @@ vi conf/example/instance.properties
       
         
           
-            <h1 id="document-的部分更新"><a href="#document-的部分更新" class="headerlink" title="document 的部分更新"></a>document 的部分更新</h1><p>对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。</p>
-<p>但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考虑version的话， 为何不在服务器完成， 提供一个部分更新的api， 让用户根据场景合理使用api， 比之前的做法可以节省一个请求。</p>
-<p>所以说， elasticsearch还是很人性化的， 它提供了这个api， 不过在其内部来说， api实现还是遵循了<code>retrieve-change-reindex</code>的步骤, 操作在shard中完成。</p>
-<h1 id="更新的安全问题"><a href="#更新的安全问题" class="headerlink" title="更新的安全问题"></a>更新的安全问题</h1><p>那么如果有多个客户端同时更新， 那么并发安全的问题es如何处理呢？<br>前面提到了， es内部是<code>retrieve-change-reindex</code>的步骤， 在<code>retrieve</code>阶段， es会获取当前的<code>_version</code>， 并在后面的<code>reindex</code>阶段使用。<br>如果其他进程修改了document， <code>_version</code>将会和update request中的不同， 从而更新将会失败。</p>
-<p>这个类似乐观锁的策略， 如果需要重试的话， 可以使用<code>retry_on_conflict</code>设置重试次数，比如：</p>
-<p><code>.../_update?retry_on_conflict=5</code></p>
-<p>不过， 这个重试使用的场景在计数器上用的较多， 因为这个更新的顺序是不那么重要的。</p>
-<h1 id="REST-api"><a href="#REST-api" class="headerlink" title="REST api"></a>REST api</h1><p>言归正传， 接下来，介绍以下api的使用吧。</p>
-<p>假设有个<code>blog</code>的document， 其中有个field叫做<code>tags</code>， 如果要部分更新这个<code>tags</code>：</p>
-<p>最简单的方式是使用<code>doc</code>参数， 和已有document合并， 已有的field会被覆盖， 新的field将会新增到document， REST api 如下：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   "doc" : &#123;</div><div class="line">      "tags" : [ "testing" ],</div><div class="line">      "views": 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果成功， 会收到这样的response：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span> :   <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_id"</span> :      <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_type"</span> :    <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_version"</span> : <span class="number">3</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>再获取一次这个文档， 检查一下是否真的只更新了<code>tags</code>这个field：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span>:    <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_type"</span>:     <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_id"</span>:       <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_version"</span>:  <span class="number">3</span>,</div><div class="line">   <span class="attr">"found"</span>:     <span class="literal">true</span>,</div><div class="line">   <span class="attr">"_source"</span>: &#123;</div><div class="line">      <span class="attr">"title"</span>:  <span class="string">"My first blog entry"</span>,</div><div class="line">      <span class="attr">"text"</span>:   <span class="string">"Starting to get the hang of this..."</span>,</div><div class="line">      <span class="attr">"tags"</span>: [ <span class="string">"testing"</span> ],</div><div class="line">      <span class="attr">"views"</span>:  <span class="number">0</span></div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="java-api"><a href="#java-api" class="headerlink" title="java api"></a>java api</h1><p>如果使用 java api 的话：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;website&quot;, &quot;blog&quot;, &quot;1&quot;)</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;tags&quot;, new String[]&#123;&quot;testing&quot;&#125;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h1 id="spring-data-elasticsearch-api"><a href="#spring-data-elasticsearch-api" class="headerlink" title="spring data elasticsearch api"></a>spring data elasticsearch api</h1><p>如果使用spring-data-elasticsearch的<code>ElasticsearchTemplate</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line">UpdateRequest updateRequest = <span class="keyword">new</span> UpdateRequest();</div><div class="line">updateRequest</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">                .startObject()</div><div class="line">                .field(field, value)</div><div class="line">                .endObject());</div><div class="line">UpdateQuery updateQuery = <span class="keyword">new</span> UpdateQueryBuilder()</div><div class="line">        <span class="comment">//.withIndexName(indexName).withType(objectType)</span></div><div class="line">        .withClass(clz)</div><div class="line">        .withId(String.valueOf(id))</div><div class="line">        .withUpdateRequest(updateRequest)</div><div class="line">        .build();</div><div class="line">elasticsearchTemplate.update(updateQuery);</div><div class="line">elasticsearchTemplate.refresh(indexName, <span class="keyword">true</span>);</div></pre></td></tr></table></figure>
-<p>使用这个api时可能会有这样的疑惑， UpdateQuery中有指定indexName和objectType， 但是<code>@Document</code>的Class中也有声明， 那么使用哪个呢？</p>
-<p>我们可以看看<code>elasticsearchTemplate.update(updateQuery)</code>的源码:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   @Override</div><div class="line">public UpdateResponse update(UpdateQuery query) &#123;</div><div class="line">	return this.prepareUpdate(query).execute().actionGet();</div><div class="line">&#125;</div><div class="line"></div><div class="line">   private UpdateRequestBuilder prepareUpdate(UpdateQuery query) &#123;</div><div class="line">   		String indexName = isNotBlank(query.getIndexName()) ? query.getIndexName() : getPersistentEntityFor(query.getClazz()).getIndexName();</div><div class="line">   		String type = isNotBlank(query.getType()) ? query.getType() : getPersistentEntityFor(query.getClazz()).getIndexType();</div><div class="line">   		Assert.notNull(indexName, &quot;No index defined for Query&quot;);</div><div class="line">   		Assert.notNull(type, &quot;No type define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getId(), &quot;No Id define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getUpdateRequest(), &quot;No IndexRequest define for Query&quot;);</div><div class="line">   		UpdateRequestBuilder updateRequestBuilder = client.prepareUpdate(indexName, type, query.getId());</div><div class="line"></div><div class="line">   		...</div><div class="line">   	&#125;</div></pre></td></tr></table></figure>
-<p>由上可知， <code>query.getIndexName()</code>和<code>query.getIndexName()</code>会被优先使用， 如果未指定， 会从document的Class注解中获取。<br>如果为了提高性能, 能写上也好, 不过最好统一管理这两个名称, 方便以后修改变更.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html</a></p>
+          document 的部分更新对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。
+但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/08/search/es/es-partial-update/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1100,33 +983,19 @@ vi conf/example/instance.properties
       
         
           
-            <p>今天要说的 <code>ThreadLocalRandom</code> 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用</p>
-<ol>
-<li>创建<code>java.util.Random</code>实例</li>
-<li>使用Math.random(), 其实内部也是创建了一个<code>java.util.Random</code></li>
-</ol>
-<p>使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.<br>但是, 如果在多线程下使用Random, 会导致多线程的竞争开销, 也会降低Random的随机性, 于是便有了<code>ThreadLocalRandom</code>.</p>
-<h1 id="ThreadLocalRandom"><a href="#ThreadLocalRandom" class="headerlink" title="ThreadLocalRandom"></a><code>ThreadLocalRandom</code></h1><hr>
-<p>那么, 对于前面的问题, <code>ThreadLocalRandom</code>对这些做了哪些工作呢 ?</p>
-<p>假设使用以下代码获取随机数 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">int randomInt = ThreadLocalRandom.current().nextInt();</div></pre></td></tr></table></figure>
-<h2 id="ThreadLocalRandom-current"><a href="#ThreadLocalRandom-current" class="headerlink" title="ThreadLocalRandom.current():"></a><code>ThreadLocalRandom.current()</code>:</h2><hr>
-<p>我们来看一下<code>ThreadLocalRandom</code>的内部实现:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static ThreadLocalRandom current() &#123;</div><div class="line">    if (UNSAFE.getInt(Thread.currentThread(), PROBE) == 0)</div><div class="line">        localInit();</div><div class="line">    return instance;</div><div class="line">&#125;</div><div class="line"></div><div class="line">static final void localInit() &#123;</div><div class="line">    int p = probeGenerator.addAndGet(PROBE_INCREMENT);</div><div class="line">    int probe = (p == 0) ? 1 : p; // skip 0</div><div class="line">    long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));</div><div class="line">    Thread t = Thread.currentThread();</div><div class="line">    UNSAFE.putLong(t, SEED, seed);</div><div class="line">    UNSAFE.putInt(t, PROBE, probe);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>其中, <code>SEED</code>和<code>PROBE</code>可以参考下面定义:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class&lt;?&gt; tk = Thread.class;</div><div class="line">SEED = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSeed&quot;));</div><div class="line">PROBE = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomProbe&quot;));</div><div class="line">SECONDARY = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSecondarySeed&quot;));</div></pre></td></tr></table></figure>
-<p><code>Thread.java</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@sun.misc.Contended(&quot;tlr&quot;)</div><div class="line">int threadLocalRandomProbe;</div></pre></td></tr></table></figure>
-<p><code>UNSAFE.getInt(Thread.currentThread(), PROBE)</code>就是获取<code>Thread</code>对象中offset偏移地址对应的field <code>threadLocalRandomProbe</code>的值, <code>threadLocalRandomProbe</code> 是<code>nonzero if threadLocalRandomSeed initialized</code>.<br>所以, 如果<code>PROBE</code>值为零, 将进行localInit(), 当前Thread对象的threadLocalRandomSeed 和 threadLocalRandomProbe将会被赋值. (<code>@sun.misc.Contended(&quot;tlr&quot;)</code>是为了解决伪共享的问题, 将另起一篇博客介绍)</p>
-<h2 id="nextInt"><a href="#nextInt" class="headerlink" title="nextInt()"></a><code>nextInt()</code></h2><hr>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public int nextInt() &#123;</div><div class="line">    return mix32(nextSeed());</div><div class="line">&#125;</div><div class="line"></div><div class="line">final long nextSeed() &#123;</div><div class="line">    Thread t; long r; // read and update per-thread seed</div><div class="line">    UNSAFE.putLong(t = Thread.currentThread(), SEED,</div><div class="line">                   r = UNSAFE.getLong(t, SEED) + GAMMA);</div><div class="line">    return r;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>注意:</code><br><code>SEED</code>是field的偏移量<br><code>GAMMA</code>是seed的increment<br>这里会更新当前Thread的SEED, 最终mix32()生成int随机数.</p>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
-<p>从上可知<code>ThreadLocalRandom</code>的工作方式, 它为每个线程分配了一个SEED(被Thread对象持有), 故而减少了多线程下的竞争开销, 也使随机性更加好.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://www.jdon.com/concurrent/concurrent-random.html" target="_blank" rel="external">http://www.jdon.com/concurrent/concurrent-random.html</a></p>
+          今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
 
-          
+创建java.util.Random实例
+使用Math.random(), 其实内部也是创建了一个java.util.Random
+
+使用Random没有问题, 其seed使用Atom
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/06/java/se/ThreadLocalRandom/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1244,9 +1113,15 @@ vi conf/example/instance.properties
       
         
           
-            <h1 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h1><p><img src="/images/books/tech-less/procrastination-12-01.png" alt=""></p>
+          笔记
 
           
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/05/books/procrastination/procrastination-12/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1364,36 +1239,16 @@ vi conf/example/instance.properties
       
         
           
-            <h1 id="Levenshtein-距离"><a href="#Levenshtein-距离" class="headerlink" title="Levenshtein 距离"></a>Levenshtein 距离</h1><p>什么是<code>Levenshtein</code>距离?<br><code>Levenshtein距离</code>是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。</p>
-<blockquote>
-<p>Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。<br>指两个字串之间，由一个转成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。</p>
-</blockquote>
-<p>比如将kitten一字转成sitting, 有三步：</p>
-<p>sitten （k→s）<br>sittin （e→i）<br>sitting （→g）</p>
-<h1 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h1><ul>
-<li>相似度检测</li>
-<li>拼写检查</li>
-<li>文本搜索 (Lucene/Solr)</li>
-<li>NLP</li>
-<li>等等</li>
-</ul>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><hr>
-<p>如果用朴素的递归方法实现, 需要O(3^n)的时间复杂度, 明显我们要进行一些优化, 动态规划是比较常用的方法.</p>
-<p>假设字符串target有1~m个字符, 字符串str1有1~n个:</p>
-<h2 id="定义最优子问题"><a href="#定义最优子问题" class="headerlink" title="定义最优子问题"></a>定义最优子问题</h2><p>通过插入/删除/替换操作, 把str1转换为target字符串.<br>要想找到最短编辑距离, 即是<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数</p>
-<h2 id="确定状态转换方程"><a href="#确定状态转换方程" class="headerlink" title="确定状态转换方程"></a>确定状态转换方程</h2><p>我们将<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数, 定义为状态d[i, j].</p>
-<h2 id="确定决策并写出状态转移方程"><a href="#确定决策并写出状态转移方程" class="headerlink" title="确定决策并写出状态转移方程"></a>确定决策并写出状态转移方程</h2><p>当target[j]等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = d[i, j] + 0;</div></pre></td></tr></table></figure></p>
-<p>当target[j]不等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = min(</div><div class="line">    d[i, j-1] + 1,</div><div class="line">    d[i-1, j] + 1,</div><div class="line">    d[i-1, j-1] + 1</div><div class="line">    )</div></pre></td></tr></table></figure></p>
-<h2 id="寻找边界条件"><a href="#寻找边界条件" class="headerlink" title="寻找边界条件"></a>寻找边界条件</h2><p>当target是空字符串时, d[i, 0] = str1的长度<br>当str1是空字符串时, d[0, j] = target的长度</p>
-<p>经过这几步, 就可以开始写代码实现了. 以下给出的是状态递推DP算法, 除此以外, 仍可以使用带记忆的递归算法.</p>
-<h1 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h1><figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getEditDistance</span><span class="params">(<span class="keyword">char</span>[] target, <span class="keyword">char</span>[] str1)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span>[][] distance = <span class="keyword">new</span> <span class="keyword">int</span>[str1.length + <span class="number">1</span>][target.length + <span class="number">1</span>];</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">        distance[i][<span class="number">0</span>] = i;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        distance[<span class="number">0</span>][j] = j;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (str1[i - <span class="number">1</span>] == target[j - <span class="number">1</span> ]) &#123;</div><div class="line">                distance[i][j] = distance[i - <span class="number">1</span>][j - <span class="number">1</span>];</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">int</span> distanceInsert = distance[i][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceDelete = distance[i - <span class="number">1</span>][j] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceEdit = distance[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                distance[i][j] = Math.min(</div><div class="line">                        Math.min(distanceInsert, distanceDelete),</div><div class="line">                        distanceEdit);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> distance[str1.length][target.length];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>以<code>snowy</code>和<code>sunny</code>字符串做测试, 计算过程如下:</p>
-<p><img src="/images/cs/dp_edit_distance_01.png" alt=""></p>
-<p>有三个值的, 分别是<code>insert</code>/<code>delete</code>/<code>edit</code>的计算距离, 最后得出最短编辑距离是<code>3</code>.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://zh.wikipedia.org/wiki/%E8%90%8A%E6%96%87%E6%96%AF%E5%9D%A6%E8%B7%9D%E9%9B%A2" target="_blank" rel="external">莱文斯坦距离</a><br>[算法的乐趣 - C3 动态规划]</p>
+          Levenshtein 距离什么是Levenshtein距离?Levenshtein距离是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。
 
-          
+Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。指两个字串之间，由一个转成另一个所需的最少编辑操作次
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1511,166 +1366,17 @@ vi conf/example/instance.properties
       
         
           
-            <p><code>tmux</code>是一个终端的terminal <code>multiplexer</code>, 用来切换多个terminal, 和之前博客提到的<code>terminator</code>比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.</p>
-<p><img src="/images/linux/tmux_preview-01.png" alt=""></p>
-<h1 id="tmux-session"><a href="#tmux-session" class="headerlink" title="tmux session"></a><code>tmux</code> session</h1><hr>
-<p>使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach). 比如远程连接断开, 下次再连上服务器时, 原先tmux打开的环境都仍保留着.</p>
-<ul>
-<li><p>start new session:<br><code>tmux new -s myname</code></p>
-</li>
-<li><p>list sessions:<br><code>tmux ls</code></p>
-</li>
-<li><p>attach:<br><code>tmux a</code></p>
-</li>
-<li><p>attach to named:<br><code>tmux a -t myname</code></p>
-</li>
-<li><p><strong>detach</strong><br><code>ctrl + b, d</code></p>
-</li>
-<li><p>切换session<br>如果在tmux中, 想要切换到其他session, 可以这样:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">s</div><div class="line"># 这时会出现session列表, 使用方向键和Enter进行选择即可</div></pre></td></tr></table></figure>
-</li>
-<li><p>命名当前session</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">$</div><div class="line"># 这时可以修改当前的session名称</div></pre></td></tr></table></figure>
-</li>
-<li><p>新建一个session</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:new</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="pane"><a href="#pane" class="headerlink" title="pane"></a>pane</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>%</td>
-<td>垂直分割</td>
-</tr>
-<tr>
-<td>“</td>
-<td>水平分割</td>
-</tr>
-<tr>
-<td>o</td>
-<td>panes切换:</td>
-</tr>
-<tr>
-<td>x</td>
-<td>关闭当前pane</td>
-</tr>
-<tr>
-<td>q</td>
-<td>显示 pane number</td>
-</tr>
-<tr>
-<td>空格</td>
-<td>切换不同的layout</td>
-</tr>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h1 id="window"><a href="#window" class="headerlink" title="window"></a>window</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>c</td>
-<td>新建窗口</td>
-</tr>
-<tr>
-<td>n</td>
-<td>切换下一个窗口</td>
-</tr>
-<tr>
-<td>p</td>
-<td>切换前一个窗口</td>
-</tr>
-<tr>
-<td>Shift+7</td>
-<td>关闭当前窗口</td>
-</tr>
-<tr>
-<td>,</td>
-<td>命名窗口</td>
-</tr>
-<tr>
-<td>.</td>
-<td>移动窗口 (使用序号)</td>
-</tr>
-<tr>
-<td>w</td>
-<td>list window</td>
-</tr>
-<tr>
-<td>&amp;</td>
-<td>kill window</td>
-</tr>
-<tr>
-<td>page-up</td>
-<td>进入滚动模式, 按<code>esc</code>退出滚动</td>
-</tr>
-</tbody>
-</table>
-<h1 id="window-pane间操作"><a href="#window-pane间操作" class="headerlink" title="window/pane间操作"></a>window/pane间操作</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>:joinp -s :2</td>
-<td>移动窗口2作为当前窗口的一个新pane</td>
-</tr>
-<tr>
-<td>:joinp -t :1</td>
-<td>移动当前pane作为窗口1的一个新pane</td>
-</tr>
-</tbody>
-</table>
-<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>t</td>
-<td>显示时间</td>
-</tr>
-<tr>
-<td>?</td>
-<td>list shortcut</td>
-</tr>
-<tr>
-<td>:</td>
-<td>prompt</td>
-</tr>
-</tbody>
-</table>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://gist.github.com/henrik/1967800" target="_blank" rel="external">https://gist.github.com/henrik/1967800</a></p>
+          tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
 
-          
+tmux session
+使用tmux, 
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/03/linux/tools/tmux/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1788,34 +1494,17 @@ vi conf/example/instance.properties
       
         
           
-            <p>spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?</p>
-<p>spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.</p>
-<p>下面介绍war方式部署:</p>
-<h1 id="pom-xml-修改"><a href="#pom-xml-修改" class="headerlink" title="pom.xml 修改"></a>pom.xml 修改</h1><hr>
-<p>首先把打包类型修改为: <code>&lt;packaging&gt;war&lt;/packaging&gt;</code></p>
-<p>接着修改<code>spring-boot-starter-tomcat</code>为<code>provided</code>的scope, 避免打包到war中:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;provided&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- ... --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
-<ul>
-<li><strong>注意:</strong></li>
-</ul>
-<p><code>boot-start</code>版本要高于<code>1.3</code>, 否则使用tomcat启动会出现异常.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<h1 id="部署到-Servlet-3-0-规范的容器"><a href="#部署到-Servlet-3-0-规范的容器" class="headerlink" title="部署到 Servlet 3.0 规范的容器"></a>部署到 Servlet 3.0 规范的容器</h1><hr>
-<p>如果你的web容器支持<code>Servlet 3.0</code>规范, 可以使用以下的方法:</p>
-<p>首先继承<code>SpringBootServletInitializer</code>, 并覆写<code>configure</code>方法, 不需要<code>web.xml</code>.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableAutoConfiguration</div><div class="line">@ComponentScan</div><div class="line">public class Application extends SpringBootServletInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) &#123;</div><div class="line">        // Customize the application or call application.sources(...) to add sources</div><div class="line">        // Since our example is itself a @Configuration class we actually don&apos;t</div><div class="line">        // need to override this method.</div><div class="line">        return application.sources(SampleControllerAndApp.class);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="部署到旧的容器-Servlet-2-5"><a href="#部署到旧的容器-Servlet-2-5" class="headerlink" title="部署到旧的容器 (Servlet 2.5)"></a>部署到旧的容器 (Servlet 2.5)</h1><p>如果你的容器不支持servlet 3.0规范怎么办 ? 下面是一个解决方法:</p>
-<ul>
-<li><p>1<br>增加一个<code>org.springframework.boot:spring-boot-legacy</code>依赖</p>
-</li>
-<li><p>2<br>创建<code>web.xml</code>, 用以声明<code>context listener</code>, 这个listener是<code>org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener</code>, 是在<code>spring-boot</code>下特别使用的, 其他配置和正常spring应用一样. <code>web.xml</code> 如下:</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app version=&quot;2.5&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context-param&gt;</div><div class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</div><div class="line">        &lt;param-value&gt;demo.Application&lt;/param-value&gt;</div><div class="line">    &lt;/context-param&gt;</div><div class="line"></div><div class="line">    &lt;listener&gt;</div><div class="line">        &lt;listener-class&gt;org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener&lt;/listener-class&gt;</div><div class="line">    &lt;/listener&gt;</div><div class="line"></div><div class="line">    &lt;filter&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;</div><div class="line">    &lt;/filter&gt;</div><div class="line"></div><div class="line">    &lt;filter-mapping&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</div><div class="line">    &lt;/filter-mapping&gt;</div><div class="line"></div><div class="line">    &lt;servlet&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</div><div class="line">        &lt;init-param&gt;</div><div class="line">            &lt;param-name&gt;contextAttribute&lt;/param-name&gt;</div><div class="line">            &lt;param-value&gt;org.springframework.web.context.WebApplicationContext.ROOT&lt;/param-value&gt;</div><div class="line">        &lt;/init-param&gt;</div><div class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</div><div class="line">    &lt;/servlet&gt;</div><div class="line"></div><div class="line">    &lt;servlet-mapping&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</div><div class="line">    &lt;/servlet-mapping&gt;</div><div class="line"></div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file" target="_blank" rel="external">howto-create-a-deployable-war-file</a><br><a href="http://docs.spring.io/spring-boot/docs/current/maven-plugin/" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/maven-plugin/</a><br><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging</a></p>
+          spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?
+spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.
+下面介绍war方式部署:
+pom.xml 修
+          ...
 
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1894,10 +1583,10 @@ vi conf/example/instance.properties
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
