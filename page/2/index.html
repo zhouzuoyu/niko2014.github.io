@@ -31,7 +31,7 @@
 
   
   
-  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -65,21 +65,21 @@
 
 
 
-<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="niko, java, linux" />
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
 
 
 
@@ -102,20 +102,26 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     scheme: 'Muse',
-    sidebar: {"position":"left","display":"always"},
+    sidebar: {"position":"left","display":"post"},
     fancybox: true,
     motion: true,
     duoshuo: {
-      userId: 0,
+      userId: '0',
       author: '博主'
     }
   };
 </script>
 
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/page/2/"/>
+
+
   <title> niko zhang </title>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
 
   
 
@@ -148,7 +154,7 @@
  ">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
       <div class="header-inner"><div class="site-meta ">
   
 
@@ -180,27 +186,13 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
             首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
           </a>
         </li>
       
         
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
             归档
           </a>
@@ -210,9 +202,15 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
           </a>
         </li>
       
@@ -220,10 +218,8 @@
       
         <li class="menu-item menu-item-search">
           
-            <a href="#" class="popup-trigger">
+            <a href="javascript:;" class="popup-trigger">
           
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
             
             搜索
           </a>
@@ -266,7 +262,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -278,8 +274,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/06/02/search/es/es-relations/" itemprop="url">
-                  【设计】elasticsearch - 处理关系型数据
+                <a class="post-title-link" href="/2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="url">
+                  稳定匹配问题 (1) - Gale & Shapley
                 </a>
               
             
@@ -306,8 +302,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/search/" itemprop="url" rel="index">
-                    <span itemprop="name">search</span>
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
                   </a>
                 </span>
 
@@ -322,8 +318,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/06/02/search/es/es-relations/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/search/es/es-relations/" itemprop="commentsCount"></span>
+                <a href="/2016/06/02/cs/algo/Gale-Shapley_Stability/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/cs/algo/Gale-Shapley_Stability/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -348,14 +344,33 @@
       
         
           
-          不同于关系型数据库， 我们使用es， 一般出于性能、弹性、近实时搜索、大数据量的分析等目的。然而， 在构建es数据模型时， 免不了会涉及到关系型数据的问题。关系型的数据在实际应用中广泛存在， 关系型数据库对此比较在行， 比如ACID支持、join查询等。es并不擅长这些，es的使用场景， 不是作为关
-          ...
+            <h1 id="稳定匹配"><a href="#稳定匹配" class="headerlink" title="稳定匹配"></a>稳定匹配</h1><hr>
+<p>在1962年Gale和Shapley发表了一篇论文: <a href="http://cramton.umd.edu/market-design/gale-shapley-college-admissions.pdf" target="_blank" rel="external">College Admissions and the Stability of Marriage</a>，首次提出了<a href="https://zh.wikipedia.org/wiki/%E7%A9%A9%E5%AE%9A%E5%A9%9A%E5%A7%BB%E5%95%8F%E9%A1%8C" target="_blank" rel="external">婚姻匹配问题(维基百科)</a>, 使婚姻和大学招生成为稳定匹配的典型例子.</p>
+<h1 id="什么是稳定匹配"><a href="#什么是稳定匹配" class="headerlink" title="什么是稳定匹配"></a>什么是稳定匹配</h1><hr>
+<p>以婚姻匹配为例, 假设在当前匹配结果中存在两对(m1, v1)和(m2, v2), 在喜好排名中, m1更喜欢w2, m2也更喜欢w1, 这时我们可以称当前匹配是不稳定的.</p>
+<h1 id="如何实现稳定匹配呢"><a href="#如何实现稳定匹配呢" class="headerlink" title="如何实现稳定匹配呢 ?"></a>如何实现稳定匹配呢 ?</h1><hr>
+<p>要找到一种稳定匹配, 可使用<code>Gale-Shapley</code>提出的算法( 用反证法证明其有效性 ), 但有个前提是让男生主动求婚, 主要过程如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">function stableMatching &#123;</div><div class="line">    Initialize all m ∈ M and w ∈ W to free</div><div class="line">    while ∃ free man m who still has a woman w to propose to &#123;</div><div class="line">       w = first woman on m’s list to whom m has not yet proposed</div><div class="line">       if w is free</div><div class="line">         (m, w) become engaged</div><div class="line">       else some pair (m&apos;, w) already exists</div><div class="line">         if w prefers m to m&apos;</div><div class="line">            m&apos; becomes free</div><div class="line">           (m, w) become engaged</div><div class="line">         else</div><div class="line">           (m&apos;, w) remain engaged</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><hr>
+<p><code>Person.java</code>, 用来表示male或female.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Integer SINGLE = -<span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Integer id;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="keyword">private</span> Integer nextAskId = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 当前伴侣id</span></div><div class="line">    <span class="keyword">private</span> Integer currentPartnerId = SINGLE;</div><div class="line">    <span class="comment">// 伴侣id在心中的排名</span></div><div class="line">    <span class="keyword">private</span> Map&lt;Integer, Integer&gt; partnerIdToRank = <span class="keyword">new</span> LinkedHashMap&lt;Integer, Integer&gt;();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">addRank</span><span class="params">(Integer personId, Integer rank)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.partnerIdToRank.put(personId, rank);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getRankOf</span><span class="params">(Integer partnerId)</span> </span>&#123;</div><div class="line">        Integer rank = <span class="keyword">this</span>.partnerIdToRank.get(partnerId);</div><div class="line">        <span class="keyword">return</span> rank == <span class="keyword">null</span> ? Integer.MAX_VALUE : rank;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//======================================================================</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setId</span><span class="params">(Integer id)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.id = id;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getNextPerfectId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> nextAskId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setNextAskId</span><span class="params">(Integer nextAskId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.nextAskId = nextAskId;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getCurrentPartnerId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> currentPartnerId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">setCurrentPartnerId</span><span class="params">(Integer currentPartnerId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.currentPartnerId = currentPartnerId;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>GaleShapley.java</code>, 主要是算法过程:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GaleShapley</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        List&lt;Person&gt; males = <span class="keyword">new</span> LinkedList&lt;Person&gt;();</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">0</span>).setName(<span class="string">"Mr.A"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>).addRank(<span class="number">0</span>, <span class="number">3</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">1</span>).setName(<span class="string">"Mr.B"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">0</span>, <span class="number">2</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">2</span>).setName(<span class="string">"Mr.C"</span>).addRank(<span class="number">0</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">        males.add(<span class="keyword">new</span> Person().setId(<span class="number">3</span>).setName(<span class="string">"Mr.D"</span>).addRank(<span class="number">3</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line"></div><div class="line">        List&lt;Person&gt; females = <span class="keyword">new</span> LinkedList&lt;Person&gt;();</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">0</span>).setName(<span class="string">"Miss.A"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">1</span>).setName(<span class="string">"Miss.B"</span>).addRank(<span class="number">0</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>).addRank(<span class="number">2</span>, <span class="number">3</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">2</span>).setName(<span class="string">"Miss.C"</span>).addRank(<span class="number">3</span>, <span class="number">1</span>).addRank(<span class="number">1</span>, <span class="number">2</span>));</div><div class="line">        females.add(<span class="keyword">new</span> Person().setId(<span class="number">3</span>).setName(<span class="string">"Miss.D"</span>).addRank(<span class="number">1</span>, <span class="number">1</span>).addRank(<span class="number">2</span>, <span class="number">2</span>));</div><div class="line"></div><div class="line">        <span class="keyword">new</span> GaleShapley().stableMatch(males, females);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stableMatch</span><span class="params">(List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (males == <span class="keyword">null</span> || females == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (males.size() != females.size()) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        Person freeMale = getFreeMale(males);</div><div class="line">        <span class="keyword">while</span> (freeMale != <span class="keyword">null</span>) &#123;</div><div class="line">            Integer femaleId = freeMale.getNextPerfectId();</div><div class="line">            Person female = females.get(femaleId);</div><div class="line">            <span class="keyword">if</span> (isSingle(female)) &#123;</div><div class="line">                <span class="comment">// 还是单身</span></div><div class="line">                freeMale.setCurrentPartnerId(female.getId());</div><div class="line">                female.setCurrentPartnerId(freeMale.getId());</div><div class="line"></div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="comment">// 选择更好的</span></div><div class="line">                Integer curMaleId = female.getCurrentPartnerId();</div><div class="line">                Integer curMalePartnerRank = female.getRankOf(curMaleId);</div><div class="line">                Integer freeMaleRank = female.getRankOf(freeMale.getId());</div><div class="line">                <span class="keyword">if</span> (freeMaleRank &lt; curMalePartnerRank) &#123;</div><div class="line">                    males.get(curMaleId).setCurrentPartnerId(Person.SINGLE);</div><div class="line">                    freeMale.setCurrentPartnerId(female.getId());</div><div class="line">                    female.setCurrentPartnerId(freeMale.getId());</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            freeMale.setNextAskId(freeMale.getNextPerfectId() + <span class="number">1</span>);</div><div class="line">            <span class="comment">// 继续为 freeMale 找对象</span></div><div class="line">            freeMale = getFreeMale(males);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        print(males, females);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">        males.forEach(m -&gt; &#123;</div><div class="line">            Person female = females.get(m.getCurrentPartnerId());</div><div class="line">            <span class="keyword">if</span> (female != <span class="keyword">null</span>) &#123;</div><div class="line">                System.out.println(m.getName() + <span class="string">"  &lt;--&gt;  "</span> + female.getName());</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                System.out.println(m.getName() + <span class="string">"  still  SINGLE"</span>);</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Person <span class="title">getFreeMale</span><span class="params">(List&lt;Person&gt; males)</span> </span>&#123;</div><div class="line">        <span class="keyword">for</span> (Person male : males) &#123;</div><div class="line">            <span class="keyword">if</span> (isSingle(male)) &#123;</div><div class="line">                <span class="keyword">return</span> male;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isSingle</span><span class="params">(Person p)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> Person.SINGLE.equals(p.getCurrentPartnerId());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行main()中的用例, 得出结果:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Mr.A  &lt;--&gt;  Miss.B</div><div class="line">Mr.B  &lt;--&gt;  Miss.A</div><div class="line">Mr.C  &lt;--&gt;  Miss.D</div><div class="line">Mr.D  &lt;--&gt;  Miss.C</div></pre></td></tr></table></figure>
+<h1 id="有多少稳定匹配结果"><a href="#有多少稳定匹配结果" class="headerlink" title="有多少稳定匹配结果"></a>有多少稳定匹配结果</h1><hr>
+<p>上面讨论的前提是男士主动求婚, 而且是先有一个队伍顺序, 如果改变一下这些条件, <code>Gale-Shapley</code>算法可能得到的是另外一种稳定匹配结果.<br>那么, 如何获得所有的稳定匹配结果呢 ?</p>
+<h1 id="使用穷举法"><a href="#使用穷举法" class="headerlink" title="使用穷举法"></a>使用穷举法</h1><p>我们需要对每个male进行穷举, 覆盖所有的male求婚顺序, 这样的问题用递归很方便.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">allStableMatch</span><span class="params">(Integer maleId, List&lt;Person&gt; males, List&lt;Person&gt; females)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (maleId.intValue()  == males.size()) &#123;</div><div class="line">        <span class="keyword">if</span> (isStableMatch(males, females)) &#123;</div><div class="line">            print(males, females);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    Person male = males.get(maleId);</div><div class="line">    <span class="comment">// 试所有女的favor舞伴</span></div><div class="line">    male.getPartnerIdToRank().entrySet().forEach((favor) -&gt; &#123;</div><div class="line">        Person female = females.get(favor.getKey());</div><div class="line">        <span class="keyword">if</span> (isSingle(female) &amp;&amp; female.like(maleId)) &#123;</div><div class="line">            male.setCurrentPartnerId(female.getId());</div><div class="line">            female.setCurrentPartnerId(male.getId());</div><div class="line">            allStableMatch(maleId + <span class="number">1</span>, males, females);</div><div class="line">            male.setCurrentPartnerId(Person.SINGLE);</div><div class="line">            female.setCurrentPartnerId(Person.SINGLE);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试用例 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">public static void main(String[] args) &#123;</div><div class="line">    List&lt;Person&gt; males = new LinkedList&lt;Person&gt;();</div><div class="line">    males.add(new Person().setId(0).setName(&quot;Mr.A&quot;).addRank(0).addRank(2).addRank(1));</div><div class="line">    males.add(new Person().setId(1).setName(&quot;Mr.B&quot;).addRank(1).addRank(2).addRank(0));</div><div class="line">    males.add(new Person().setId(2).setName(&quot;Mr.C&quot;).addRank(0).addRank(1).addRank(2));</div><div class="line"></div><div class="line">    List&lt;Person&gt; females = new LinkedList&lt;Person&gt;();</div><div class="line">    females.add(new Person().setId(0).setName(&quot;Miss.A&quot;).addRank(2).addRank(0).addRank(1));</div><div class="line">    females.add(new Person().setId(1).setName(&quot;Miss.B&quot;).addRank(0).addRank(2).addRank(1));</div><div class="line">    females.add(new Person().setId(2).setName(&quot;Miss.C&quot;).addRank(1).addRank(0).addRank(2));</div><div class="line"></div><div class="line">    new GaleShapleyAllCompose().allStableMatch(0, males, females);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最终可以找出两个匹配结果, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">Mr.A  &lt;--&gt;  Miss.C</div><div class="line">Mr.B  &lt;--&gt;  Miss.B</div><div class="line">Mr.C  &lt;--&gt;  Miss.A</div><div class="line"></div><div class="line"></div><div class="line">Mr.A  &lt;--&gt;  Miss.B</div><div class="line">Mr.B  &lt;--&gt;  Miss.C</div><div class="line">Mr.C  &lt;--&gt;  Miss.A</div></pre></td></tr></table></figure>
+<h1 id="二分图和匈牙利算法"><a href="#二分图和匈牙利算法" class="headerlink" title="二分图和匈牙利算法"></a>二分图和匈牙利算法</h1><p>其实这个问题还可以用二部图和匈牙利算法来处理, 详细内容请看下一篇博客.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://cramton.umd.edu/market-design/gale-shapley-college-admissions.pdf" target="_blank" rel="external">College Admissions and the Stability of Marriage</a><br><a href="https://en.wikipedia.org/wiki/Stable_marriage_problem" target="_blank" rel="external">https://en.wikipedia.org/wiki/Stable_marriage_problem</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/06/02/search/es/es-relations/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -391,7 +406,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -473,15 +488,28 @@
       
         
           
-          随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.
-安装过程首先在官网下载ubuntu安装包dropbox_2015.10.28_amd64.deb, 安装完
-          ...
+            <p>随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.</p>
+<h1 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h1><p>首先在<a href="https://www.dropbox.com/install-linux" target="_blank" rel="external">官网</a>下载ubuntu安装包<code>dropbox_2015.10.28_amd64.deb</code>, 安装完成之后, 需要启动dropbox :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">proxychains dropbox start</div><div class="line">ProxyChains-3.1 (http://proxychains.sf.net)</div><div class="line">Starting Dropbox...</div><div class="line">The Dropbox daemon is not installed!</div><div class="line">Run &quot;dropbox start -i&quot; to install the daemon</div></pre></td></tr></table></figure>
+<p>如上, 提示需要安装daemon程序, 继续按着指引做:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dropbox start -i</div></pre></td></tr></table></figure>
+<p>如果没有翻墙, 可能遇到这样的错误:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Trouble connecting to Dropbox servers. Maybe your internet connection is down, or you need to set your http_proxy environment variable.</div></pre></td></tr></table></figure>
+<p>为了继续下载, 本地搭建一个翻墙的http代理, 并export到环境变量:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">export https_proxy=http://127.0.0.1:8123</div></pre></td></tr></table></figure>
+<p>然后重新<code>dropbox start -i</code>:</p>
+<p><img src="/images/linux/tools/dropbox/dropbox-downloading.png" alt=""></p>
+<h1 id="安装完之后-可以使用dropbox-proxy设置数据同步的代理"><a href="#安装完之后-可以使用dropbox-proxy设置数据同步的代理" class="headerlink" title="安装完之后, 可以使用dropbox proxy设置数据同步的代理:"></a>安装完之后, 可以使用<code>dropbox proxy</code>设置数据同步的代理:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox help proxy</div><div class="line"></div><div class="line">dropbox proxy MODE [TYPE] [HOST] [PORT] [USERNAME] [PASSWORD]</div><div class="line"></div><div class="line">Set proxy settings for Dropbox.</div><div class="line"></div><div class="line">MODE - one of &quot;none&quot;, &quot;auto&quot;, &quot;manual&quot;</div><div class="line">TYPE - one of &quot;http&quot;, &quot;socks4&quot;, &quot;socks5&quot; (only valid with &quot;manual&quot; mode)</div><div class="line">HOST - proxy hostname (only valid with &quot;manual&quot; mode)</div><div class="line">PORT - proxy port (only valid with &quot;manual&quot; mode)</div><div class="line">USERNAME - (optional) proxy username (only valid with &quot;manual&quot; mode)</div><div class="line">PASSWORD - (optional) proxy password (only valid with &quot;manual&quot; mode)</div></pre></td></tr></table></figure>
+<h1 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h1><p>启动后, 输入账号密码进行登录:</p>
+<p><img src="/home/niko/mount/hsb_ssd_1/niko/dev/code/git_repos/HexoBlog/hexo-hello/source/images/linux/tools/dropbox/dropbox-login.png" alt=""></p>
+<p>由于dropbox采用和nautilus整合的方式, 只要我们在文件管理器修改了同步文件夹(默认是<code>/home/username/Dropbox</code>)的数据, dropbox会自动同步到云端.</p>
+<h1 id="问题-gnome下icon有时候不显示"><a href="#问题-gnome下icon有时候不显示" class="headerlink" title="问题: gnome下icon有时候不显示"></a>问题: gnome下icon有时候不显示</h1><p>最简单粗暴的方式, 重启一下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ dropbox stop</div><div class="line">Dropbox daemon stopped.</div><div class="line">niko@niko-ub1404:~$ dropbox start</div><div class="line">Starting Dropbox...Done!</div></pre></td></tr></table></figure>
+<p>至于bug, 可能跟这个<a href="https://github.com/rgcjonas/gnome-shell-extension-appindicator/issues/40" target="_blank" rel="external">issue</a>有关.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/201727/how-can-i-make-dropbox-display-an-icon-in-gnome-shell" target="_blank" rel="external">How can I make dropbox display an icon in Gnome Shell?</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/20/linux/install/dropbox-install/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -517,7 +545,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -599,14 +627,55 @@
       
         
           
-          canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成
-          ...
+            <p>canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.<br>原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成很多重要的业务功能, 比如变更通知/缓存更新/索引同步等等. 事不宜迟, 先体验一下.</p>
+<h1 id="下载并安装"><a href="#下载并安装" class="headerlink" title="下载并安装"></a>下载并安装</h1><hr>
+<p>mysql, version: 5.7.9, 安装略.<br><a href="https://github.com/alibaba/canal" target="_blank" rel="external">canal, version: v1.0.22</a></p>
+<h1 id="mysql-部分的配置"><a href="#mysql-部分的配置" class="headerlink" title="mysql 部分的配置"></a>mysql 部分的配置</h1><hr>
+<h2 id="启用-bin-log"><a href="#启用-bin-log" class="headerlink" title="启用 bin log"></a>启用 bin log</h2><p>sudo vim /etc/mysql/my.cnf</p>
+<p>在[mysqld]的配置节下， 插入：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log-bin=mysql-bin</div><div class="line">binlog-format=ROW</div><div class="line">server-id=1        #配置mysql replaction需要定义，不能和canal的slaveId重复</div></pre></td></tr></table></figure>
+<h2 id="检查是否开启"><a href="#检查是否开启" class="headerlink" title="检查是否开启"></a>检查是否开启</h2><p>show variables like ‘log_%’;</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_bin	ON</div><div class="line">log_bin_basename	/var/lib/mysql/mysql-bin</div><div class="line">log_bin_index	/var/lib/mysql/mysql-bin.index</div><div class="line">log_bin_trust_function_creators	OFF</div><div class="line">log_bin_use_v1_row_events	OFF</div><div class="line">log_error	/var/log/mysqld.log</div><div class="line">log_output	FILE</div><div class="line">log_queries_not_using_indexes	OFF</div><div class="line">log_slave_updates	OFF</div><div class="line">log_slow_admin_statements	OFF</div><div class="line">log_slow_slave_statements	OFF</div><div class="line">log_throttle_queries_not_using_indexes	0</div><div class="line">log_warnings	1</div></pre></td></tr></table></figure>
+<h2 id="查询确认当前binlog模式"><a href="#查询确认当前binlog模式" class="headerlink" title="查询确认当前binlog模式:"></a>查询确认当前binlog模式:</h2><pre><code>SQL查询:
+show variables like &apos;binlog_format&apos;;
+</code></pre><h1 id="canal-部分的配置"><a href="#canal-部分的配置" class="headerlink" title="canal 部分的配置"></a>canal 部分的配置</h1><hr>
+<p>接下来是canal安装配置.</p>
+<h2 id="canal-的MySQL权限"><a href="#canal-的MySQL权限" class="headerlink" title="canal 的MySQL权限"></a>canal 的MySQL权限</h2><p>canal的原理是模拟自己为mysql slave，所以这里一定需要作为 mysql slave 的相关权限.</p>
+<p>创建canal用户及授权:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">CREATE USER canal IDENTIFIED BY &apos;canal&apos;;</div><div class="line">GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO &apos;canal&apos;@&apos;%&apos;;</div><div class="line">FLUSH PRIVILEGES;</div><div class="line">-- GRANT ALL PRIVILEGES ON *.* TO &apos;canal&apos;@&apos;%&apos; ;</div></pre></td></tr></table></figure>
+<h2 id="构建-amp-配置-canal"><a href="#构建-amp-配置-canal" class="headerlink" title="构建 &amp; 配置 canal"></a>构建 &amp; 配置 canal</h2><pre><code>git clone git@github.com:alibaba/canal.git
+cd canal
+mvn clean install -Dmaven.test.skip=true -Denv=release
+mkdir /tmp/canal
+tar zxvf target/canal.deployer-1.0.22-SNAPSHOT.tar.gz -C /tmp/canal
+</code></pre><p>编辑<code>instance.properties</code> :</p>
+<pre><code>cd /tmp/canal/
+vi conf/example/instance.properties
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">#################################################</div><div class="line">## mysql serverId</div><div class="line">canal.instance.mysql.slaveId = 1234</div><div class="line"></div><div class="line"># position info</div><div class="line">canal.instance.master.address = 127.0.0.1:3306</div><div class="line">canal.instance.master.journal.name =</div><div class="line">canal.instance.master.position =</div><div class="line">canal.instance.master.timestamp =</div><div class="line"></div><div class="line">#canal.instance.standby.address =</div><div class="line">#canal.instance.standby.journal.name =</div><div class="line">#canal.instance.standby.position =</div><div class="line">#canal.instance.standby.timestamp =</div><div class="line"></div><div class="line"># username/password</div><div class="line">canal.instance.dbUsername = canal</div><div class="line">canal.instance.dbPassword = canal</div><div class="line">canal.instance.defaultDatabaseName =</div><div class="line">canal.instance.connectionCharset = UTF-8</div><div class="line"></div><div class="line"># table regex</div><div class="line">canal.instance.filter.regex = .*\\..*</div><div class="line"># table black regex</div><div class="line">canal.instance.filter.black.regex =</div><div class="line"></div><div class="line">#################################################</div></pre></td></tr></table></figure>
+<p>怎么来填写这个配置, 首先先要查询master状态 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; show master status;</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">| mysql-bin.000002 |      154 |              |                  |                   |</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure>
+<p>如上, 把 <code>mysql-bin.000002</code>填入<code>canal.instance.master.journal.name</code>,<br><code>154</code> 填入<code>canal.instance.master.position</code>, 即是:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">...</div><div class="line">canal.instance.master.journal.name = mysql-bin.000002</div><div class="line">canal.instance.master.position = 154</div><div class="line">....</div></pre></td></tr></table></figure>
+<h2 id="启动-canal-server"><a href="#启动-canal-server" class="headerlink" title="启动 canal server"></a>启动 canal server</h2><pre><code>vim conf/canal.properties
+</code></pre><p>暂时使用默认配置</p>
+<pre><code>sh bin/startup.sh
+</code></pre><p>启动日志:<br>tail -f logs/canal/canal.log</p>
+<p>具体instance的日志：<br>tail -f logs/example/example.log</p>
+<p>sh bin/stop.sh</p>
+<h1 id="mysqlbinlog-测试"><a href="#mysqlbinlog-测试" class="headerlink" title="mysqlbinlog 测试"></a>mysqlbinlog 测试</h1><p>使用 <a href="http://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html" target="_blank" rel="external">mysqlbinlog</a> 可以查看binlog, 例如:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysqlbinlog -h127.0.0.1 -P33306 -ucanal -pcanal --read-from-remote-server -v --start-position=296 -d dbroute_01 mysql-bin.000003</div></pre></td></tr></table></figure>
+<div style="display: none;"><br>mysqlbinlog -h192.168.7.90 -P3306 -ucanal -pcanal –read-from-remote-server -v –start-position=877194 -d dbroute_01 mysql-bin.000001<br></div>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/12/java/opsrc/canal/canal_quick_start/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+
+
+<h1 id="使用-canal-client-订阅数据"><a href="#使用-canal-client-订阅数据" class="headerlink" title="使用 canal client 订阅数据"></a>使用 canal client 订阅数据</h1><p>canal 客户端的代码程序太长, 这里就不贴了, 在github项目的example包下<a href="https://github.com/alibaba/canal/blob/master/example/src/main/java/com/alibaba/otter/canal/example/SimpleCanalClientTest.java" target="_blank" rel="external">SimpleCanalClientTest.java</a></p>
+<p>因为是使用<code>ROW</code>的binlog, 可以观察到变更的行和列, 而且哪些列更新了都可以获取, 日志示例:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">================&gt; binlog[mysql-bin.000001:65595295] , executeTime :  , delay : 1039ms</div><div class="line"> BEGIN ----&gt; Thread id: 131608</div><div class="line">----------------&gt; binlog[mysql-bin.000001:65595441] , name[test,city] , eventType : UPDATE , executeTime :  , delay : 1040ms</div><div class="line">id : 56    type=int(11)</div><div class="line">province_id : 5    type=int(11)</div><div class="line">name : 包头市    type=varchar(50)    update=true</div><div class="line">code : 229    type=varchar(50)</div><div class="line">----------------</div><div class="line"> END ----&gt; transaction id: 269626487</div><div class="line">================&gt; binlog[mysql-bin.000001:65595556] , executeTime :  , delay : 1040ms</div></pre></td></tr></table></figure>
+<p>使用上面的example, 可以快速入门 canal API, 实现很多重要的业务功能.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://github.com/alibaba/canal/wiki/QuickStart" target="_blank" rel="external">https://github.com/alibaba/canal/wiki/QuickStart</a><br><a href="http://www.ilanni.com/?p=7816" target="_blank" rel="external">http://www.ilanni.com/?p=7816</a><br><a href="http://m.blog.csdn.net/article/details?id=50824271" target="_blank" rel="external">http://m.blog.csdn.net/article/details?id=50824271</a></p>
+
+          
         
       
     </div>
@@ -642,7 +711,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -724,15 +793,21 @@
       
         
           
-          把应用做成一个service我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。为了方便管理，可以考虑制作成一个service。步骤如下：
-创建 upstart 配置文件首先用m
-          ...
+            <h1 id="把应用做成一个service"><a href="#把应用做成一个service" class="headerlink" title="把应用做成一个service"></a>把应用做成一个service</h1><p>我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。<br>为了方便管理，可以考虑制作成一个service。步骤如下：</p>
+<h2 id="创建-upstart-配置文件"><a href="#创建-upstart-配置文件" class="headerlink" title="创建 upstart 配置文件"></a>创建 upstart 配置文件</h2><p>首先用<code>mvn package</code>打包成jar类型的spring-boot程序， 然后 <code>sudo vim /etc/init/hellosb.conf</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">start on filesystem</div><div class="line">exec /usr/bin/java -jar /path_to/program.jar</div></pre></td></tr></table></figure>
+<p>多行的话使用<code>script</code>标记：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># myprogram.conf</div><div class="line">start on filesystem</div><div class="line">script</div><div class="line">    /usr/bin/java -jar /path_to/program</div><div class="line">    echo &quot;Another command&quot;</div><div class="line">end script</div></pre></td></tr></table></figure>
+<h2 id="service-启动"><a href="#service-启动" class="headerlink" title="service 启动"></a>service 启动</h2><pre><code>sudo ln -s /etc/init/myprogram.conf /etc/init.d/myprogram
+</code></pre><p>建立链接后，使用service就可以用自动补全功能了：</p>
+<pre><code>sudo service myprogram start
+</code></pre><p>上面只是一个简单的启动功能，upstart的配置文件远比这强大，可以做更细节的处理（下图是job的状态变迁图）。</p>
+<p><img src="http://www.ibm.com/developerworks/cn/linux/1407_liuming_init2/image003.jpg" alt="job 状态变迁"></p>
+<h1 id="更进一步"><a href="#更进一步" class="headerlink" title="更进一步"></a>更进一步</h1><p>若想要深入了解，可以查看官方文档和学习一下其他程序（nginx等）的upstart脚本：<a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">Upstart Intro, Cookbook and Best Practises</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">http://upstart.ubuntu.com/cookbook/</a><br><a href="http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart" target="_blank" rel="external">http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart</a><br><a href="http://upstart.ubuntu.com/getting-started.html" target="_blank" rel="external">http://upstart.ubuntu.com/getting-started.html</a><br><a href="http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service" target="_blank" rel="external">http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/10/linux/tools/app-as-service-upstart/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -768,7 +843,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -850,15 +925,33 @@
       
         
           
-          document 的部分更新对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。
-但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考
-          ...
+            <h1 id="document-的部分更新"><a href="#document-的部分更新" class="headerlink" title="document 的部分更新"></a>document 的部分更新</h1><p>对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。</p>
+<p>但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考虑version的话， 为何不在服务器完成， 提供一个部分更新的api， 让用户根据场景合理使用api， 比之前的做法可以节省一个请求。</p>
+<p>所以说， elasticsearch还是很人性化的， 它提供了这个api， 不过在其内部来说， api实现还是遵循了<code>retrieve-change-reindex</code>的步骤, 操作在shard中完成。</p>
+<h1 id="更新的安全问题"><a href="#更新的安全问题" class="headerlink" title="更新的安全问题"></a>更新的安全问题</h1><p>那么如果有多个客户端同时更新， 那么并发安全的问题es如何处理呢？<br>前面提到了， es内部是<code>retrieve-change-reindex</code>的步骤， 在<code>retrieve</code>阶段， es会获取当前的<code>_version</code>， 并在后面的<code>reindex</code>阶段使用。<br>如果其他进程修改了document， <code>_version</code>将会和update request中的不同， 从而更新将会失败。</p>
+<p>这个类似乐观锁的策略， 如果需要重试的话， 可以使用<code>retry_on_conflict</code>设置重试次数，比如：</p>
+<p><code>.../_update?retry_on_conflict=5</code></p>
+<p>不过， 这个重试使用的场景在计数器上用的较多， 因为这个更新的顺序是不那么重要的。</p>
+<h1 id="REST-api"><a href="#REST-api" class="headerlink" title="REST api"></a>REST api</h1><p>言归正传， 接下来，介绍以下api的使用吧。</p>
+<p>假设有个<code>blog</code>的document， 其中有个field叫做<code>tags</code>， 如果要部分更新这个<code>tags</code>：</p>
+<p>最简单的方式是使用<code>doc</code>参数， 和已有document合并， 已有的field会被覆盖， 新的field将会新增到document， REST api 如下：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   "doc" : &#123;</div><div class="line">      "tags" : [ "testing" ],</div><div class="line">      "views": 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果成功， 会收到这样的response：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span> :   <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_id"</span> :      <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_type"</span> :    <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_version"</span> : <span class="number">3</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>再获取一次这个文档， 检查一下是否真的只更新了<code>tags</code>这个field：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span>:    <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_type"</span>:     <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_id"</span>:       <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_version"</span>:  <span class="number">3</span>,</div><div class="line">   <span class="attr">"found"</span>:     <span class="literal">true</span>,</div><div class="line">   <span class="attr">"_source"</span>: &#123;</div><div class="line">      <span class="attr">"title"</span>:  <span class="string">"My first blog entry"</span>,</div><div class="line">      <span class="attr">"text"</span>:   <span class="string">"Starting to get the hang of this..."</span>,</div><div class="line">      <span class="attr">"tags"</span>: [ <span class="string">"testing"</span> ],</div><div class="line">      <span class="attr">"views"</span>:  <span class="number">0</span></div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="java-api"><a href="#java-api" class="headerlink" title="java api"></a>java api</h1><p>如果使用 java api 的话：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;website&quot;, &quot;blog&quot;, &quot;1&quot;)</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;tags&quot;, new String[]&#123;&quot;testing&quot;&#125;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
+<h1 id="spring-data-elasticsearch-api"><a href="#spring-data-elasticsearch-api" class="headerlink" title="spring data elasticsearch api"></a>spring data elasticsearch api</h1><p>如果使用spring-data-elasticsearch的<code>ElasticsearchTemplate</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line">UpdateRequest updateRequest = <span class="keyword">new</span> UpdateRequest();</div><div class="line">updateRequest</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">                .startObject()</div><div class="line">                .field(field, value)</div><div class="line">                .endObject());</div><div class="line">UpdateQuery updateQuery = <span class="keyword">new</span> UpdateQueryBuilder()</div><div class="line">        <span class="comment">//.withIndexName(indexName).withType(objectType)</span></div><div class="line">        .withClass(clz)</div><div class="line">        .withId(String.valueOf(id))</div><div class="line">        .withUpdateRequest(updateRequest)</div><div class="line">        .build();</div><div class="line">elasticsearchTemplate.update(updateQuery);</div><div class="line">elasticsearchTemplate.refresh(indexName, <span class="keyword">true</span>);</div></pre></td></tr></table></figure>
+<p>使用这个api时可能会有这样的疑惑， UpdateQuery中有指定indexName和objectType， 但是<code>@Document</code>的Class中也有声明， 那么使用哪个呢？</p>
+<p>我们可以看看<code>elasticsearchTemplate.update(updateQuery)</code>的源码:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   @Override</div><div class="line">public UpdateResponse update(UpdateQuery query) &#123;</div><div class="line">	return this.prepareUpdate(query).execute().actionGet();</div><div class="line">&#125;</div><div class="line"></div><div class="line">   private UpdateRequestBuilder prepareUpdate(UpdateQuery query) &#123;</div><div class="line">   		String indexName = isNotBlank(query.getIndexName()) ? query.getIndexName() : getPersistentEntityFor(query.getClazz()).getIndexName();</div><div class="line">   		String type = isNotBlank(query.getType()) ? query.getType() : getPersistentEntityFor(query.getClazz()).getIndexType();</div><div class="line">   		Assert.notNull(indexName, &quot;No index defined for Query&quot;);</div><div class="line">   		Assert.notNull(type, &quot;No type define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getId(), &quot;No Id define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getUpdateRequest(), &quot;No IndexRequest define for Query&quot;);</div><div class="line">   		UpdateRequestBuilder updateRequestBuilder = client.prepareUpdate(indexName, type, query.getId());</div><div class="line"></div><div class="line">   		...</div><div class="line">   	&#125;</div></pre></td></tr></table></figure>
+<p>由上可知， <code>query.getIndexName()</code>和<code>query.getIndexName()</code>会被优先使用， 如果未指定， 会从document的Class注解中获取。<br>如果为了提高性能, 能写上也好, 不过最好统一管理这两个名称, 方便以后修改变更.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/08/search/es/es-partial-update/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -894,7 +987,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -976,19 +1069,33 @@
       
         
           
-          今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
+            <p>今天要说的 <code>ThreadLocalRandom</code> 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用</p>
+<ol>
+<li>创建<code>java.util.Random</code>实例</li>
+<li>使用Math.random(), 其实内部也是创建了一个<code>java.util.Random</code></li>
+</ol>
+<p>使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.<br>但是, 如果在多线程下使用Random, 会导致多线程的竞争开销, 也会降低Random的随机性, 于是便有了<code>ThreadLocalRandom</code>.</p>
+<h1 id="ThreadLocalRandom"><a href="#ThreadLocalRandom" class="headerlink" title="ThreadLocalRandom"></a><code>ThreadLocalRandom</code></h1><hr>
+<p>那么, 对于前面的问题, <code>ThreadLocalRandom</code>对这些做了哪些工作呢 ?</p>
+<p>假设使用以下代码获取随机数 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">int randomInt = ThreadLocalRandom.current().nextInt();</div></pre></td></tr></table></figure>
+<h2 id="ThreadLocalRandom-current"><a href="#ThreadLocalRandom-current" class="headerlink" title="ThreadLocalRandom.current():"></a><code>ThreadLocalRandom.current()</code>:</h2><hr>
+<p>我们来看一下<code>ThreadLocalRandom</code>的内部实现:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static ThreadLocalRandom current() &#123;</div><div class="line">    if (UNSAFE.getInt(Thread.currentThread(), PROBE) == 0)</div><div class="line">        localInit();</div><div class="line">    return instance;</div><div class="line">&#125;</div><div class="line"></div><div class="line">static final void localInit() &#123;</div><div class="line">    int p = probeGenerator.addAndGet(PROBE_INCREMENT);</div><div class="line">    int probe = (p == 0) ? 1 : p; // skip 0</div><div class="line">    long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));</div><div class="line">    Thread t = Thread.currentThread();</div><div class="line">    UNSAFE.putLong(t, SEED, seed);</div><div class="line">    UNSAFE.putInt(t, PROBE, probe);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中, <code>SEED</code>和<code>PROBE</code>可以参考下面定义:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class&lt;?&gt; tk = Thread.class;</div><div class="line">SEED = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSeed&quot;));</div><div class="line">PROBE = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomProbe&quot;));</div><div class="line">SECONDARY = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSecondarySeed&quot;));</div></pre></td></tr></table></figure>
+<p><code>Thread.java</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@sun.misc.Contended(&quot;tlr&quot;)</div><div class="line">int threadLocalRandomProbe;</div></pre></td></tr></table></figure>
+<p><code>UNSAFE.getInt(Thread.currentThread(), PROBE)</code>就是获取<code>Thread</code>对象中offset偏移地址对应的field <code>threadLocalRandomProbe</code>的值, <code>threadLocalRandomProbe</code> 是<code>nonzero if threadLocalRandomSeed initialized</code>.<br>所以, 如果<code>PROBE</code>值为零, 将进行localInit(), 当前Thread对象的threadLocalRandomSeed 和 threadLocalRandomProbe将会被赋值. (<code>@sun.misc.Contended(&quot;tlr&quot;)</code>是为了解决伪共享的问题, 将另起一篇博客介绍)</p>
+<h2 id="nextInt"><a href="#nextInt" class="headerlink" title="nextInt()"></a><code>nextInt()</code></h2><hr>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public int nextInt() &#123;</div><div class="line">    return mix32(nextSeed());</div><div class="line">&#125;</div><div class="line"></div><div class="line">final long nextSeed() &#123;</div><div class="line">    Thread t; long r; // read and update per-thread seed</div><div class="line">    UNSAFE.putLong(t = Thread.currentThread(), SEED,</div><div class="line">                   r = UNSAFE.getLong(t, SEED) + GAMMA);</div><div class="line">    return r;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>注意:</code><br><code>SEED</code>是field的偏移量<br><code>GAMMA</code>是seed的increment<br>这里会更新当前Thread的SEED, 最终mix32()生成int随机数.</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>从上可知<code>ThreadLocalRandom</code>的工作方式, 它为每个线程分配了一个SEED(被Thread对象持有), 故而减少了多线程下的竞争开销, 也使随机性更加好.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://www.jdon.com/concurrent/concurrent-random.html" target="_blank" rel="external">http://www.jdon.com/concurrent/concurrent-random.html</a></p>
 
-创建java.util.Random实例
-使用Math.random(), 其实内部也是创建了一个java.util.Random
-
-使用Random没有问题, 其seed使用Atom
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/06/java/se/ThreadLocalRandom/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1024,7 +1131,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1106,15 +1213,9 @@
       
         
           
-          笔记
+            <h1 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h1><p><img src="/images/books/tech-less/procrastination-12-01.png" alt=""></p>
 
           
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/05/books/procrastination/procrastination-12/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
         
       
     </div>
@@ -1150,7 +1251,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1232,16 +1333,36 @@
       
         
           
-          Levenshtein 距离什么是Levenshtein距离?Levenshtein距离是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。
+            <h1 id="Levenshtein-距离"><a href="#Levenshtein-距离" class="headerlink" title="Levenshtein 距离"></a>Levenshtein 距离</h1><p>什么是<code>Levenshtein</code>距离?<br><code>Levenshtein距离</code>是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。</p>
+<blockquote>
+<p>Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。<br>指两个字串之间，由一个转成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。</p>
+</blockquote>
+<p>比如将kitten一字转成sitting, 有三步：</p>
+<p>sitten （k→s）<br>sittin （e→i）<br>sitting （→g）</p>
+<h1 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h1><ul>
+<li>相似度检测</li>
+<li>拼写检查</li>
+<li>文本搜索 (Lucene/Solr)</li>
+<li>NLP</li>
+<li>等等</li>
+</ul>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><hr>
+<p>如果用朴素的递归方法实现, 需要O(3^n)的时间复杂度, 明显我们要进行一些优化, 动态规划是比较常用的方法.</p>
+<p>假设字符串target有1~m个字符, 字符串str1有1~n个:</p>
+<h2 id="定义最优子问题"><a href="#定义最优子问题" class="headerlink" title="定义最优子问题"></a>定义最优子问题</h2><p>通过插入/删除/替换操作, 把str1转换为target字符串.<br>要想找到最短编辑距离, 即是<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数</p>
+<h2 id="确定状态转换方程"><a href="#确定状态转换方程" class="headerlink" title="确定状态转换方程"></a>确定状态转换方程</h2><p>我们将<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数, 定义为状态d[i, j].</p>
+<h2 id="确定决策并写出状态转移方程"><a href="#确定决策并写出状态转移方程" class="headerlink" title="确定决策并写出状态转移方程"></a>确定决策并写出状态转移方程</h2><p>当target[j]等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = d[i, j] + 0;</div></pre></td></tr></table></figure></p>
+<p>当target[j]不等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = min(</div><div class="line">    d[i, j-1] + 1,</div><div class="line">    d[i-1, j] + 1,</div><div class="line">    d[i-1, j-1] + 1</div><div class="line">    )</div></pre></td></tr></table></figure></p>
+<h2 id="寻找边界条件"><a href="#寻找边界条件" class="headerlink" title="寻找边界条件"></a>寻找边界条件</h2><p>当target是空字符串时, d[i, 0] = str1的长度<br>当str1是空字符串时, d[0, j] = target的长度</p>
+<p>经过这几步, 就可以开始写代码实现了. 以下给出的是状态递推DP算法, 除此以外, 仍可以使用带记忆的递归算法.</p>
+<h1 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h1><figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getEditDistance</span><span class="params">(<span class="keyword">char</span>[] target, <span class="keyword">char</span>[] str1)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span>[][] distance = <span class="keyword">new</span> <span class="keyword">int</span>[str1.length + <span class="number">1</span>][target.length + <span class="number">1</span>];</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">        distance[i][<span class="number">0</span>] = i;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        distance[<span class="number">0</span>][j] = j;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (str1[i - <span class="number">1</span>] == target[j - <span class="number">1</span> ]) &#123;</div><div class="line">                distance[i][j] = distance[i - <span class="number">1</span>][j - <span class="number">1</span>];</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">int</span> distanceInsert = distance[i][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceDelete = distance[i - <span class="number">1</span>][j] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceEdit = distance[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                distance[i][j] = Math.min(</div><div class="line">                        Math.min(distanceInsert, distanceDelete),</div><div class="line">                        distanceEdit);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> distance[str1.length][target.length];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以<code>snowy</code>和<code>sunny</code>字符串做测试, 计算过程如下:</p>
+<p><img src="/images/cs/dp_edit_distance_01.png" alt=""></p>
+<p>有三个值的, 分别是<code>insert</code>/<code>delete</code>/<code>edit</code>的计算距离, 最后得出最短编辑距离是<code>3</code>.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://zh.wikipedia.org/wiki/%E8%90%8A%E6%96%87%E6%96%AF%E5%9D%A6%E8%B7%9D%E9%9B%A2" target="_blank" rel="external">莱文斯坦距离</a><br>[算法的乐趣 - C3 动态规划]</p>
 
-Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。指两个字串之间，由一个转成另一个所需的最少编辑操作次
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1277,7 +1398,7 @@ Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一�
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1359,17 +1480,166 @@ Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一�
       
         
           
-          tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
+            <p><code>tmux</code>是一个终端的terminal <code>multiplexer</code>, 用来切换多个terminal, 和之前博客提到的<code>terminator</code>比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.</p>
+<p><img src="/images/linux/tmux_preview-01.png" alt=""></p>
+<h1 id="tmux-session"><a href="#tmux-session" class="headerlink" title="tmux session"></a><code>tmux</code> session</h1><hr>
+<p>使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach). 比如远程连接断开, 下次再连上服务器时, 原先tmux打开的环境都仍保留着.</p>
+<ul>
+<li><p>start new session:<br><code>tmux new -s myname</code></p>
+</li>
+<li><p>list sessions:<br><code>tmux ls</code></p>
+</li>
+<li><p>attach:<br><code>tmux a</code></p>
+</li>
+<li><p>attach to named:<br><code>tmux a -t myname</code></p>
+</li>
+<li><p><strong>detach</strong><br><code>ctrl + b, d</code></p>
+</li>
+<li><p>切换session<br>如果在tmux中, 想要切换到其他session, 可以这样:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">s</div><div class="line"># 这时会出现session列表, 使用方向键和Enter进行选择即可</div></pre></td></tr></table></figure>
+</li>
+<li><p>命名当前session</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">$</div><div class="line"># 这时可以修改当前的session名称</div></pre></td></tr></table></figure>
+</li>
+<li><p>新建一个session</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:new</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="pane"><a href="#pane" class="headerlink" title="pane"></a>pane</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%</td>
+<td>垂直分割</td>
+</tr>
+<tr>
+<td>“</td>
+<td>水平分割</td>
+</tr>
+<tr>
+<td>o</td>
+<td>panes切换:</td>
+</tr>
+<tr>
+<td>x</td>
+<td>关闭当前pane</td>
+</tr>
+<tr>
+<td>q</td>
+<td>显示 pane number</td>
+</tr>
+<tr>
+<td>空格</td>
+<td>切换不同的layout</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="window"><a href="#window" class="headerlink" title="window"></a>window</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>新建窗口</td>
+</tr>
+<tr>
+<td>n</td>
+<td>切换下一个窗口</td>
+</tr>
+<tr>
+<td>p</td>
+<td>切换前一个窗口</td>
+</tr>
+<tr>
+<td>Shift+7</td>
+<td>关闭当前窗口</td>
+</tr>
+<tr>
+<td>,</td>
+<td>命名窗口</td>
+</tr>
+<tr>
+<td>.</td>
+<td>移动窗口 (使用序号)</td>
+</tr>
+<tr>
+<td>w</td>
+<td>list window</td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>kill window</td>
+</tr>
+<tr>
+<td>page-up</td>
+<td>进入滚动模式, 按<code>esc</code>退出滚动</td>
+</tr>
+</tbody>
+</table>
+<h1 id="window-pane间操作"><a href="#window-pane间操作" class="headerlink" title="window/pane间操作"></a>window/pane间操作</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:joinp -s :2</td>
+<td>移动窗口2作为当前窗口的一个新pane</td>
+</tr>
+<tr>
+<td>:joinp -t :1</td>
+<td>移动当前pane作为窗口1的一个新pane</td>
+</tr>
+</tbody>
+</table>
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
+<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t</td>
+<td>显示时间</td>
+</tr>
+<tr>
+<td>?</td>
+<td>list shortcut</td>
+</tr>
+<tr>
+<td>:</td>
+<td>prompt</td>
+</tr>
+</tbody>
+</table>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://gist.github.com/henrik/1967800" target="_blank" rel="external">https://gist.github.com/henrik/1967800</a></p>
 
-tmux session
-使用tmux, 
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/03/linux/tools/tmux/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1405,7 +1675,7 @@ tmux session
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1487,17 +1757,34 @@ tmux session
       
         
           
-          spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?
-spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.
-下面介绍war方式部署:
-pom.xml 修
-          ...
+            <p>spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?</p>
+<p>spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.</p>
+<p>下面介绍war方式部署:</p>
+<h1 id="pom-xml-修改"><a href="#pom-xml-修改" class="headerlink" title="pom.xml 修改"></a>pom.xml 修改</h1><hr>
+<p>首先把打包类型修改为: <code>&lt;packaging&gt;war&lt;/packaging&gt;</code></p>
+<p>接着修改<code>spring-boot-starter-tomcat</code>为<code>provided</code>的scope, 避免打包到war中:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;provided&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- ... --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li><strong>注意:</strong></li>
+</ul>
+<p><code>boot-start</code>版本要高于<code>1.3</code>, 否则使用tomcat启动会出现异常.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h1 id="部署到-Servlet-3-0-规范的容器"><a href="#部署到-Servlet-3-0-规范的容器" class="headerlink" title="部署到 Servlet 3.0 规范的容器"></a>部署到 Servlet 3.0 规范的容器</h1><hr>
+<p>如果你的web容器支持<code>Servlet 3.0</code>规范, 可以使用以下的方法:</p>
+<p>首先继承<code>SpringBootServletInitializer</code>, 并覆写<code>configure</code>方法, 不需要<code>web.xml</code>.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableAutoConfiguration</div><div class="line">@ComponentScan</div><div class="line">public class Application extends SpringBootServletInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) &#123;</div><div class="line">        // Customize the application or call application.sources(...) to add sources</div><div class="line">        // Since our example is itself a @Configuration class we actually don&apos;t</div><div class="line">        // need to override this method.</div><div class="line">        return application.sources(SampleControllerAndApp.class);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="部署到旧的容器-Servlet-2-5"><a href="#部署到旧的容器-Servlet-2-5" class="headerlink" title="部署到旧的容器 (Servlet 2.5)"></a>部署到旧的容器 (Servlet 2.5)</h1><p>如果你的容器不支持servlet 3.0规范怎么办 ? 下面是一个解决方法:</p>
+<ul>
+<li><p>1<br>增加一个<code>org.springframework.boot:spring-boot-legacy</code>依赖</p>
+</li>
+<li><p>2<br>创建<code>web.xml</code>, 用以声明<code>context listener</code>, 这个listener是<code>org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener</code>, 是在<code>spring-boot</code>下特别使用的, 其他配置和正常spring应用一样. <code>web.xml</code> 如下:</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app version=&quot;2.5&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context-param&gt;</div><div class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</div><div class="line">        &lt;param-value&gt;demo.Application&lt;/param-value&gt;</div><div class="line">    &lt;/context-param&gt;</div><div class="line"></div><div class="line">    &lt;listener&gt;</div><div class="line">        &lt;listener-class&gt;org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener&lt;/listener-class&gt;</div><div class="line">    &lt;/listener&gt;</div><div class="line"></div><div class="line">    &lt;filter&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;</div><div class="line">    &lt;/filter&gt;</div><div class="line"></div><div class="line">    &lt;filter-mapping&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</div><div class="line">    &lt;/filter-mapping&gt;</div><div class="line"></div><div class="line">    &lt;servlet&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</div><div class="line">        &lt;init-param&gt;</div><div class="line">            &lt;param-name&gt;contextAttribute&lt;/param-name&gt;</div><div class="line">            &lt;param-value&gt;org.springframework.web.context.WebApplicationContext.ROOT&lt;/param-value&gt;</div><div class="line">        &lt;/init-param&gt;</div><div class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</div><div class="line">    &lt;/servlet&gt;</div><div class="line"></div><div class="line">    &lt;servlet-mapping&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</div><div class="line">    &lt;/servlet-mapping&gt;</div><div class="line"></div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file" target="_blank" rel="external">howto-create-a-deployable-war-file</a><br><a href="http://docs.spring.io/spring-boot/docs/current/maven-plugin/" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/maven-plugin/</a><br><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1559,7 +1846,7 @@ pom.xml 修
       
 
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
                alt="niko" />
@@ -1576,10 +1863,10 @@ pom.xml 修
 
           
             <div class="site-state-item site-state-categories">
-              <a href="/categories">
+              
                 <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
-              </a>
+              
             </div>
           
 
@@ -1631,7 +1918,7 @@ pom.xml 修
 </div>
 
 <div class="powered-by">
-  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
 </div>
 
 <div class="theme-info">
@@ -1673,42 +1960,42 @@ pom.xml 修
 
 
   
-  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
 
   
-  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
 
   
-  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
-  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
 
   
-  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
   
-  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
 
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
-
-
-
-  
-  
-
-  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
 
 
 
@@ -1733,7 +2020,10 @@ pom.xml 修
 
   
     
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
   
+
 
 
 
@@ -1779,35 +2069,32 @@ pom.xml 修
             var $resultContent = document.getElementById(content_id);
             $input.addEventListener('input', function(){
                 var matchcounts = 0;
-                var str='<ul class=\"search-result-list\">';                
+                var str='<ul class=\"search-result-list\">';
                 var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
                 $resultContent.innerHTML = "";
                 if (this.value.trim().length > 1) {
                 // perform local searching
                 datas.forEach(function(data) {
-                    var isMatch = true;
+                    var isMatch = false;
                     var content_index = [];
                     var data_title = data.title.trim().toLowerCase();
                     var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
-                    var data_url = data.url;
+                    var data_url = decodeURIComponent(data.url);
                     var index_title = -1;
                     var index_content = -1;
                     var first_occur = -1;
                     // only match artiles with not empty titles and contents
-                    if(data_title != '' && data_content != '') {
+                    if(data_title != '') {
                         keywords.forEach(function(keyword, i) {
                             index_title = data_title.indexOf(keyword);
                             index_content = data_content.indexOf(keyword);
-                            if( index_title < 0 && index_content < 0 ){
-                                isMatch = false;
-                            } else {
-                                if (index_content < 0) {
-                                    index_content = 0;
-                                }
-                                if (i == 0) {
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
                                     first_occur = index_content;
                                 }
-                            }
+                            } 
+							
                         });
                     }
                     // show search results
@@ -1834,7 +2121,7 @@ pom.xml 修
                                 var regS = new RegExp(keyword, "gi");
                                 match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
                             });
-                            
+
                             str += "<p class=\"search-result\">" + match_content +"...</p>"
                         }
                         str += "</li>";
@@ -1850,7 +2137,7 @@ pom.xml 修
     });}
 
     // handle and trigger popup window;
-    $('.popup-trigger').mousedown(function(e) {
+    $('.popup-trigger').click(function(e) {
       e.stopPropagation();
       if (isfetched == false) {
         searchFunc(path, 'local-search-input', 'local-search-result');
@@ -1870,11 +2157,15 @@ pom.xml 修
     });
   </script>
 
+
+  
+
   
 
   
 
   
+
 
 </body>
 </html>

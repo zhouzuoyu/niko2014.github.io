@@ -31,7 +31,7 @@
 
   
   
-  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -65,21 +65,21 @@
 
 
 
-<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="niko, java, linux" />
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
 
 
 
@@ -102,20 +102,26 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     scheme: 'Muse',
-    sidebar: {"position":"left","display":"always"},
+    sidebar: {"position":"left","display":"post"},
     fancybox: true,
     motion: true,
     duoshuo: {
-      userId: 0,
+      userId: '0',
       author: '博主'
     }
   };
 </script>
 
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/page/6/"/>
+
+
   <title> niko zhang </title>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
 
   
 
@@ -148,7 +154,7 @@
  ">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
       <div class="header-inner"><div class="site-meta ">
   
 
@@ -180,27 +186,13 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
             首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
           </a>
         </li>
       
         
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
             归档
           </a>
@@ -210,9 +202,15 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
           </a>
         </li>
       
@@ -220,10 +218,8 @@
       
         <li class="menu-item menu-item-search">
           
-            <a href="#" class="popup-trigger">
+            <a href="javascript:;" class="popup-trigger">
           
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
             
             搜索
           </a>
@@ -266,7 +262,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -348,15 +344,32 @@
       
         
           
-          今天今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。
-MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。（MySQL的行级锁需要使用INNODB引擎来
-          ...
+            <h2 id="今天"><a href="#今天" class="headerlink" title="今天"></a>今天</h2><p>今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，<br>当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。</p>
+<h2 id="MySQL-行级锁"><a href="#MySQL-行级锁" class="headerlink" title="MySQL 行级锁"></a>MySQL 行级锁</h2><p>行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。<br>（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）</p>
+<p>首先回顾一下大学的基础知识：<br>数据库的锁，是事务在某个数据对象（如表、行等）进行操作前，对数据库发起请求，对其加锁，<br>使其不被其他事务所修改。<br>基本的锁有两种：读锁和写锁。<br>写锁，也称排它锁（ExclusiveLock，也称X锁），若事务对数据D加了X锁，则其他事务不能读取和修改D。<br>读锁，也称共享锁（ShareLock，也称S锁），若事务对数据D加了S锁，则其他事务只能对D加S锁，不能修改D。</p>
+<h3 id="S-LOCK-在MySQL："><a href="#S-LOCK-在MySQL：" class="headerlink" title="S LOCK 在MySQL："></a>S LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_02.png" alt=""><br><img src="/images/mysql_x_lock_demo_04.png" alt=""><br>从上面的测试中可以发现，事务1（窗口1）加了S锁后，事务2不能加X锁和进行修改。<br>如果S锁一段时间后仍未释放就会超时，如下图：<br><img src="/images/mysql_x_lock_demo_03.png" alt=""></p>
+<h3 id="X-LOCK-在MySQL："><a href="#X-LOCK-在MySQL：" class="headerlink" title="X LOCK 在MySQL："></a>X LOCK 在MySQL：</h3><p><img src="/images/mysql_x_lock_demo_01.png" alt=""></p>
+<p>从上面的测试中可以发现，事务1加了X锁之后，事务2不能加S锁，但只要去掉<br><code>LOCK IN SHARE MODE</code>就可以查询了。</p>
+<p>其他的场景，可用以上SQL测试验证一下。<br>（注意：当用到索引时，MySql才会使用row-lock，否则table-lock。）</p>
+<h2 id="JPA-规范"><a href="#JPA-规范" class="headerlink" title="JPA 规范"></a>JPA 规范</h2><hr>
+<p>看完了锁在MySQL的实现，那在Java中如何使用呢？这里以spring+JPA为例（为了方便，使用了starter-jpa）：</p>
+<h3 id="JPA-锁相关规范"><a href="#JPA-锁相关规范" class="headerlink" title="JPA 锁相关规范"></a>JPA 锁相关规范</h3><p>在spring-data-jpa中，<code>@Lock + LockModeType</code> 可以为某个数据操作进行锁控制，比如用X锁：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Lock(LockModeType.PESSIMISTIC_WRITE)</div><div class="line">List&lt;MemberOrder&gt; findByOrderNo(String orderNo);</div></pre></td></tr></table></figure>
+<p>可以跑一下测试：</p>
+<ol>
+<li>使用上面的窗口二先加S锁，不commit。</li>
+<li>然后调用findByOrderNo()查询。</li>
+<li>可以发现，程序抛出LockAcquisitionException异常，不能获取锁，等待超时，如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Caused by: org.hibernate.exception.LockAcquisitionException: could not extract ResultSet</div><div class="line">        at org.hibernate.dialect.MySQLDialect$1.convert(MySQLDialect.java:451)</div><div class="line">        ...</div><div class="line">Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)</div><div class="line">        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)</div><div class="line">        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</div><div class="line">        at java.lang.reflect.Constructor.newInstance(Constructor.java:422)</div><div class="line">        at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)</div><div class="line">        at com.mysql.jdbc.Util.getInstance(Util.java:387)</div><div class="line">        at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:946)</div><div class="line">        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3878)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRowFast(MysqlIO.java:2090)</div><div class="line">        at com.mysql.jdbc.MysqlIO.nextRow(MysqlIO.java:1964)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readSingleRowSet(MysqlIO.java:3306)</div><div class="line">        atannotation com.mysql.jdbc.MysqlIO.getResultSet(MysqlIO.java:463)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readResultsForQueryOrUpdate(MysqlIO.java:3040)</div><div class="line">        at com.mysql.jdbc.MysqlIO.readAllResults(MysqlIO.java:2288)</div><div class="line">        at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2681)</div><div class="line">        at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2551)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1861)</div><div class="line">        at com.mysql.jdbc.PreparedStatement.executeQuery(PreparedStatement.java:1962)</div><div class="line">        at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.extract(ResultSetReturnImpl.java:82)</div><div class="line">        ... 64 more</div></pre></td></tr></table></figure>
+<p>现在来看Lock和LockModeType，Lock是spring-data的annotation，<br>LockModeType属于JPA规范，可作为EntityManager的方法参数传入或者使用Query.setLockMode()或TypedQuery.setLockMode()进行设置。<br>当然使用spring-data的话，直接使用@Lock即可，如果对细节感兴趣，可以去看spring-data的源码。<br>LockModeType是一个enum，它包括：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">READ：同OPTIMISTIC</div><div class="line">WRITE：同OPTIMISTIC_FORCE_INCREMENT</div><div class="line">OPTIMISTIC：乐观锁</div><div class="line">OPTIMISTIC_FORCE_INCREMENT：乐观锁，带版本更新</div><div class="line">PESSIMISTIC_READ：悲观读 （MySQL对应： `lock in share mode`）</div><div class="line">PESSIMISTIC_WRITE：悲观写 （MySQL对应： `for update`）</div><div class="line">PESSIMISTIC_FORCE_INCREMENT：悲观写，带版本更新</div></pre></td></tr></table></figure>
+<p>上面涉及到了悲观锁和乐观锁：<br>所谓悲观锁，就是对数据被其他事务修改的概率保持悲观态度，<br>因此在处理过程中，都将数据锁定。<br>而乐观锁，反过来即是保持乐观态度，认为数据被其他事务修改的概率是较低的，所以在真正提交更新的时候，<br>才去检测数据是否冲突，实现方式可以是版本号或者时间戳，这里不再赘述。</p>
+<p>悲观锁能严格保证数据的正确性，但凡事有利必有弊，很多事情我们都需要去平衡。<br>如果一个并发冲突的概率不高，而使用悲观锁，会对数据库性能开销影响比较大。<br>除此之外，良好的设计也可有效地避免一些并发问题。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><hr>
+<p>【1】 <a href="https://spring.io/guides/gs/accessing-data-jpa/" target="_blank" rel="external">https://spring.io/guides/gs/accessing-data-jpa/</a><br>【2】 <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html" target="_blank" rel="external">http://docs.oracle.com/javaee/6/tutorial/doc/gkjiu.html</a><br>【3】 <a href="https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.5/en/innodb-lock-modes.html</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/10/12/java/lock__mysql_jpa/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -392,7 +405,7 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -474,14 +487,19 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
       
         
           
-            (function() {    var cx = ‘005735843669583756565:phrkilwibwg’;    var gcse = document.createElement(‘script’);    gcse.type = ‘text/javascript’;    
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/10/01/java/j8/java8_null_check/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+            <p><script><br>  (function() {<br>    var cx = ‘005735843669583756565:phrkilwibwg’;<br>    var gcse = document.createElement(‘script’);<br>    gcse.type = ‘text/javascript’;<br>    gcse.async = true;<br>    gcse.src = ‘<a href="https://cse.google.com/cse.js?cx=">https://cse.google.com/cse.js?cx=</a>‘ + cx;<br>    var s = document.getElementsByTagName(‘script’)[0];<br>    s.parentNode.insertBefore(gcse, s);<br>  })();<br></script></p>
+<p><gcse:search></gcse:search></p>
+<h1 id="使用-Optional"><a href="#使用-Optional" class="headerlink" title="使用 Optional"></a>使用 <code>Optional</code></h1><hr>
+<p>Optional是核心类库的新成员，用来替换null。相信大家对NPE已经司空见惯，在代码里也有不少 null check，null 这个东西也是颇有争议的， 而Optional可以消除我们这种厌恶感，鼓励我们适当时候去检查null值，防止程序崩溃。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例 :"></a>示例 :</h2><p>Shop.java</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class Shop &#123;</div><div class="line">    private Integer provinceId;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (shop.getProvinceId() != null) &#123;</div><div class="line">    ProvinceEntity productEntity = provinceJpaRepository.findOne(shop.getProvinceId());</div><div class="line">    if (productEntity != null) &#123;</div><div class="line">        shop.setProvinceName(productEntity.getName());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
+<p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
+<h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>
+          
         
       
     </div>
@@ -517,7 +535,7 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -599,16 +617,22 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
       
         
           
-          最近买了一个新无线网卡, 可惜在linux上用时, 总是几分钟后就断, 停止working, 于是尝试安装官方光盘中的驱动, 竟然有许多编译错误…只能在网上找驱动了~~
-查询网卡型号使用lsusb -v查到usb无线网卡的相关信息, 如下:
-Bus 003 Device 002: ID 0bda:8
-          ...
+            <p>最近买了一个新无线网卡, 可惜在linux上用时, 总是几分钟后就断, 停止working, 于是尝试安装官方光盘中的驱动, 竟然有许多编译错误…只能在网上找驱动了~~</p>
+<h1 id="查询网卡型号"><a href="#查询网卡型号" class="headerlink" title="查询网卡型号"></a>查询网卡型号</h1><p>使用<code>lsusb -v</code>查到usb无线网卡的相关信息, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Bus 003 Device 002: ID 0bda:8178 Realtek Semiconductor Corp. RTL8192CU 802.11n WLAN Adapter</div><div class="line">Device Descriptor:</div><div class="line">  bLength                18</div><div class="line">  bDescriptorType         1</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  idVendor           0x0bda Realtek Semiconductor Corp.</div><div class="line">  idProduct          0x8178 RTL8192CU 802.11n WLAN Adapter</div><div class="line">  bcdDevice            2.00</div><div class="line">  iManufacturer           1 Realtek</div><div class="line">  iProduct                2 802.11n WLAN Adapter</div><div class="line">  iSerial                 3 00e04c000001</div><div class="line">  bNumConfigurations      1</div><div class="line">  Configuration Descriptor:</div><div class="line">    bLength                 9</div><div class="line">    bDescriptorType         2</div><div class="line">    wTotalLength           46</div><div class="line">    bNumInterfaces          1</div><div class="line">    bConfigurationValue     1</div><div class="line">    iConfiguration          0</div><div class="line">    bmAttributes         0xa0</div><div class="line">      (Bus Powered)</div><div class="line">      Remote Wakeup</div><div class="line">    MaxPower              500mA</div><div class="line">    Interface Descriptor:</div><div class="line">      bLength                 9</div><div class="line">      bDescriptorType         4</div><div class="line">      bInterfaceNumber        0</div><div class="line">      bAlternateSetting       0</div><div class="line">      bNumEndpoints           4</div><div class="line">      bInterfaceClass       255 Vendor Specific Class</div><div class="line">      bInterfaceSubClass    255 Vendor Specific Subclass</div><div class="line">      bInterfaceProtocol    255 Vendor Specific Protocol</div><div class="line">      iInterface              0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x81  EP 1 IN</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x02  EP 2 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x03  EP 3 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x84  EP 4 IN</div><div class="line">        bmAttributes            3</div><div class="line">          Transfer Type            Interrupt</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0040  1x 64 bytes</div><div class="line">        bInterval               1</div><div class="line">Device Qualifier (for other device speed):</div><div class="line">  bLength                10</div><div class="line">  bDescriptorType         6</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  bNumConfigurations      1</div><div class="line">Device Status:     0x0000</div><div class="line">  (Bus Powered)</div></pre></td></tr></table></figure>
+<p>可知, 这个网卡型号是<code>Realtek Semiconductor Corp. RTL8192CU 802.11n</code>, 接下来就是搜索驱动.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接google上面查询到的型号, 很容易找到驱动, 接下来就是安装即可:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo add-apt-repository ppa:hanipouspilot/rtlwifi</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install rtl8192cu-dkms linux-firmware</div></pre></td></tr></table></figure>
+<p>完成后要进行reboot.</p>
+<h1 id="生效-amp-测试"><a href="#生效-amp-测试" class="headerlink" title="生效 &amp; 测试"></a>生效 &amp; 测试</h1><p>查看网络状态可以用<code>ethstatus</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ethstatus -i wlan0</div></pre></td></tr></table></figure>
+<p>开个米神的视频测测:</p>
+<p><img src="/images/linux/tools/edup-wireless-card-ethstatus-test-01.png" alt=""></p>
+<p>整首&lt;恰空&gt;播放流畅稳定, 测试完美 ! :-D</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle" target="_blank" rel="external">http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -644,7 +668,7 @@ Bus 003 Device 002: ID 0bda:8
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -726,14 +750,33 @@ Bus 003 Device 002: ID 0bda:8
       
         
           
-          最近网络比较“不稳定”，上google也是断断续续的，三个科学上网工具 —— 红杏/VPN/shadowsocks， 已经跪了两个，只剩shadowsocks了，中国的程序员效率降低了一半以上。看来平时的”冗余容错”很重要啊，几百块花得值了，T_T, 虽然两个工具暂时不能用，还好现在还能通过shad
-          ...
+            <p>最近网络比较“不稳定”，上google也是断断续续的，<br>三个科学上网工具 —— 红杏/VPN/shadowsocks， 已经跪了两个，只剩shadowsocks了，中国的程序员效率降低了一半以上。<br>看来平时的”冗余容错”很重要啊，几百块花得值了，T_T, 虽然两个工具暂时不能用，还好现在还能通过shadowsocks上网。</p>
+<h2 id="简单原理"><a href="#简单原理" class="headerlink" title="简单原理"></a>简单原理</h2><p>当前的gfw的特征检测对shadowsocks还是没什么特别好的办法，我们可以看一下shadowsocks原理:</p>
+<p><img src="/images/what-is-shadowsocks.png" alt=""></p>
+<p>如上图，sslocal是你本机的一个代理，ss server是部署在国外（vps）。<br>shadowsocks使用的是socks5协议， 该协议处于OSI的会话层层，在传输层之上。<br>所以数据在ss local和ss server做了加密解密，在gfw的特征检查下就是个普通的tcp包，因此允许通过。</p>
+<hr>
+<h3 id="小事件"><a href="#小事件" class="headerlink" title="小事件"></a>小事件</h3><p>BTW, 在github上看到一个留言：</p>
+<p><img src="/images/shadowsocks_clowwindy.jpg" alt=""></p>
+<p>随便逛了一下，clowwindy大神（任职知乎）的项目还真全删了，twitter也设成私密模式了。<br>根据各大科学上网工具的公告，我也理解最近是特殊时期。<br>最后想说的和能说的是，感谢clowwindy。</p>
+<hr>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/08/22/shadowsocks/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+<p>页面已被访问<span id="busuanzi_value_site_pv"></span>次</p>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p>[1] <a href="https://tumutanzi.com/archives/13005" target="_blank" rel="external">https://tumutanzi.com/archives/13005</a></p>
+
+          
         
       
     </div>
@@ -769,7 +812,7 @@ Bus 003 Device 002: ID 0bda:8
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -851,18 +894,28 @@ Bus 003 Device 002: ID 0bda:8
       
         
           
-          Monit 是一个开源的非常实用的进程管理和监控工具，如Linux下的apache、nginx、MySql、FTP等服务都可以使用。
-install
-# for RedHat/CentOS/Fedora/
+            <p>Monit 是一个开源的非常实用的进程管理和监控工具，如Linux下的apache、nginx、MySql、FTP等服务都可以使用。</p>
+<h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><hr>
+<pre><code># for RedHat/CentOS/Fedora/
 yum install monit
-# for Ubuntu/Debian/Linux Min
-          ...
+# for Ubuntu/Debian/Linux Mint
+sudo apt-get install monit
+</code></pre><h2 id="configure"><a href="#configure" class="headerlink" title="configure"></a>configure</h2><hr>
+<pre><code>安装完后，配置文件目录如下所示：
+</code></pre><p><img src="/images/etc-monit.png" alt=""></p>
+<pre><code># 这个是monit的配置文件，里边记录了log位置、deamon数、监控脚本等配置。
+sudo vim /etc/monit/monitrc
+</code></pre><p>翻到最后，可以发现有个<code>include</code>指令，后面跟你的监控脚本的位置，这样可以避免全部脚本写在同一个地方。</p>
+<pre><code>include /etc/monit/include/*
+</code></pre><h2 id="for-tomcat"><a href="#for-tomcat" class="headerlink" title="for tomcat"></a>for tomcat</h2><hr>
+<p>这里以tomcat为例，写一个monit脚本，实现停机时的邮件提醒和自动重启：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set alert alertwho@foo.com</div><div class="line"></div><div class="line">set mailserver mail.×××.com</div><div class="line">  port 25</div><div class="line">  username &quot;mail&quot; password &quot;pwd&quot;</div><div class="line">  using tlsv1</div><div class="line">  with timeout 30 seconds</div><div class="line"></div><div class="line">check host tomcat with address localhost</div><div class="line">  stop program &quot;/.../bin/catalina.sh stop&quot;</div><div class="line">  start program &quot;/.../bin/catalina.sh restart&quot;</div><div class="line">  if failed port 8080 and protocol http</div><div class="line">  # then start 重启</div><div class="line">  then alert</div></pre></td></tr></table></figure>
+<p>mail server 的语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">SET MAILSERVER &lt;hostname|ip-address [PORT number] [USERNAME string]</div><div class="line"> [PASSWORD string] [using SSLAUTO|SSLV2|SSLV3|TLSV1|TLSV11|TLSV12]</div><div class="line"> [CERTMD5 checksum]&gt;, ...</div><div class="line">   [with TIMEOUT X SECONDS]</div><div class="line">   [using HOSTNAME hostname]</div></pre></td></tr></table></figure>
+<p>其他语法都很易懂。<br>monit监控tomcat的方式其实有两种，一种是检查pid文件，另一种就是上面的port检查。</p>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><h2 id="others"><a href="#others" class="headerlink" title="others"></a>others</h2><p><a href="http://www.tecmint.com/command-line-tools-to-monitor-linux-performance/" target="_blank" rel="external">20 Command Line Tools to Monitor Linux Performance</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/07/18/linux/monit/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -898,7 +951,7 @@ yum install monit
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -980,41 +1033,374 @@ yum install monit
       
         
           
-          基本模式
-命令模式
+            <h1 id="基本模式"><a href="#基本模式" class="headerlink" title="基本模式"></a>基本模式</h1><ul>
+<li>命令模式</li>
+</ul>
+<p>进入vim后, 默认就是命令模式.</p>
+<ul>
+<li><code>input</code>模式</li>
+</ul>
+<p>命令模式下, 输入<code>i</code>进入input模式, <code>esc</code>返回命令模式.</p>
+<h1 id="文本操作"><a href="#文本操作" class="headerlink" title="文本操作"></a>文本操作</h1><hr>
+<p><code>文本选择</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V</td>
+<td>selects entire lines</td>
+</tr>
+<tr>
+<td>v</td>
+<td>selects range of text</td>
+</tr>
+<tr>
+<td>ctrl-v</td>
+<td>列选择</td>
+</tr>
+<tr>
+<td>gv</td>
+<td>重新选择上次选择的区块</td>
+</tr>
+</tbody>
+</table>
+<p><code>选择 / 复制 / 粘贴 ...</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v(V for lines) -&gt; y  (yank)</td>
+<td>选择-&gt;复制</td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+</tr>
+<tr>
+<td>v -&gt; d  (delete)</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl + shift + v</td>
+<td>paster from clipboard in <code>input</code> mode</td>
+</tr>
+<tr>
+<td>ctrl + ;</td>
+<td>弹出clipboard菜单, 选择一个粘贴 (<code>input</code> mode)</td>
+</tr>
+</tbody>
+</table>
+<p><code>输入</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u</td>
+<td>undo</td>
+</tr>
+<tr>
+<td>ctrl + r</td>
+<td>redo</td>
+</tr>
+<tr>
+<td>ctrl-p or ctrl-n</td>
+<td>使用当前session中的pattern来自动完成</td>
+</tr>
+<tr>
+<td>a</td>
+<td>在光标后开始编辑</td>
+</tr>
+<tr>
+<td>o</td>
+<td>当前行后面插入一个新行</td>
+</tr>
+<tr>
+<td>O</td>
+<td>当前行前面插入一个新行</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>选择一个词</td>
+</tr>
+<tr>
+<td>ctrl-v + 大写I + 字符 + esc</td>
+<td>列选择插入</td>
+</tr>
+<tr>
+<td>v + gU</td>
+<td>(变大写)</td>
+</tr>
+<tr>
+<td>v + gu</td>
+<td>gu (变小写)</td>
+</tr>
+<tr>
+<td>ye</td>
+<td>复制当前光标到单词结尾的部分</td>
+</tr>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><code>缩进</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v or V</td>
+<td>区块缩进前需要选择文本</td>
+</tr>
+<tr>
+<td>5&gt;</td>
+<td>表示右缩进5个tab</td>
+</tr>
+<tr>
+<td><code>4&lt;</code></td>
+<td>同理, 左向4个tab</td>
+</tr>
+</tbody>
+</table>
+<p><code>浏览 / 移动</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ctrl + e</td>
+<td>向下滚屏，保持光标</td>
+</tr>
+<tr>
+<td>ctrl + y</td>
+<td>向上滚屏, 保持光标</td>
+</tr>
+<tr>
+<td>ctrl + d</td>
+<td>向下, 不保持光标</td>
+</tr>
+<tr>
+<td>ctrl + u</td>
+<td>向上, 不保持光标</td>
+</tr>
+<tr>
+<td>0 或 ^</td>
+<td>跳至行头</td>
+</tr>
+<tr>
+<td>$</td>
+<td>跳至行尾</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移至档尾（最后一行的第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移至档首（第一行之第一个非空白字元处）</td>
+</tr>
+<tr>
+<td>ctrl+f</td>
+<td>下翻页</td>
+</tr>
+<tr>
+<td>ctrl+b</td>
+<td>上翻页</td>
+</tr>
+<tr>
+<td>w</td>
+<td>移至次一个字（word）字首。当然是指英文单字。</td>
+</tr>
+<tr>
+<td>W</td>
+<td>同上，但会忽略一些标点符号。</td>
+</tr>
+<tr>
+<td>)</td>
+<td>移至下一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>(</td>
+<td>移至上一个句子（sentence）首。</td>
+</tr>
+<tr>
+<td>}</td>
+<td>移至下一个段落（paragraph）首。</td>
+</tr>
+<tr>
+<td>{</td>
+<td>移至上一个段落（paragraph）首。</td>
+</tr>
+</tbody>
+</table>
+<p><code>查找 / 替换</code></p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/ + your-search-string</td>
+<td>搜索, 可以使用正则, 注意转义</td>
+</tr>
+<tr>
+<td>ggn</td>
+<td></td>
+</tr>
+<tr>
+<td>GN</td>
+<td>最后一个</td>
+</tr>
+<tr>
+<td>/ + ↑或↓</td>
+<td>搜索历史</td>
+</tr>
+<tr>
+<td>:%s/源字符串/目的字符串/g</td>
+<td>全局替换， <code>%</code>表示所有行</td>
+</tr>
+<tr>
+<td>:4s/源字符串/目的字符串/g</td>
+<td>替换从第4行</td>
+</tr>
+<tr>
+<td>:1,4s/源字符串/目的字符串/g</td>
+<td>替换从第1行到第4行</td>
+</tr>
+</tbody>
+</table>
+<h1 id="多窗口"><a href="#多窗口" class="headerlink" title="多窗口"></a>多窗口</h1><hr>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:vsp file_path</td>
+<td>新增窗口垂直打开</td>
+</tr>
+<tr>
+<td>:sv</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, s</td>
+<td>复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl + w, v</td>
+<td>垂直, 复制分割当前窗口</td>
+</tr>
+<tr>
+<td>ctrl w + up/down</td>
+<td>切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, w</td>
+<td>循环切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, h/j/k/l</td>
+<td>按方向切换窗口</td>
+</tr>
+<tr>
+<td>ctrl w, H/J/K/L</td>
+<td>按方向移动窗口</td>
+</tr>
+<tr>
+<td>ctrl w , q 或 c</td>
+<td>关闭窗口</td>
+</tr>
+</tbody>
+</table>
+<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp file_path(able to use tab)</td>
+<td>新增窗口打开</td>
+</tr>
+<tr>
+<td>:set noautoindent</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number</td>
+<td></td>
+</tr>
+<tr>
+<td>:set number!</td>
+<td>切换</td>
+</tr>
+<tr>
+<td>:set number&amp;</td>
+<td>Set option to default value</td>
+</tr>
+<tr>
+<td>:set number?</td>
+<td>Show value of option</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>更多请参看另一博客，将会记录常见的配置及相关命令。</p>
+<h2 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h2><p>1.<br><code>:!command</code><br>如：</p>
+<pre><code>:!ls -al
+</code></pre><p>执行一个命令, 但不退出vim.</p>
+<p>2.<br><code>:r !command</code><br>将shell命令command的结果插入到当前行的下一行</p>
+<p>这个命令比较常用, 比如输入当前目录:</p>
+<pre><code>:r !pwd
+</code></pre><p>3.<br><code>:起始行号,结束行号 !command</code><br>将起始行号和结束行号指定的范围中的内容输入到shell命令command处理，并将处理结果替换起始行号和结束行号指定的范围中的内容</p>
+<p>4.<br><code>:起始行号,结束行号 w !command</code><br>将起始行号和结束行号所指定的范围的内容作为命令command的输入。不会改变当前编辑的文件的内容</p>
+<h2 id="编辑root权限的文件"><a href="#编辑root权限的文件" class="headerlink" title="编辑root权限的文件"></a>编辑root权限的文件</h2><p>这个功能也经常用到, 比如编辑某个root的文件(readonly)时, 忘记了sudo, 当改了很多内容才发现, 怎么办呢 ?</p>
+<pre><code>:w !sudo tee %
+</code></pre><p>若是sudo不能解决的, 先写到临时文件:</p>
+<pre><code>:w! ~/tempfile.ext
+</code></pre><h2 id="其他-待续…"><a href="#其他-待续…" class="headerlink" title="其他, 待续…"></a>其他, 待续…</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>[1] <a href="http://vimgifs.com/" target="_blank" rel="external">http://vimgifs.com/</a><br>[2] <a href="http://vimcasts.org/episodes/working-with-windows/" target="_blank" rel="external">http://vimcasts.org/episodes/working-with-windows/</a><br>[3] <a href="http://blog.csdn.net/topgun_chenlingyun/article/details/8013115" target="_blank" rel="external">http://blog.csdn.net/topgun_chenlingyun/article/details/8013115</a><br>[4] <a href="http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions" target="_blank" rel="external">http://superuser.com/questions/694450/using-vim-to-force-edit-a-file-when-you-opened-without-permissions</a></p>
 
-进入vim后, 默认就是命令模式.
-
-input模式
-
-命令模式下, 输入i进入input模式, esc返回命令模式.
-文本操作
-文本选择
-
-
-
-快捷键
-说明
-
-
-
-
-V
-selects entire lines
-
-
-v
-selects range of text
-
-
-ctrl
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/07/01/linux/tools/vim_cmd/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1050,7 +1436,7 @@ ctrl
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1132,15 +1518,12 @@ ctrl
       
         
           
-          今天看源码，发现许多框架的log部分都会有log.isTraceEnabled()之类的判断，然后再进行调用trace()打印日志。我不禁想，为什么不直接使用log.trace(),结果不是一样吗。但细细想来，肯定有原因的。
-再看看if(isTraceEnabled()){}中的内容，有些打印日志的
-          ...
+            <p>今天看源码，发现许多框架的log部分都会有log.isTraceEnabled()之类的判断，然后再进行调用trace()打印日志。<br>我不禁想，为什么不直接使用log.trace(),结果不是一样吗。但细细想来，肯定有原因的。</p>
+<p>再看看if(isTraceEnabled()){}中的内容，有些打印日志的字符是比较多的，如果不判断直接调用的话，势必造成大量的资源消耗，如字符串拼接和对象toString()的操作。如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (log.isTraceEnabled()) &#123;</div><div class="line">    log.trace(&quot;attempting to get session; create = &quot; + create +</div><div class="line">            &quot;; session is null = &quot; + (this.session == null) +</div><div class="line">            &quot;; session has id = &quot; + (this.session != null &amp;&amp; session.getId() != null));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>原因就是这样～～</p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/05/30/java/log_why_use_isDebug/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1176,7 +1559,7 @@ ctrl
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1258,17 +1641,70 @@ ctrl
       
         
           
-          aop 简介aop，全称：aspect-oriented programming，即是面向切面编程。aop和Ioc并称为spring的两大特性，但aop有什么用呢？
-场景一：
+            <h2 id="aop-简介"><a href="#aop-简介" class="headerlink" title="aop 简介"></a>aop 简介</h2><p>aop，全称：aspect-oriented programming，即是面向切面编程。<br>aop和Ioc并称为spring的两大特性，但aop有什么用呢？</p>
+<p>场景一：</p>
+<blockquote>
+<p>对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util的被调用。<br>假如我们需要在每次数据库操作之前或之后使用某个util记录日志，使用直接调用的话，要是有100个操作，你就需要在这100个操作前后调用log util。<br>又有可能，后来你不需要这个util了，你又需要在100个地方取消它。是不是很痛苦呢～～<br>当然，可以通过面向对象和设计模式的方法来解决一部分问题，但仍显得不够优雅和敏捷。</p>
+</blockquote>
+<p>当然应用场景还不仅这些，还有如session管理，验证，事务，权限等等方面都有类似的问题。</p>
+<p>为了解决这些痛点，于是便有了AOP。那AOP是如何解决这个问题的呢？首先了解基本概念。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><hr>
+<p><img src="/images/spring-pointcut.png" alt=""></p>
+<p><img src="/images/aop-gif.gif" alt=""></p>
+<p>以上两张图，很好的展示了AOP的工作方式，以及为什么叫切面编程。<br>这里主要涉及到几个概念：</p>
+<h4 id="Advice（通知）："><a href="#Advice（通知）：" class="headerlink" title="Advice（通知）："></a>Advice（通知）：</h4><p>如图，主要描述要增强的行为，如场景一中的log行为，但不仅如此，Advice还分BeforeAdvice、AfterAdvice、ThrowsAdvice等类型。</p>
+<h4 id="Pointcut（切点）："><a href="#Pointcut（切点）：" class="headerlink" title="Pointcut（切点）："></a>Pointcut（切点）：</h4><p>这个描述了Advice或切面要嵌入的位置，比如场景一中的数据库操作，其实就是一个Pointcut。</p>
+<p>现在，有了Advice和Pointcut，总感觉差点什么。没错，需要一个配置器（通知器），把两者关联起来。因此定义为：</p>
+<h4 id="Advisor（通知器）："><a href="#Advisor（通知器）：" class="headerlink" title="Advisor（通知器）："></a>Advisor（通知器）：</h4><p>通知器建立了Advice和Pointcut的关联，因此我们终于可以知道在某个切点要用哪个通知了。</p>
+<hr>
+<p>因此，场景一的AOP解决方案，以Spring Aspect（注解版）为例：</p>
+<p>1, 使用spring注解，如下代码， 定义Advice，下面我们使用<code>@Before</code>注解，被标注的方法相当与一个Advice。<br>2, <code>@Before</code>注解中有个参数，这个参数定义了切点的描述，这里可以使用一些通配符来简化配置。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Aspect</div><div class="line">@Component</div><div class="line">public class LogAspect &#123;</div><div class="line"></div><div class="line">    @Before(&quot;execution(* foo.FooDao.op(..))&quot;)</div><div class="line">    public void log(JoinPoint joinPoint) &#123;</div><div class="line">        LOG.info(&quot;before ...&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用注解，好处就是省去了Advisor的配置，偷个懒～～  当然在<code>applicationContext.xml</code>中要启用<code>&lt;aop:aspectj-autoproxy/&gt;</code>和<code>&lt;context:component-scan</code>才行。<br><a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html" target="_blank" rel="external">XML 声明文档传送门</a></p>
+<p>看完这个，你一定对spring aop的实现很好奇，接下来就简单看一下spring aop的工作flow吧。</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><hr>
+<p>也许你已经猜到，要实现AOP，必须使用反射和动态代理。没错，Java的这个特性可以实现AOP。<br>spring环境下，再结合Ioc的统一对象管理，功能无比强大啊。<br>接下来我们就一起结合源码看一下aop是怎么工作的。</p>
+<h3 id="生成-aop-proxy"><a href="#生成-aop-proxy" class="headerlink" title="生成 aop proxy"></a>生成 aop proxy</h3><hr>
+<p>这里Ioc部分不介绍了（请参阅另一博文<code>spring Ioc</code>），直接以aop proxy生成为入口。<br>以下是主要的类，接下来让我们慢慢体会这样设计的原因：</p>
+<p><img src="/images/ProxyCreatorSupport-hierarchy.png" alt=""></p>
+<p>具体的aop代理对象的生成，分别是由AspectJProxyFactory、ProxyFactoryBean和ProxyFactory来完成的。</p>
+<p>以ProxyFactoryBean.getObject()为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object getObject() throws BeansException &#123;</div><div class="line">    initializeAdvisorChain();</div><div class="line">    if (isSingleton()) &#123;</div><div class="line">        return getSingletonInstance();</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        ...</div><div class="line">        return newPrototypeInstance();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>initializeAdvisorChain()代码比较长，主要流程是 : 根据内置成员<code>interceptorNames : String[]</code>生成bean，然后namedBeanToAdvisor()转换成Advisor，<br>再调用父类AdvisedSupport.addAdvisor(Advisor)增加到通知器链<code>LinkedList&lt;Advisor&gt;</code>中，后面也会对这部分进行更详细介绍。</p>
+<p>结合上面的class hierarchy图，可知AdvisedSupport主要封装了对通知和通知器的相关操作（从命名也可以知道），这些操作对不同的代理对象应该是一致的，<br>而代理对象的生成，是交给子类去实现的，<code>ProxyCreatorSupport</code>则协助子类进行proxy的生成。</p>
+<p>而生成的proxy, 可以是singleton或者prototype，这个功能都是由AopProxy完成的。<br>而这个AopProxy是由AopProxyFactory创建，这部分代码在ProxyCreatorSupport中：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// ProxyCreatorSupport.java</div><div class="line">protected final synchronized AopProxy createAopProxy() &#123;</div><div class="line">    if (!this.active) &#123;</div><div class="line">        activate();</div><div class="line">    &#125;</div><div class="line">    return getAopProxyFactory().createAopProxy(this);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中getAopProxyFactory()，即this.aopProxyFactory，是spring封装的DefaultAopProxyFactory：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public ProxyCreatorSupport() &#123;</div><div class="line">    this.aopProxyFactory = new DefaultAopProxyFactory();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>DefaultAopProxyFactory createAopProxy()会根据target class是否接口来选择不同的生成方式(下图)。<br>如果是接口，则使用jdk动态代理；否则使用cglib，如下所示：<br>所以，上面提到的AopProxy是一个接口，它有两个实现：CglibAopProxy和JdkDynamicAopProxy。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException &#123;</div><div class="line">    if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) &#123;</div><div class="line">        Class targetClass = config.getTargetClass();</div><div class="line">        if (targetClass == null) &#123;</div><div class="line">            throw new AopConfigException(&quot;TargetSource cannot determine target class: &quot; +</div><div class="line">                    &quot;Either an interface or a target is required for proxy creation.&quot;);</div><div class="line">        &#125;</div><div class="line">        if (targetClass.isInterface()) &#123;</div><div class="line">            return new JdkDynamicAopProxy(config);</div><div class="line">        &#125;</div><div class="line">        return CglibProxyFactory.createCglibProxy(config);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        return new JdkDynamicAopProxy(config);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>jdk和cglib的生成方式这里略过，感兴趣的话查看<code>new JdkDynamicAopProxy(AdvisedSupport)</code>和<code>CglibProxyFactory.createCglibProxy(config)</code>即可。</p>
+<h3 id="拦截器调用"><a href="#拦截器调用" class="headerlink" title="拦截器调用"></a>拦截器调用</h3><hr>
+<p>生成代理完成时，相关的拦截器已经配置完成了，现在只需在代理对象调用时回调这些拦截器即可，Jdk和cglib的代理和回调有些不同。</p>
+<p>这里以大家熟悉的jdk dynamic proxy为例，如下图，JdkDynamicAopProxy实现了InvocationHandler：</p>
+<p><img src="/images/JdkDynamicAopProxy.png" alt=""></p>
+<p>invoke()的源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</div><div class="line">    MethodInvocation invocation;</div><div class="line">    Object oldProxy = null;</div><div class="line">    boolean setProxyContext = false;</div><div class="line"></div><div class="line">    TargetSource targetSource = this.advised.targetSource;</div><div class="line">    Class&lt;?&gt; targetClass = null;</div><div class="line">    Object target = null;</div><div class="line"></div><div class="line">    ...</div><div class="line">    // Get the interception chain for this method.</div><div class="line">    List&lt;Object&gt; chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);</div><div class="line"></div><div class="line">    // Check whether we have any advice. If we don&apos;t, we can fallback on direct</div><div class="line">    // reflective invocation of the target, and avoid creating a MethodInvocation.</div><div class="line">    if (chain.isEmpty()) &#123;</div><div class="line">        // We can skip creating a MethodInvocation: just invoke the target directly</div><div class="line">        // Note that the final invoker must be an InvokerInterceptor so we know it does</div><div class="line">        // nothing but a reflective operation on the target, and no hot swapping or fancy proxying.</div><div class="line">        retVal = AopUtils.invokeJoinpointUsingReflection(target, method, args);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        // We need to create a method invocation...</div><div class="line">        invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);</div><div class="line">        // Proceed to the joinpoint through the interceptor chain.</div><div class="line">        retVal = invocation.proceed();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如上可知，<code>chain</code>是通过<code>AdvisedSupport</code>（this.advised）的getInterceptorsAndDynamicInterceptionAdvice()获取的。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public List&lt;Object&gt; getInterceptorsAndDynamicInterceptionAdvice(Method method, Class targetClass) &#123;</div><div class="line">    MethodCacheKey cacheKey = new MethodCacheKey(method);</div><div class="line">    List&lt;Object&gt; cached = this.methodCache.get(cacheKey);</div><div class="line">    if (cached == null) &#123;</div><div class="line">        cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(</div><div class="line">                this, method, targetClass);</div><div class="line">        this.methodCache.put(cacheKey, cached);</div><div class="line">    &#125;</div><div class="line">    return cached;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，this.advisorChainFactory是一个叫DefaultAdvisorChainFactory的工厂，主要实现了拦截器链的获取。<br>而且，会注册到<code>AdvisorAdapterRegistry</code>接口的实现<code>DefaultAdvisorAdapterRegistry</code>中。<br>DefaultAdvisorAdapterRegistry的构造器如下所示，可以看到，这里注册了一些常见的AdviceAdapter：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public DefaultAdvisorAdapterRegistry() &#123;</div><div class="line">    registerAdvisorAdapter(new MethodBeforeAdviceAdapter());</div><div class="line">    registerAdvisorAdapter(new AfterReturningAdviceAdapter());</div><div class="line">    registerAdvisorAdapter(new ThrowsAdviceAdapter());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="/images/AdvisorAdapter-hierarchy.png" alt=""></p>
+<p>上面这些adapters，主要有两个作用，以<code>AfterReturningAdviceAdapter</code>为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class AfterReturningAdviceAdapter implements AdvisorAdapter, Serializable &#123;</div><div class="line"></div><div class="line">    public boolean supportsAdvice(Advice advice) &#123;</div><div class="line">        return (advice instanceof AfterReturningAdvice);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public MethodInterceptor getInterceptor(Advisor advisor) &#123;</div><div class="line">        AfterReturningAdvice advice = (AfterReturningAdvice) advisor.getAdvice();</div><div class="line">        return new AfterReturningAdviceInterceptor(advice);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>作用之一是判断某个Advice属于什么类型;还有就是返回相对应的AdviceInterceptor。</p>
+<p>advice的实现其实也是拦截器(实现了MethodInterceptor)，如下所示：</p>
+<p><img src="/images/AdviceInterceptor.png" alt=""></p>
+<p>和上面保持一致，以AfterReturingInterceptor为例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public Object invoke(MethodInvocation mi) throws Throwable &#123;</div><div class="line">    Object retVal = mi.proceed();</div><div class="line">    this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());</div><div class="line">    return retVal;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>回到<code>JdkDynamicAopProxy.invoke()</code>，其中的ReflectiveMethodInvocation.proceed()就是链调用主要入口, 如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">public Object proceed() throws Throwable &#123;</div><div class="line">    //  We start with an index of -1 and increment early.</div><div class="line">    if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) &#123;</div><div class="line">        return invokeJoinpoint();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Object interceptorOrInterceptionAdvice =</div><div class="line">            this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);</div><div class="line">    if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) &#123;</div><div class="line">        // Evaluate dynamic method matcher here: static part will already have</div><div class="line">        // been evaluated and found to match.</div><div class="line">        InterceptorAndDynamicMethodMatcher dm =</div><div class="line">                (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;</div><div class="line">        if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) &#123;</div><div class="line">            return dm.interceptor.invoke(this);</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            // Dynamic matching failed.</div><div class="line">            // Skip this interceptor and invoke the next in the chain.</div><div class="line">            return proceed();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        // It&apos;s an interceptor, so we just invoke it: The pointcut will have</div><div class="line">        // been evaluated statically before this object was constructed.</div><div class="line">        return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面主要是遍历每个 interceptorOrInterceptionAdvice，并调用相应的拦截器，这样串起来，整个流程就清晰了。<br>其中InterceptorAndDynamicMethodMatcher组合MethodInterceptor和MethodMatcher，使其作为通知链的一个element使用，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class InterceptorAndDynamicMethodMatcher &#123;</div><div class="line"></div><div class="line">    final MethodInterceptor interceptor;</div><div class="line"></div><div class="line">    final MethodMatcher methodMatcher;</div><div class="line"></div><div class="line">    public InterceptorAndDynamicMethodMatcher(MethodInterceptor interceptor, MethodMatcher methodMatcher) &#123;</div><div class="line">        this.interceptor = interceptor;</div><div class="line">        this.methodMatcher = methodMatcher;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上就是ProxyFactoryBean调用的主要流程，只是一个大概的流程，看源码的话，spring会有许多细节验证和处理。不过阅读时，一定要抓住重要的主线，还有熟悉常见的设计模式，这会让你有个全景的认识和理解。</p>
+<h2 id="DIY-属于自己的AOP"><a href="#DIY-属于自己的AOP" class="headerlink" title="DIY 属于自己的AOP"></a>DIY 属于自己的AOP</h2><p>// TODO still in drafts 。</p>
 
-对功能重复的代码，并被不同地方使用，我们都会把它简单的封装成util，以供调用。但是，我们并不能很好的灵活控制这个util
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/05/01/java/spring/spring-aop/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1304,7 +1740,7 @@ ctrl
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1386,18 +1822,63 @@ ctrl
       
         
           
-          之前写爬虫都是用Java，换成Python来写，开发速度应该会更快，今天就来试试。
-初体验
-安装
-首先，安装Python（for Ubuntu）:
-sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
-          ...
+            <p>之前写爬虫都是用Java，换成Python来写，开发速度应该会更快，今天就来试试。</p>
+<h1 id="初体验"><a href="#初体验" class="headerlink" title="初体验"></a>初体验</h1><hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><hr>
+<p>首先，安装Python（for Ubuntu）:</p>
+<pre><code>sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev
+</code></pre><p>安装<a href="https://pip.pypa.io/en/latest/installing/" target="_blank" rel="external">pip</a>，pip类似Java的Maven</p>
+<p>安装使用虚拟环境：</p>
+<pre><code>sudo pip install virtualenv
+virtualenv foo_env
+source ./foo_env/bin/active
+</code></pre><p>安装scrapy：</p>
+<pre><code>pip install scrapy
+</code></pre><h1 id="scrapy-架构"><a href="#scrapy-架构" class="headerlink" title="scrapy 架构"></a>scrapy 架构</h1><p>Scrapy 的架构图如下所示，有个大概的印象即可，以后会陆续使用到：</p>
+<p><img src="/images/scrapy_architecture.png" alt=""></p>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><hr>
+<p>写一个小爬虫，来获取一个网页的所有图片：</p>
+<p>进入一个新建目录，生成项目结构：</p>
+<pre><code>scrapy startproject hello
+</code></pre><p>目录结构：</p>
+<pre><code>.
+├── hello
+│   ├── __init__.py
+│   ├── items.py
+│   ├── pipelines.py
+│   ├── settings.py
+│   └── spiders
+│       └── __init__.py
+└── scrapy.cfg
+</code></pre><p>首先，我们定义要crawl的东西，会把它封装成一个Item，传递给框架的其他组件处理：</p>
+<p><code>hello/items.py</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import scrapy</div><div class="line"></div><div class="line"></div><div class="line">class HelloItem(scrapy.Item):</div><div class="line">    # define the fields for your item here like:</div><div class="line">    link = scrapy.Field()</div></pre></td></tr></table></figure>
+<p>这个Item只定义了一个属性<code>link</code>，来保存图片链接。</p>
+<p>接下来编写Spider：</p>
+<p>新建<code>hello/spiders/img_spider.py</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><div class="line"><span class="keyword">from</span> hello.items <span class="keyword">import</span> HelloItem</div><div class="line"></div><div class="line">__author__ = <span class="string">'niko'</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> scrapy</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloSpider</span><span class="params">(scrapy.Spider)</span>:</span></div><div class="line">    name = <span class="string">"img"</span></div><div class="line">    allowed_domains = [<span class="string">"moegirl.org"</span>]</div><div class="line">    start_urls = [</div><div class="line">        <span class="string">"https://zh.moegirl.org/index.php?title=%E7%BB%AB%E6%B3%A2%E4%B8%BD&amp;mobileaction=toggle_view_desktop"</span>,</div><div class="line">    ]</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self, response)</span>:</span></div><div class="line">        title = response.xpath(<span class="string">'//title/text()'</span>).extract()[<span class="number">0</span>]</div><div class="line">        <span class="comment"># TODO make dir with value of title</span></div><div class="line">        items = []</div><div class="line">        <span class="keyword">for</span> image_link <span class="keyword">in</span> response.xpath(<span class="string">'//img/@src'</span>).extract():</div><div class="line">            item = HelloItem()</div><div class="line">            item[<span class="string">'link'</span>] = image_link</div><div class="line">            items.append(item)</div><div class="line">        <span class="keyword">return</span> items</div></pre></td></tr></table></figure>
+<p>上面的代码是使用xpath的选择器，简单的选取了<code>img</code>标签的src属性，并构造了HelloItem实例，传递给框架的pipelines来处理，下面我们看一下pipelines：</p>
+<p><code>hello/pipelines.py</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class HelloPipeline(object):</div><div class="line">    def process_item(self, item, spider):</div><div class="line">        print &apos;\n\n processing image =&gt; &apos; + item[&apos;link&apos;]</div><div class="line">        return item</div></pre></td></tr></table></figure>
+<p>上面定义了一个HelloPipeline，第二个参数<code>item</code>就是我们刚才构造的HelloItem；在process_item()方法中，我们通常会做如下处理：</p>
+<ul>
+<li>清洗数据</li>
+<li>验证数据</li>
+<li>数据去重</li>
+<li>持久化数据</li>
+<li>～～～</li>
+</ul>
+<p>写好自定义的Pipeline之后，我们还需要在<code>settings.py</code>注册：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ITEM_PIPELINES = &#123;</div><div class="line">   &apos;hello.pipelines.HelloPipeline&apos;: 300</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>300</code>是多个pipelines执行的顺序值。</p>
+<p>现在可以执行刚才定义的<code>img</code>小蜘蛛了：</p>
+<pre><code>scrapy crawl img
+</code></pre><p>在console可以看到我们我们爬取网页的所有图片URL了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在这个小例子中，只涉及到了架构图中的Spider和Pipeline，这些middleware还需要更深入的学习和实践。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://doc.scrapy.org/en/latest/intro/tutorial.html" target="_blank" rel="external">http://doc.scrapy.org/en/latest/intro/tutorial.html</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/03/30/python/python_scrapy_get_started/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1433,7 +1914,7 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1515,15 +1996,42 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
       
         
           
-          简介Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。
-可能你还是要问， 为什
-          ...
+            <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。</p>
+<p>可能你还是要问， 为什么要使用slf4j呢？<br>举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。<br>现在你想换成logback或其他的日志实现，你就需要修改100个地方。<br>而如果使用slf4j来写入日志，因为多了一层绑定的过程，你只要切换你的依赖即可。</p>
+<p>使用slf4j很简单，只要加入slf4j-api-xxx.jar、第三方日志实现及其binding包的依赖即可。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;!-- slf4j api --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;slf4j.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback binding --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-classic&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;!-- logback impl --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;ch.qos.logback&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;logback-core&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;$&#123;logback.version&#125;&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<p>接下来， 你就可以“hello world”啦！</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">import org.slf4j.Logger;</div><div class="line">import org.slf4j.LoggerFactory;</div><div class="line"></div><div class="line">public class HelloWorld &#123;</div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    Logger logger = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line">    logger.info(&quot;Hello World&quot;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>根据slf4j的介绍，</p>
+<blockquote>
+<p>each SLF4J binding is hardwired at compile time to use one and only one specific logging framework</p>
+</blockquote>
+<p>它是静态绑定的， 接下来，让我们一起来揭开绑定的神秘面纱吧。</p>
+<h2 id="绑定原理"><a href="#绑定原理" class="headerlink" title="绑定原理"></a>绑定原理</h2><p>这是官网的一张图, 这里展示了常见的一些log实现和绑定：</p>
+<p><img src="/images/slf4j-concrete-bindings.png" alt=""></p>
+<p>前面说过， slf4j是在静态绑定， 为什么这么说呢？ 答案就在绑定实现的包中， 如下：</p>
+<p>logback-classic.jar<br><img src="/images/logback-jar.png" alt=""></p>
+<p>slf4j-log4j.jar<br><img src="/images/slf4j-log4j.png" alt=""></p>
+<p>如上图，可以发现都有<code>org.slf4j.impl.StaticLoggerBinder</code>,<br>再看LoggerFactory.getLogger()时，即<code>org.slf4j.LoggerFactory.getILoggerFactory</code>的调用hierarchy：</p>
+<p><img src="/images/slf4j_LoggerFactory_bind_called.png" alt=""></p>
+<p>其中bind()内部是我们想要的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">private final static void bind() &#123;</div><div class="line">  try &#123;</div><div class="line">    Set staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();</div><div class="line">    reportMultipleBindingAmbiguity(staticLoggerBinderPathSet);</div><div class="line">    // the next line does the binding</div><div class="line">    StaticLoggerBinder.getSingleton();</div><div class="line">    INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;</div><div class="line">    reportActualBinding(staticLoggerBinderPathSet);</div><div class="line">    emitSubstituteLoggerWarning();</div><div class="line">  &#125; catch (NoClassDefFoundError ncde) &#123;</div><div class="line">    String msg = ncde.getMessage();</div><div class="line">    if (messageContainsOrgSlf4jImplStaticLoggerBinder(msg)) &#123;</div><div class="line">      INITIALIZATION_STATE = NOP_FALLBACK_INITIALIZATION;</div><div class="line">      Util.report(&quot;Failed to load class \&quot;org.slf4j.impl.StaticLoggerBinder\&quot;.&quot;);</div><div class="line">      Util.report(&quot;Defaulting to no-operation (NOP) logger implementation&quot;);</div><div class="line">      Util.report(&quot;See &quot; + NO_STATICLOGGERBINDER_URL</div><div class="line">              + &quot; for further details.&quot;);</div><div class="line">    &#125; else &#123;</div><div class="line">      failedBinding(ncde);</div><div class="line">      throw ncde;</div><div class="line">    &#125;</div><div class="line">  &#125; catch (java.lang.NoSuchMethodError nsme) &#123;</div><div class="line">    String msg = nsme.getMessage();</div><div class="line">    if (msg != null &amp;&amp; msg.indexOf(&quot;org.slf4j.impl.StaticLoggerBinder.getSingleton()&quot;) != -1) &#123;</div><div class="line">      INITIALIZATION_STATE = FAILED_INITIALIZATION;</div><div class="line">      Util.report(&quot;slf4j-api 1.6.x (or later) is incompatible with this binding.&quot;);</div><div class="line">      Util.report(&quot;Your binding is version 1.5.5 or earlier.&quot;);</div><div class="line">      Util.report(&quot;Upgrade your binding to version 1.6.x.&quot;);</div><div class="line">    &#125;</div><div class="line">    throw nsme;</div><div class="line">  &#125; catch (Exception e) &#123;</div><div class="line">    failedBinding(e);</div><div class="line">    throw new IllegalStateException(&quot;Unexpected initialization failure&quot;, e);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如代码，绑定方法bind()，首先通过<code>findPossibleStaticLoggerBinderPathSet()：staticLoggerBinderPathSet</code>来获取classpath中可能的binder paths, 如下：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Enumeration&lt;URL&gt; ClassLoader.getSystemResources(String STATIC_LOGGER_BINDER_PATH)</div></pre></td></tr></table></figure></p>
+<p>其中STATIC_LOGGER_BINDER_PATH = “org/slf4j/impl/StaticLoggerBinder.class”。</p>
+<h3 id="多个绑定存在的情况"><a href="#多个绑定存在的情况" class="headerlink" title="多个绑定存在的情况"></a>多个绑定存在的情况</h3><p>当发生多个绑定同时存在时，官方的说明是这样的：</p>
+<blockquote>
+<p>The warning emitted by SLF4J is just that, a warning. Even when multiple bindings are present, SLF4J will pick one logging framework/implementation and bind with it. The way SLF4J picks a binding is determined by the JVM and for all practical purposes should be considered random.</p>
+</blockquote>
+<p>实际运行结果并结合以上代码，当返回的URL有多个时，reportMultipleBindingAmbiguity()会打印出警告：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class path contains multiple SLF4J bindings.</div><div class="line">Found binding in [jar:file:/home/niko/.m2/repository/.../logback-classic-1.1.3.jar!/org/slf4j/impl/StaticLoggerBinder.class[]</div><div class="line">Found binding in [...]</div></pre></td></tr></table></figure>
+<p>然后reportActualBinding()再打印出真正被加载的<code>StaticLoggerBinder</code>的class name，比如：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]</div></pre></td></tr></table></figure></p>
+<p>为了避免这种问题，可以使用maven的全局排除依赖来保证只会出现某一个实现。</p>
+<blockquote>
+<p>more info -&gt; <a href="http://www.slf4j.org/codes.html" target="_blank" rel="external">http://www.slf4j.org/codes.html</a></p>
+</blockquote>
+<h2 id="MDC-Mapped-Diagnostic-Context"><a href="#MDC-Mapped-Diagnostic-Context" class="headerlink" title="MDC (Mapped Diagnostic Context )"></a>MDC (Mapped Diagnostic Context )</h2><p>这个功能只有log4j和logback支持。<br>具体内容请查看log4j和logback部分。</p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/03/03/java/slf4j/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1585,7 +2093,7 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
       
 
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
                alt="niko" />
@@ -1602,10 +2110,10 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
 
           
             <div class="site-state-item site-state-categories">
-              <a href="/categories">
+              
                 <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
-              </a>
+              
             </div>
           
 
@@ -1657,7 +2165,7 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
 </div>
 
 <div class="powered-by">
-  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
 </div>
 
 <div class="theme-info">
@@ -1699,42 +2207,42 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
 
 
   
-  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
 
   
-  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
 
   
-  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
-  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
 
   
-  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
   
-  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
 
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
-
-
-
-  
-  
-
-  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
 
 
 
@@ -1759,7 +2267,10 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
 
   
     
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
   
+
 
 
 
@@ -1805,35 +2316,32 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
             var $resultContent = document.getElementById(content_id);
             $input.addEventListener('input', function(){
                 var matchcounts = 0;
-                var str='<ul class=\"search-result-list\">';                
+                var str='<ul class=\"search-result-list\">';
                 var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
                 $resultContent.innerHTML = "";
                 if (this.value.trim().length > 1) {
                 // perform local searching
                 datas.forEach(function(data) {
-                    var isMatch = true;
+                    var isMatch = false;
                     var content_index = [];
                     var data_title = data.title.trim().toLowerCase();
                     var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
-                    var data_url = data.url;
+                    var data_url = decodeURIComponent(data.url);
                     var index_title = -1;
                     var index_content = -1;
                     var first_occur = -1;
                     // only match artiles with not empty titles and contents
-                    if(data_title != '' && data_content != '') {
+                    if(data_title != '') {
                         keywords.forEach(function(keyword, i) {
                             index_title = data_title.indexOf(keyword);
                             index_content = data_content.indexOf(keyword);
-                            if( index_title < 0 && index_content < 0 ){
-                                isMatch = false;
-                            } else {
-                                if (index_content < 0) {
-                                    index_content = 0;
-                                }
-                                if (i == 0) {
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
                                     first_occur = index_content;
                                 }
-                            }
+                            } 
+							
                         });
                     }
                     // show search results
@@ -1860,7 +2368,7 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
                                 var regS = new RegExp(keyword, "gi");
                                 match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
                             });
-                            
+
                             str += "<p class=\"search-result\">" + match_content +"...</p>"
                         }
                         str += "</li>";
@@ -1876,7 +2384,7 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
     });}
 
     // handle and trigger popup window;
-    $('.popup-trigger').mousedown(function(e) {
+    $('.popup-trigger').click(function(e) {
       e.stopPropagation();
       if (isfetched == false) {
         searchFunc(path, 'local-search-input', 'local-search-result');
@@ -1896,11 +2404,15 @@ sudo apt-get install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-d
     });
   </script>
 
+
+  
+
   
 
   
 
   
+
 
 </body>
 </html>

@@ -31,7 +31,7 @@
 
   
   
-  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -65,21 +65,21 @@
 
 
 
-<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="niko, java, linux" />
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
 
 
 
@@ -102,20 +102,26 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     scheme: 'Muse',
-    sidebar: {"position":"left","display":"always"},
+    sidebar: {"position":"left","display":"post"},
     fancybox: true,
     motion: true,
     duoshuo: {
-      userId: 0,
+      userId: '0',
       author: '博主'
     }
   };
 </script>
 
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/page/3/"/>
+
+
   <title> niko zhang </title>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
 
   
 
@@ -148,7 +154,7 @@
  ">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
       <div class="header-inner"><div class="site-meta ">
   
 
@@ -180,27 +186,13 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
             首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
           </a>
         </li>
       
         
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
             归档
           </a>
@@ -210,9 +202,15 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
           </a>
         </li>
       
@@ -220,10 +218,8 @@
       
         <li class="menu-item menu-item-search">
           
-            <a href="#" class="popup-trigger">
+            <a href="javascript:;" class="popup-trigger">
           
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
             
             搜索
           </a>
@@ -266,7 +262,7 @@
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -348,16 +344,105 @@
       
         
           
-          最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.
-workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.
-为什么这么说呢? 因为
-          ...
+            <p>最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.</p>
+<p>workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.</p>
+<p>为什么这么说呢? 因为我的每个workspace都固定放了不同的工具, 而且不超过2个(保证同一个workspace我可以使用<code>alt+tab</code>快速切换), 这样我不用费时费力去找我要的窗口.</p>
+<p>这样分好类后再加上无敌科学的快捷键, 持之以恒形成条件反射, 外人看来那操作简直碉堡.</p>
+<p>事不宜迟, 赶紧看一下是这个小技巧.</p>
+<h1 id="设置快捷键"><a href="#设置快捷键" class="headerlink" title="设置快捷键"></a>设置快捷键</h1><hr>
+<p>首先我们需要设置用到的快捷键:</p>
+<p>在<code>System Settings</code>的<code>Keyboard</code>中, 可以设置workspace 1-4 的快捷切换键.</p>
+<p>我习惯使用<code>ctrl + 1234</code>, 缺点就是每天感觉在打魔兽, 懂行的一定知道为什么选择这个键.</p>
+<p>如果想用4个以上的workspace点算啊?</p>
+<p>莫担心, 比如我使用的是gnome, 可以这样:</p>
+<pre><code>$ dconf read /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
+[&apos;&lt;Primary&gt;4&apos;]
+</code></pre><p>读出值是: <code>&#39;&lt;Primary&gt;4&#39;</code></p>
+<p>同样的, 我们把workspace 5的键值写入相应的workspace:</p>
+<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
+</code></pre><p>同理, 其他workspace也是这样设置, 为了造福网友, 这里还是贴一下:</p>
+<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-6 &quot;[&apos;&lt;Primary&gt;6&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-7 &quot;[&apos;&lt;Primary&gt;7&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-8 &quot;[&apos;&lt;Primary&gt;8&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-9 &quot;[&apos;&lt;Primary&gt;9&apos;]&quot;
+dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apos;&lt;Primary&gt;0&apos;]&quot;
+</code></pre><p>当然还有移动窗口（把当前窗口移动到某个工作区）的快捷键设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-1  &quot;[&apos;&lt;Alt&gt;1&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-2  &quot;[&apos;&lt;Alt&gt;2&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-3  &quot;[&apos;&lt;Alt&gt;3&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-4  &quot;[&apos;&lt;Alt&gt;4&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-5  &quot;[&apos;&lt;Alt&gt;5&apos;]&quot;</div></pre></td></tr></table></figure>
+<h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
+<p>接下来是工作区的分类, 主要关注每个工作区放置什么工具. 有了这些分类, 切换工具几乎不用时间思考和寻找了.<br>以下是我常用的分类:</p>
+<table>
+<thead>
+<tr>
+<th>workspace</th>
+<th>放置的工具</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>terminator 控制台 &amp; file manger</td>
+</tr>
+<tr>
+<td>-</td>
+<td>PDF reader</td>
+</tr>
+<tr>
+<td>2</td>
+<td>IDE</td>
+</tr>
+<tr>
+<td>3</td>
+<td>博客/笔记工具</td>
+</tr>
+<tr>
+<td>-</td>
+<td>思维导图工具</td>
+</tr>
+<tr>
+<td>4</td>
+<td>chrome (工作用)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>虚拟机</td>
+</tr>
+<tr>
+<td>6</td>
+<td>空</td>
+</tr>
+<tr>
+<td>7</td>
+<td>scrum 任务面板</td>
+</tr>
+<tr>
+<td>-</td>
+<td>WPS sheet</td>
+</tr>
+<tr>
+<td>8</td>
+<td>原型文档</td>
+</tr>
+<tr>
+<td>9</td>
+<td>IDE 2</td>
+</tr>
+<tr>
+<td>0</td>
+<td>音乐播放器</td>
+</tr>
+<tr>
+<td>-</td>
+<td>chrome 2</td>
+</tr>
+</tbody>
+</table>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>需要强调的是, 这个分类是根据个人的实际使用需求来定制的, 制订了一个分类后, 在实际使用的时候, 如果有不适或者更好的, 可以随时调整, 或者说不断迭代吧.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects" target="_blank" rel="external">http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/05/01/linux/practice/my_workspace_management/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -393,7 +478,7 @@ workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -475,14 +560,56 @@ workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率
       
         
           
-          tensorflowtensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is chea
-          ...
+            <h1 id="tensorflow"><a href="#tensorflow" class="headerlink" title="tensorflow"></a>tensorflow</h1><p>tensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.</p>
+<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>数据集采用<code>MNIST 手写图片数据集</code>的图片，可以从<a href="http://yann.lecun.com/exdb/mnist/" target="_blank" rel="external">这个网站</a>下载, 或者使用这个<a href="https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank" rel="external">python脚本</a>来获取数据:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">from tensorflow.examples.tutorials.mnist import input_data</div><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div></pre></td></tr></table></figure>
+<p>这个数据集有三部分, 55000个训练数据+10000个测试数据+5000个验证数据.</p>
+<p>每个数据包含了手写图片和对应的label, 每个是28*28像素的, 用数组保存, 可以把这个矩阵转换为一个<code>28x28=784</code>大小的vector.</p>
+<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>有了数据集, 就可以导入和开始初始化主要参数:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div><div class="line">model_filepath = &quot;model2.ckpt&quot;</div><div class="line">sess = tf.InteractiveSession()</div><div class="line"></div><div class="line">x = tf.placeholder(tf.float32, [None, 784])</div><div class="line">y_ = tf.placeholder(tf.float32, [None, 10])</div><div class="line"></div><div class="line">W = tf.Variable(tf.zeros([784, 10]))</div><div class="line">b = tf.Variable(tf.zeros([10]))</div></pre></td></tr></table></figure>
+<p>Variable和placeholder的区别是, Variable需要初始化值, 而placeholder则不需要, 你可以在运行时通过<code>Session.run</code>中的<code>feed_dict</code>来指定值.</p>
+<p>上面y的计算描述如下图:</p>
+<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-01.png" alt=""></p>
+<p>写成矩阵计算就是:</p>
+<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-02.png" alt=""></p>
+<h1 id="构建多层卷积网络"><a href="#构建多层卷积网络" class="headerlink" title="构建多层卷积网络"></a>构建多层卷积网络</h1><p>要构建CNN(这里假设你已经了解CNN的相关内容), 我们会创建很多权重和偏置参数, 一般我们应该用小噪声的权重去初始化, 为了<code>symmetry breaking</code>和避免<code>0 gradients</code>. 因为我们使用的是<code>ReLu</code>激活函数, 用较小的正值bias来初始化可以有效地避免<code>dead neurons</code>. 这部分会被反复使用到, 因此需要写成一个function.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def weight_variable(shape):</div><div class="line">    initial = tf.truncated_normal(shape, stddev=0.1)</div><div class="line">    return tf.Variable(initial)</div><div class="line"></div><div class="line">def bias_variable(shape):</div><div class="line">    initial = tf.constant(0.1, shape=shape)</div><div class="line">    return tf.Variable(initial)</div></pre></td></tr></table></figure>
+<h1 id="构建第一卷积层"><a href="#构建第一卷积层" class="headerlink" title="构建第一卷积层"></a>构建第一卷积层</h1><p>使用刚才介绍的初始化function,</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv1 = weight_variable([5, 5, 1, 32])</div><div class="line">b_conv1 = bias_variable([32])</div><div class="line">x_image = tf.reshape(x, [-1, 28, 28, 1])</div></pre></td></tr></table></figure>
+<p>上面的<code>[5, 5, 1, 32]</code>，表示weight的形状, 第一和第二参数表示使用<code>5*5</code>的patch，第三个参数表示有一个输入通道（因为是灰度图片），第四个参数表示32个输出通道。同时, 我们有一个相应的偏置向量来对应每个输出通道.</p>
+<p>为了使用这一卷积层, 我们需要把图片输入reshape成四维的tensor: <code>[-1,28,28,1]</code>.<br><code>-1</code>表示flat, 第二三维表示图片大小, 第四维表示颜色通道.</p>
+<h2 id="卷积和池化-采样"><a href="#卷积和池化-采样" class="headerlink" title="卷积和池化(采样)"></a>卷积和池化(采样)</h2><p>接下来, 设置卷积的步长为1和<code>SAME</code>的padding方式, 池化采用2*2的大小. 这个也是可以复用的, 因此封装成一个function.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def conv2d(x, W):</div><div class="line">  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding=&apos;SAME&apos;)</div><div class="line"></div><div class="line">def max_pool_2x2(x):</div><div class="line">  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],</div><div class="line">                        strides=[1, 2, 2, 1], padding=&apos;SAME&apos;)</div></pre></td></tr></table></figure>
+<p>使用上面定义的卷积(使用relu激活)和池化函数计算:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)</div><div class="line">h_pool1 = max_pool_2x2(h_conv1)</div></pre></td></tr></table></figure>
+<h1 id="第二卷积层"><a href="#第二卷积层" class="headerlink" title="第二卷积层"></a>第二卷积层</h1><p>此时, 输入是第一卷积池化层的计算结果. 因此weight的输入channel变成了32, 输出设置为64, 同样的bias向量大小也相应设置为64.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv2 = weight_variable([5, 5, 32, 64])</div><div class="line">b_conv2 = bias_variable([64])</div><div class="line"></div><div class="line">h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)</div><div class="line">h_pool2 = max_pool_2x2(h_conv2)</div></pre></td></tr></table></figure>
+<h1 id="全连接"><a href="#全连接" class="headerlink" title="全连接"></a>全连接</h1><p>经过前面的处理, 此时的图片size已经减到7*7, 可以使用全连接来处理整个输入了. 这里我们选择1024个神经元:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc1 = weight_variable([7 * 7 * 64, 1024])</div><div class="line">b_fc1 = bias_variable([1024])</div><div class="line">h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])</div><div class="line">h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)</div></pre></td></tr></table></figure>
+<h1 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h1><p>这个操作主要减少一些过拟合, 使用的方法是<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">dropout</a>:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">keep_prob = tf.placeholder(tf.float32)</div><div class="line">h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)</div></pre></td></tr></table></figure>
+<h1 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc2 = weight_variable([1024, 10])</div><div class="line">b_fc2 = bias_variable([10])</div></pre></td></tr></table></figure>
+<p>使用 <code>softmax</code> 回归分类, 计算分类结果:</p>
+<pre><code>y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+</code></pre><h1 id="评估模型的方法"><a href="#评估模型的方法" class="headerlink" title="评估模型的方法"></a>评估模型的方法</h1><p>获取到预测值后, 我们需要了解预测值和真实结果的差距, 定义我们的cost function:</p>
+<pre><code>cross_entropy = -tf.reduce_sum(y_ * tf.log(y_conv))
+</code></pre><h1 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h1><p>因此, 要达到我们预期的效果, 训练模型需要把<code>cross_entropy</code>减少到最小, 这里采用<code>AdamOptimizer</code>(更多Optimizer请戳<a href="https://www.tensorflow.org/versions/r0.9/api_docs/python/train.html#optimizers" target="_blank" rel="external">这里</a>):</p>
+<pre><code>train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+for i in range(20000):
+    batch = mnist.train.next_batch(50)
+    train_step.run(feed_dict={x: batch[0], y_: batch[1])    
+</code></pre><h1 id="保存模型"><a href="#保存模型" class="headerlink" title="保存模型"></a>保存模型</h1><p>训练结束后, 可以把结果保存成模型文件, 供以后识别图片使用.</p>
+<pre><code>save_path = saver.save(sess, model_filepath)
+</code></pre><h1 id="查看训练结果"><a href="#查看训练结果" class="headerlink" title="查看训练结果"></a>查看训练结果</h1><p>由于我们需要看当前训练的情况, 要加上一些debug的输出(比如精准度等), 于是将代码修改一下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))</div><div class="line">train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)</div><div class="line">correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))</div><div class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</div><div class="line">sess.run(tf.initialize_all_variables())</div><div class="line"></div><div class="line">for i in range(20000):</div><div class="line">  batch = mnist.train.next_batch(50)</div><div class="line">  if i%100 == 0:</div><div class="line">    train_accuracy = accuracy.eval(feed_dict=&#123;</div><div class="line">        x:batch[0], y_: batch[1], keep_prob: 1.0&#125;)</div><div class="line">    print(&quot;step %d, training accuracy %g&quot;%(i, train_accuracy))</div><div class="line">  train_step.run(feed_dict=&#123;x: batch[0], y_: batch[1], keep_prob: 0.5&#125;)</div><div class="line"></div><div class="line">print(&quot;test accuracy %g&quot;%accuracy.eval(feed_dict=&#123;</div><div class="line">    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0&#125;))</div></pre></td></tr></table></figure>
+<p>运行这个python脚本, 从输出可以看出, 随着step的增加, 训练的精准度在不断提升然后稳定, 最终使用测试集的精确度达到了99.21%, 如下</p>
+<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-01.png" alt=""></p>
+<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-02.png" alt=""></p>
+<p>至于如何使用训练出来的模型去识别图片, 以及如何可视化训练过程, 将在接下来的两篇博客中介绍.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://www.tensorflow.org/versions/r0.8/tutorials/mnist/pros/index.html#deep-mnist-for-experts" target="_blank" rel="external">Deep MNIST for Experts</a><br><a href="http://blog.csdn.net/heyongluoyao8/article/details/49429629" target="_blank" rel="external">机器学习中防止过拟合的处理方法</a><br><a href="http://www.jianshu.com/p/05c4f1621c7e" target="_blank" rel="external">http://www.jianshu.com/p/05c4f1621c7e</a><br><a href="http://blog.csdn.net/zouxy09/article/details/49080029" target="_blank" rel="external">http://blog.csdn.net/zouxy09/article/details/49080029</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -518,7 +645,7 @@ workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -600,19 +727,67 @@ workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率
       
         
           
-          简介作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。
-版本兼容以下版本亲测兼容：
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。<br>但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。</p>
+<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><p>以下版本亲测兼容：</p>
+<ul>
+<li><p>Logstash 2.3.1</p>
+</li>
+<li><p>Elasticsearch 2.3.x</p>
+</li>
+<li><p>Kibana 4.5.0</p>
+</li>
+</ul>
+<blockquote>
+<p>Compatible with Elasticsearch 2.3.x. Kibana can also be installed from our repositories using apt or yum. See Repositories in the Guide.</p>
+</blockquote>
+<h1 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h1><hr>
+<p>主要作用：负责日志检索和分析。</p>
+<pre><code>tar xvf elasticsearch-2.3.2.tar.gz -C /foo/path
+bin/elasticsearch
+</code></pre><p>默认端口是:</p>
+<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><hr>
+<p>主要作用：负责日志的收集，处理和储存。</p>
+<p>使用：</p>
+<pre><code>tar zxvf logstash-2.3.1.tar.gz
+bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
+`-e`代表直接从命令行输入配置文件, input选择了标准输入, output选择了标准输出。
+</code></pre><p>我们要做的是把nginx日志输出存储到Elasticsearch，使用<code>-f</code>传入预先写好的配置：</p>
+<pre><code>bin/logstash -f logstash-nginx.conf
+</code></pre><p><code>logstash-nginx.conf</code>是我们需要编写的配置文件，用以指定nginx日志的位置和格式，以及es的接口位置。</p>
+<h2 id="编写-logstash-nginx-conf"><a href="#编写-logstash-nginx-conf" class="headerlink" title="编写 logstash-nginx.conf"></a>编写 logstash-nginx.conf</h2><p>更多关于 <code>logstash 配置文件</code> 的编写， 请参考<a href="https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html" target="_blank" rel="external">官方文档</a></p>
+<p>假设nginx的日志格式为:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</div><div class="line">                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div></pre></td></tr></table></figure>
+<p>新建 <code>logstash-nginx.conf</code> 文件，写入:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#</div><div class="line">input &#123;</div><div class="line">    file &#123;</div><div class="line">        path =&gt; [ &quot;/home/niko/mount/hsb_D/niko/temp_trash/logs/foo.com.access_20160617.log&quot; ]</div><div class="line">        type =&gt; &quot;nginx-access&quot;</div><div class="line">        start_position =&gt; &quot;beginning&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">filter &#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;&quot;message&quot; =&gt; &quot;%&#123;IPORHOST:source_ip&#125; - %&#123;USERNAME:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] %&#123;QS:request&#125; %&#123;INT:status&#125; %&#123;INT:body_bytes_sent&#125; %&#123;QS:http_referer&#125; %&#123;QS:http_user_agent&#125;&quot;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123; hosts =&gt; [&quot;localhost:9200&quot;] &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>启动后，等logstash处理完日志文件并写入es，可以查看es的索引:</p>
+<p><a href="http://localhost:9200/_cat/indices" target="_blank" rel="external">http://localhost:9200/_cat/indices</a></p>
+<p>可以看到以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">yellow open .kibana             1 1 1 0  3.1kb  3.1kb</div><div class="line">yellow open logstash-2016.04.28 5 1 4 0 12.3kb 12.3kb</div></pre></td></tr></table></figure>
+<p>grok 使用请看<a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="external"> grok 插件文档 </a>。</p>
+<p>以上grok解析nginx日志文件到es的配置，当然还可以从其他输入源（不止文件）获取数据，输出到不同位置（redis等其他中间件）。</p>
+<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><hr>
+<p>主要作用：负责日志的可视化。</p>
+<ul>
+<li><p>使用：</p>
+<p>  tar xf kibana-4.5.0-linux-x64.tar.gz -C /foo/path<br>  bin/kibana</p>
+</li>
+<li><p>visit <a href="localhost:5601" target="_blank" rel="external">localhost:5601</a></p>
+</li>
+<li><p>配置index pattern:</p>
+</li>
+<li><p>点击<code>Settings</code>,  在<code>Indices</code>tab, 创建一个<code>index pattern</code>，选择<code>logstash-*</code></p>
+</li>
+<li><p>点击<code>visualization</code>, <code>Create a new visualization</code> 这里选择<code>Line Chart</code>类型图</p>
+</li>
+<li><p>然后选择X和Y坐标，Y有常见的聚合属性，X是nginx日志行的几个字段，完成后点击生成， 如下：</p>
+</li>
+</ul>
+<p><img src="/images/dtai/kibana_01.png" alt=""></p>
+<p>以上只是一个示例，kibana 的功能远强大于此，根据自己的需求去定制可视化吧。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/elastic/examples/tree/master/ELK_NGINX" target="_blank" rel="external">https://github.com/elastic/examples/tree/master/ELK_NGINX</a><br>【2】<a href="http://www.icyfire.me/2014/11/13/logstash-es-kibana.html" target="_blank" rel="external">http://www.icyfire.me/2014/11/13/logstash-es-kibana.html</a><br>【3】<a href="http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html</a><br>【4】<a href="http://www.wklken.me/posts/2015/05/08/elk-data-collect.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/05/08/elk-data-collect.html</a></p>
 
-Logstash 2.3.1
-
-Elasticsearch 2.3
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -648,7 +823,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -730,17 +905,33 @@ Elasticsearch 2.3
       
         
           
-          java的volatile经常见到, 可惜不少程序员都不太了解其用法及工作原理. 很多东西如果不懂其实现原理和机制, 就使用的话, 少不了会埋下许多炸弹, 有时候可能造成严重损失.
-因此, 接下来就简单介绍一下volatile的作用和实现原理:
-线程内存模型
-为什么要说这个呢? 理解Java的线程内
-          ...
+            <p>java的volatile经常见到, 可惜不少程序员都不太了解其用法及工作原理. 很多东西如果不懂其实现原理和机制, 就使用的话, 少不了会埋下许多炸弹, 有时候可能造成严重损失.</p>
+<p>因此, 接下来就简单介绍一下volatile的作用和实现原理:</p>
+<h1 id="线程内存模型"><a href="#线程内存模型" class="headerlink" title="线程内存模型"></a>线程内存模型</h1><hr>
+<p>为什么要说这个呢? 理解Java的线程内存模型有助于我们更好地理解volatile的工作方式.<br>若想了解, 可查看<a href="/2016/04/06/java/concurrent/java_thread_memory_model/">另一篇博客</a></p>
+<h1 id="volatile-作用"><a href="#volatile-作用" class="headerlink" title="volatile 作用"></a>volatile 作用</h1><hr>
+<h2 id="1-可见性"><a href="#1-可见性" class="headerlink" title="1. 可见性"></a>1. 可见性</h2><p>我们为什么使用volatile, 相信大部分人都是为了可见性, 保证变量对所有线程的可见性. 比如一条线程修改了变量值, 其他线程可以马上得知.</p>
+<p>某些情况来说, volatile可以避免一致性问题, 因为在使用前都会刷新, 但是在比如自增操作的情况下, 就会有并发一致性的问题.</p>
+<p>我们都知道<code>i++</code>, 转成字节码是有4个指令:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">getstatic</div><div class="line">iconst_1</div><div class="line">iadd</div><div class="line">putstatic</div></pre></td></tr></table></figure>
+<p>在<code>getstatic</code>时, volatile保证了此时的i值是最新的; 但是接下来到<code>pustatic</code>同步回主内存的这个期间, 可能有其他线程更新的i值, 导致数据不一致.</p>
+<p>需要注意, 这些字节码指令也不一定是原子操作(<code>-XX:+PrintAssembly</code>可查看汇编指令). 因此, volatile只能保证可见性, 而非一致性. 有些场景我们还是需要用锁来保证原子性(或者使用CAS).</p>
+<h3 id="其他方法实现可见性"><a href="#其他方法实现可见性" class="headerlink" title="其他方法实现可见性:"></a>其他方法实现可见性:</h3><p>除了volatile, 还有两个关键字能实现可见性: <code>synchronized</code>和<code>final</code>.<br>synchronized: 在unlock前, 会把数据同步回主内存(store + write).<br>final: 构造器初始化完成后, 变量的值就固定了.</p>
+<h2 id="2-禁止指令重排序优化"><a href="#2-禁止指令重排序优化" class="headerlink" title="2. 禁止指令重排序优化"></a>2. 禁止指令重排序优化</h2><blockquote>
+<p>大多数现代微处理器都会采用将指令乱序执行的方法（out-of-order execution，简称OoOE或OOE）,在条件允许的情况下，直接运行当前有能力立即执行的后续指令，避开获取下一条指令所需数据时造成的等待, 这样可以大大提高执行效率。JIT编译器也会做指令重排序操作4，即生成的机器指令与字节码指令顺序不一致。</p>
+</blockquote>
+<p>具体可以看下面的两个例子:</p>
+<h3 id="例子1-提前执行"><a href="#例子1-提前执行" class="headerlink" title="例子1: 提前执行"></a>例子1: 提前执行</h3><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 初始化</div><div class="line">volatile boolean initialized = false;</div><div class="line">...</div><div class="line">doInit();</div><div class="line">initialized = true;</div><div class="line"></div><div class="line">// 线程2</div><div class="line">while (!initialized) &#123;</div><div class="line">    sleep();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面代码中的<code>initialized</code>用了volatile修饰, 若非如此, <code>initialized = true</code>可能被提前执行. 因为机器级别的重排序优化, 把该代码的汇编指令提前执行了, 使用volatile就可以避免这种情况的发生.</p>
+<h3 id="例子2-双重检查"><a href="#例子2-双重检查" class="headerlink" title="例子2: 双重检查"></a>例子2: 双重检查</h3><p>相信看过GOF的<code>&lt;设计模式&gt;</code>的同学, 应该记得单例模式那部分有提到双重检查延迟初始化的代码, 大概是这样的:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class VolatileSingleton &#123;</div><div class="line">    private volatile static VolatileSingleton instance;</div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        VolatileSingleton.getInstance();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static VolatileSingleton getInstance() &#123;</div><div class="line">        if (instance == null) &#123;</div><div class="line">            synchronized (VolatileSingleton.class) &#123;</div><div class="line">                if (instance == null) &#123;</div><div class="line">                    instance = new VolatileSingleton();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        return instance;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中<code>instance</code>用了<code>volatile</code>修饰, 为什么呢? 我们看一下打印出来的汇编代码 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">0x00007f512d108fae: mov    0x20(%rsp),%rsi</div><div class="line">0x00007f512d108fb3: mov    %rsi,%r10</div><div class="line">0x00007f512d108fb6: shr    $0x3,%r10</div><div class="line">0x00007f512d108fba: mov    %r10d,0x68(%rax)</div><div class="line">0x00007f512d108fbe: shr    $0x9,%rax</div><div class="line">0x00007f512d108fc2: mov    $0x7f513f242000,%rsi</div><div class="line">0x00007f512d108fcc: movb   $0x0,(%rax,%rsi,1)</div><div class="line">0x00007f512d108fd0: lock addl $0x0,(%rsp)     ;*putstatic instance</div><div class="line">                                              ; - org.niko.xxx.VolatileSingleton::getInstance@24 (line 18)</div></pre></td></tr></table></figure>
+<p>其中<code>lock addl $0x0,(%rsp)</code>操作(如果去掉<code>volatile</code>的话, 将不会有这一句), 把rsp的内容加0, 这个相当于什么都没做, 这个有什么作用呢? 其实这个和lock搭配, 相当于一个<code>内存屏障</code>, 他会把前面的修改内容同步到内存, 同时通知到缓存子系统.<br>(那为什么不用<code>nop</code>呢? 因为lock不允许和nop搭配使用) lock操作会把高速缓存写入内存, 并促发其他CPU或内存去invalidate自己的cache.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Memory_barrier" target="_blank" rel="external">https://en.wikipedia.org/wiki/Memory_barrier</a><br><a href="http://tech.meituan.com/java-memory-reordering.html" target="_blank" rel="external">http://tech.meituan.com/java-memory-reordering.html</a><br>周志明 - [深入理解Java虚拟机.JVM高级特性与最佳实践]</p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/07/java/concurrent/java_volatile/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -776,7 +967,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -858,16 +1049,77 @@ Elasticsearch 2.3
       
         
           
-          java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: JSR-133)
-主内存和工作内存
-首先要先
-          ...
+            <p>java 线程内存模型, 是由虚拟机规范定义, 旨在屏蔽不同平台硬件和操作系统的差异, 使Java程序在不同平台表现出相同的并发行为和结果, 进行无歧义的内存并发访问操作, 同时让虚拟机也能利用不同硬件和平台的特性去表现更好的性能. (与此相关的规范是: <a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a>)</p>
+<h1 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h1><hr>
+<p>首先要先介绍主内存和工作内存, 这两者到底是什么呢? 周志明的书<code>&lt;深入理解Java虚拟机&gt;</code>中有一幅图, 描述两者的关系:</p>
+<p><img src="/images/java/main_working_memory.png" alt=""></p>
+<p>如果要快速地理解他们之间的关系, 可以类比CPU/高速缓存/内存的关系(对应线程/工作内存/主内存).</p>
+<p>映射到底层来看, 主内存在物理硬件内存中, 工作内存可能会存在于寄存器或高速缓存.</p>
+<h1 id="线程操作术语和框架"><a href="#线程操作术语和框架" class="headerlink" title="线程操作术语和框架"></a>线程操作术语和框架</h1><hr>
+<p>以下操作都是原子的:</p>
+<ul>
+<li><code>lock</code></li>
+</ul>
+<p>锁定一个变量为某个线程独占</p>
+<ul>
+<li><code>unlock</code></li>
+</ul>
+<p>释放已lock的变量</p>
+<ul>
+<li><code>read</code></li>
+</ul>
+<p>从主内存读取variable到工作内存</p>
+<ul>
+<li><code>load</code></li>
+</ul>
+<p>把read到的variable放入工作内存的变量副本</p>
+<ul>
+<li><code>use</code></li>
+</ul>
+<p>把工作内存的变量传递给执行引擎</p>
+<ul>
+<li><code>assign</code></li>
+</ul>
+<p>执行引擎通过此操作值赋给工作内存的变量</p>
+<ul>
+<li><code>store</code></li>
+</ul>
+<p>把工作内存的一个变量值送到主内存中</p>
+<ul>
+<li><code>write</code></li>
+</ul>
+<p>把store送到主内存的值写到主内存变量中</p>
+<p>以上八个操作更详细的介绍可以从这个<a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">JVM Specs 文档</a>中查阅.</p>
+<h1 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h1><hr>
+<p>有了以上8种基本操作, 可以观察到, 这些操作的一些pattern组合是有意义的, 一些是不合法无意义的. 因此我们还需要一些规则来限定这些操作的顺序和组合, 如下:</p>
+<h2 id="变量规则"><a href="#变量规则" class="headerlink" title="变量规则"></a>变量规则</h2><ul>
+<li>不允许丢失最近的<code>assign</code>, 必须把工作内存的变化同步回主内存</li>
+<li>不允许线程没有发生<code>assign</code>就把内容同步回主内存.</li>
+<li>新线程创建时工作内存是空的, 而且需从主内存获取(即use/store前必须已经assign/load)</li>
+<li>read+load和store+write是成对按顺序出现的, 从主内存read了, 工作内存就必须接受; store了主内存, 主内存就必须write</li>
+</ul>
+<h2 id="lock-规则"><a href="#lock-规则" class="headerlink" title="lock 规则"></a>lock 规则</h2><ul>
+<li>同一时刻只能有一个线程进行lock操作, 但同一线程可以lock多次, 同时unlock也需要执行相同的次数.</li>
+<li>不允许lock未被lock的以及被其他线程lock住的变量</li>
+</ul>
+<h2 id="lock和变量互动规则"><a href="#lock和变量互动规则" class="headerlink" title="lock和变量互动规则"></a>lock和变量互动规则</h2><ul>
+<li>unlock时, 必须把内容同步会主内存</li>
+<li>当lock某个变量时, 会清空工作内存中的该变量的值, 当执行引擎使用到该变量时, 从主内存进行load或assign.</li>
+</ul>
+<h1 id="先行发生原则"><a href="#先行发生原则" class="headerlink" title="先行发生原则"></a>先行发生原则</h1><hr>
+<p>观察上面这些规则的设计, 可以发现是比较严谨繁琐的. 但写代码时, 我们判断是否<code>线程安全</code>的方法用的是<code>先行发生(happens-before)原则</code>. 如果程序不在该规则及其推导中, 那么就不是线程安全的. 以下是<a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.4.5" target="_blank" rel="external">主要规则</a>:</p>
+<ul>
+<li>一个线程内, 代码按控制流顺序执行</li>
+<li>监视器上的unlock先于器lock操作</li>
+<li>volatile的write先于随后的read</li>
+<li>start()的调用先于此线程的所有action</li>
+<li>所有action先于该线程的join()返回</li>
+<li>对象初始化操作先于其他action</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr133/index.html" target="_blank" rel="external">JSR-133</a><br><a href="http://gvsmirnov.ru/blog/tech/2014/02/10/jmm-under-the-hood.html" target="_blank" rel="external">Java Memory Model Under The Hood</a><br><a href="https://docs.oracle.com/javase/specs/jvms/se6/html/Threads.doc.html" target="_blank" rel="external">VM Spec Threads and Locks</a><br><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html" target="_blank" rel="external">Chapter 17. Threads and Locks</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/06/java/concurrent/java_thread_memory_model/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -903,7 +1155,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -985,14 +1237,27 @@ Elasticsearch 2.3
       
         
           
-          CASCAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个原
-          ...
+            <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><p>CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把预期值E(expected memory value)和内存中的M(memory value)进行比较, 如果没其他线程修改M, 那么E和M将是相同的, 然后可将M修改为N(new value), 这是一个<code>原子操作</code>. 如果更改的同时, M被其他线程修改了, M和E一般来说不相同, 那么修改就会失败.</p>
+<p>CAS操作基于<code>CPU提供的原子操作</code>指令实现(现在几乎所有的CPU指令都支持CAS的原子操作，X86下对应的是 CMPXCHG 汇编指令), 这是保证数据一致的根本, 也是Java concurrent包并发机制的基础之一, 使用上CAS常被用于实现<code>无锁队列</code>.</p>
+<p>从CAS的机制可以发现, 这和<code>乐观锁</code>很相似, 它假设在它修改之前，没有其它线程修改它, 直到提交的时候才进行检查；而synchronized是一种<code>悲观的策略</code>, 它假设会有线程同时修改它, 因此一开始就锁定, 无论是否真的有线程修改它, 因此性能比较低.</p>
+<h2 id="以AtomicInteger为例"><a href="#以AtomicInteger为例" class="headerlink" title="以AtomicInteger为例:"></a>以AtomicInteger为例:</h2><p>这里使用的时 Jdk 8:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// setup to use Unsafe.compareAndSwapInt for updates</div><div class="line">private static final Unsafe unsafe = Unsafe.getUnsafe();</div><div class="line"></div><div class="line">public final int incrementAndGet() &#123;</div><div class="line">    return unsafe.getAndAddInt(this, valueOffset, 1) + 1;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final boolean compareAndSet(int expect, int update) &#123;</div><div class="line">    return unsafe.compareAndSwapInt(this, valueOffset, expect, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这两个方法的实现要看openjdk8中的<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external"><code>sun.misc.Unsafe.java</code></a> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public final int getAndAddInt(Object o, long offset, int delta) &#123;</div><div class="line">    int v;</div><div class="line">    do &#123;</div><div class="line">        v = getIntVolatile(o, offset);</div><div class="line">    &#125; while (!compareAndSwapInt(o, offset, v, v + delta));</div><div class="line">    return v;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">public final native boolean compareAndSwapInt(java.lang.Object o, long l, int i, int i1);</div></pre></td></tr></table></figure>
+<p>可知, 底层还是依赖native方法compareAndSwapInt(), 进行CAS的操作, 因此这个方法在concurrent和locks包中被大量使用.</p>
+<h1 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h1><p>CAS很好, 不过也有一个问题: <code>ABA问题</code>, 简单来说就是:</p>
+<ol>
+<li>一个进程P1读取值的时候是A</li>
+<li>然后因为一些原因被挂起(时间片耗尽、中断等)</li>
+<li>另一个进程P2把A改成了B, 然后又改回了A</li>
+<li>P1被唤醒, 发现值仍然是A, 没有变化, 于是继续执行</li>
+</ol>
+<p>这个在某些场景下, 可能不会影响正确结果. 但是, 比如在设计一个队列时, <strong>地址重用机制</strong> 将可能导致top指针异常错乱和误修改next元素. <a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">这里有个案例</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">wikipedia给出的一种解决方法</a> 是增加引用计数或者timeStamp(如Java的<code>AtomicStampedReference</code>).</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Compare-and-swap" target="_blank" rel="external">https://en.wikipedia.org/wiki/Compare-and-swap</a><br><a href="http://coolshell.cn/articles/8239.html" target="_blank" rel="external">http://coolshell.cn/articles/8239.html</a><br><a href="http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/java/library/j-jtp04186/index.html</a><br><a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java" target="_blank" rel="external">http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/sun/misc/Unsafe.java</a><br><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf" target="_blank" rel="external">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.53.8674&amp;rep=rep1&amp;type=pdf</a><br><a href="http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/cn/aix/library/au-multithreaded_structures2/index.html</a><br><a href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html" target="_blank" rel="external">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/05/java/concurrent/CAS_ABA_Java/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1028,7 +1293,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1110,16 +1375,23 @@ Elasticsearch 2.3
       
         
           
-          刷入过程0. 准备
-下载recovery和SU：http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113
-下载ROM：http://forum.xda-develo
-          ...
+            <h1 id="刷入过程"><a href="#刷入过程" class="headerlink" title="刷入过程"></a>刷入过程</h1><h2 id="0-准备"><a href="#0-准备" class="headerlink" title="0. 准备"></a>0. 准备</h2><ul>
+<li>下载recovery和SU：<a href="http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/recovery-clockworkmod-recovery-t3060113</a></li>
+<li>下载ROM：<a href="http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056" target="_blank" rel="external">http://forum.xda-developers.com/honor-6/orig-development/rom-cyanogenmod-11-honor-6-t3019056</a></li>
+<li>保证1G的TF卡空闲空间</li>
+</ul>
+<h2 id="1-解锁"><a href="#1-解锁" class="headerlink" title="1. 解锁"></a>1. 解锁</h2><p>官网解锁说明：<a href="https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step" target="_blank" rel="external">https://emui.huawei.com/cn/plugin.php?id=unlock&amp;mod=step</a><br>获取解锁码：<a href="https://www.emui.com/plugin.php?id=unlock" target="_blank" rel="external">https://www.emui.com/plugin.php?id=unlock</a></p>
+<h2 id="2-第三方recovery和root"><a href="#2-第三方recovery和root" class="headerlink" title="2. 第三方recovery和root"></a>2. 第三方recovery和root</h2><p>adb 连接手机，刷入recovery（ClockworkMod）：</p>
+<pre><code>fastboot flash recovery cwm-6.0.5.1_2015xxxx_h60_l0x.img
+（cwm-6.0.5.1_2015xxxx_h60_l0x.img 太长了，最好改个名）
+</code></pre><p>进入recovery，安装SuperSU。</p>
+<h2 id="3-ROM"><a href="#3-ROM" class="headerlink" title="3. ROM"></a>3. ROM</h2><p>我的是H60-L01,<code>20150822</code>这个版本已经可以使用<code>cm-11-20150822-UNOFFICIAL-h60_l02.zip</code>ROM了，有些教程会让你改<code>META-INF/com/google/android/updater-script</code>来跳过机型验证，这个版本的ROM并不需要。<br>由于我改了<code>updater-script</code>导致无法刷入，然而重新启动后，卡在开机画面无法继续。我必须拷贝原ROM到TF卡，再重新进入recovery。</p>
+<p>然而，坑爹的是，荣耀6按住电源键10秒可以重启，没有强制关机的方法。而进入recovery必须在关机状态下，按住<code>电源和音量+</code>键。</p>
+<p>所以准备拔电源了，但是荣耀拔电源是在苦逼，掀了后盖后缺少螺丝刀，于是去午睡准备晚上接着搞。<br>午休时迷迷糊糊灵光一现，能不能在重启的时候，有那几秒，快速进入recovery模式呢？哈哈，问题解决！插入TF卡，5分钟不到，就刷入了CM11。比起之前的EMUI，这流畅度简直让人上天啊。<br>好困，午休就这么过去了～～</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC" target="_blank" rel="external">http://cn.club.vmall.com/forum.php?mod=viewthread&amp;tid=3280749&amp;highlight=%E9%B9%B0%E7%9C%BC</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/04/linux/android/honor6_root_rom/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1155,7 +1427,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1237,16 +1509,25 @@ Elasticsearch 2.3
       
         
           
-          motorola defy，相信是很多人的回忆，他伴随我走过了大学四年，只要我在手里，就感觉是会到了大学校园，教室的最后一排。然而现在很多App已经不能安装了，因为系统仍然是2.x版本，所以需要升级到4.x才能重生。
-准备我的机子是android 2.3版本的，已root。所以需要的工具只是：
-终端
-          ...
+            <p>motorola defy，相信是很多人的回忆，他伴随我走过了大学四年，只要我在手里，就感觉是会到了大学校园，教室的最后一排。然而现在很多App已经不能安装了，因为系统仍然是2.x版本，所以需要升级到<code>4.x</code>才能重生。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>我的机子是android 2.3版本的，已root。<br>所以需要的工具只是：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">终端模拟器.apk</div><div class="line">cm-11-20160330-NIGHTLY-mb52x.zip</div><div class="line">defy_bootstrap_ext3.img</div><div class="line">resize.zip</div></pre></td></tr></table></figure>
+<p>模拟器需要先安装，后面三个文件要放到SD卡根目录。</p>
+<h2 id="开搞"><a href="#开搞" class="headerlink" title="开搞"></a>开搞</h2><p>这次的刷机比以前简单多了，首先，安装完终端模拟器，进入终端使用<code>su</code>命令获取root权限：</p>
+<p>把img写入<code>/dev/block/mmcblk1p21</code>  ：</p>
+<pre><code>cat /sdcard/defy_bootstrap_ext3.img &gt; /dev/block/mmcblk1p21
+</code></pre><p>重启，若无反应，拔电池重新开机：</p>
+<p><img src="/images/defy_android44_recovery_home.jpg" alt=""></p>
+<p>从图标可以看出，对应了手机底部的几个物理按键，选择<code>recovery</code>：</p>
+<p>然后点击<code>install</code>， 进入sdcard选择<code>resize.zip</code>，滑动按钮到右边进行install：</p>
+<p>重启：</p>
+<p>再次进入recovery和install，这次选择<code>cm-11-20160330-NIGHTLY-mb52x.zip</code>，这次文件比较大，会比上次时间长一点，完成后选择<code>reboot system</code>：</p>
+<p>这次进入home界面时，选择<code>Continue</code>进入系统，系统会有2～3分钟的loading动画进行初始化操作，然后就进入用户界面的初始设置，升级complete：</p>
+<p><img src="/images/defy_android44_installed.jpg" alt=""></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p><a href="http://tieba.baidu.com/p/3600016194" target="_blank" rel="external">http://tieba.baidu.com/p/3600016194</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/01/linux/defy_to_cm_android44/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1282,7 +1563,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1364,16 +1645,48 @@ Elasticsearch 2.3
       
         
           
-          4K 对齐为什么要4k对齐呢?主要是为了提高性能和延长寿命, 尤其是运行在window系统和NTFS格式的.
+            <h1 id="4K-对齐"><a href="#4K-对齐" class="headerlink" title="4K 对齐"></a>4K 对齐</h1><h2 id="为什么要4k对齐呢"><a href="#为什么要4k对齐呢" class="headerlink" title="为什么要4k对齐呢?"></a>为什么要4k对齐呢?</h2><p>主要是为了提高性能和延长寿命, 尤其是运行在window系统和NTFS格式的.</p>
+<blockquote>
+<p>從Windows NT開始，微軟導入了「NTFS」這個格式，自此取代了長久以來一直使用的FAT╱FAT32，一直到XP所使用的NTFS 5.X版本以來，硬碟分割區都是從第63個扇區開始（請注意這裡的扇區指的是傳統硬碟喔，不過XP並不會認SSD，所以一律都是以此方式來分割），也就是會保留512Byte＊63=31.5KB的空間大小才開始第一個分區，因此假如你的SSD沒有做過對齊的話，每128個叢集就會跨越兩個block，如果系統剛好操作到跨越兩個block之間的叢集時，就要同時擦除那是不是SSD就得同時操作兩個page來搬移寫入呢？這樣效能一定會下降，因此從Vista開始，就支援將NTFS磁區的起始點設定為4的倍數，這樣一來就不會在出現性能下降的情形，而將分割區設定為4可以整除的數字開始，就稱為「對齊」。</p>
+</blockquote>
+<p>下面是没有对齐的:</p>
+<p><img src="/images/linux/kha7bnwQpeg5sBhVVLPA_unaligned.png" alt=""></p>
+<p>下图是对齐之后的:</p>
+<p><img src="/images/linux/pVxPJVszQR2MpN0SMBuj_aligned.png" alt=""></p>
+<p>更多内容可以参考<a href="http://www.techbang.com/posts/10651-ssd-tuning-practice-3-4k-alignment-upgrade-ssd-performance-cheat-secretly-reported-63-issues-cover-story" target="_blank" rel="external">这个</a></p>
+<h2 id="如何查看是否4k对齐呢"><a href="#如何查看是否4k对齐呢" class="headerlink" title="如何查看是否4k对齐呢 ?"></a>如何查看是否4k对齐呢 ?</h2><pre><code>sudo fdisk -l
+</code></pre><p>查看<code>Primary分区</code>的start栏是否能被8整除, <code>Extended</code>分区可能不能整除8, 不用担心. 如果是ext4, 那是自动对齐的.</p>
+<h2 id="进行-4k-对齐"><a href="#进行-4k-对齐" class="headerlink" title="进行 4k 对齐"></a>进行 4k 对齐</h2><p>window下面可以用系统自带工具或<code>DiskGenius</code>进行分区, linux下使用<code>gparted</code>等.</p>
+<h1 id="trim"><a href="#trim" class="headerlink" title="trim"></a>trim</h1><hr>
+<p>首先我们需要了解一下什么是trim ?</p>
+<blockquote>
+<p>一般来说, 存储设备只知道哪些地方存了数据，但不知道这个数据到底还有没有用（因为文件删除之后，数据实际上可能还留在数据块中），数据有没有用只有操作系统才知道。</p>
+<p>对于物理存储设备来说，“写入空白数据块”和“覆盖已有内容的数据块”所需要的操作是完全相同的。</p>
+</blockquote>
+<p>上面的结论对机械硬盘成立, 但SSD却不是.</p>
+<blockquote>
+<p>由于硬件方面的限制，SSD单独对某个页面进行读/写的操作，但擦除操作却只能对整个块进行，也就是说，一旦擦除就必须一次性擦除整个块。</p>
+<p>在SSD中，数据存储的最小单位是页面（page），一个页面的大小一般是4KB，若干个页面又被组合成块（block），一个块的大小一般是512KB。由于硬件方面的限制，SSD单独对某个页面进行读/写的操作，但擦除操作却只能对整个块进行，也就是说，一旦擦除就必须一次性擦除整个块。</p>
+<p>想想看，如果操作系统要让SSD改写某个页面的数据，SSD需要执行怎样的操作呢：<br>将要改写的目标页面所在的整个块的数据读取到缓存。w<br>在缓存中修改目标页面的数据。<br>对整个块执行擦除操作。<br>将缓存中的数据重新写入整个块中。</p>
+</blockquote>
+<p>这就意味着，如果我要修改某个4KB大小的页面，就必须把512KB大小的整个块都折腾一遍，大家应该可以想象出这将带来何等巨大的性能和寿命上的损失。</p>
+<blockquote>
+<p>SSD中提供了一个TRIM命令，操作系统在删除文件时可以通过向SSD发送TRIM命令告诉它哪些数据块中的数据已经不再使用了。SSD在收到TRIM命令后，通常会在定期的垃圾收集操作中重新组织这些区块，为将来写入数据做好准备，不过每一款SSD在底层对TRIM命令的执行机制都不尽相同，但无论如何，通过TRIM能够显著改善SSD的性能和寿命。当然，大家可能已经发现了，有了TRIM，删除的文件数据会被SSD自动回收，这意味着以往在传统硬盘上能够使用的一些数据恢复（反删除）软件，在SSD上可能就不再管用了。</p>
+</blockquote>
+<h2 id="启用trim"><a href="#启用trim" class="headerlink" title="启用trim"></a>启用trim</h2><h2 id="方法一-discard"><a href="#方法一-discard" class="headerlink" title="方法一: discard"></a>方法一: discard</h2><pre><code>vim /etc/fstab
+</code></pre><p>为SSD的每个分区option中加上<code>discard</code>选项, 每当系统删除文件时, 就会通知ssd进行trim. 可知, 当删除大量文件时, 性能也会有所下降的.<br>更多内容可参考<a href="https://patrick-nagel.net/blog/archives/337" target="_blank" rel="external">这里</a></p>
+<h2 id="方法二-使用-cron-按计划执行-fstrim"><a href="#方法二-使用-cron-按计划执行-fstrim" class="headerlink" title="方法二: 使用 cron 按计划执行 fstrim"></a>方法二: 使用 cron 按计划执行 fstrim</h2><pre><code>sudo vim /etc/cron.daily/trim
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#!/bin/sh</div><div class="line">LOG=/var/log/trim.log</div><div class="line">echo &quot;*** $(date -R) ***&quot; &gt;&gt; $LOG</div><div class="line">fstrim -v / &gt;&gt; $LOG</div></pre></td></tr></table></figure>
+<pre><code>sudo chmod +x /etc/cron.daily/trim
+</code></pre><p>我的<code>/</code>目录时我要trim的ssd分区, 这个根据情况来设置.</p>
+<p>至于cron.daily的具体执行时间, 是在6:25, 如下(<code>cat /etc/crontab</code>):</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ cat /etc/crontab</div><div class="line"># /etc/crontab: system-wide crontab</div><div class="line"># Unlike any other crontab you don&apos;t have to run the `crontab&apos;</div><div class="line"># command to install the new version when you edit this file</div><div class="line"># and files in /etc/cron.d. These files also have username fields,</div><div class="line"># that none of the other crontabs do.</div><div class="line"></div><div class="line">SHELL=/bin/sh</div><div class="line">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</div><div class="line"></div><div class="line"># m h dom mon dow user	command</div><div class="line">17 *	* * *	root    cd / &amp;&amp; run-parts --report /etc/cron.hourly</div><div class="line">25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.daily )</div><div class="line">47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.weekly )</div><div class="line">52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.monthly )</div></pre></td></tr></table></figure>
+<h1 id="查看-fstrim-结果"><a href="#查看-fstrim-结果" class="headerlink" title="查看 fstrim 结果"></a>查看 fstrim 结果</h1><p>每天可以从日志中查看trim结果, <code>tail /var/log/trim.log</code>, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">*** Fri, 12 Aug 2016 08:26:23 +0800 ***</div><div class="line">/: 426609340416 bytes were trimmed</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>[1] Ubuntu 固态硬盘 4K 对齐及启用 Trim - <a href="http://www.slblog.net/2013/07/enable-trim-and-perform-4k-alignment-in-ubuntu/" target="_blank" rel="external">http://www.slblog.net/2013/07/enable-trim-and-perform-4k-alignment-in-ubuntu/</a><br>[2] 【无聊科普】固态硬盘（SSD）为什么需要TRIM？ - <a href="http://www.guokr.com/blog/483475/" target="_blank" rel="external">http://www.guokr.com/blog/483475/</a><br>[3] Ubuntu 固态硬盘 4K对齐及启用 Trim，及其验证方法 - <a href="http://www.cnblogs.com/welhzh/p/4261348.html" target="_blank" rel="external">http://www.cnblogs.com/welhzh/p/4261348.html</a><br>[4] <a href="http://pcedu.pconline.com.cn/504/5047738_all.html" target="_blank" rel="external">你以为数据都被删除了？谈彻底删除文件 </a></p>
 
-從Windows NT開始，微軟導入了「NTFS」這個格式，自此取代了長久以來一直使用的FAT╱FAT32，一直到XP所使用的NTFS 5.X版本以來，硬碟分割區都是從第63個扇區開始（請
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/03/28/linux/tools/ssd_4k_trim/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1409,7 +1722,7 @@ Elasticsearch 2.3
   
   
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
 
     
       <header class="post-header">
@@ -1491,17 +1804,35 @@ Elasticsearch 2.3
       
         
           
-          disconf是分布式配置管理服务平台，目前已经在 百度、滴滴出行、银联、网易、拉勾网、苏宁易购等公司使用，专注于解决分布式环境下的配置管理。
-部署web server：
-要使用disconf，首先需要搭建disconf服务端先，不过先把项目clone下来：
-git clone https://gi
-          ...
+            <p>disconf是分布式配置管理服务平台，目前已经在 百度、滴滴出行、银联、网易、拉勾网、苏宁易购等公司使用，专注于解决分布式环境下的配置管理。</p>
+<h1 id="部署web-server："><a href="#部署web-server：" class="headerlink" title="部署web server："></a>部署web server：</h1><hr>
+<p>要使用disconf，首先需要搭建disconf服务端先，不过先把项目clone下来：</p>
+<pre><code>git clone https://github.com/knightliao/disconf
+</code></pre><h2 id="准备配置文件"><a href="#准备配置文件" class="headerlink" title="准备配置文件"></a>准备配置文件</h2><pre><code>mkdir /home/work/dsp/disconf-rd/online-resources
+mkdir /home/work/dsp/disconf-rd/war
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd  $DISCONF_HOME/disconf-web/</div><div class="line">cp  profile/rd/application-demo.properties /home/work/dsp/disconf-rd/online-resources/application.properties</div><div class="line">cp  profile/rd/jdbc-mysql.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/redis-config.properties /home/work/dsp/disconf-rd/online-resources/</div><div class="line">cp  profile/rd/zoo.properties /home/work/dsp/disconf-rd/online-resources/</div></pre></td></tr></table></figure>
+<h2 id="build-amp-deploy"><a href="#build-amp-deploy" class="headerlink" title="build &amp; deploy"></a>build &amp; deploy</h2><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ONLINE_CONFIG_PATH=/home/work/dsp/disconf-rd/online-resources</div><div class="line">WAR_ROOT_PATH=/home/work/dsp/disconf-rd/war</div><div class="line">export ONLINE_CONFIG_PATH</div><div class="line">export WAR_ROOT_PATH</div><div class="line">cd disconf-web</div><div class="line">sh deploy/deploy.sh</div></pre></td></tr></table></figure>
+<h2 id="准备mysql"><a href="#准备mysql" class="headerlink" title="准备mysql"></a>准备mysql</h2><p>修改mysql用户和密码：</p>
+<pre><code>vim /home/work/dsp/disconf-rd/online-resources/jdbc-mysql.properties
+</code></pre><p>初始化数据库：<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; source 0-init_table.sql</div><div class="line">mysql&gt; source 1-init_data.sql</div><div class="line">mysql&gt; source 201512/20151225.sql</div></pre></td></tr></table></figure></p>
+<h2 id="准备Redis"><a href="#准备Redis" class="headerlink" title="准备Redis"></a>准备Redis</h2><p>默认配置，启动就行了。参考官方文档：<a href="http://redis.io/download" target="_blank" rel="external">http://redis.io/download</a></p>
+<h2 id="准备zookeeper"><a href="#准备zookeeper" class="headerlink" title="准备zookeeper"></a>准备zookeeper</h2><p>默认的disconf的zookeeper客户端配置是三个实例的，如果只是为了体验disconf，可以改成standalone的配置。<br>修改zookeeper服务器的<code>clientPort</code>，使和disconf的zkClient配置一致：</p>
+<p>vim $ZK_HOME/conf/zoo.cfg</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">##############</div><div class="line">clientPort=8581</div><div class="line">##############</div></pre></td></tr></table></figure>
+<p>其他同理（127.0.0.1:8582,127.0.0.1:8583…）。</p>
+<h2 id="准备tomcat"><a href="#准备tomcat" class="headerlink" title="准备tomcat"></a>准备tomcat</h2><p>vim $TOMCAT_HOME/conf/server.xml<br>在Host结点下增加：</p>
+<pre><code>&lt;Context path=&quot;&quot; docBase=&quot;/home/work/dsp/disconf-rd/war&quot;&gt;&lt;/Context&gt;
+</code></pre><p>访问端口设为<code>8015</code>。</p>
+<h2 id="准备nginx"><a href="#准备nginx" class="headerlink" title="准备nginx"></a>准备nginx</h2><p>vim /path/nginx.conf</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">upstream disconf &#123;</div><div class="line">    server 127.0.0.1:8015;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line"></div><div class="line">    listen   8081;</div><div class="line">    server_name localhost;</div><div class="line">    access_log /home/work/var/logs/disconf/access.log;</div><div class="line">    error_log /home/work/var/logs/disconf/error.log;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root /home/work/dsp/disconf-rd/war/html;</div><div class="line">        # niko , use alias if root not working</div><div class="line">        # alias /home/work/dsp/disconf-rd/war/html/;</div><div class="line">        if ($query_string) &#123;</div><div class="line">            expires max;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    location ~ ^/(api|export) &#123;</div><div class="line">        proxy_pass_header Server;</div><div class="line">        proxy_set_header Host $http_host;</div><div class="line">        proxy_redirect off;</div><div class="line">        proxy_set_header X-Real-IP $remote_addr;</div><div class="line">        proxy_set_header X-Scheme $scheme;</div><div class="line">        proxy_pass http://disconf;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>记得要</p>
+<pre><code>mkdir /home/work/var/logs/disconf/ -p
+</code></pre><p>如果没有该目录，无法访问页面。</p>
+<h2 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h2><p>完成以上的搭建后，访问<code>http://localhost:8081/main.html</code>，就可以看到管理页面了（账号密码是<code>admin/admin</code>）。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="https://github.com/knightliao/disconf" target="_blank" rel="external">https://github.com/knightliao/disconf</a></p>
 
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/03/01/java/dist/disconf_1_server/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+          
         
       
     </div>
@@ -1563,7 +1894,7 @@ git clone https://gi
       
 
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
                alt="niko" />
@@ -1580,10 +1911,10 @@ git clone https://gi
 
           
             <div class="site-state-item site-state-categories">
-              <a href="/categories">
+              
                 <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">分类</span>
-              </a>
+              
             </div>
           
 
@@ -1635,7 +1966,7 @@ git clone https://gi
 </div>
 
 <div class="powered-by">
-  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
 </div>
 
 <div class="theme-info">
@@ -1677,42 +2008,42 @@ git clone https://gi
 
 
   
-  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
 
   
-  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
 
   
-  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
-  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
 
   
-  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
   
-  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
 
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
-
-
-
-  
-  
-
-  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
 
 
 
@@ -1737,7 +2068,10 @@ git clone https://gi
 
   
     
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
   
+
 
 
 
@@ -1783,35 +2117,32 @@ git clone https://gi
             var $resultContent = document.getElementById(content_id);
             $input.addEventListener('input', function(){
                 var matchcounts = 0;
-                var str='<ul class=\"search-result-list\">';                
+                var str='<ul class=\"search-result-list\">';
                 var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
                 $resultContent.innerHTML = "";
                 if (this.value.trim().length > 1) {
                 // perform local searching
                 datas.forEach(function(data) {
-                    var isMatch = true;
+                    var isMatch = false;
                     var content_index = [];
                     var data_title = data.title.trim().toLowerCase();
                     var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
-                    var data_url = data.url;
+                    var data_url = decodeURIComponent(data.url);
                     var index_title = -1;
                     var index_content = -1;
                     var first_occur = -1;
                     // only match artiles with not empty titles and contents
-                    if(data_title != '' && data_content != '') {
+                    if(data_title != '') {
                         keywords.forEach(function(keyword, i) {
                             index_title = data_title.indexOf(keyword);
                             index_content = data_content.indexOf(keyword);
-                            if( index_title < 0 && index_content < 0 ){
-                                isMatch = false;
-                            } else {
-                                if (index_content < 0) {
-                                    index_content = 0;
-                                }
-                                if (i == 0) {
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
                                     first_occur = index_content;
                                 }
-                            }
+                            } 
+							
                         });
                     }
                     // show search results
@@ -1838,7 +2169,7 @@ git clone https://gi
                                 var regS = new RegExp(keyword, "gi");
                                 match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
                             });
-                            
+
                             str += "<p class=\"search-result\">" + match_content +"...</p>"
                         }
                         str += "</li>";
@@ -1854,7 +2185,7 @@ git clone https://gi
     });}
 
     // handle and trigger popup window;
-    $('.popup-trigger').mousedown(function(e) {
+    $('.popup-trigger').click(function(e) {
       e.stopPropagation();
       if (isfetched == false) {
         searchFunc(path, 'local-search-input', 'local-search-result');
@@ -1874,11 +2205,15 @@ git clone https://gi
     });
   </script>
 
+
+  
+
   
 
   
 
   
+
 
 </body>
 </html>
