@@ -204,117 +204,6 @@
             
             
               
-                <a class="post-title-link" href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="url">
-                  edup 无线网卡驱动安装
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-08-22T00:00:00+08:00" content="2015-08-22">
-              2015-08-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>最近买了一个新无线网卡, 可惜在linux上用时, 总是几分钟后就断, 停止working, 于是尝试安装官方光盘中的驱动, 竟然有许多编译错误…只能在网上找驱动了~~</p>
-<h1 id="查询网卡型号"><a href="#查询网卡型号" class="headerlink" title="查询网卡型号"></a>查询网卡型号</h1><p>使用<code>lsusb -v</code>查到usb无线网卡的相关信息, 如下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Bus 003 Device 002: ID 0bda:8178 Realtek Semiconductor Corp. RTL8192CU 802.11n WLAN Adapter</div><div class="line">Device Descriptor:</div><div class="line">  bLength                18</div><div class="line">  bDescriptorType         1</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  idVendor           0x0bda Realtek Semiconductor Corp.</div><div class="line">  idProduct          0x8178 RTL8192CU 802.11n WLAN Adapter</div><div class="line">  bcdDevice            2.00</div><div class="line">  iManufacturer           1 Realtek</div><div class="line">  iProduct                2 802.11n WLAN Adapter</div><div class="line">  iSerial                 3 00e04c000001</div><div class="line">  bNumConfigurations      1</div><div class="line">  Configuration Descriptor:</div><div class="line">    bLength                 9</div><div class="line">    bDescriptorType         2</div><div class="line">    wTotalLength           46</div><div class="line">    bNumInterfaces          1</div><div class="line">    bConfigurationValue     1</div><div class="line">    iConfiguration          0</div><div class="line">    bmAttributes         0xa0</div><div class="line">      (Bus Powered)</div><div class="line">      Remote Wakeup</div><div class="line">    MaxPower              500mA</div><div class="line">    Interface Descriptor:</div><div class="line">      bLength                 9</div><div class="line">      bDescriptorType         4</div><div class="line">      bInterfaceNumber        0</div><div class="line">      bAlternateSetting       0</div><div class="line">      bNumEndpoints           4</div><div class="line">      bInterfaceClass       255 Vendor Specific Class</div><div class="line">      bInterfaceSubClass    255 Vendor Specific Subclass</div><div class="line">      bInterfaceProtocol    255 Vendor Specific Protocol</div><div class="line">      iInterface              0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x81  EP 1 IN</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x02  EP 2 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x03  EP 3 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x84  EP 4 IN</div><div class="line">        bmAttributes            3</div><div class="line">          Transfer Type            Interrupt</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0040  1x 64 bytes</div><div class="line">        bInterval               1</div><div class="line">Device Qualifier (for other device speed):</div><div class="line">  bLength                10</div><div class="line">  bDescriptorType         6</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  bNumConfigurations      1</div><div class="line">Device Status:     0x0000</div><div class="line">  (Bus Powered)</div></pre></td></tr></table></figure>
-<p>可知, 这个网卡型号是<code>Realtek Semiconductor Corp. RTL8192CU 802.11n</code>, 接下来就是搜索驱动.</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接google上面查询到的型号, 很容易找到驱动, 接下来就是安装即可:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo add-apt-repository ppa:hanipouspilot/rtlwifi</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install rtl8192cu-dkms linux-firmware</div></pre></td></tr></table></figure>
-<p>完成后要进行reboot.</p>
-<h1 id="生效-amp-测试"><a href="#生效-amp-测试" class="headerlink" title="生效 &amp; 测试"></a>生效 &amp; 测试</h1><p>查看网络状态可以用<code>ethstatus</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ethstatus -i wlan0</div></pre></td></tr></table></figure>
-<p>开个米神的视频测测:</p>
-<p><img src="/images/linux/tools/edup-wireless-card-ethstatus-test-01.png" alt=""></p>
-<p>整首&lt;恰空&gt;播放流畅稳定, 测试完美 ! :-D</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle" target="_blank" rel="external">http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 <a class="post-title-link" href="/2015/08/22/shadowsocks/" itemprop="url">
                   （随笔）shadowsocks 科学上网工具
                 </a>
@@ -400,6 +289,117 @@ var _hmt = _hmt || [];
 
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
 <p>[1] <a href="https://tumutanzi.com/archives/13005" target="_blank" rel="external">https://tumutanzi.com/archives/13005</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="url">
+                  edup 无线网卡驱动安装
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-08-22T00:00:00+08:00" content="2015-08-22">
+              2015-08-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/22/linux/tools/edup_rtl8192cu_wireless_driver/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>最近买了一个新无线网卡, 可惜在linux上用时, 总是几分钟后就断, 停止working, 于是尝试安装官方光盘中的驱动, 竟然有许多编译错误…只能在网上找驱动了~~</p>
+<h1 id="查询网卡型号"><a href="#查询网卡型号" class="headerlink" title="查询网卡型号"></a>查询网卡型号</h1><p>使用<code>lsusb -v</code>查到usb无线网卡的相关信息, 如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Bus 003 Device 002: ID 0bda:8178 Realtek Semiconductor Corp. RTL8192CU 802.11n WLAN Adapter</div><div class="line">Device Descriptor:</div><div class="line">  bLength                18</div><div class="line">  bDescriptorType         1</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  idVendor           0x0bda Realtek Semiconductor Corp.</div><div class="line">  idProduct          0x8178 RTL8192CU 802.11n WLAN Adapter</div><div class="line">  bcdDevice            2.00</div><div class="line">  iManufacturer           1 Realtek</div><div class="line">  iProduct                2 802.11n WLAN Adapter</div><div class="line">  iSerial                 3 00e04c000001</div><div class="line">  bNumConfigurations      1</div><div class="line">  Configuration Descriptor:</div><div class="line">    bLength                 9</div><div class="line">    bDescriptorType         2</div><div class="line">    wTotalLength           46</div><div class="line">    bNumInterfaces          1</div><div class="line">    bConfigurationValue     1</div><div class="line">    iConfiguration          0</div><div class="line">    bmAttributes         0xa0</div><div class="line">      (Bus Powered)</div><div class="line">      Remote Wakeup</div><div class="line">    MaxPower              500mA</div><div class="line">    Interface Descriptor:</div><div class="line">      bLength                 9</div><div class="line">      bDescriptorType         4</div><div class="line">      bInterfaceNumber        0</div><div class="line">      bAlternateSetting       0</div><div class="line">      bNumEndpoints           4</div><div class="line">      bInterfaceClass       255 Vendor Specific Class</div><div class="line">      bInterfaceSubClass    255 Vendor Specific Subclass</div><div class="line">      bInterfaceProtocol    255 Vendor Specific Protocol</div><div class="line">      iInterface              0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x81  EP 1 IN</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x02  EP 2 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x03  EP 3 OUT</div><div class="line">        bmAttributes            2</div><div class="line">          Transfer Type            Bulk</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0200  1x 512 bytes</div><div class="line">        bInterval               0</div><div class="line">      Endpoint Descriptor:</div><div class="line">        bLength                 7</div><div class="line">        bDescriptorType         5</div><div class="line">        bEndpointAddress     0x84  EP 4 IN</div><div class="line">        bmAttributes            3</div><div class="line">          Transfer Type            Interrupt</div><div class="line">          Synch Type               None</div><div class="line">          Usage Type               Data</div><div class="line">        wMaxPacketSize     0x0040  1x 64 bytes</div><div class="line">        bInterval               1</div><div class="line">Device Qualifier (for other device speed):</div><div class="line">  bLength                10</div><div class="line">  bDescriptorType         6</div><div class="line">  bcdUSB               2.00</div><div class="line">  bDeviceClass            0 (Defined at Interface level)</div><div class="line">  bDeviceSubClass         0</div><div class="line">  bDeviceProtocol         0</div><div class="line">  bMaxPacketSize0        64</div><div class="line">  bNumConfigurations      1</div><div class="line">Device Status:     0x0000</div><div class="line">  (Bus Powered)</div></pre></td></tr></table></figure>
+<p>可知, 这个网卡型号是<code>Realtek Semiconductor Corp. RTL8192CU 802.11n</code>, 接下来就是搜索驱动.</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>直接google上面查询到的型号, 很容易找到驱动, 接下来就是安装即可:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo add-apt-repository ppa:hanipouspilot/rtlwifi</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install rtl8192cu-dkms linux-firmware</div></pre></td></tr></table></figure>
+<p>完成后要进行reboot.</p>
+<h1 id="生效-amp-测试"><a href="#生效-amp-测试" class="headerlink" title="生效 &amp; 测试"></a>生效 &amp; 测试</h1><p>查看网络状态可以用<code>ethstatus</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ethstatus -i wlan0</div></pre></td></tr></table></figure>
+<p>开个米神的视频测测:</p>
+<p><img src="/images/linux/tools/edup-wireless-card-ethstatus-test-01.png" alt=""></p>
+<p>整首&lt;恰空&gt;播放流畅稳定, 测试完美 ! :-D</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle" target="_blank" rel="external">http://askubuntu.com/questions/650887/problem-with-wifi-on-kubuntu-15-04-with-realtek-rtl8192cu-usb-dongle</a></p>
 
             
           </span>

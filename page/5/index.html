@@ -1219,114 +1219,6 @@ app.description=${app.name} is a Spring Boot application
             
             
               
-                <a class="post-title-link" href="/2015/10/01/java/j8/java8_null_check/" itemprop="url">
-                  使用 Java 8 函数接口避免 Null Check
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-10-01T00:00:00+08:00" content="2015-10-01">
-              2015-10-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/10/01/java/j8/java8_null_check/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/01/java/j8/java8_null_check/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p><script><br>  (function() {<br>    var cx = ‘005735843669583756565:phrkilwibwg’;<br>    var gcse = document.createElement(‘script’);<br>    gcse.type = ‘text/javascript’;<br>    gcse.async = true;<br>    gcse.src = ‘<a href="https://cse.google.com/cse.js?cx=">https://cse.google.com/cse.js?cx=</a>‘ + cx;<br>    var s = document.getElementsByTagName(‘script’)[0];<br>    s.parentNode.insertBefore(gcse, s);<br>  })();<br></script></p>
-<p><gcse:search></gcse:search></p>
-<h1 id="使用-Optional"><a href="#使用-Optional" class="headerlink" title="使用 Optional"></a>使用 <code>Optional</code></h1><hr>
-<p>Optional是核心类库的新成员，用来替换null。相信大家对NPE已经司空见惯，在代码里也有不少 null check，null 这个东西也是颇有争议的， 而Optional可以消除我们这种厌恶感，鼓励我们适当时候去检查null值，防止程序崩溃。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例 :"></a>示例 :</h2><p>Shop.java</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class Shop &#123;</div><div class="line">    private Integer provinceId;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>不使用 Java8 的 Null Check：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (shop.getProvinceId() != null) &#123;</div><div class="line">    ProvinceEntity productEntity = provinceJpaRepository.findOne(shop.getProvinceId());</div><div class="line">    if (productEntity != null) &#123;</div><div class="line">        shop.setProvinceName(productEntity.getName());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>使用 Java8 的 Null Check：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
-<p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
-<h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 <a class="post-title-link" href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/" itemprop="url">
                   JVM 常用GC算法简介
                 </a>
@@ -1432,6 +1324,114 @@ app.description=${app.name} is a Spring Boot application
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
 <p>&lt;深入理解Java虚拟机 JVM高级特性和最佳实践&gt;.周志明</p>
 
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                <a class="post-title-link" href="/2015/10/01/java/j8/java8_null_check/" itemprop="url">
+                  使用 Java 8 函数接口避免 Null Check
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-10-01T00:00:00+08:00" content="2015-10-01">
+              2015-10-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/01/java/j8/java8_null_check/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/01/java/j8/java8_null_check/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p><script><br>  (function() {<br>    var cx = ‘005735843669583756565:phrkilwibwg’;<br>    var gcse = document.createElement(‘script’);<br>    gcse.type = ‘text/javascript’;<br>    gcse.async = true;<br>    gcse.src = ‘<a href="https://cse.google.com/cse.js?cx=">https://cse.google.com/cse.js?cx=</a>‘ + cx;<br>    var s = document.getElementsByTagName(‘script’)[0];<br>    s.parentNode.insertBefore(gcse, s);<br>  })();<br></script></p>
+<p><gcse:search></gcse:search></p>
+<h1 id="使用-Optional"><a href="#使用-Optional" class="headerlink" title="使用 Optional"></a>使用 <code>Optional</code></h1><hr>
+<p>Optional是核心类库的新成员，用来替换null。相信大家对NPE已经司空见惯，在代码里也有不少 null check，null 这个东西也是颇有争议的， 而Optional可以消除我们这种厌恶感，鼓励我们适当时候去检查null值，防止程序崩溃。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例 :"></a>示例 :</h2><p>Shop.java</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">class Shop &#123;</div><div class="line">    private Integer provinceId;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">if (shop.getProvinceId() != null) &#123;</div><div class="line">    ProvinceEntity productEntity = provinceJpaRepository.findOne(shop.getProvinceId());</div><div class="line">    if (productEntity != null) &#123;</div><div class="line">        shop.setProvinceName(productEntity.getName());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用 Java8 的 Null Check：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Optional.of(shop).map(Shop::getProvinceId)</div><div class="line">                .map(id -&gt; provinceJpaRepository.findOne(id))</div><div class="line">                .ifPresent(p -&gt; shop.setProvinceName(p.getName()));</div></pre></td></tr></table></figure>
+<p>对比上面的代码，可以发现使用Java8的特性，可以大大减少代码量，Optional的API文档化提高了可读性。</p>
+<h2 id=""><a href="#" class="headerlink" title="#"></a>#</h2>
             
           </span>
         
