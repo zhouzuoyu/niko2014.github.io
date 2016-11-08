@@ -204,6 +204,121 @@
             
             
               
+                <a class="post-title-link" href="/2016/01/30/linux/tools/terminator/" itemprop="url">
+                  terminator 使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-01-30T00:00:00+08:00" content="2016-01-30">
+              2016-01-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/30/linux/tools/terminator/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/30/linux/tools/terminator/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>terminator是一个多窗口的控制台管理器( terminal multiplexer )，通过它我们可以很方便的切割多个控制台窗口，分类任务，充分地利用屏幕空间，使桌面下的工作效率大大提高。除了terminator，若是在纯console下作业，<code>tmux</code>也是不错的选择。</p>
+<h1 id="layout"><a href="#layout" class="headerlink" title="layout"></a>layout</h1><hr>
+<p>由于我们需要打开许多console，所以才需要terminator，但每次开启都要手工去建好tab和window，再进入不同的工作路径等等，实在太烦人。因此，terminator提供了layout的功能，能够满足我们的一键还原console工作环境的需求。接下来通过实操感受一下：</p>
+<h2 id="1-新建一个layout"><a href="#1-新建一个layout" class="headerlink" title="1. 新建一个layout"></a>1. 新建一个layout</h2><p>首先，我们先建立好想要的窗口布局，然后进入<code>Preferences</code>-&gt;<code>layout tab</code>：<br>点击左下角<code>Add</code>一个Layout File, 并命名为<code>work1</code>，这个<code>layout</code>内容就是当前的布局。</p>
+<p><img src="/images/linux/terminator_1.png" alt=""></p>
+<h2 id="2-查看-amp-编辑配置文件"><a href="#2-查看-amp-编辑配置文件" class="headerlink" title="2. 查看&amp;编辑配置文件"></a>2. 查看&amp;编辑配置文件</h2><pre><code>vim ~/.config/terminator/config
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">  [[work01]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
+<p>找到<code>work01</code>的节点，改名为<code>default</code>,原先的<code>default</code>改名为<code>default_bak</code>。</p>
+<p>然后关闭重新打开terminator，可以发现自动打开了两个tab，分割成四个窗口，但是</p>
+<h2 id="3-增加command"><a href="#3-增加command" class="headerlink" title="3. 增加command"></a>3. 增加command</h2><p>这一步可以编辑<code>~/.config/terminator/config</code>文件（如果不嫌麻烦），也可以通过<code>Preference</code>修改。</p>
+<p>通过<code>Preference</code>方式修改：</p>
+<p>找到Terminal，将<code>sslocal -c /etc/ss.json ; bash</code>填入<code>Custom command</code>，其他同理。重新打开</p>
+<p><img src="/images/linux/terminator_2.png" alt=""></p>
+<p>重新打开terminator, perfect。每个上午都可以愉悦的开始一天的工作！</p>
+<p>最后附上修改后的配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">      command = cd ~/dev/tools/servers/ ; bash</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">      command = top; bash</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">      command = sslocal -c /etc/ss.json ; bash</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">      command = cd  ~/dev/git_repos/HexoBlog/hexo-hello/; bash</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">      command = cd ~/dev/git_repos/Java/MavenProj/; bash</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">  [[default_bak]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p>【1】<a href="http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout" target="_blank" rel="external">http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/01/26/linux/tools/cheat-cmd/" itemprop="url">
                   man的铺助工具——cheat
                 </a>
@@ -1417,146 +1532,6 @@ cd synergy-1.7.5-stable
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2015/12/01/java/utils/java_dir_watchdog/" itemprop="url">
-                  java版目录watchdog
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2015-12-01T00:00:00+08:00" content="2015-12-01">
-              2015-12-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/01/java/utils/java_dir_watchdog/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/01/java/utils/java_dir_watchdog/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>工作中我们经常会用到监听目录的功能, 当目录中有文件增加删除等操作时, 执行某些任务. 如果是Java来写, 怎么做呢 ?</p>
-<h1 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h1><p>实现这个功能, 我们要使用到<code>WatchService</code>和<code>Path</code>这两个东西, 首先创建一个WatchService:</p>
-<pre><code>WatchService watcher = FileSystems.getDefault().newWatchService();
-</code></pre><p>接着就可以注册这个WatchService到某个Path了:</p>
-<pre><code>Path dir = ...;
-WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-`ENTRY_CREATE`等事件定义在`StandardWatchEventKinds`中.
-</code></pre><p>注册后, 我们使用<code>WatchService.take()</code>就可以获取目录变更的事件了, 若没有, 则wait .</p>
-<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><p>接下来就是写一个工具类<code>WatchDirUtils</code>, 用来接收和注册监听请求及回调.</p>
-<p>相对于<code>WatchDirUtils</code>, 客户端的需求无非就两个, 一个是要监听的目录, 另一个是变更时的Callback. 我们可以封装成一个类.</p>
-<p>我们暂且定义<code>WatchPath</code>和<code>WatchCallback</code>两个接口:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchPath &#123;</div><div class="line">    public java.nio.file.Path getPath();</div><div class="line">&#125;</div><div class="line">public interface WatchCallback &#123;</div><div class="line">    public void handle(WatchEvent&lt;?&gt; event);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>然后, 定义一个<code>WatchRequest</code>接口, 继承<code>WatchPath</code>和<code>WatchCallback</code>, 同时要求返回是否递归监听.<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public interface WatchRequest extends WatchPath, WatchCallback &#123;</div><div class="line">    public boolean isRecursive();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>接口定义好了, 接下来就是实现了, 我们新建一个<code>DebugWatchRequest</code>实现类,</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class DebugWatchRequest implements WatchRequest &#123;</div><div class="line">    ...</div><div class="line">    @Override</div><div class="line">    public void handle(WatchEvent&lt;Path&gt; ev) &#123;</div><div class="line">        Path name = ev.context();</div><div class="line">        Path child = dir.resolve(name);</div><div class="line">        System.out.format(&quot;%s: %s\n&quot;, event.kind().name(), child);</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>封装好了watch请求, 只需要定义一个静态方法, 把请求传入即可.</p>
-<pre><code>WatchDirUtils.register(new DebugWatchRequest(Path dir));
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static void register(WatchRequest watchRequest) throws IOException &#123;</div><div class="line">        if (started.compareAndSet(false, true)) &#123;</div><div class="line">            init();</div><div class="line">        &#125;</div><div class="line">        if (serviceDown.get()) &#123;</div><div class="line">            throw new Exception(&quot;watch service down.&quot;);</div><div class="line">        &#125;</div><div class="line">        try &#123;</div><div class="line">            Path dir = watchRequest.getPath();</div><div class="line">            if (watchRequest.isRecursive()) &#123;</div><div class="line">                System.out.format(&quot;Scanning %s ...\n&quot;, dir);</div><div class="line">                registerRecursive(dir, watchRequest);</div><div class="line">                System.out.println(&quot;Done.&quot;);</div><div class="line">            &#125; else &#123;</div><div class="line">                registerNonRecursive(watchRequest);</div><div class="line">            &#125;</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>当该方法第一次被调用时, 会进行初始化:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">private static void init() throws IOException &#123;</div><div class="line">        watcher = FileSystems.getDefault().newWatchService();</div><div class="line">        keysToWatchRequest = new ConcurrentHashMap&lt;&gt;();</div><div class="line">        trace = true;</div><div class="line"></div><div class="line">        // 启动线程来处理事件</div><div class="line">        ExecutorService exec = Executors.newSingleThreadExecutor();</div><div class="line">        exec.execute(new EventProcessor());</div><div class="line"></div><div class="line">        serviceDown.set(false);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>初始化包括新建watcher, 还有keysToWatchRequest(<br>在前面的介绍中, 我们已经知道, register某个目录后, 会有一个WatchKey返回, 所以需要有一个Map来关联WatchKey和Callback ).</p>
-<p>最后启动一个线程来从watcher获取变更的事件, 并调用对应的Callback去handle该事件.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// EventProcessor</div><div class="line"></div><div class="line">private static class EventProcessor implements Runnable &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            while (!Thread.interrupted()) &#123;</div><div class="line">                // wait for key to be signalled</div><div class="line">                WatchKey key;</div><div class="line">                try &#123;</div><div class="line">                    key = watcher.take();</div><div class="line">                &#125; catch (InterruptedException x) &#123;</div><div class="line">                    serviceDown();</div><div class="line">                    return;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                WatchRequest watchRequest = keysToWatchRequest.get(key);</div><div class="line">                if (watchRequest == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no cb) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">                Path dir = watchRequest.getPath();</div><div class="line">                if (dir == null) &#123;</div><div class="line">                    System.err.println(&quot;WatchKey not recognized (no path) !!&quot;);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                for (WatchEvent&lt;?&gt; event: key.pollEvents()) &#123;</div><div class="line">                    WatchEvent.Kind kind = event.kind();</div><div class="line">                    // TBD - provide example of how OVERFLOW event is handled</div><div class="line">                    if (kind == OVERFLOW) &#123;</div><div class="line">                        continue;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    // handle</div><div class="line">                    watchRequest.handle(event);</div><div class="line"></div><div class="line">                    // Context for directory entry event is the file name of entry</div><div class="line">                    WatchEvent&lt;Path&gt; ev = cast(event);</div><div class="line">                    Path name = ev.context();</div><div class="line">                    Path child = dir.resolve(name);</div><div class="line"></div><div class="line">                    // if directory is created, and watching recursively, then</div><div class="line">                    // register it and its sub-directories</div><div class="line">                    if (watchRequest.isRecursive() &amp;&amp; (kind == ENTRY_CREATE)) &#123;</div><div class="line">                        try &#123;</div><div class="line">                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) &#123;</div><div class="line">                                registerRecursive(child, new DebugWatchRequest(child).setIsRecursive(true));</div><div class="line">                            &#125;</div><div class="line">                        &#125; catch (IOException x) &#123;</div><div class="line">                            // ignore to keep sample readbale</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                // reset key and remove from set if directory no longer accessible</div><div class="line">                boolean valid = key.reset();</div><div class="line">                if (!valid) &#123;</div><div class="line">                    keysToWatchRequest.remove(key);</div><div class="line"></div><div class="line">                    // all directories are inaccessible</div><div class="line">                    if (keysToWatchRequest.isEmpty()) &#123;</div><div class="line">                        break;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            serviceDown();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private void serviceDown() &#123;</div><div class="line">            serviceDown.set(true);</div><div class="line">            // TODO REPORT IT</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<h1 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h1><p>这个demo实现了一个简单的目录watch功能, 还有许多地方需要改进. 比如:</p>
-<ul>
-<li><strong>InterruptedException等异常 及 客户端自定义通知方</strong></li>
-</ul>
-<p>当发生interrupt时, 应该停止服务释放资源, 进行记录日志并通过一些report通知给中控或相关人员, 关闭WatchService等 不过也应支持一下客户端自定义通知方式.<br>同时,  OVERFLOW等异常也要有对应的处理方式, 这个WatchService也不能100%保证可靠, 可以采取一些定时扫描的其他措施来弥补.</p>
-<ul>
-<li><strong>事件的处理和Callback的调用效率</strong></li>
-</ul>
-<p>目前的事件处理线程是只有一个的, 而且Callback的handle()时同步调用的.</p>
-<p><strong> 那能够改成异步的呢 ? </strong></p>
-<p>这个要看情况.<br>如果这个回调操作是次要业务, 那就不能使用异步. 因为如果一瞬间促发了许多回调, 那么这些回调同时运行, 极有可能迅速占用系统功能, 影响主业务, 甚至崩溃.<br>使用异步是有一定风险的, 不过开多几个线程还是可以考虑的.</p>
-<ul>
-<li><strong>支持多个WatchCallback</strong></li>
-</ul>
-<p>这个demo支持一个WatchKey对应一个Callback, 当有新的到来时, 就会覆盖旧的, 这个明显不太好. 不过要支持多个WatchCallback也很容易修改.</p>
-<ul>
-<li><strong>增加取消注册的功能</strong></li>
-</ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://docs.oracle.com/javase/tutorial/essential/io/notification.html" target="_blank" rel="external">https://docs.oracle.com/javase/tutorial/essential/io/notification.html</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1599,7 +1574,7 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">58</span>
+              <span class="site-state-item-count">59</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1613,7 +1588,7 @@ WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">136</span>
+              <span class="site-state-item-count">137</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

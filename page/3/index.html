@@ -204,6 +204,128 @@
             
             
               
+                <a class="post-title-link" href="/2016/04/07/java/concurrent/java_volatile/" itemprop="url">
+                  java的volatile浅解
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-07T13:03:30+08:00" content="2016-04-07">
+              2016-04-07
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/07/java/concurrent/java_volatile/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/07/java/concurrent/java_volatile/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p>java的volatile经常见到, 可惜不少程序员都不太了解其用法及工作原理. 很多东西如果不懂其实现原理和机制, 就使用的话, 少不了会埋下许多炸弹, 有时候可能造成严重损失.</p>
+<p>因此, 接下来就简单介绍一下volatile的作用和实现原理:</p>
+<h1 id="线程内存模型"><a href="#线程内存模型" class="headerlink" title="线程内存模型"></a>线程内存模型</h1><hr>
+<p>为什么要说这个呢? 理解Java的线程内存模型有助于我们更好地理解volatile的工作方式.<br>若想了解, 可查看<a href="/2016/04/06/java/concurrent/java_thread_memory_model/">另一篇博客</a></p>
+<h1 id="volatile-作用"><a href="#volatile-作用" class="headerlink" title="volatile 作用"></a>volatile 作用</h1><hr>
+<h2 id="1-可见性"><a href="#1-可见性" class="headerlink" title="1. 可见性"></a>1. 可见性</h2><p>我们为什么使用volatile, 相信大部分人都是为了可见性, 保证变量对所有线程的可见性. 比如一条线程修改了变量值, 其他线程可以马上得知.</p>
+<p>某些情况来说, volatile可以避免一致性问题, 因为在使用前都会刷新, 但是在比如自增操作的情况下, 就会有并发一致性的问题.</p>
+<p>我们都知道<code>i++</code>, 转成字节码是有4个指令:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">getstatic</div><div class="line">iconst_1</div><div class="line">iadd</div><div class="line">putstatic</div></pre></td></tr></table></figure>
+<p>在<code>getstatic</code>时, volatile保证了此时的i值是最新的; 但是接下来到<code>pustatic</code>同步回主内存的这个期间, 可能有其他线程更新的i值, 导致数据不一致.</p>
+<p>需要注意, 这些字节码指令也不一定是原子操作(<code>-XX:+PrintAssembly</code>可查看汇编指令). 因此, volatile只能保证可见性, 而非一致性. 有些场景我们还是需要用锁来保证原子性(或者使用CAS).</p>
+<h3 id="其他方法实现可见性"><a href="#其他方法实现可见性" class="headerlink" title="其他方法实现可见性:"></a>其他方法实现可见性:</h3><p>除了volatile, 还有两个关键字能实现可见性: <code>synchronized</code>和<code>final</code>.<br>synchronized: 在unlock前, 会把数据同步回主内存(store + write).<br>final: 构造器初始化完成后, 变量的值就固定了.</p>
+<h2 id="2-禁止指令重排序优化"><a href="#2-禁止指令重排序优化" class="headerlink" title="2. 禁止指令重排序优化"></a>2. 禁止指令重排序优化</h2><blockquote>
+<p>大多数现代微处理器都会采用将指令乱序执行的方法（out-of-order execution，简称OoOE或OOE）,在条件允许的情况下，直接运行当前有能力立即执行的后续指令，避开获取下一条指令所需数据时造成的等待, 这样可以大大提高执行效率。JIT编译器也会做指令重排序操作4，即生成的机器指令与字节码指令顺序不一致。</p>
+</blockquote>
+<p>具体可以看下面的两个例子:</p>
+<h3 id="例子1-提前执行"><a href="#例子1-提前执行" class="headerlink" title="例子1: 提前执行"></a>例子1: 提前执行</h3><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">// 初始化</div><div class="line">volatile boolean initialized = false;</div><div class="line">...</div><div class="line">doInit();</div><div class="line">initialized = true;</div><div class="line"></div><div class="line">// 线程2</div><div class="line">while (!initialized) &#123;</div><div class="line">    sleep();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面代码中的<code>initialized</code>用了volatile修饰, 若非如此, <code>initialized = true</code>可能被提前执行. 因为机器级别的重排序优化, 把该代码的汇编指令提前执行了, 使用volatile就可以避免这种情况的发生.</p>
+<h3 id="例子2-双重检查"><a href="#例子2-双重检查" class="headerlink" title="例子2: 双重检查"></a>例子2: 双重检查</h3><p>相信看过GOF的<code>&lt;设计模式&gt;</code>的同学, 应该记得单例模式那部分有提到双重检查延迟初始化的代码, 大概是这样的:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public class VolatileSingleton &#123;</div><div class="line">    private volatile static VolatileSingleton instance;</div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        VolatileSingleton.getInstance();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static VolatileSingleton getInstance() &#123;</div><div class="line">        if (instance == null) &#123;</div><div class="line">            synchronized (VolatileSingleton.class) &#123;</div><div class="line">                if (instance == null) &#123;</div><div class="line">                    instance = new VolatileSingleton();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        return instance;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中<code>instance</code>用了<code>volatile</code>修饰, 为什么呢? 我们看一下打印出来的汇编代码 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">0x00007f512d108fae: mov    0x20(%rsp),%rsi</div><div class="line">0x00007f512d108fb3: mov    %rsi,%r10</div><div class="line">0x00007f512d108fb6: shr    $0x3,%r10</div><div class="line">0x00007f512d108fba: mov    %r10d,0x68(%rax)</div><div class="line">0x00007f512d108fbe: shr    $0x9,%rax</div><div class="line">0x00007f512d108fc2: mov    $0x7f513f242000,%rsi</div><div class="line">0x00007f512d108fcc: movb   $0x0,(%rax,%rsi,1)</div><div class="line">0x00007f512d108fd0: lock addl $0x0,(%rsp)     ;*putstatic instance</div><div class="line">                                              ; - org.niko.xxx.VolatileSingleton::getInstance@24 (line 18)</div></pre></td></tr></table></figure>
+<p>其中<code>lock addl $0x0,(%rsp)</code>操作(如果去掉<code>volatile</code>的话, 将不会有这一句), 把rsp的内容加0, 这个相当于什么都没做, 这个有什么作用呢? 其实这个和lock搭配, 相当于一个<code>内存屏障</code>, 他会把前面的修改内容同步到内存, 同时通知到缓存子系统.<br>(那为什么不用<code>nop</code>呢? 因为lock不允许和nop搭配使用) lock操作会把高速缓存写入内存, 并促发其他CPU或内存去invalidate自己的cache.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://en.wikipedia.org/wiki/Memory_barrier" target="_blank" rel="external">https://en.wikipedia.org/wiki/Memory_barrier</a><br><a href="http://tech.meituan.com/java-memory-reordering.html" target="_blank" rel="external">http://tech.meituan.com/java-memory-reordering.html</a><br>周志明 - [深入理解Java虚拟机.JVM高级特性与最佳实践]</p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
                 <a class="post-title-link" href="/2016/04/06/java/concurrent/java_thread_memory_model/" itemprop="url">
                   java thread 内存模型
                 </a>
@@ -1320,121 +1442,6 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
 
     
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/01/30/linux/tools/terminator/" itemprop="url">
-                  terminator 使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-01-30T00:00:00+08:00" content="2016-01-30">
-              2016-01-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/01/30/linux/tools/terminator/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/30/linux/tools/terminator/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>terminator是一个多窗口的控制台管理器( terminal multiplexer )，通过它我们可以很方便的切割多个控制台窗口，分类任务，充分地利用屏幕空间，使桌面下的工作效率大大提高。除了terminator，若是在纯console下作业，<code>tmux</code>也是不错的选择。</p>
-<h1 id="layout"><a href="#layout" class="headerlink" title="layout"></a>layout</h1><hr>
-<p>由于我们需要打开许多console，所以才需要terminator，但每次开启都要手工去建好tab和window，再进入不同的工作路径等等，实在太烦人。因此，terminator提供了layout的功能，能够满足我们的一键还原console工作环境的需求。接下来通过实操感受一下：</p>
-<h2 id="1-新建一个layout"><a href="#1-新建一个layout" class="headerlink" title="1. 新建一个layout"></a>1. 新建一个layout</h2><p>首先，我们先建立好想要的窗口布局，然后进入<code>Preferences</code>-&gt;<code>layout tab</code>：<br>点击左下角<code>Add</code>一个Layout File, 并命名为<code>work1</code>，这个<code>layout</code>内容就是当前的布局。</p>
-<p><img src="/images/linux/terminator_1.png" alt=""></p>
-<h2 id="2-查看-amp-编辑配置文件"><a href="#2-查看-amp-编辑配置文件" class="headerlink" title="2. 查看&amp;编辑配置文件"></a>2. 查看&amp;编辑配置文件</h2><pre><code>vim ~/.config/terminator/config
-</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">  [[work01]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
-<p>找到<code>work01</code>的节点，改名为<code>default</code>,原先的<code>default</code>改名为<code>default_bak</code>。</p>
-<p>然后关闭重新打开terminator，可以发现自动打开了两个tab，分割成四个窗口，但是</p>
-<h2 id="3-增加command"><a href="#3-增加command" class="headerlink" title="3. 增加command"></a>3. 增加command</h2><p>这一步可以编辑<code>~/.config/terminator/config</code>文件（如果不嫌麻烦），也可以通过<code>Preference</code>修改。</p>
-<p>通过<code>Preference</code>方式修改：</p>
-<p>找到Terminal，将<code>sslocal -c /etc/ss.json ; bash</code>填入<code>Custom command</code>，其他同理。重新打开</p>
-<p><img src="/images/linux/terminator_2.png" alt=""></p>
-<p>重新打开terminator, perfect。每个上午都可以愉悦的开始一天的工作！</p>
-<p>最后附上修改后的配置文件：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[global_config]</div><div class="line">  inactive_color_offset = 0.74</div><div class="line">  title_transmit_fg_color = &quot;#fbebeb&quot;</div><div class="line">[keybindings]</div><div class="line">[profiles]</div><div class="line">  [[default]]</div><div class="line">    background_darkness = 0.73</div><div class="line">    palette = &quot;#000000:#aa0000:#00aa00:#aa5500:#0000aa:#aa00aa:#00aaaa:#aaaaaa:#555555:#ff5555:#55ff55:#ffff55:#5555ff:#ff55ff:#55ffff:#ffffff&quot;</div><div class="line">    background_type = transparent</div><div class="line">    background_image = None</div><div class="line">    foreground_color = &quot;#00ff00&quot;</div><div class="line">[layouts]</div><div class="line">  [[default]]</div><div class="line">    [[[child0]]]</div><div class="line">      position = 45:24</div><div class="line">      type = Window</div><div class="line">      order = 0</div><div class="line">      parent = &quot;&quot;</div><div class="line">      size = 1871, 904</div><div class="line">    [[[child1]]]</div><div class="line">      labels = localhost, servers</div><div class="line">      type = Notebook</div><div class="line">      order = 0</div><div class="line">      parent = child0</div><div class="line">    [[[child2]]]</div><div class="line">      position = 438</div><div class="line">      type = VPaned</div><div class="line">      order = 0</div><div class="line">      parent = child1</div><div class="line">    [[[child3]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child2</div><div class="line">    [[[child6]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child2</div><div class="line">    [[[child13]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 1</div><div class="line">      parent = child9</div><div class="line">    [[[child9]]]</div><div class="line">      position = 446</div><div class="line">      type = VPaned</div><div class="line">      order = 1</div><div class="line">      parent = child1</div><div class="line">    [[[child10]]]</div><div class="line">      position = 934</div><div class="line">      type = HPaned</div><div class="line">      order = 0</div><div class="line">      parent = child9</div><div class="line">    [[[terminal11]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child10</div><div class="line">      command = cd ~/dev/tools/servers/ ; bash</div><div class="line">    [[[terminal12]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child10</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal5]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child3</div><div class="line">      command = top; bash</div><div class="line">    [[[terminal4]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child3</div><div class="line">      command = sslocal -c /etc/ss.json ; bash</div><div class="line">    [[[terminal7]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child6</div><div class="line">      command = cd  ~/dev/git_repos/HexoBlog/hexo-hello/; bash</div><div class="line">    [[[terminal15]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">    [[[terminal8]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 1</div><div class="line">      parent = child6</div><div class="line">      command = cd ~/dev/git_repos/Java/MavenProj/; bash</div><div class="line">    [[[terminal14]]]</div><div class="line">      profile = default</div><div class="line">      type = Terminal</div><div class="line">      order = 0</div><div class="line">      parent = child13</div><div class="line">      command = &quot;&quot;</div><div class="line">  [[default_bak]]</div><div class="line">    [[[child1]]]</div><div class="line">      type = Terminal</div><div class="line">      parent = window0</div><div class="line">      profile = default</div><div class="line">    [[[window0]]]</div><div class="line">      type = Window</div><div class="line">      parent = &quot;&quot;</div><div class="line">[plugins]</div></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout" target="_blank" rel="external">http://askubuntu.com/questions/158159/how-do-i-get-terminator-to-start-up-with-my-custom-layout</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1477,7 +1484,7 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">58</span>
+              <span class="site-state-item-count">59</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1491,7 +1498,7 @@ sudo sh ./NVIDIA-Linux-x86_64-352.79.run
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">136</span>
+              <span class="site-state-item-count">137</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>

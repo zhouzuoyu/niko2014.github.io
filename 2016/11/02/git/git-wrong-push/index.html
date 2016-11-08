@@ -62,7 +62,7 @@ reset 毁尸灭迹法
 <meta property="og:image" content="http://niko2014.github.io/images/git/git-remote-wrong-commit-01.png">
 <meta property="og:image" content="http://niko2014.github.io/images/git/git-remote-wrong-commit-02.png">
 <meta property="og:image" content="http://niko2014.github.io/images/git/git-wrong-push-01.png">
-<meta property="og:updated_time" content="2016-11-02T09:24:59.742Z">
+<meta property="og:updated_time" content="2016-11-04T01:28:19.545Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git 推错分支的处理">
 <meta name="twitter:description" content="人的状态总有低落的时候, 平时很谨慎的人也有可能出错, 在git使用时, 经常会有合并了错误分支并推送的情况. 这种情况如何处理呢 ?
@@ -292,7 +292,7 @@ reset 毁尸灭迹法
 <h1 id="revert-警示后人法"><a href="#revert-警示后人法" class="headerlink" title="revert 警示后人法"></a>revert 警示后人法</h1><hr>
 <p>使用 <code>git revert</code> 建立新的commit来回滚, 假设现在服务器和本地的 <code>git log</code>是:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
-<p>其中<code>ceaa73fd804aefc406f6384c9c0fffaedafbcb79</code>是要revert错误commit.</p>
+<p>其中<code>ceaa73fd804aefc406f6384c9c0fffaedafbcb79</code>是要revert的错误commit.</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ git revert ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div></pre></td></tr></table></figure>
 <p>此时的gitlog :</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">commit 4b9fe2c1ad02640fa63cfb18df409086b7681caf</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 17:13:38 2016 +0800</div><div class="line"></div><div class="line">    Revert &quot;Add: txt-02.&quot;</div><div class="line"></div><div class="line">    This reverts commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79.</div><div class="line"></div><div class="line">commit ceaa73fd804aefc406f6384c9c0fffaedafbcb79</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:39 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-02.</div><div class="line"></div><div class="line">commit 42a87088af08b54cf09be122e39e4d85c0f450ec</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 14:54:11 2016 +0800</div><div class="line"></div><div class="line">    Add: txt-01.</div><div class="line"></div><div class="line">commit f000b1ac4bf9dbd57d107895f349f448a3af05cc</div><div class="line">Author: niko &lt;329872193@qq.com&gt;</div><div class="line">Date:   Wed Nov 2 10:27:47 2016 +0800</div><div class="line"></div><div class="line">    hello</div></pre></td></tr></table></figure>
@@ -324,6 +324,10 @@ reset 毁尸灭迹法
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/07/java/opsrc/canal/canal_zookeeper_ha/" rel="prev" title="canal 搭配 zookeeper 实现 HA">
+                canal 搭配 zookeeper 实现 HA <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -392,7 +396,7 @@ reset 毁尸灭迹法
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">58</span>
+              <span class="site-state-item-count">59</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -406,7 +410,7 @@ reset 毁尸灭迹法
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">136</span>
+              <span class="site-state-item-count">137</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
