@@ -1,15 +1,21 @@
 <!doctype html>
-<html class="theme-next use-motion theme-next-mist">
-<head>
+
+
+
   
 
-<meta charset="UTF-8"/>
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
 
+
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
+
 
 
   <meta name="google-site-verification" content="005735843669583756565:phrkilwibwg" />
@@ -20,67 +26,97 @@
 
 
 
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
 
 
   
-    <link href='//fonts.lug.ustc.edu.cn/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
   
 
 
-<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
-
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
-
-
-    <meta name="description" content="去发现更大的世界！" />
-
-
-
-  <meta name="keywords" content="Hexo,next" />
 
 
 
 
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="niko, java, linux" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
 
 
 <meta name="description" content="去发现更大的世界！">
 <meta property="og:type" content="website">
-<meta property="og:title" content="niko">
+<meta property="og:title" content="niko zhang">
 <meta property="og:url" content="http://niko2014.github.io/page/2/index.html">
-<meta property="og:site_name" content="niko">
+<meta property="og:site_name" content="niko zhang">
 <meta property="og:description" content="去发现更大的世界！">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="niko">
+<meta name="twitter:title" content="niko zhang">
 <meta name="twitter:description" content="去发现更大的世界！">
 
 
+
 <script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
   var CONFIG = {
-    scheme: 'Mist',
-    sidebar: 'always'
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
   };
 </script>
 
-
-
-  <title> niko </title>
+  <title> niko zhang </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
-  <!--[if lte IE 8]>
-  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
-    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
-      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
-           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
-           style='margin-left:auto;margin-right:auto;display: block;'/>
-    </a>
-  </div>
-<![endif]-->
   
 
 
@@ -98,9 +134,18 @@
 
 
 
-  <div class="container one-column 
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left 
    page-home 
-">
+ ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -110,11 +155,11 @@
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko</span>
+      <span class="site-title">niko zhang</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle"></p>
+  <p class="site-subtitle">去发现更大的世界 ！</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -129,13 +174,13 @@
   
 
   
-    <ul id="menu" class="menu ">
+    <ul id="menu" class="menu">
       
         
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
           </a>
@@ -145,7 +190,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories" rel="section">
             
-              <i class="menu-item-icon fa fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
             分类
           </a>
@@ -155,7 +200,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
-              <i class="menu-item-icon fa fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
             归档
           </a>
@@ -165,7 +210,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
           </a>
@@ -173,10 +218,32 @@
       
 
       
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
       
     </ul>
   
 
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
   
 </nav>
 
@@ -185,11 +252,17 @@
 
     <main id="main" class="main">
       <div class="main-inner">
-        <div id="content" class="content"> 
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
   <section id="posts" class="posts-expand">
     
       
 
+  
+  
+
+  
   
   
 
@@ -204,6 +277,383 @@
             
             
               
+                
+                <a class="post-title-link" href="/2016/06/02/search/es/es-relations/" itemprop="url">
+                  【设计】elasticsearch - 处理关系型数据
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-06-02T00:00:00+08:00" content="2016-06-02">
+              2016-06-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/02/search/es/es-relations/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/02/search/es/es-relations/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          不同于关系型数据库， 我们使用es， 一般出于性能、弹性、近实时搜索、大数据量的分析等目的。然而， 在构建es数据模型时， 免不了会涉及到关系型数据的问题。关系型的数据在实际应用中广泛存在， 关系型数据库对此比较在行， 比如ACID支持、join查询等。es并不擅长这些，es的使用场景， 不是作为关
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/06/02/search/es/es-relations/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/20/linux/install/dropbox-install/" itemprop="url">
+                  使用`dropbox`服务
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-20T00:00:00+08:00" content="2016-05-20">
+              2016-05-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/20/linux/install/dropbox-install/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/20/linux/install/dropbox-install/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          随着国内的网盘相继关闭, 我常用的快盘也要停止服务了, 只好换dropbox了, 因为平时全流量走代理, 墙的问题倒不是很大, 就是只有2G的免费空间, 不够再买空间, 毕竟免费往往是昂贵的.
+安装过程首先在官网下载ubuntu安装包dropbox_2015.10.28_amd64.deb, 安装完
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/20/linux/install/dropbox-install/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/12/java/opsrc/canal/canal_quick_start/" itemprop="url">
+                  canal quick start
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-12T00:00:00+08:00" content="2016-05-12">
+              2016-05-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/12/java/opsrc/canal/canal_quick_start/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/12/java/opsrc/canal/canal_quick_start/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/12/java/opsrc/canal/canal_quick_start/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/05/10/linux/tools/app-as-service-upstart/" itemprop="url">
                   为 spring boot 程序创建 service
                 </a>
@@ -214,7 +664,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-10T00:00:00+08:00" content="2016-05-10">
               2016-05-10
             </time>
@@ -222,7 +675,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/linux/" itemprop="url" rel="index">
@@ -250,37 +707,41 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <h1 id="把应用做成一个service"><a href="#把应用做成一个service" class="headerlink" title="把应用做成一个service"></a>把应用做成一个service</h1><p>我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。<br>为了方便管理，可以考虑制作成一个service。步骤如下：</p>
-<h2 id="创建-upstart-配置文件"><a href="#创建-upstart-配置文件" class="headerlink" title="创建 upstart 配置文件"></a>创建 upstart 配置文件</h2><p>首先用<code>mvn package</code>打包成jar类型的spring-boot程序， 然后 <code>sudo vim /etc/init/hellosb.conf</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">start on filesystem</div><div class="line">exec /usr/bin/java -jar /path_to/program.jar</div></pre></td></tr></table></figure>
-<p>多行的话使用<code>script</code>标记：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># myprogram.conf</div><div class="line">start on filesystem</div><div class="line">script</div><div class="line">    /usr/bin/java -jar /path_to/program</div><div class="line">    echo &quot;Another command&quot;</div><div class="line">end script</div></pre></td></tr></table></figure>
-<h2 id="service-启动"><a href="#service-启动" class="headerlink" title="service 启动"></a>service 启动</h2><pre><code>sudo ln -s /etc/init/myprogram.conf /etc/init.d/myprogram
-</code></pre><p>建立链接后，使用service就可以用自动补全功能了：</p>
-<pre><code>sudo service myprogram start
-</code></pre><p>上面只是一个简单的启动功能，upstart的配置文件远比这强大，可以做更细节的处理（下图是job的状态变迁图）。</p>
-<p><img src="http://www.ibm.com/developerworks/cn/linux/1407_liuming_init2/image003.jpg" alt="job 状态变迁"></p>
-<h1 id="更进一步"><a href="#更进一步" class="headerlink" title="更进一步"></a>更进一步</h1><p>若想要深入了解，可以查看官方文档和学习一下其他程序（nginx等）的upstart脚本：<a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">Upstart Intro, Cookbook and Best Practises</a></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://upstart.ubuntu.com/cookbook/" target="_blank" rel="external">http://upstart.ubuntu.com/cookbook/</a><br><a href="http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart" target="_blank" rel="external">http://askubuntu.com/questions/351879/how-to-create-a-service-on-ubuntu-upstart</a><br><a href="http://upstart.ubuntu.com/getting-started.html" target="_blank" rel="external">http://upstart.ubuntu.com/getting-started.html</a><br><a href="http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service" target="_blank" rel="external">http://askubuntu.com/questions/299371/correct-way-to-install-a-custom-upstart-service</a></p>
+          
+          把应用做成一个service我们经常会自己用Java或Python等写一些程序，例如我会写一些个人管理的 spring boot 小程序（日记/事务/笔记管理等），但是每次都要手动去启动和关闭，好麻烦。为了方便管理，可以考虑制作成一个service。步骤如下：
+创建 upstart 配置文件首先用m
+          ...
 
-            
-          </span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/10/linux/tools/app-as-service-upstart/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
       
     </div>
 
@@ -303,6 +764,10 @@
   
   
 
+  
+  
+  
+
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
@@ -314,6 +779,7 @@
             
             
               
+                
                 <a class="post-title-link" href="/2016/05/08/search/es/es-partial-update/" itemprop="url">
                   【api】elasticsearch - 部分更新文档
                 </a>
@@ -324,7 +790,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-08T00:00:00+08:00" content="2016-05-08">
               2016-05-08
             </time>
@@ -332,7 +801,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/search/" itemprop="url" rel="index">
@@ -360,49 +833,41 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <h1 id="document-的部分更新"><a href="#document-的部分更新" class="headerlink" title="document 的部分更新"></a>document 的部分更新</h1><p>对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。</p>
-<p>但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考虑version的话， 为何不在服务器完成， 提供一个部分更新的api， 让用户根据场景合理使用api， 比之前的做法可以节省一个请求。</p>
-<p>所以说， elasticsearch还是很人性化的， 它提供了这个api， 不过在其内部来说， api实现还是遵循了<code>retrieve-change-reindex</code>的步骤, 操作在shard中完成。</p>
-<h1 id="更新的安全问题"><a href="#更新的安全问题" class="headerlink" title="更新的安全问题"></a>更新的安全问题</h1><p>那么如果有多个客户端同时更新， 那么并发安全的问题es如何处理呢？<br>前面提到了， es内部是<code>retrieve-change-reindex</code>的步骤， 在<code>retrieve</code>阶段， es会获取当前的<code>_version</code>， 并在后面的<code>reindex</code>阶段使用。<br>如果其他进程修改了document， <code>_version</code>将会和update request中的不同， 从而更新将会失败。</p>
-<p>这个类似乐观锁的策略， 如果需要重试的话， 可以使用<code>retry_on_conflict</code>设置重试次数，比如：</p>
-<p><code>.../_update?retry_on_conflict=5</code></p>
-<p>不过， 这个重试使用的场景在计数器上用的较多， 因为这个更新的顺序是不那么重要的。</p>
-<h1 id="REST-api"><a href="#REST-api" class="headerlink" title="REST api"></a>REST api</h1><p>言归正传， 接下来，介绍以下api的使用吧。</p>
-<p>假设有个<code>blog</code>的document， 其中有个field叫做<code>tags</code>， 如果要部分更新这个<code>tags</code>：</p>
-<p>最简单的方式是使用<code>doc</code>参数， 和已有document合并， 已有的field会被覆盖， 新的field将会新增到document， REST api 如下：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><div class="line">POST /website/blog/1/_update</div><div class="line">&#123;</div><div class="line">   "doc" : &#123;</div><div class="line">      "tags" : [ "testing" ],</div><div class="line">      "views": 0</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果成功， 会收到这样的response：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span> :   <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_id"</span> :      <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_type"</span> :    <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_version"</span> : <span class="number">3</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>再获取一次这个文档， 检查一下是否真的只更新了<code>tags</code>这个field：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">   <span class="attr">"_index"</span>:    <span class="string">"website"</span>,</div><div class="line">   <span class="attr">"_type"</span>:     <span class="string">"blog"</span>,</div><div class="line">   <span class="attr">"_id"</span>:       <span class="string">"1"</span>,</div><div class="line">   <span class="attr">"_version"</span>:  <span class="number">3</span>,</div><div class="line">   <span class="attr">"found"</span>:     <span class="literal">true</span>,</div><div class="line">   <span class="attr">"_source"</span>: &#123;</div><div class="line">      <span class="attr">"title"</span>:  <span class="string">"My first blog entry"</span>,</div><div class="line">      <span class="attr">"text"</span>:   <span class="string">"Starting to get the hang of this..."</span>,</div><div class="line">      <span class="attr">"tags"</span>: [ <span class="string">"testing"</span> ],</div><div class="line">      <span class="attr">"views"</span>:  <span class="number">0</span></div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="java-api"><a href="#java-api" class="headerlink" title="java api"></a>java api</h1><p>如果使用 java api 的话：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">UpdateRequest updateRequest = new UpdateRequest(&quot;website&quot;, &quot;blog&quot;, &quot;1&quot;)</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">            .startObject()</div><div class="line">                .field(&quot;tags&quot;, new String[]&#123;&quot;testing&quot;&#125;)</div><div class="line">            .endObject());</div><div class="line">client.update(updateRequest).get();</div></pre></td></tr></table></figure>
-<h1 id="spring-data-elasticsearch-api"><a href="#spring-data-elasticsearch-api" class="headerlink" title="spring data elasticsearch api"></a>spring data elasticsearch api</h1><p>如果使用spring-data-elasticsearch的<code>ElasticsearchTemplate</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line">UpdateRequest updateRequest = <span class="keyword">new</span> UpdateRequest();</div><div class="line">updateRequest</div><div class="line">        .doc(XContentFactory.jsonBuilder()</div><div class="line">                .startObject()</div><div class="line">                .field(field, value)</div><div class="line">                .endObject());</div><div class="line">UpdateQuery updateQuery = <span class="keyword">new</span> UpdateQueryBuilder()</div><div class="line">        <span class="comment">//.withIndexName(indexName).withType(objectType)</span></div><div class="line">        .withClass(clz)</div><div class="line">        .withId(String.valueOf(id))</div><div class="line">        .withUpdateRequest(updateRequest)</div><div class="line">        .build();</div><div class="line">elasticsearchTemplate.update(updateQuery);</div><div class="line">elasticsearchTemplate.refresh(indexName, <span class="keyword">true</span>);</div></pre></td></tr></table></figure>
-<p>使用这个api时可能会有这样的疑惑， UpdateQuery中有指定indexName和objectType， 但是<code>@Document</code>的Class中也有声明， 那么使用哪个呢？</p>
-<p>我们可以看看<code>elasticsearchTemplate.update(updateQuery)</code>的源码:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">   @Override</div><div class="line">public UpdateResponse update(UpdateQuery query) &#123;</div><div class="line">	return this.prepareUpdate(query).execute().actionGet();</div><div class="line">&#125;</div><div class="line"></div><div class="line">   private UpdateRequestBuilder prepareUpdate(UpdateQuery query) &#123;</div><div class="line">   		String indexName = isNotBlank(query.getIndexName()) ? query.getIndexName() : getPersistentEntityFor(query.getClazz()).getIndexName();</div><div class="line">   		String type = isNotBlank(query.getType()) ? query.getType() : getPersistentEntityFor(query.getClazz()).getIndexType();</div><div class="line">   		Assert.notNull(indexName, &quot;No index defined for Query&quot;);</div><div class="line">   		Assert.notNull(type, &quot;No type define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getId(), &quot;No Id define for Query&quot;);</div><div class="line">   		Assert.notNull(query.getUpdateRequest(), &quot;No IndexRequest define for Query&quot;);</div><div class="line">   		UpdateRequestBuilder updateRequestBuilder = client.prepareUpdate(indexName, type, query.getId());</div><div class="line"></div><div class="line">   		...</div><div class="line">   	&#125;</div></pre></td></tr></table></figure>
-<p>由上可知， <code>query.getIndexName()</code>和<code>query.getIndexName()</code>会被优先使用， 如果未指定， 会从document的Class注解中获取。<br>如果为了提高性能, 能写上也好, 不过最好统一管理这两个名称, 方便以后修改变更.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/guide/current/partial-updates.html</a><br><a href="https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html" target="_blank" rel="external">https://www.elastic.co/guide/en/elasticsearch/client/java-api/1.7/java-update-api-merge-docs.html</a></p>
+          
+          document 的部分更新对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。
+但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考
+          ...
 
-            
-          </span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/08/search/es/es-partial-update/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
       
     </div>
 
@@ -425,6 +890,10 @@
   
   
 
+  
+  
+  
+
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
@@ -436,6 +905,7 @@
             
             
               
+                
                 <a class="post-title-link" href="/2016/05/06/java/se/ThreadLocalRandom/" itemprop="url">
                   ThreadLocalRandom - 为多线程而生
                 </a>
@@ -446,7 +916,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-06T00:00:00+08:00" content="2016-05-06">
               2016-05-06
             </time>
@@ -454,7 +927,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/java/" itemprop="url" rel="index">
@@ -482,49 +959,45 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <p>今天要说的 <code>ThreadLocalRandom</code> 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用</p>
-<ol>
-<li>创建<code>java.util.Random</code>实例</li>
-<li>使用Math.random(), 其实内部也是创建了一个<code>java.util.Random</code></li>
-</ol>
-<p>使用Random没有问题, 其seed使用AtomicLong来存储, 在多线程下也是线程安全的.<br>但是, 如果在多线程下使用Random, 会导致多线程的竞争开销, 也会降低Random的随机性, 于是便有了<code>ThreadLocalRandom</code>.</p>
-<h1 id="ThreadLocalRandom"><a href="#ThreadLocalRandom" class="headerlink" title="ThreadLocalRandom"></a><code>ThreadLocalRandom</code></h1><hr>
-<p>那么, 对于前面的问题, <code>ThreadLocalRandom</code>对这些做了哪些工作呢 ?</p>
-<p>假设使用以下代码获取随机数 :</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">int randomInt = ThreadLocalRandom.current().nextInt();</div></pre></td></tr></table></figure>
-<h2 id="ThreadLocalRandom-current"><a href="#ThreadLocalRandom-current" class="headerlink" title="ThreadLocalRandom.current():"></a><code>ThreadLocalRandom.current()</code>:</h2><hr>
-<p>我们来看一下<code>ThreadLocalRandom</code>的内部实现:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public static ThreadLocalRandom current() &#123;</div><div class="line">    if (UNSAFE.getInt(Thread.currentThread(), PROBE) == 0)</div><div class="line">        localInit();</div><div class="line">    return instance;</div><div class="line">&#125;</div><div class="line"></div><div class="line">static final void localInit() &#123;</div><div class="line">    int p = probeGenerator.addAndGet(PROBE_INCREMENT);</div><div class="line">    int probe = (p == 0) ? 1 : p; // skip 0</div><div class="line">    long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));</div><div class="line">    Thread t = Thread.currentThread();</div><div class="line">    UNSAFE.putLong(t, SEED, seed);</div><div class="line">    UNSAFE.putInt(t, PROBE, probe);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>其中, <code>SEED</code>和<code>PROBE</code>可以参考下面定义:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Class&lt;?&gt; tk = Thread.class;</div><div class="line">SEED = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSeed&quot;));</div><div class="line">PROBE = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomProbe&quot;));</div><div class="line">SECONDARY = UNSAFE.objectFieldOffset</div><div class="line">    (tk.getDeclaredField(&quot;threadLocalRandomSecondarySeed&quot;));</div></pre></td></tr></table></figure>
-<p><code>Thread.java</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@sun.misc.Contended(&quot;tlr&quot;)</div><div class="line">int threadLocalRandomProbe;</div></pre></td></tr></table></figure>
-<p><code>UNSAFE.getInt(Thread.currentThread(), PROBE)</code>就是获取<code>Thread</code>对象中offset偏移地址对应的field <code>threadLocalRandomProbe</code>的值, <code>threadLocalRandomProbe</code> 是<code>nonzero if threadLocalRandomSeed initialized</code>.<br>所以, 如果<code>PROBE</code>值为零, 将进行localInit(), 当前Thread对象的threadLocalRandomSeed 和 threadLocalRandomProbe将会被赋值. (<code>@sun.misc.Contended(&quot;tlr&quot;)</code>是为了解决伪共享的问题, 将另起一篇博客介绍)</p>
-<h2 id="nextInt"><a href="#nextInt" class="headerlink" title="nextInt()"></a><code>nextInt()</code></h2><hr>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">public int nextInt() &#123;</div><div class="line">    return mix32(nextSeed());</div><div class="line">&#125;</div><div class="line"></div><div class="line">final long nextSeed() &#123;</div><div class="line">    Thread t; long r; // read and update per-thread seed</div><div class="line">    UNSAFE.putLong(t = Thread.currentThread(), SEED,</div><div class="line">                   r = UNSAFE.getLong(t, SEED) + GAMMA);</div><div class="line">    return r;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>注意:</code><br><code>SEED</code>是field的偏移量<br><code>GAMMA</code>是seed的increment<br>这里会更新当前Thread的SEED, 最终mix32()生成int随机数.</p>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
-<p>从上可知<code>ThreadLocalRandom</code>的工作方式, 它为每个线程分配了一个SEED(被Thread对象持有), 故而减少了多线程下的竞争开销, 也使随机性更加好.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://www.jdon.com/concurrent/concurrent-random.html" target="_blank" rel="external">http://www.jdon.com/concurrent/concurrent-random.html</a></p>
+          
+          今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
 
-            
-          </span>
+创建java.util.Random实例
+使用Math.random(), 其实内部也是创建了一个java.util.Random
+
+使用Random没有问题, 其seed使用Atom
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/06/java/se/ThreadLocalRandom/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
       
     </div>
 
@@ -547,6 +1020,10 @@
   
   
 
+  
+  
+  
+
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
@@ -558,6 +1035,7 @@
             
             
               
+                
                 <a class="post-title-link" href="/2016/05/05/books/procrastination/procrastination-12/" itemprop="url">
                   【书：拖延心理学】（12） 作战武器 - 明确目标和可行性的计划
                 </a>
@@ -568,7 +1046,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-05T00:00:00+08:00" content="2016-05-05">
               2016-05-05
             </time>
@@ -576,7 +1057,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/books/" itemprop="url" rel="index">
@@ -604,25 +1089,41 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <h1 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h1><p><img src="/images/books/tech-less/procrastination-12-01.png" alt=""></p>
+          
+          笔记
 
-            
-          </span>
+          
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/05/books/procrastination/procrastination-12/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
       
     </div>
 
@@ -645,6 +1146,10 @@
   
   
 
+  
+  
+  
+
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
@@ -656,6 +1161,7 @@
             
             
               
+                
                 <a class="post-title-link" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="url">
                   Levenshtein 距离
                 </a>
@@ -666,7 +1172,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-04T00:00:00+08:00" content="2016-05-04">
               2016-05-04
             </time>
@@ -674,7 +1183,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/cs/" itemprop="url" rel="index">
@@ -702,52 +1215,42 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <h1 id="Levenshtein-距离"><a href="#Levenshtein-距离" class="headerlink" title="Levenshtein 距离"></a>Levenshtein 距离</h1><p>什么是<code>Levenshtein</code>距离?<br><code>Levenshtein距离</code>是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。</p>
-<blockquote>
-<p>Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。<br>指两个字串之间，由一个转成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。</p>
-</blockquote>
-<p>比如将kitten一字转成sitting, 有三步：</p>
-<p>sitten （k→s）<br>sittin （e→i）<br>sitting （→g）</p>
-<h1 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h1><ul>
-<li>相似度检测</li>
-<li>拼写检查</li>
-<li>文本搜索 (Lucene/Solr)</li>
-<li>NLP</li>
-<li>等等</li>
-</ul>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><hr>
-<p>如果用朴素的递归方法实现, 需要O(3^n)的时间复杂度, 明显我们要进行一些优化, 动态规划是比较常用的方法.</p>
-<p>假设字符串target有1~m个字符, 字符串str1有1~n个:</p>
-<h2 id="定义最优子问题"><a href="#定义最优子问题" class="headerlink" title="定义最优子问题"></a>定义最优子问题</h2><p>通过插入/删除/替换操作, 把str1转换为target字符串.<br>要想找到最短编辑距离, 即是<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数</p>
-<h2 id="确定状态转换方程"><a href="#确定状态转换方程" class="headerlink" title="确定状态转换方程"></a>确定状态转换方程</h2><p>我们将<code>str1[1~i]</code>转换成<code>target[1~j]</code>所需要的最少编辑次数, 定义为状态d[i, j].</p>
-<h2 id="确定决策并写出状态转移方程"><a href="#确定决策并写出状态转移方程" class="headerlink" title="确定决策并写出状态转移方程"></a>确定决策并写出状态转移方程</h2><p>当target[j]等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = d[i, j] + 0;</div></pre></td></tr></table></figure></p>
-<p>当target[j]不等于str1[i]<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">d[i, j] = min(</div><div class="line">    d[i, j-1] + 1,</div><div class="line">    d[i-1, j] + 1,</div><div class="line">    d[i-1, j-1] + 1</div><div class="line">    )</div></pre></td></tr></table></figure></p>
-<h2 id="寻找边界条件"><a href="#寻找边界条件" class="headerlink" title="寻找边界条件"></a>寻找边界条件</h2><p>当target是空字符串时, d[i, 0] = str1的长度<br>当str1是空字符串时, d[0, j] = target的长度</p>
-<p>经过这几步, 就可以开始写代码实现了. 以下给出的是状态递推DP算法, 除此以外, 仍可以使用带记忆的递归算法.</p>
-<h1 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h1><figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getEditDistance</span><span class="params">(<span class="keyword">char</span>[] target, <span class="keyword">char</span>[] str1)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span>[][] distance = <span class="keyword">new</span> <span class="keyword">int</span>[str1.length + <span class="number">1</span>][target.length + <span class="number">1</span>];</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">        distance[i][<span class="number">0</span>] = i;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        distance[<span class="number">0</span>][j] = j;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= target.length; j++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= str1.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (str1[i - <span class="number">1</span>] == target[j - <span class="number">1</span> ]) &#123;</div><div class="line">                distance[i][j] = distance[i - <span class="number">1</span>][j - <span class="number">1</span>];</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">int</span> distanceInsert = distance[i][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceDelete = distance[i - <span class="number">1</span>][j] + <span class="number">1</span>;</div><div class="line">                <span class="keyword">int</span> distanceEdit = distance[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</div><div class="line">                distance[i][j] = Math.min(</div><div class="line">                        Math.min(distanceInsert, distanceDelete),</div><div class="line">                        distanceEdit);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> distance[str1.length][target.length];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>以<code>snowy</code>和<code>sunny</code>字符串做测试, 计算过程如下:</p>
-<p><img src="/images/cs/dp_edit_distance_01.png" alt=""></p>
-<p>有三个值的, 分别是<code>insert</code>/<code>delete</code>/<code>edit</code>的计算距离, 最后得出最短编辑距离是<code>3</code>.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://zh.wikipedia.org/wiki/%E8%90%8A%E6%96%87%E6%96%AF%E5%9D%A6%E8%B7%9D%E9%9B%A2" target="_blank" rel="external">莱文斯坦距离</a><br>[算法的乐趣 - C3 动态规划]</p>
+          
+          Levenshtein 距离什么是Levenshtein距离?Levenshtein距离是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。
 
-            
-          </span>
+Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。指两个字串之间，由一个转成另一个所需的最少编辑操作次
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
       
     </div>
 
@@ -770,6 +1273,10 @@
   
   
 
+  
+  
+  
+
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
@@ -781,6 +1288,7 @@
             
             
               
+                
                 <a class="post-title-link" href="/2016/05/03/linux/tools/tmux/" itemprop="url">
                   tmux cheatsheet
                 </a>
@@ -791,7 +1299,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-03T00:00:00+08:00" content="2016-05-03">
               2016-05-03
             </time>
@@ -799,7 +1310,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/linux/" itemprop="url" rel="index">
@@ -827,182 +1342,43 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <p><code>tmux</code>是一个终端的terminal <code>multiplexer</code>, 用来切换多个terminal, 和之前博客提到的<code>terminator</code>比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.</p>
-<p><img src="/images/linux/tmux_preview-01.png" alt=""></p>
-<h1 id="tmux-session"><a href="#tmux-session" class="headerlink" title="tmux session"></a><code>tmux</code> session</h1><hr>
-<p>使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach). 比如远程连接断开, 下次再连上服务器时, 原先tmux打开的环境都仍保留着.</p>
-<ul>
-<li><p>start new session:<br><code>tmux new -s myname</code></p>
-</li>
-<li><p>list sessions:<br><code>tmux ls</code></p>
-</li>
-<li><p>attach:<br><code>tmux a</code></p>
-</li>
-<li><p>attach to named:<br><code>tmux a -t myname</code></p>
-</li>
-<li><p><strong>detach</strong><br><code>ctrl + b, d</code></p>
-</li>
-<li><p>切换session<br>如果在tmux中, 想要切换到其他session, 可以这样:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">s</div><div class="line"># 这时会出现session列表, 使用方向键和Enter进行选择即可</div></pre></td></tr></table></figure>
-</li>
-<li><p>命名当前session</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">$</div><div class="line"># 这时可以修改当前的session名称</div></pre></td></tr></table></figure>
-</li>
-<li><p>新建一个session</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:new</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="pane"><a href="#pane" class="headerlink" title="pane"></a>pane</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>%</td>
-<td>垂直分割</td>
-</tr>
-<tr>
-<td>“</td>
-<td>水平分割</td>
-</tr>
-<tr>
-<td>o</td>
-<td>panes切换:</td>
-</tr>
-<tr>
-<td>x</td>
-<td>关闭当前pane</td>
-</tr>
-<tr>
-<td>q</td>
-<td>显示 pane number</td>
-</tr>
-<tr>
-<td>空格</td>
-<td>切换不同的layout</td>
-</tr>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h1 id="window"><a href="#window" class="headerlink" title="window"></a>window</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>c</td>
-<td>新建窗口</td>
-</tr>
-<tr>
-<td>n</td>
-<td>切换下一个窗口</td>
-</tr>
-<tr>
-<td>p</td>
-<td>切换前一个窗口</td>
-</tr>
-<tr>
-<td>Shift+7</td>
-<td>关闭当前窗口</td>
-</tr>
-<tr>
-<td>,</td>
-<td>命名窗口</td>
-</tr>
-<tr>
-<td>.</td>
-<td>移动窗口 (使用序号)</td>
-</tr>
-<tr>
-<td>w</td>
-<td>list window</td>
-</tr>
-<tr>
-<td>&amp;</td>
-<td>kill window</td>
-</tr>
-<tr>
-<td>page-up</td>
-<td>进入滚动模式, 按<code>esc</code>退出滚动</td>
-</tr>
-</tbody>
-</table>
-<h1 id="window-pane间操作"><a href="#window-pane间操作" class="headerlink" title="window/pane间操作"></a>window/pane间操作</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>:joinp -s :2</td>
-<td>移动窗口2作为当前窗口的一个新pane</td>
-</tr>
-<tr>
-<td>:joinp -t :1</td>
-<td>移动当前pane作为窗口1的一个新pane</td>
-</tr>
-</tbody>
-</table>
-<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
-<table>
-<thead>
-<tr>
-<th>快捷键</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>t</td>
-<td>显示时间</td>
-</tr>
-<tr>
-<td>?</td>
-<td>list shortcut</td>
-</tr>
-<tr>
-<td>:</td>
-<td>prompt</td>
-</tr>
-</tbody>
-</table>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://gist.github.com/henrik/1967800" target="_blank" rel="external">https://gist.github.com/henrik/1967800</a></p>
+          
+          tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
 
-            
-          </span>
+tmux session
+使用tmux, 
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/03/linux/tools/tmux/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
       
     </div>
 
@@ -1025,6 +1401,10 @@
   
   
 
+  
+  
+  
+
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
@@ -1036,6 +1416,7 @@
             
             
               
+                
                 <a class="post-title-link" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="url">
                   deploy spring-boot as war file
                 </a>
@@ -1046,7 +1427,10 @@
 
         <div class="post-meta">
           <span class="post-time">
-            发表于
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-05-02T00:00:00+08:00" content="2016-05-02">
               2016-05-02
             </time>
@@ -1054,7 +1438,11 @@
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/java/" itemprop="url" rel="index">
@@ -1082,545 +1470,43 @@
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
         
-          <span itemprop="articleBody">
-            
-              <p>spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?</p>
-<p>spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.</p>
-<p>下面介绍war方式部署:</p>
-<h1 id="pom-xml-修改"><a href="#pom-xml-修改" class="headerlink" title="pom.xml 修改"></a>pom.xml 修改</h1><hr>
-<p>首先把打包类型修改为: <code>&lt;packaging&gt;war&lt;/packaging&gt;</code></p>
-<p>接着修改<code>spring-boot-starter-tomcat</code>为<code>provided</code>的scope, 避免打包到war中:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;</div><div class="line">        &lt;scope&gt;provided&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;!-- ... --&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
-<ul>
-<li><strong>注意:</strong></li>
-</ul>
-<p><code>boot-start</code>版本要高于<code>1.3</code>, 否则使用tomcat启动会出现异常.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.3.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<h1 id="部署到-Servlet-3-0-规范的容器"><a href="#部署到-Servlet-3-0-规范的容器" class="headerlink" title="部署到 Servlet 3.0 规范的容器"></a>部署到 Servlet 3.0 规范的容器</h1><hr>
-<p>如果你的web容器支持<code>Servlet 3.0</code>规范, 可以使用以下的方法:</p>
-<p>首先继承<code>SpringBootServletInitializer</code>, 并覆写<code>configure</code>方法, 不需要<code>web.xml</code>.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableAutoConfiguration</div><div class="line">@ComponentScan</div><div class="line">public class Application extends SpringBootServletInitializer &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) &#123;</div><div class="line">        // Customize the application or call application.sources(...) to add sources</div><div class="line">        // Since our example is itself a @Configuration class we actually don&apos;t</div><div class="line">        // need to override this method.</div><div class="line">        return application.sources(SampleControllerAndApp.class);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="部署到旧的容器-Servlet-2-5"><a href="#部署到旧的容器-Servlet-2-5" class="headerlink" title="部署到旧的容器 (Servlet 2.5)"></a>部署到旧的容器 (Servlet 2.5)</h1><p>如果你的容器不支持servlet 3.0规范怎么办 ? 下面是一个解决方法:</p>
-<ul>
-<li><p>1<br>增加一个<code>org.springframework.boot:spring-boot-legacy</code>依赖</p>
-</li>
-<li><p>2<br>创建<code>web.xml</code>, 用以声明<code>context listener</code>, 这个listener是<code>org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener</code>, 是在<code>spring-boot</code>下特别使用的, 其他配置和正常spring应用一样. <code>web.xml</code> 如下:</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app version=&quot;2.5&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context-param&gt;</div><div class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</div><div class="line">        &lt;param-value&gt;demo.Application&lt;/param-value&gt;</div><div class="line">    &lt;/context-param&gt;</div><div class="line"></div><div class="line">    &lt;listener&gt;</div><div class="line">        &lt;listener-class&gt;org.springframework.boot.legacy.context.web.SpringBootContextLoaderListener&lt;/listener-class&gt;</div><div class="line">    &lt;/listener&gt;</div><div class="line"></div><div class="line">    &lt;filter&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;</div><div class="line">    &lt;/filter&gt;</div><div class="line"></div><div class="line">    &lt;filter-mapping&gt;</div><div class="line">        &lt;filter-name&gt;metricFilter&lt;/filter-name&gt;</div><div class="line">        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</div><div class="line">    &lt;/filter-mapping&gt;</div><div class="line"></div><div class="line">    &lt;servlet&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</div><div class="line">        &lt;init-param&gt;</div><div class="line">            &lt;param-name&gt;contextAttribute&lt;/param-name&gt;</div><div class="line">            &lt;param-value&gt;org.springframework.web.context.WebApplicationContext.ROOT&lt;/param-value&gt;</div><div class="line">        &lt;/init-param&gt;</div><div class="line">        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</div><div class="line">    &lt;/servlet&gt;</div><div class="line"></div><div class="line">    &lt;servlet-mapping&gt;</div><div class="line">        &lt;servlet-name&gt;appServlet&lt;/servlet-name&gt;</div><div class="line">        &lt;url-pattern&gt;/&lt;/url-pattern&gt;</div><div class="line">    &lt;/servlet-mapping&gt;</div><div class="line"></div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file" target="_blank" rel="external">howto-create-a-deployable-war-file</a><br><a href="http://docs.spring.io/spring-boot/docs/current/maven-plugin/" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/maven-plugin/</a><br><a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging" target="_blank" rel="external">http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#build-tool-plugins-maven-packaging</a></p>
+          
+          spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?
+spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.
+下面介绍war方式部署:
+pom.xml 修
+          ...
 
-            
-          </span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
 
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/05/01/linux/practice/my_workspace_management/" itemprop="url">
-                  我的workspace管理之道
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-05-01T00:03:30+08:00" content="2016-05-01">
-              2016-05-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/05/01/linux/practice/my_workspace_management/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/linux/practice/my_workspace_management/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <p>最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.</p>
-<p>workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.</p>
-<p>为什么这么说呢? 因为我的每个workspace都固定放了不同的工具, 而且不超过2个(保证同一个workspace我可以使用<code>alt+tab</code>快速切换), 这样我不用费时费力去找我要的窗口.</p>
-<p>这样分好类后再加上无敌科学的快捷键, 持之以恒形成条件反射, 外人看来那操作简直碉堡.</p>
-<p>事不宜迟, 赶紧看一下是这个小技巧.</p>
-<h1 id="设置快捷键"><a href="#设置快捷键" class="headerlink" title="设置快捷键"></a>设置快捷键</h1><hr>
-<p>首先我们需要设置用到的快捷键:</p>
-<p>在<code>System Settings</code>的<code>Keyboard</code>中, 可以设置workspace 1-4 的快捷切换键.</p>
-<p>我习惯使用<code>ctrl + 1234</code>, 缺点就是每天感觉在打魔兽, 懂行的一定知道为什么选择这个键.</p>
-<p>如果想用4个以上的workspace点算啊?</p>
-<p>莫担心, 比如我使用的是gnome, 可以这样:</p>
-<pre><code>$ dconf read /org/gnome/desktop/wm/keybindings/switch-to-workspace-4
-[&apos;&lt;Primary&gt;4&apos;]
-</code></pre><p>读出值是: <code>&#39;&lt;Primary&gt;4&#39;</code></p>
-<p>同样的, 我们把workspace 5的键值写入相应的workspace:</p>
-<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
-</code></pre><p>同理, 其他workspace也是这样设置, 为了造福网友, 这里还是贴一下:</p>
-<pre><code>dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-5 &quot;[&apos;&lt;Primary&gt;5&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-6 &quot;[&apos;&lt;Primary&gt;6&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-7 &quot;[&apos;&lt;Primary&gt;7&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-8 &quot;[&apos;&lt;Primary&gt;8&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-9 &quot;[&apos;&lt;Primary&gt;9&apos;]&quot;
-dconf write /org/gnome/desktop/wm/keybindings/switch-to-workspace-10 &quot;[&apos;&lt;Primary&gt;0&apos;]&quot;
-</code></pre><p>当然还有移动窗口（把当前窗口移动到某个工作区）的快捷键设置：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-1  &quot;[&apos;&lt;Alt&gt;1&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-2  &quot;[&apos;&lt;Alt&gt;2&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-3  &quot;[&apos;&lt;Alt&gt;3&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-4  &quot;[&apos;&lt;Alt&gt;4&apos;]&quot;</div><div class="line">dconf write /org/gnome/desktop/wm/keybindings/move-to-workspace-5  &quot;[&apos;&lt;Alt&gt;5&apos;]&quot;</div></pre></td></tr></table></figure>
-<h1 id="工作区分类"><a href="#工作区分类" class="headerlink" title="工作区分类"></a>工作区分类</h1><hr>
-<p>接下来是工作区的分类, 主要关注每个工作区放置什么工具. 有了这些分类, 切换工具几乎不用时间思考和寻找了.<br>以下是我常用的分类:</p>
-<table>
-<thead>
-<tr>
-<th>workspace</th>
-<th>放置的工具</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>terminator 控制台 &amp; file manger</td>
-</tr>
-<tr>
-<td>-</td>
-<td>PDF reader</td>
-</tr>
-<tr>
-<td>2</td>
-<td>IDE</td>
-</tr>
-<tr>
-<td>3</td>
-<td>博客/笔记工具</td>
-</tr>
-<tr>
-<td>-</td>
-<td>思维导图工具</td>
-</tr>
-<tr>
-<td>4</td>
-<td>chrome (工作用)</td>
-</tr>
-<tr>
-<td>5</td>
-<td>虚拟机</td>
-</tr>
-<tr>
-<td>6</td>
-<td>空</td>
-</tr>
-<tr>
-<td>7</td>
-<td>scrum 任务面板</td>
-</tr>
-<tr>
-<td>-</td>
-<td>WPS sheet</td>
-</tr>
-<tr>
-<td>8</td>
-<td>原型文档</td>
-</tr>
-<tr>
-<td>9</td>
-<td>IDE 2</td>
-</tr>
-<tr>
-<td>0</td>
-<td>音乐播放器</td>
-</tr>
-<tr>
-<td>-</td>
-<td>chrome 2</td>
-</tr>
-</tbody>
-</table>
-<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
-<p>需要强调的是, 这个分类是根据个人的实际使用需求来定制的, 制订了一个分类后, 在实际使用的时候, 如果有不适或者更好的, 可以随时调整, 或者说不断迭代吧.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects" target="_blank" rel="external">http://askubuntu.com/questions/332264/13-04-more-than-four-workspace-shortcuts-in-gnome-flashback-no-effects</a></p>
-
-            
-          </span>
-        
+    <div>
       
     </div>
 
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="url">
-                  用tensorflow训练识别手写数字的CNN模型
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-29T13:03:30+08:00" content="2016-04-29">
-              2016-04-29
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/data-science/" itemprop="url" rel="index">
-                    <span itemprop="name">data science</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="tensorflow"><a href="#tensorflow" class="headerlink" title="tensorflow"></a>tensorflow</h1><p>tensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is cheap, 接下来就以识别手写数字的例子来体验一下tensorflow.</p>
-<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>数据集采用<code>MNIST 手写图片数据集</code>的图片，可以从<a href="http://yann.lecun.com/exdb/mnist/" target="_blank" rel="external">这个网站</a>下载, 或者使用这个<a href="https://github.com/tensorflow/tensorflow/blob/r0.9/tensorflow/examples/tutorials/mnist/input_data.py" target="_blank" rel="external">python脚本</a>来获取数据:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">from tensorflow.examples.tutorials.mnist import input_data</div><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div></pre></td></tr></table></figure>
-<p>这个数据集有三部分, 55000个训练数据+10000个测试数据+5000个验证数据.</p>
-<p>每个数据包含了手写图片和对应的label, 每个是28*28像素的, 用数组保存, 可以把这个矩阵转换为一个<code>28x28=784</code>大小的vector.</p>
-<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>有了数据集, 就可以导入和开始初始化主要参数:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mnist = input_data.read_data_sets(&quot;MNIST_data/&quot;, one_hot=True)</div><div class="line">model_filepath = &quot;model2.ckpt&quot;</div><div class="line">sess = tf.InteractiveSession()</div><div class="line"></div><div class="line">x = tf.placeholder(tf.float32, [None, 784])</div><div class="line">y_ = tf.placeholder(tf.float32, [None, 10])</div><div class="line"></div><div class="line">W = tf.Variable(tf.zeros([784, 10]))</div><div class="line">b = tf.Variable(tf.zeros([10]))</div></pre></td></tr></table></figure>
-<p>Variable和placeholder的区别是, Variable需要初始化值, 而placeholder则不需要, 你可以在运行时通过<code>Session.run</code>中的<code>feed_dict</code>来指定值.</p>
-<p>上面y的计算描述如下图:</p>
-<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-01.png" alt=""></p>
-<p>写成矩阵计算就是:</p>
-<p><img src="/images/dtai/tensorflow/mnist_beginer_cal-02.png" alt=""></p>
-<h1 id="构建多层卷积网络"><a href="#构建多层卷积网络" class="headerlink" title="构建多层卷积网络"></a>构建多层卷积网络</h1><p>要构建CNN(这里假设你已经了解CNN的相关内容), 我们会创建很多权重和偏置参数, 一般我们应该用小噪声的权重去初始化, 为了<code>symmetry breaking</code>和避免<code>0 gradients</code>. 因为我们使用的是<code>ReLu</code>激活函数, 用较小的正值bias来初始化可以有效地避免<code>dead neurons</code>. 这部分会被反复使用到, 因此需要写成一个function.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def weight_variable(shape):</div><div class="line">    initial = tf.truncated_normal(shape, stddev=0.1)</div><div class="line">    return tf.Variable(initial)</div><div class="line"></div><div class="line">def bias_variable(shape):</div><div class="line">    initial = tf.constant(0.1, shape=shape)</div><div class="line">    return tf.Variable(initial)</div></pre></td></tr></table></figure>
-<h1 id="构建第一卷积层"><a href="#构建第一卷积层" class="headerlink" title="构建第一卷积层"></a>构建第一卷积层</h1><p>使用刚才介绍的初始化function,</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv1 = weight_variable([5, 5, 1, 32])</div><div class="line">b_conv1 = bias_variable([32])</div><div class="line">x_image = tf.reshape(x, [-1, 28, 28, 1])</div></pre></td></tr></table></figure>
-<p>上面的<code>[5, 5, 1, 32]</code>，表示weight的形状, 第一和第二参数表示使用<code>5*5</code>的patch，第三个参数表示有一个输入通道（因为是灰度图片），第四个参数表示32个输出通道。同时, 我们有一个相应的偏置向量来对应每个输出通道.</p>
-<p>为了使用这一卷积层, 我们需要把图片输入reshape成四维的tensor: <code>[-1,28,28,1]</code>.<br><code>-1</code>表示flat, 第二三维表示图片大小, 第四维表示颜色通道.</p>
-<h2 id="卷积和池化-采样"><a href="#卷积和池化-采样" class="headerlink" title="卷积和池化(采样)"></a>卷积和池化(采样)</h2><p>接下来, 设置卷积的步长为1和<code>SAME</code>的padding方式, 池化采用2*2的大小. 这个也是可以复用的, 因此封装成一个function.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">def conv2d(x, W):</div><div class="line">  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding=&apos;SAME&apos;)</div><div class="line"></div><div class="line">def max_pool_2x2(x):</div><div class="line">  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],</div><div class="line">                        strides=[1, 2, 2, 1], padding=&apos;SAME&apos;)</div></pre></td></tr></table></figure>
-<p>使用上面定义的卷积(使用relu激活)和池化函数计算:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)</div><div class="line">h_pool1 = max_pool_2x2(h_conv1)</div></pre></td></tr></table></figure>
-<h1 id="第二卷积层"><a href="#第二卷积层" class="headerlink" title="第二卷积层"></a>第二卷积层</h1><p>此时, 输入是第一卷积池化层的计算结果. 因此weight的输入channel变成了32, 输出设置为64, 同样的bias向量大小也相应设置为64.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_conv2 = weight_variable([5, 5, 32, 64])</div><div class="line">b_conv2 = bias_variable([64])</div><div class="line"></div><div class="line">h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)</div><div class="line">h_pool2 = max_pool_2x2(h_conv2)</div></pre></td></tr></table></figure>
-<h1 id="全连接"><a href="#全连接" class="headerlink" title="全连接"></a>全连接</h1><p>经过前面的处理, 此时的图片size已经减到7*7, 可以使用全连接来处理整个输入了. 这里我们选择1024个神经元:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc1 = weight_variable([7 * 7 * 64, 1024])</div><div class="line">b_fc1 = bias_variable([1024])</div><div class="line">h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])</div><div class="line">h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)</div></pre></td></tr></table></figure>
-<h1 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h1><p>这个操作主要减少一些过拟合, 使用的方法是<a href="https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf" target="_blank" rel="external">dropout</a>:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">keep_prob = tf.placeholder(tf.float32)</div><div class="line">h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)</div></pre></td></tr></table></figure>
-<h1 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">W_fc2 = weight_variable([1024, 10])</div><div class="line">b_fc2 = bias_variable([10])</div></pre></td></tr></table></figure>
-<p>使用 <code>softmax</code> 回归分类, 计算分类结果:</p>
-<pre><code>y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
-</code></pre><h1 id="评估模型的方法"><a href="#评估模型的方法" class="headerlink" title="评估模型的方法"></a>评估模型的方法</h1><p>获取到预测值后, 我们需要了解预测值和真实结果的差距, 定义我们的cost function:</p>
-<pre><code>cross_entropy = -tf.reduce_sum(y_ * tf.log(y_conv))
-</code></pre><h1 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h1><p>因此, 要达到我们预期的效果, 训练模型需要把<code>cross_entropy</code>减少到最小, 这里采用<code>AdamOptimizer</code>(更多Optimizer请戳<a href="https://www.tensorflow.org/versions/r0.9/api_docs/python/train.html#optimizers" target="_blank" rel="external">这里</a>):</p>
-<pre><code>train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-for i in range(20000):
-    batch = mnist.train.next_batch(50)
-    train_step.run(feed_dict={x: batch[0], y_: batch[1])    
-</code></pre><h1 id="保存模型"><a href="#保存模型" class="headerlink" title="保存模型"></a>保存模型</h1><p>训练结束后, 可以把结果保存成模型文件, 供以后识别图片使用.</p>
-<pre><code>save_path = saver.save(sess, model_filepath)
-</code></pre><h1 id="查看训练结果"><a href="#查看训练结果" class="headerlink" title="查看训练结果"></a>查看训练结果</h1><p>由于我们需要看当前训练的情况, 要加上一些debug的输出(比如精准度等), 于是将代码修改一下:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))</div><div class="line">train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)</div><div class="line">correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))</div><div class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</div><div class="line">sess.run(tf.initialize_all_variables())</div><div class="line"></div><div class="line">for i in range(20000):</div><div class="line">  batch = mnist.train.next_batch(50)</div><div class="line">  if i%100 == 0:</div><div class="line">    train_accuracy = accuracy.eval(feed_dict=&#123;</div><div class="line">        x:batch[0], y_: batch[1], keep_prob: 1.0&#125;)</div><div class="line">    print(&quot;step %d, training accuracy %g&quot;%(i, train_accuracy))</div><div class="line">  train_step.run(feed_dict=&#123;x: batch[0], y_: batch[1], keep_prob: 0.5&#125;)</div><div class="line"></div><div class="line">print(&quot;test accuracy %g&quot;%accuracy.eval(feed_dict=&#123;</div><div class="line">    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0&#125;))</div></pre></td></tr></table></figure>
-<p>运行这个python脚本, 从输出可以看出, 随着step的增加, 训练的精准度在不断提升然后稳定, 最终使用测试集的精确度达到了99.21%, 如下</p>
-<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-01.png" alt=""></p>
-<p><img src="/images/dtai/tensorflow/tensorflow-mnist-train-result-02.png" alt=""></p>
-<p>至于如何使用训练出来的模型去识别图片, 以及如何可视化训练过程, 将在接下来的两篇博客中介绍.</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://www.tensorflow.org/versions/r0.8/tutorials/mnist/pros/index.html#deep-mnist-for-experts" target="_blank" rel="external">Deep MNIST for Experts</a><br><a href="http://blog.csdn.net/heyongluoyao8/article/details/49429629" target="_blank" rel="external">机器学习中防止过拟合的处理方法</a><br><a href="http://www.jianshu.com/p/05c4f1621c7e" target="_blank" rel="external">http://www.jianshu.com/p/05c4f1621c7e</a><br><a href="http://blog.csdn.net/zouxy09/article/details/49080029" target="_blank" rel="external">http://blog.csdn.net/zouxy09/article/details/49080029</a></p>
-
-            
-          </span>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                <a class="post-title-link" href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="url">
-                  使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            发表于
-            <time itemprop="dateCreated" datetime="2016-04-28T00:00:00+08:00" content="2016-04-28">
-              2016-04-28
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp; 分类于
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/data-science/" itemprop="url" rel="index">
-                    <span itemprop="name">data science</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-              <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>作为一个后台开发，我们经常会用到日志，为了debug或验证一些问题，这时候只是需要在console找到某几行日志。<br>但是如果要有一个可视化的全局视图，还是需要借助一些工具，ELK就是常用的一套工具集。</p>
-<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><p>以下版本亲测兼容：</p>
-<ul>
-<li><p>Logstash 2.3.1</p>
-</li>
-<li><p>Elasticsearch 2.3.x</p>
-</li>
-<li><p>Kibana 4.5.0</p>
-</li>
-</ul>
-<blockquote>
-<p>Compatible with Elasticsearch 2.3.x. Kibana can also be installed from our repositories using apt or yum. See Repositories in the Guide.</p>
-</blockquote>
-<h1 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h1><hr>
-<p>主要作用：负责日志检索和分析。</p>
-<pre><code>tar xvf elasticsearch-2.3.2.tar.gz -C /foo/path
-bin/elasticsearch
-</code></pre><p>默认端口是:</p>
-<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><hr>
-<p>主要作用：负责日志的收集，处理和储存。</p>
-<p>使用：</p>
-<pre><code>tar zxvf logstash-2.3.1.tar.gz
-bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
-`-e`代表直接从命令行输入配置文件, input选择了标准输入, output选择了标准输出。
-</code></pre><p>我们要做的是把nginx日志输出存储到Elasticsearch，使用<code>-f</code>传入预先写好的配置：</p>
-<pre><code>bin/logstash -f logstash-nginx.conf
-</code></pre><p><code>logstash-nginx.conf</code>是我们需要编写的配置文件，用以指定nginx日志的位置和格式，以及es的接口位置。</p>
-<h2 id="编写-logstash-nginx-conf"><a href="#编写-logstash-nginx-conf" class="headerlink" title="编写 logstash-nginx.conf"></a>编写 logstash-nginx.conf</h2><p>更多关于 <code>logstash 配置文件</code> 的编写， 请参考<a href="https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html" target="_blank" rel="external">官方文档</a></p>
-<p>假设nginx的日志格式为:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</div><div class="line">                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</div><div class="line">                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</div></pre></td></tr></table></figure>
-<p>新建 <code>logstash-nginx.conf</code> 文件，写入:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#</div><div class="line">input &#123;</div><div class="line">    file &#123;</div><div class="line">        path =&gt; [ &quot;/home/niko/mount/hsb_D/niko/temp_trash/logs/foo.com.access_20160617.log&quot; ]</div><div class="line">        type =&gt; &quot;nginx-access&quot;</div><div class="line">        start_position =&gt; &quot;beginning&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">filter &#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;&quot;message&quot; =&gt; &quot;%&#123;IPORHOST:source_ip&#125; - %&#123;USERNAME:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] %&#123;QS:request&#125; %&#123;INT:status&#125; %&#123;INT:body_bytes_sent&#125; %&#123;QS:http_referer&#125; %&#123;QS:http_user_agent&#125;&quot;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123; hosts =&gt; [&quot;localhost:9200&quot;] &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>启动后，等logstash处理完日志文件并写入es，可以查看es的索引:</p>
-<p><a href="http://localhost:9200/_cat/indices" target="_blank" rel="external">http://localhost:9200/_cat/indices</a></p>
-<p>可以看到以下内容：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">yellow open .kibana             1 1 1 0  3.1kb  3.1kb</div><div class="line">yellow open logstash-2016.04.28 5 1 4 0 12.3kb 12.3kb</div></pre></td></tr></table></figure>
-<p>grok 使用请看<a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="external"> grok 插件文档 </a>。</p>
-<p>以上grok解析nginx日志文件到es的配置，当然还可以从其他输入源（不止文件）获取数据，输出到不同位置（redis等其他中间件）。</p>
-<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><hr>
-<p>主要作用：负责日志的可视化。</p>
-<ul>
-<li><p>使用：</p>
-<p>  tar xf kibana-4.5.0-linux-x64.tar.gz -C /foo/path<br>  bin/kibana</p>
-</li>
-<li><p>visit <a href="localhost:5601" target="_blank" rel="external">localhost:5601</a></p>
-</li>
-<li><p>配置index pattern:</p>
-</li>
-<li><p>点击<code>Settings</code>,  在<code>Indices</code>tab, 创建一个<code>index pattern</code>，选择<code>logstash-*</code></p>
-</li>
-<li><p>点击<code>visualization</code>, <code>Create a new visualization</code> 这里选择<code>Line Chart</code>类型图</p>
-</li>
-<li><p>然后选择X和Y坐标，Y有常见的聚合属性，X是nginx日志行的几个字段，完成后点击生成， 如下：</p>
-</li>
-</ul>
-<p><img src="/images/dtai/kibana_01.png" alt=""></p>
-<p>以上只是一个示例，kibana 的功能远强大于此，根据自己的需求去定制可视化吧。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p>【1】<a href="https://github.com/elastic/examples/tree/master/ELK_NGINX" target="_blank" rel="external">https://github.com/elastic/examples/tree/master/ELK_NGINX</a><br>【2】<a href="http://www.icyfire.me/2014/11/13/logstash-es-kibana.html" target="_blank" rel="external">http://www.icyfire.me/2014/11/13/logstash-es-kibana.html</a><br>【3】<a href="http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/04/26/elk-for-nginx-log.html</a><br>【4】<a href="http://www.wklken.me/posts/2015/05/08/elk-data-collect.html" target="_blank" rel="external">http://www.wklken.me/posts/2015/05/08/elk-data-collect.html</a></p>
-
-            
-          </span>
-        
+    <div>
       
     </div>
 
@@ -1642,19 +1528,20 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
- </div>
 
-        
+          </div>
+          
 
-        
-      </div>
 
-      
+          
+
+        </div>
         
+          
   
   <div class="sidebar-toggle">
     <div class="sidebar-toggle-line-wrap">
@@ -1673,31 +1560,37 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
 
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" src="/images/default_avatar.jpg" alt="niko" itemprop="image"/>
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="niko" />
           <p class="site-author-name" itemprop="name">niko</p>
+          <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
         </div>
-        <p class="site-description motion-element" itemprop="description">去发现更大的世界！</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">59</span>
+              <span class="site-state-item-count">61</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
-          <div class="site-state-item site-state-categories">
-            <a href="/categories">
-              <span class="site-state-item-count">49</span>
-              <span class="site-state-item-name">分类</span>
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
               </a>
-          </div>
+            </div>
+          
 
-          <div class="site-state-item site-state-tags">
-            <a href="/tags">
-              <span class="site-state-item-count">137</span>
-              <span class="site-state-item-name">标签</span>
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-name">标签</span>
               </a>
-          </div>
+            </div>
+          
 
         </nav>
 
@@ -1710,9 +1603,8 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
         
         
 
-        <div class="links-of-author motion-element">
-          
-        </div>
+        
+        
 
       </section>
 
@@ -1722,16 +1614,18 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
   </aside>
 
 
-      
+        
+      </div>
     </main>
 
     <footer id="footer" class="footer">
-      <div class="footer-inner"> <div class="copyright" >
+      <div class="footer-inner">
+        <div class="copyright" >
   
   &copy; 
   <span itemprop="copyrightYear">2016</span>
   <span class="with-love">
-    <i class="icon-next-heart fa fa-heart"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">niko</span>
 </div>
@@ -1743,23 +1637,82 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
 <div class="theme-info">
   主题 -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Mist
+    NexT.Muse
   </a>
 </div>
 
+        
 
- </div>
+        
+      </div>
     </footer>
 
-    <div class="back-to-top"></div>
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
   </div>
 
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
   <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
 
   
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
   
   
-    
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
 
   
     
@@ -1777,61 +1730,151 @@ bin/logstash -e &apos;input { stdin { } } output { stdout {} }&apos;
       || document.getElementsByTagName('body')[0]).appendChild(ds);
     })();
   </script>
-    
-     
 
-
+  
     
   
-  
-  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
-
-
-  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
-  
-
-  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
-  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
-
-  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.2" id="motion.global"></script>
 
 
 
 
-  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
-  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
 
   
-
+  
   <script type="text/javascript">
-    $(document).ready(function () {
-      if (CONFIG.sidebar === 'always') {
-        displaySidebar();
-      }
-      if (isMobile()) {
-        FastClick.attach(document.body);
-      }
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
 
-      motionIntegrator.bootstrap();
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
     });
   </script>
 
   
+
   
 
   
-  
 
-  
-  <script type="text/javascript" src="/js/lazyload.js"></script>
-  <script type="text/javascript">
-    $(function () {
-      $("#posts").find('img').lazyload({
-        placeholder: "/images/loading.gif",
-        effect: "fadeIn"
-      });
-    });
-  </script>
 </body>
 </html>
