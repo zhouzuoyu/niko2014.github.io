@@ -1,0 +1,825 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="java,spring," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="前一篇博客我们提到， 如果bean是prototype或者刷新重新create后， 读取还是旧的properties， 所以从根本来说, 我们需要更新BeanDefinition，如此才能保证在重新初始化Bean的时候使用最新的配置。
+运行时动态注册 bean 到 spring 容器
+使用主要通过BeanDefinitionBuilder构建BeanDefinition,  然后通过Default">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring runtime 更新 bean">
+<meta property="og:url" content="http://niko2014.github.io/2016/04/23/java/spring/spring-runtime-update-bean/index.html">
+<meta property="og:site_name" content="niko zhang">
+<meta property="og:description" content="前一篇博客我们提到， 如果bean是prototype或者刷新重新create后， 读取还是旧的properties， 所以从根本来说, 我们需要更新BeanDefinition，如此才能保证在重新初始化Bean的时候使用最新的配置。
+运行时动态注册 bean 到 spring 容器
+使用主要通过BeanDefinitionBuilder构建BeanDefinition,  然后通过Default">
+<meta property="og:updated_time" content="2016-11-11T01:47:37.690Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring runtime 更新 bean">
+<meta name="twitter:description" content="前一篇博客我们提到， 如果bean是prototype或者刷新重新create后， 读取还是旧的properties， 所以从根本来说, 我们需要更新BeanDefinition，如此才能保证在重新初始化Bean的时候使用最新的配置。
+运行时动态注册 bean 到 spring 容器
+使用主要通过BeanDefinitionBuilder构建BeanDefinition,  然后通过Default">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/2016/04/23/java/spring/spring-runtime-update-bean/"/>
+
+
+  <title> spring runtime 更新 bean | niko zhang </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko zhang</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring runtime 更新 bean
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-23T00:00:00+08:00" content="2016-04-23">
+              2016-04-23
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/23/java/spring/spring-runtime-update-bean/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/23/java/spring/spring-runtime-update-bean/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前一篇博客我们提到， 如果bean是prototype或者刷新重新create后， 读取还是旧的properties， 所以从根本来说, 我们需要更新BeanDefinition，如此才能保证在重新初始化Bean的时候使用最新的配置。</p>
+<h1 id="运行时动态注册-bean-到-spring-容器"><a href="#运行时动态注册-bean-到-spring-容器" class="headerlink" title="运行时动态注册 bean 到 spring 容器"></a>运行时动态注册 bean 到 spring 容器</h1><hr>
+<p>使用主要通过<code>BeanDefinitionBuilder</code>构建BeanDefinition,  然后通过<code>DefaultListableBeanFactory.registerBeanDefinition</code>注册到容器中:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line">BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(SomeClass.class);</div><div class="line">builder.addPropertyReference(<span class="string">"propertyName"</span>, <span class="string">"someBean"</span>);  <span class="comment">// add dependency to other bean</span></div><div class="line">builder.addPropertyValue(<span class="string">"propertyName"</span>, someValue);      <span class="comment">// set property value</span></div><div class="line">DefaultListableBeanFactory factory = (DefaultListableBeanFactory) context.getBeanFactory();</div><div class="line">factory.registerBeanDefinition(<span class="string">"beanName"</span>, builder.getBeanDefinition());</div></pre></td></tr></table></figure>
+<p><code>registerBeanDefinition(String beanName, BeanDefinition beanDefinition)</code> 的内部逻辑如下, 主要是验证BeanDefinition和清除缓存：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line">   <span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerBeanDefinition</span><span class="params">(String beanName, BeanDefinition beanDefinition)</span></span></div><div class="line">		<span class="keyword">throws</span> BeanDefinitionStoreException &#123;</div><div class="line"></div><div class="line">	Assert.hasText(beanName, <span class="string">"Bean name must not be empty"</span>);</div><div class="line">	Assert.notNull(beanDefinition, <span class="string">"BeanDefinition must not be null"</span>);</div><div class="line"></div><div class="line">	...</div><div class="line"></div><div class="line">	BeanDefinition oldBeanDefinition;</div><div class="line"></div><div class="line">       <span class="comment">// beanDefinitionMap</span></div><div class="line">	oldBeanDefinition = <span class="keyword">this</span>.beanDefinitionMap.get(beanName);</div><div class="line">	<span class="keyword">if</span> (oldBeanDefinition != <span class="keyword">null</span>) &#123;</div><div class="line">           <span class="comment">// 是否允许 BeanDefinition 的 Overriding</span></div><div class="line">		<span class="keyword">if</span> (!isAllowBeanDefinitionOverriding()) &#123;</div><div class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,</div><div class="line">					<span class="string">"Cannot register bean definition ["</span> + beanDefinition + <span class="string">"] for bean '"</span> + beanName +</div><div class="line">					<span class="string">"': There is already ["</span> + oldBeanDefinition + <span class="string">"] bound."</span>);</div><div class="line">		&#125;</div><div class="line">		...</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">else</span> &#123;</div><div class="line">		<span class="keyword">this</span>.beanDefinitionNames.add(beanName);</div><div class="line">		<span class="keyword">this</span>.manualSingletonNames.remove(beanName);</div><div class="line">		<span class="keyword">this</span>.frozenBeanDefinitionNames = <span class="keyword">null</span>;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">this</span>.beanDefinitionMap.put(beanName, beanDefinition);</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (oldBeanDefinition != <span class="keyword">null</span> || containsSingleton(beanName)) &#123;</div><div class="line">           <span class="comment">// 这里重置该 bean 的所有 definition caches, 包括派生于此bean的</span></div><div class="line">		resetBeanDefinition(beanName);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="更新依赖这个动态-Bean-的-Bean"><a href="#更新依赖这个动态-Bean-的-Bean" class="headerlink" title="更新依赖这个动态 Bean 的 Bean"></a>更新依赖这个动态 Bean 的 Bean</h1><hr>
+<p>注册之后, 如果使用singleton模式的话, 由于singleton实例和缓存并没有改变, 所以要进行更新DynamicBean.</p>
+<h2 id="方法1-destroySingleton"><a href="#方法1-destroySingleton" class="headerlink" title="方法1: destroySingleton"></a>方法1: destroySingleton</h2><hr>
+<p>这个方法简单粗暴, 使用 <code>destroyXXX</code> 可以销毁旧的Bean :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">factory.destroySingleton(&quot;calculation&quot;);</div><div class="line">factory.destroyBean();</div><div class="line">factory.destroyXXX();</div></pre></td></tr></table></figure>
+<p>例如 <code>org.springframework.beans.factory.support.DefaultSingletonBeanRegistry#destroySingleton</code> :</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroySingleton</span><span class="params">(String beanName)</span> </span>&#123;</div><div class="line">	<span class="comment">// Remove a registered singleton of the given name, if any.</span></div><div class="line">	removeSingleton(beanName);</div><div class="line"></div><div class="line">	<span class="comment">// Destroy the corresponding DisposableBean instance.</span></div><div class="line">	DisposableBean disposableBean;</div><div class="line">	<span class="keyword">synchronized</span> (<span class="keyword">this</span>.disposableBeans) &#123;</div><div class="line">		disposableBean = (DisposableBean) <span class="keyword">this</span>.disposableBeans.remove(beanName);</div><div class="line">	&#125;</div><div class="line">	destroyBean(beanName, disposableBean);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">destroyBean</span><span class="params">(String beanName, DisposableBean bean)</span> </span>&#123;</div><div class="line">	<span class="comment">// Trigger destruction of dependent beans first...</span></div><div class="line">	Set&lt;String&gt; dependencies = <span class="keyword">this</span>.dependentBeanMap.remove(beanName);</div><div class="line">	<span class="keyword">if</span> (dependencies != <span class="keyword">null</span>) &#123;</div><div class="line">		<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">			logger.debug(<span class="string">"Retrieved dependent beans for bean '"</span> + beanName + <span class="string">"': "</span> + dependencies);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">for</span> (String dependentBeanName : dependencies) &#123;</div><div class="line">			destroySingleton(dependentBeanName);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// Actually destroy the bean now...</span></div><div class="line">	<span class="keyword">if</span> (bean != <span class="keyword">null</span>) &#123;</div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			bean.destroy();</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">catch</span> (Throwable ex) &#123;</div><div class="line">			logger.error(<span class="string">"Destroy method on bean with name '"</span> + beanName + <span class="string">"' threw an exception"</span>, ex);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// Trigger destruction of contained beans...</span></div><div class="line">	Set&lt;String&gt; containedBeans = <span class="keyword">this</span>.containedBeanMap.remove(beanName);</div><div class="line">	<span class="keyword">if</span> (containedBeans != <span class="keyword">null</span>) &#123;</div><div class="line">		<span class="keyword">for</span> (String containedBeanName : containedBeans) &#123;</div><div class="line">			destroySingleton(containedBeanName);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// Remove destroyed bean from other beans' dependencies.</span></div><div class="line">	<span class="keyword">synchronized</span> (<span class="keyword">this</span>.dependentBeanMap) &#123;</div><div class="line">		<span class="keyword">for</span> (Iterator&lt;Map.Entry&lt;String, Set&lt;String&gt;&gt;&gt; it = <span class="keyword">this</span>.dependentBeanMap.entrySet().iterator(); it.hasNext();) &#123;</div><div class="line">			Map.Entry&lt;String, Set&lt;String&gt;&gt; entry = it.next();</div><div class="line">			Set&lt;String&gt; dependenciesToClean = entry.getValue();</div><div class="line">			dependenciesToClean.remove(beanName);</div><div class="line">			<span class="keyword">if</span> (dependenciesToClean.isEmpty()) &#123;</div><div class="line">				it.remove();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// Remove destroyed bean's prepared dependency information.</span></div><div class="line">	<span class="keyword">this</span>.dependenciesForBeanMap.remove(beanName);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如上, 内部的<code>singletonObjects singletonFactories earlySingletonObjects registeredSingletons containedBeans containedBeanMap</code>等记录会清除掉这个Bean.</p>
+<p>当下次需要这个Bean的时候, 如下面 <code>org.springframework.beans.factory.support.AbstractBeanFactory#doGetBean</code> 代码所示, 如果没有缓存, 就会重新创建这个Bean.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">protected</span> &lt;T&gt; <span class="function">T <span class="title">doGetBean</span><span class="params">(</span></span></div><div class="line">			<span class="keyword">final</span> String name, <span class="keyword">final</span> Class&lt;T&gt; requiredType, <span class="keyword">final</span> Object[] args, <span class="keyword">boolean</span> typeCheckOnly)</div><div class="line">			<span class="keyword">throws</span> BeansException &#123;</div><div class="line"></div><div class="line">		<span class="keyword">final</span> String beanName = transformedBeanName(name);</div><div class="line">		Object bean;</div><div class="line"></div><div class="line">		<span class="comment">// Eagerly check singleton cache for manually registered singletons.</span></div><div class="line">		Object sharedInstance = getSingleton(beanName);</div><div class="line">		<span class="keyword">if</span> (sharedInstance != <span class="keyword">null</span> &amp;&amp; args == <span class="keyword">null</span>) &#123;</div><div class="line">			<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">				<span class="keyword">if</span> (isSingletonCurrentlyInCreation(beanName)) &#123;</div><div class="line">					logger.debug(<span class="string">"Returning eagerly cached instance of singleton bean '"</span> + beanName +</div><div class="line">							<span class="string">"' that is not fully initialized yet - a consequence of a circular reference"</span>);</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">else</span> &#123;</div><div class="line">					logger.debug(<span class="string">"Returning cached instance of singleton bean '"</span> + beanName + <span class="string">"'"</span>);</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			bean = getObjectForBeanInstance(sharedInstance, name, beanName, <span class="keyword">null</span>);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">else</span> &#123;</div><div class="line">			<span class="comment">// Fail if we're already creating this bean instance:</span></div><div class="line">			<span class="comment">// We're assumably within a circular reference.</span></div><div class="line">			<span class="keyword">if</span> (isPrototypeCurrentlyInCreation(beanName)) &#123;</div><div class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> BeanCurrentlyInCreationException(beanName);</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			<span class="comment">// Check if bean definition exists in this factory.</span></div><div class="line">			BeanFactory parentBeanFactory = getParentBeanFactory();</div><div class="line">			<span class="keyword">if</span> (parentBeanFactory != <span class="keyword">null</span> &amp;&amp; !containsBeanDefinition(beanName)) &#123;</div><div class="line">				<span class="comment">// Not found -&gt; check parent.</span></div><div class="line">				String nameToLookup = originalBeanName(name);</div><div class="line">				<span class="keyword">if</span> (args != <span class="keyword">null</span>) &#123;</div><div class="line">					<span class="comment">// Delegation to parent with explicit args.</span></div><div class="line">					<span class="keyword">return</span> (T) parentBeanFactory.getBean(nameToLookup, args);</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">else</span> &#123;</div><div class="line">					<span class="comment">// No args -&gt; delegate to standard getBean method.</span></div><div class="line">					<span class="keyword">return</span> parentBeanFactory.getBean(nameToLookup, requiredType);</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			<span class="keyword">if</span> (!typeCheckOnly) &#123;</div><div class="line">				markBeanAsCreated(beanName);</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			<span class="keyword">try</span> &#123;</div><div class="line">				<span class="keyword">final</span> RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);</div><div class="line">				checkMergedBeanDefinition(mbd, beanName, args);</div><div class="line"></div><div class="line">				<span class="comment">// Guarantee initialization of beans that the current bean depends on.</span></div><div class="line">				String[] dependsOn = mbd.getDependsOn();</div><div class="line">				<span class="keyword">if</span> (dependsOn != <span class="keyword">null</span>) &#123;</div><div class="line">					<span class="keyword">for</span> (String dependsOnBean : dependsOn) &#123;</div><div class="line">						<span class="keyword">if</span> (isDependent(beanName, dependsOnBean)) &#123;</div><div class="line">							<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(mbd.getResourceDescription(), beanName,</div><div class="line">									<span class="string">"Circular depends-on relationship between '"</span> + beanName + <span class="string">"' and '"</span> + dependsOnBean + <span class="string">"'"</span>);</div><div class="line">						&#125;</div><div class="line">						registerDependentBean(dependsOnBean, beanName);</div><div class="line">						getBean(dependsOnBean);</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line"></div><div class="line">				<span class="comment">// Create bean instance.</span></div><div class="line">				<span class="keyword">if</span> (mbd.isSingleton()) &#123;</div><div class="line">					sharedInstance = getSingleton(beanName, <span class="keyword">new</span> ObjectFactory&lt;Object&gt;() &#123;</div><div class="line">						<span class="meta">@Override</span></div><div class="line">						<span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">()</span> <span class="keyword">throws</span> BeansException </span>&#123;</div><div class="line">							<span class="keyword">try</span> &#123;</div><div class="line">								<span class="keyword">return</span> createBean(beanName, mbd, args);</div><div class="line">							&#125;</div><div class="line">							<span class="keyword">catch</span> (BeansException ex) &#123;</div><div class="line">								<span class="comment">// Explicitly remove instance from singleton cache: It might have been put there</span></div><div class="line">								<span class="comment">// eagerly by the creation process, to allow for circular reference resolution.</span></div><div class="line">								<span class="comment">// Also remove any beans that received a temporary reference to the bean.</span></div><div class="line">								destroySingleton(beanName);</div><div class="line">								<span class="keyword">throw</span> ex;</div><div class="line">							&#125;</div><div class="line">						&#125;</div><div class="line">					&#125;);</div><div class="line">					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);</div><div class="line">				&#125;</div><div class="line"></div><div class="line">				<span class="keyword">else</span> <span class="keyword">if</span> (mbd.isPrototype()) &#123;</div><div class="line">					<span class="comment">// It's a prototype -&gt; create a new instance.</span></div><div class="line">					Object prototypeInstance = <span class="keyword">null</span>;</div><div class="line">					<span class="keyword">try</span> &#123;</div><div class="line">						beforePrototypeCreation(beanName);</div><div class="line">						prototypeInstance = createBean(beanName, mbd, args);</div><div class="line">					&#125;</div><div class="line">					<span class="keyword">finally</span> &#123;</div><div class="line">						afterPrototypeCreation(beanName);</div><div class="line">					&#125;</div><div class="line">					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);</div><div class="line">				&#125;</div><div class="line"></div><div class="line">				<span class="keyword">else</span> &#123;</div><div class="line">					String scopeName = mbd.getScope();</div><div class="line">					<span class="keyword">final</span> Scope scope = <span class="keyword">this</span>.scopes.get(scopeName);</div><div class="line">					<span class="keyword">if</span> (scope == <span class="keyword">null</span>) &#123;</div><div class="line">						<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"No Scope registered for scope '"</span> + scopeName + <span class="string">"'"</span>);</div><div class="line">					&#125;</div><div class="line">					<span class="keyword">try</span> &#123;</div><div class="line">						Object scopedInstance = scope.get(beanName, <span class="keyword">new</span> ObjectFactory&lt;Object&gt;() &#123;</div><div class="line">							<span class="meta">@Override</span></div><div class="line">							<span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">()</span> <span class="keyword">throws</span> BeansException </span>&#123;</div><div class="line">								beforePrototypeCreation(beanName);</div><div class="line">								<span class="keyword">try</span> &#123;</div><div class="line">									<span class="keyword">return</span> createBean(beanName, mbd, args);</div><div class="line">								&#125;</div><div class="line">								<span class="keyword">finally</span> &#123;</div><div class="line">									afterPrototypeCreation(beanName);</div><div class="line">								&#125;</div><div class="line">							&#125;</div><div class="line">						&#125;);</div><div class="line">						bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);</div><div class="line">					&#125;</div><div class="line">					<span class="keyword">catch</span> (IllegalStateException ex) &#123;</div><div class="line">						<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(beanName,</div><div class="line">								<span class="string">"Scope '"</span> + scopeName + <span class="string">"' is not active for the current thread; "</span> +</div><div class="line">								<span class="string">"consider defining a scoped proxy for this bean if you intend to refer to it from a singleton"</span>,</div><div class="line">								ex);</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">catch</span> (BeansException ex) &#123;</div><div class="line">				cleanupAfterBeanCreationFailure(beanName);</div><div class="line">				<span class="keyword">throw</span> ex;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// Check if required type matches the type of the actual bean instance.</span></div><div class="line">		<span class="keyword">if</span> (requiredType != <span class="keyword">null</span> &amp;&amp; bean != <span class="keyword">null</span> &amp;&amp; !requiredType.isAssignableFrom(bean.getClass())) &#123;</div><div class="line">			<span class="keyword">try</span> &#123;</div><div class="line">				<span class="keyword">return</span> getTypeConverter().convertIfNecessary(bean, requiredType);</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">catch</span> (TypeMismatchException ex) &#123;</div><div class="line">				<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">					logger.debug(<span class="string">"Failed to convert bean '"</span> + name + <span class="string">"' to required type ["</span> +</div><div class="line">							ClassUtils.getQualifiedName(requiredType) + <span class="string">"]"</span>, ex);</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> (T) bean;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>从上可知, 因为已经destroy了DynamicBean, 所以<code>Object sharedInstance = getSingleton(beanName)</code> 是null的, 所以需要重新缓存DynamicBean, <code>org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean</code> 被调用, 这样我们的修改就被刷新了.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">doCreateBean</span><span class="params">(<span class="keyword">final</span> String beanName, <span class="keyword">final</span> RootBeanDefinition mbd, <span class="keyword">final</span> Object[] args)</span> </span>&#123;</div><div class="line">		<span class="comment">// Instantiate the bean.</span></div><div class="line">		BeanWrapper instanceWrapper = <span class="keyword">null</span>;</div><div class="line">		<span class="keyword">if</span> (mbd.isSingleton()) &#123;</div><div class="line">			instanceWrapper = <span class="keyword">this</span>.factoryBeanInstanceCache.remove(beanName);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">if</span> (instanceWrapper == <span class="keyword">null</span>) &#123;</div><div class="line">			instanceWrapper = createBeanInstance(beanName, mbd, args);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">final</span> Object bean = (instanceWrapper != <span class="keyword">null</span> ? instanceWrapper.getWrappedInstance() : <span class="keyword">null</span>);</div><div class="line">		Class&lt;?&gt; beanType = (instanceWrapper != <span class="keyword">null</span> ? instanceWrapper.getWrappedClass() : <span class="keyword">null</span>);</div><div class="line"></div><div class="line">		<span class="comment">// Allow post-processors to modify the merged bean definition.</span></div><div class="line">		<span class="keyword">synchronized</span> (mbd.postProcessingLock) &#123;</div><div class="line">			<span class="keyword">if</span> (!mbd.postProcessed) &#123;</div><div class="line">				applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);</div><div class="line">				mbd.postProcessed = <span class="keyword">true</span>;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// Eagerly cache singletons to be able to resolve circular references</span></div><div class="line">		<span class="comment">// even when triggered by lifecycle interfaces like BeanFactoryAware.</span></div><div class="line">		<span class="keyword">boolean</span> earlySingletonExposure = (mbd.isSingleton() &amp;&amp; <span class="keyword">this</span>.allowCircularReferences &amp;&amp;</div><div class="line">				isSingletonCurrentlyInCreation(beanName));</div><div class="line">		<span class="keyword">if</span> (earlySingletonExposure) &#123;</div><div class="line">			<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">				logger.debug(<span class="string">"Eagerly caching bean '"</span> + beanName +</div><div class="line">						<span class="string">"' to allow for resolving potential circular references"</span>);</div><div class="line">			&#125;</div><div class="line">			addSingletonFactory(beanName, <span class="keyword">new</span> ObjectFactory&lt;Object&gt;() &#123;</div><div class="line">				<span class="meta">@Override</span></div><div class="line">				<span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">()</span> <span class="keyword">throws</span> BeansException </span>&#123;</div><div class="line">					<span class="keyword">return</span> getEarlyBeanReference(beanName, mbd, bean);</div><div class="line">				&#125;</div><div class="line">			&#125;);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// Initialize the bean instance.</span></div><div class="line">		Object exposedObject = bean;</div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			populateBean(beanName, mbd, instanceWrapper);</div><div class="line">			<span class="keyword">if</span> (exposedObject != <span class="keyword">null</span>) &#123;</div><div class="line">				exposedObject = initializeBean(beanName, exposedObject, mbd);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">catch</span> (Throwable ex) &#123;</div><div class="line">			<span class="keyword">if</span> (ex <span class="keyword">instanceof</span> BeanCreationException &amp;&amp; beanName.equals(((BeanCreationException) ex).getBeanName())) &#123;</div><div class="line">				<span class="keyword">throw</span> (BeanCreationException) ex;</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">else</span> &#123;</div><div class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(mbd.getResourceDescription(), beanName, <span class="string">"Initialization of bean failed"</span>, ex);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (earlySingletonExposure) &#123;</div><div class="line">			Object earlySingletonReference = getSingleton(beanName, <span class="keyword">false</span>);</div><div class="line">			<span class="keyword">if</span> (earlySingletonReference != <span class="keyword">null</span>) &#123;</div><div class="line">				<span class="keyword">if</span> (exposedObject == bean) &#123;</div><div class="line">					exposedObject = earlySingletonReference;</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">else</span> <span class="keyword">if</span> (!<span class="keyword">this</span>.allowRawInjectionDespiteWrapping &amp;&amp; hasDependentBean(beanName)) &#123;</div><div class="line">					String[] dependentBeans = getDependentBeans(beanName);</div><div class="line">					Set&lt;String&gt; actualDependentBeans = <span class="keyword">new</span> LinkedHashSet&lt;String&gt;(dependentBeans.length);</div><div class="line">					<span class="keyword">for</span> (String dependentBean : dependentBeans) &#123;</div><div class="line">						<span class="keyword">if</span> (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) &#123;</div><div class="line">							actualDependentBeans.add(dependentBean);</div><div class="line">						&#125;</div><div class="line">					&#125;</div><div class="line">					<span class="keyword">if</span> (!actualDependentBeans.isEmpty()) &#123;</div><div class="line">						<span class="keyword">throw</span> <span class="keyword">new</span> BeanCurrentlyInCreationException(beanName,</div><div class="line">								<span class="string">"Bean with name '"</span> + beanName + <span class="string">"' has been injected into other beans ["</span> +</div><div class="line">								StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +</div><div class="line">								<span class="string">"] in its raw version as part of a circular reference, but has eventually been "</span> +</div><div class="line">								<span class="string">"wrapped. This means that said other beans do not use the final version of the "</span> +</div><div class="line">								<span class="string">"bean. This is often the result of over-eager type matching - consider using "</span> +</div><div class="line">								<span class="string">"'getBeanNamesOfType' with the 'allowEagerInit' flag turned off, for example."</span>);</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// Register bean as disposable.</span></div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			registerDisposableBeanIfNecessary(beanName, bean, mbd);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">catch</span> (BeanDefinitionValidationException ex) &#123;</div><div class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(mbd.getResourceDescription(), beanName, <span class="string">"Invalid destruction signature"</span>, ex);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">return</span> exposedObject;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h2 id="方法2-WrapBean"><a href="#方法2-WrapBean" class="headerlink" title="方法2: WrapBean"></a>方法2: WrapBean</h2><hr>
+<ul>
+<li>一个比较好的策略是定义一个 WrapBean 包一下这个可能在runtime被动态更新的 DynamicBean, 大概如下:</li>
+</ul>
+<div style="display: none;"><br></div>
+
+
+
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WrapBean</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Resource</span></div><div class="line">    DynamicBean dynamicBean;</div><div class="line"></div><div class="line">    <span class="comment">// get set...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样的话, 动态修改后只需要更新这个WrapBean的dynamicBean, 而且对系统的影响相对较小.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://stackoverflow.com/questions/15328904/dynamically-declare-beans-at-runtime-in-spring" target="_blank" rel="external">http://stackoverflow.com/questions/15328904/dynamically-declare-beans-at-runtime-in-spring</a><br><a href="http://stackoverflow.com/questions/12800769/replace-spring-bean-in-one-context-with-mock-version-from-another-context" target="_blank" rel="external">http://stackoverflow.com/questions/12800769/replace-spring-bean-in-one-context-with-mock-version-from-another-context</a><br><a href="http://stackoverflow.com/questions/11606504/registering-beansprototype-at-runtime-in-spring" target="_blank" rel="external">http://stackoverflow.com/questions/11606504/registering-beansprototype-at-runtime-in-spring</a><br><a href="http://stackoverflow.com/questions/8711560/dynamic-creation-of-beans-in-spring" target="_blank" rel="external">http://stackoverflow.com/questions/8711560/dynamic-creation-of-beans-in-spring</a><br><a href="http://shayanth.blogspot.com/2009/10/dynamic-bean-creation-in-spring.html" target="_blank" rel="external">http://shayanth.blogspot.com/2009/10/dynamic-bean-creation-in-spring.html</a><br><a href="http://stackoverflow.com/questions/4540713/add-bean-programatically-to-spring-web-app-context" target="_blank" rel="external">http://stackoverflow.com/questions/4540713/add-bean-programatically-to-spring-web-app-context</a><br><a href="http://stackoverflow.com/questions/27998502/java-spring-recreate-specific-bean" target="_blank" rel="external">http://stackoverflow.com/questions/27998502/java-spring-recreate-specific-bean</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+            <a href="/tags/spring/" rel="tag">#spring</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/22/java/spring/spring-runtime-modify-bean-attrs/" rel="next" title="spring runtime 修改 bean 属性">
+                <i class="fa fa-chevron-left"></i> spring runtime 修改 bean 属性
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/28/dtai/data/ELK__Elasticsearch_Logstash_Kibana/" rel="prev" title="使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志">
+                使用 ELK（elasticsearch/logstash/kibana）分析 nginx 日志 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/04/23/java/spring/spring-runtime-update-bean/"
+           data-title="spring runtime 更新 bean" data-url="http://niko2014.github.io/2016/04/23/java/spring/spring-runtime-update-bean/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko" />
+          <p class="site-author-name" itemprop="name">niko</p>
+          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">65</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#运行时动态注册-bean-到-spring-容器"><span class="nav-number">1.</span> <span class="nav-text">运行时动态注册 bean 到 spring 容器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#更新依赖这个动态-Bean-的-Bean"><span class="nav-number">2.</span> <span class="nav-text">更新依赖这个动态 Bean 的 Bean</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法1-destroySingleton"><span class="nav-number">2.1.</span> <span class="nav-text">方法1: destroySingleton</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法2-WrapBean"><span class="nav-number">2.2.</span> <span class="nav-text">方法2: WrapBean</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

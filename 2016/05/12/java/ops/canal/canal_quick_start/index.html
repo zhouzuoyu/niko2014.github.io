@@ -1,0 +1,839 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="mysql,canal," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成很多重要的业务功能, 比如变更通知/缓存更新/索引同步等等. 事不宜迟, 先体验一下.
+下载并安装">
+<meta property="og:type" content="article">
+<meta property="og:title" content="canal quick start">
+<meta property="og:url" content="http://niko2014.github.io/2016/05/12/java/ops/canal/canal_quick_start/index.html">
+<meta property="og:site_name" content="niko zhang">
+<meta property="og:description" content="canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成很多重要的业务功能, 比如变更通知/缓存更新/索引同步等等. 事不宜迟, 先体验一下.
+下载并安装">
+<meta property="og:updated_time" content="2016-11-08T23:59:38.828Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="canal quick start">
+<meta name="twitter:description" content="canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成很多重要的业务功能, 比如变更通知/缓存更新/索引同步等等. 事不宜迟, 先体验一下.
+下载并安装">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/2016/05/12/java/ops/canal/canal_quick_start/"/>
+
+
+  <title> canal quick start | niko zhang </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko zhang</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                canal quick start
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-12T00:00:00+08:00" content="2016-05-12">
+              2016-05-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/12/java/ops/canal/canal_quick_start/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/12/java/ops/canal/canal_quick_start/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>canal, 是阿里巴巴出品的基于MySQL的数据增量日志解析, 提供数据订阅和消费的工具.<br>原理是实现MySQL的dump协议, 作为一个slave客户端, 向master发送dump请求. master收到请求后会传送相应的数据, 接着 canal 接收并解析binlog. 使用canal可以完成很多重要的业务功能, 比如变更通知/缓存更新/索引同步等等. 事不宜迟, 先体验一下.</p>
+<h1 id="下载并安装"><a href="#下载并安装" class="headerlink" title="下载并安装"></a>下载并安装</h1><hr>
+<p>mysql, version: 5.7.9, 安装略.<br><a href="https://github.com/alibaba/canal" target="_blank" rel="external">canal, version: v1.0.22</a></p>
+<h1 id="mysql-部分的配置"><a href="#mysql-部分的配置" class="headerlink" title="mysql 部分的配置"></a>mysql 部分的配置</h1><hr>
+<h2 id="启用-bin-log"><a href="#启用-bin-log" class="headerlink" title="启用 bin log"></a>启用 bin log</h2><p>sudo vim /etc/mysql/my.cnf</p>
+<p>在[mysqld]的配置节下， 插入：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log-bin=mysql-bin</div><div class="line">binlog-format=ROW</div><div class="line">server-id=1        #配置mysql replaction需要定义，不能和canal的slaveId重复</div></pre></td></tr></table></figure>
+<h2 id="检查是否开启"><a href="#检查是否开启" class="headerlink" title="检查是否开启"></a>检查是否开启</h2><p>show variables like ‘log_%’;</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">log_bin	ON</div><div class="line">log_bin_basename	/var/lib/mysql/mysql-bin</div><div class="line">log_bin_index	/var/lib/mysql/mysql-bin.index</div><div class="line">log_bin_trust_function_creators	OFF</div><div class="line">log_bin_use_v1_row_events	OFF</div><div class="line">log_error	/var/log/mysqld.log</div><div class="line">log_output	FILE</div><div class="line">log_queries_not_using_indexes	OFF</div><div class="line">log_slave_updates	OFF</div><div class="line">log_slow_admin_statements	OFF</div><div class="line">log_slow_slave_statements	OFF</div><div class="line">log_throttle_queries_not_using_indexes	0</div><div class="line">log_warnings	1</div></pre></td></tr></table></figure>
+<h2 id="查询确认当前binlog模式"><a href="#查询确认当前binlog模式" class="headerlink" title="查询确认当前binlog模式:"></a>查询确认当前binlog模式:</h2><pre><code>SQL查询:
+show variables like &apos;binlog_format&apos;;
+</code></pre><h1 id="canal-部分的配置"><a href="#canal-部分的配置" class="headerlink" title="canal 部分的配置"></a>canal 部分的配置</h1><hr>
+<p>接下来是canal安装配置.</p>
+<h2 id="canal-的MySQL权限"><a href="#canal-的MySQL权限" class="headerlink" title="canal 的MySQL权限"></a>canal 的MySQL权限</h2><p>canal的原理是模拟自己为mysql slave，所以这里一定需要作为 mysql slave 的相关权限.</p>
+<p>创建canal用户及授权:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">CREATE USER canal IDENTIFIED BY &apos;canal&apos;;</div><div class="line">GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO &apos;canal&apos;@&apos;%&apos;;</div><div class="line">FLUSH PRIVILEGES;</div><div class="line">-- GRANT ALL PRIVILEGES ON *.* TO &apos;canal&apos;@&apos;%&apos; ;</div></pre></td></tr></table></figure>
+<h2 id="构建-amp-配置-canal"><a href="#构建-amp-配置-canal" class="headerlink" title="构建 &amp; 配置 canal"></a>构建 &amp; 配置 canal</h2><pre><code>git clone git@github.com:alibaba/canal.git
+cd canal
+mvn clean install -Dmaven.test.skip=true -Denv=release
+mkdir /tmp/canal
+tar zxvf target/canal.deployer-1.0.22-SNAPSHOT.tar.gz -C /tmp/canal
+</code></pre><p>编辑<code>instance.properties</code> :</p>
+<pre><code>cd /tmp/canal/
+vi conf/example/instance.properties
+</code></pre><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">#################################################</div><div class="line">## mysql serverId</div><div class="line">canal.instance.mysql.slaveId = 1234</div><div class="line"></div><div class="line"># position info</div><div class="line">canal.instance.master.address = 127.0.0.1:3306</div><div class="line">canal.instance.master.journal.name =</div><div class="line">canal.instance.master.position =</div><div class="line">canal.instance.master.timestamp =</div><div class="line"></div><div class="line">#canal.instance.standby.address =</div><div class="line">#canal.instance.standby.journal.name =</div><div class="line">#canal.instance.standby.position =</div><div class="line">#canal.instance.standby.timestamp =</div><div class="line"></div><div class="line"># username/password</div><div class="line">canal.instance.dbUsername = canal</div><div class="line">canal.instance.dbPassword = canal</div><div class="line">canal.instance.defaultDatabaseName =</div><div class="line">canal.instance.connectionCharset = UTF-8</div><div class="line"></div><div class="line"># table regex</div><div class="line">canal.instance.filter.regex = .*\\..*</div><div class="line"># table black regex</div><div class="line">canal.instance.filter.black.regex =</div><div class="line"></div><div class="line">#################################################</div></pre></td></tr></table></figure>
+<p>怎么来填写这个配置, 首先先要查询master状态 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysql&gt; show master status;</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">| mysql-bin.000002 |      154 |              |                  |                   |</div><div class="line">+------------------+----------+--------------+------------------+-------------------+</div><div class="line">1 row in set (0.00 sec)</div></pre></td></tr></table></figure>
+<p>如上, 把 <code>mysql-bin.000002</code>填入<code>canal.instance.master.journal.name</code>,<br><code>154</code> 填入<code>canal.instance.master.position</code>, 即是:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">...</div><div class="line">canal.instance.master.journal.name = mysql-bin.000002</div><div class="line">canal.instance.master.position = 154</div><div class="line">....</div></pre></td></tr></table></figure>
+<h2 id="启动-canal-server"><a href="#启动-canal-server" class="headerlink" title="启动 canal server"></a>启动 canal server</h2><pre><code>vim conf/canal.properties
+</code></pre><p>暂时使用默认配置</p>
+<pre><code>sh bin/startup.sh
+</code></pre><p>启动日志:<br>tail -f logs/canal/canal.log</p>
+<p>具体instance的日志：<br>tail -f logs/example/example.log</p>
+<p>sh bin/stop.sh</p>
+<h1 id="mysqlbinlog-测试"><a href="#mysqlbinlog-测试" class="headerlink" title="mysqlbinlog 测试"></a>mysqlbinlog 测试</h1><p>使用 <a href="http://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html" target="_blank" rel="external">mysqlbinlog</a> 可以查看binlog, 例如:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">mysqlbinlog -h127.0.0.1 -P33306 -ucanal -pcanal --read-from-remote-server -v --start-position=296 -d dbroute_01 mysql-bin.000003</div></pre></td></tr></table></figure>
+<div style="display: none;"><br>mysqlbinlog -h192.168.7.90 -P3306 -ucanal -pcanal –read-from-remote-server -v –start-position=877194 -d dbroute_01 mysql-bin.000001<br></div>
+
+
+
+<h1 id="使用-canal-client-订阅数据"><a href="#使用-canal-client-订阅数据" class="headerlink" title="使用 canal client 订阅数据"></a>使用 canal client 订阅数据</h1><p>canal 客户端的代码程序太长, 这里就不贴了, 在github项目的example包下<a href="https://github.com/alibaba/canal/blob/master/example/src/main/java/com/alibaba/otter/canal/example/SimpleCanalClientTest.java" target="_blank" rel="external">SimpleCanalClientTest.java</a></p>
+<p>因为是使用<code>ROW</code>的binlog, 可以观察到变更的行和列, 而且哪些列更新了都可以获取, 日志示例:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"></div><div class="line">================&gt; binlog[mysql-bin.000001:65595295] , executeTime :  , delay : 1039ms</div><div class="line"> BEGIN ----&gt; Thread id: 131608</div><div class="line">----------------&gt; binlog[mysql-bin.000001:65595441] , name[test,city] , eventType : UPDATE , executeTime :  , delay : 1040ms</div><div class="line">id : 56    type=int(11)</div><div class="line">province_id : 5    type=int(11)</div><div class="line">name : 包头市    type=varchar(50)    update=true</div><div class="line">code : 229    type=varchar(50)</div><div class="line">----------------</div><div class="line"> END ----&gt; transaction id: 269626487</div><div class="line">================&gt; binlog[mysql-bin.000001:65595556] , executeTime :  , delay : 1040ms</div></pre></td></tr></table></figure>
+<p>使用上面的example, 可以快速入门 canal API, 实现很多重要的业务功能.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://github.com/alibaba/canal/wiki/QuickStart" target="_blank" rel="external">https://github.com/alibaba/canal/wiki/QuickStart</a><br><a href="http://www.ilanni.com/?p=7816" target="_blank" rel="external">http://www.ilanni.com/?p=7816</a><br><a href="http://m.blog.csdn.net/article/details?id=50824271" target="_blank" rel="external">http://m.blog.csdn.net/article/details?id=50824271</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag">#mysql</a>
+          
+            <a href="/tags/canal/" rel="tag">#canal</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/10/linux/tools/app-as-service-upstart/" rel="next" title="为 spring boot 程序创建 service">
+                <i class="fa fa-chevron-left"></i> 为 spring boot 程序创建 service
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/12/java/opsrc/canal/canal_quick_start/" rel="prev" title="canal quick start">
+                canal quick start <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/05/12/java/ops/canal/canal_quick_start/"
+           data-title="canal quick start" data-url="http://niko2014.github.io/2016/05/12/java/ops/canal/canal_quick_start/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko" />
+          <p class="site-author-name" itemprop="name">niko</p>
+          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">65</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#下载并安装"><span class="nav-number">1.</span> <span class="nav-text">下载并安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql-部分的配置"><span class="nav-number">2.</span> <span class="nav-text">mysql 部分的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#启用-bin-log"><span class="nav-number">2.1.</span> <span class="nav-text">启用 bin log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查是否开启"><span class="nav-number">2.2.</span> <span class="nav-text">检查是否开启</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询确认当前binlog模式"><span class="nav-number">2.3.</span> <span class="nav-text">查询确认当前binlog模式:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#canal-部分的配置"><span class="nav-number">3.</span> <span class="nav-text">canal 部分的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#canal-的MySQL权限"><span class="nav-number">3.1.</span> <span class="nav-text">canal 的MySQL权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建-amp-配置-canal"><span class="nav-number">3.2.</span> <span class="nav-text">构建 & 配置 canal</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动-canal-server"><span class="nav-number">3.3.</span> <span class="nav-text">启动 canal server</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mysqlbinlog-测试"><span class="nav-number">4.</span> <span class="nav-text">mysqlbinlog 测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用-canal-client-订阅数据"><span class="nav-number">5.</span> <span class="nav-text">使用 canal client 订阅数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
