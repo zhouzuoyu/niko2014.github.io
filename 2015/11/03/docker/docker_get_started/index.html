@@ -1,0 +1,850 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="docker 是什么？docker 起初是dotCloud公司的一个业余项目， 是基于Go和LXC实现的一个轻量级的操作系统虚拟化方案。他可以实现更快的交付部署、更高效的虚拟化、更耿丹的迁移拓展和管理等，具体的在后面会慢慢体会到。首先我们先要把 docker 装到你的机子上，下面以 ubuntu 为例：
+docker 获取安装
+最新的安装说明， 请查阅 官方文档
+首先查看 ubuntu 发行版本号">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【docker】 get started - with ubuntu">
+<meta property="og:url" content="http://niko2014.github.io/2015/11/03/docker/docker_get_started/index.html">
+<meta property="og:site_name" content="niko zhang">
+<meta property="og:description" content="docker 是什么？docker 起初是dotCloud公司的一个业余项目， 是基于Go和LXC实现的一个轻量级的操作系统虚拟化方案。他可以实现更快的交付部署、更高效的虚拟化、更耿丹的迁移拓展和管理等，具体的在后面会慢慢体会到。首先我们先要把 docker 装到你的机子上，下面以 ubuntu 为例：
+docker 获取安装
+最新的安装说明， 请查阅 官方文档
+首先查看 ubuntu 发行版本号">
+<meta property="og:updated_time" content="2016-11-14T03:25:47.580Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【docker】 get started - with ubuntu">
+<meta name="twitter:description" content="docker 是什么？docker 起初是dotCloud公司的一个业余项目， 是基于Go和LXC实现的一个轻量级的操作系统虚拟化方案。他可以实现更快的交付部署、更高效的虚拟化、更耿丹的迁移拓展和管理等，具体的在后面会慢慢体会到。首先我们先要把 docker 装到你的机子上，下面以 ubuntu 为例：
+docker 获取安装
+最新的安装说明， 请查阅 官方文档
+首先查看 ubuntu 发行版本号">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/2015/11/03/docker/docker_get_started/"/>
+
+
+  <title> 【docker】 get started - with ubuntu | niko zhang </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko zhang</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                【docker】 get started - with ubuntu
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-11-03T00:00:00+08:00" content="2015-11-03">
+              2015-11-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/11/03/docker/docker_get_started/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/03/docker/docker_get_started/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><code>docker</code> 是什么？docker 起初是dotCloud公司的一个业余项目， 是基于Go和LXC实现的一个轻量级的操作系统虚拟化方案。他可以实现更快的交付部署、更高效的虚拟化、更耿丹的迁移拓展和管理等，具体的在后面会慢慢体会到。首先我们先要把 docker 装到你的机子上，下面以 ubuntu 为例：</p>
+<h1 id="docker-获取安装"><a href="#docker-获取安装" class="headerlink" title="docker 获取安装"></a>docker 获取安装</h1><hr>
+<p>最新的安装说明， 请查阅 <a href="https://docs.docker.com/engine/getstarted/step_one/" target="_blank" rel="external">官方文档</a></p>
+<p>首先查看 ubuntu 发行版本号， 文档上针对不同版本的系统会有一些注意事项。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ uname -r</div><div class="line">3.13.0-98-generic</div></pre></td></tr></table></figure>
+<p>导入 apt key：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sudo apt-get update</div><div class="line">$ sudo apt-get install apt-transport-https ca-certificates</div><div class="line">$ sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D</div></pre></td></tr></table></figure>
+<p>选择对应的仓库， 根据 Ubuntu version 选择 Repository：</p>
+<ul>
+<li>Precise 12.04 (LTS)    deb <a href="https://apt.dockerproject.org/repo" target="_blank" rel="external">https://apt.dockerproject.org/repo</a> ubuntu-precise main</li>
+<li>Trusty 14.04 (LTS)    deb <a href="https://apt.dockerproject.org/repo" target="_blank" rel="external">https://apt.dockerproject.org/repo</a> ubuntu-trusty main</li>
+<li>Wily 15.10    deb <a href="https://apt.dockerproject.org/repo" target="_blank" rel="external">https://apt.dockerproject.org/repo</a> ubuntu-wily main</li>
+<li>Xenial 16.04 (LTS)    deb <a href="https://apt.dockerproject.org/repo" target="_blank" rel="external">https://apt.dockerproject.org/repo</a> ubuntu-xenial main</li>
+</ul>
+<p>选择后， 写入 docker.list：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ <span class="built_in">echo</span> <span class="string">"deb https://apt.dockerproject.org/repo ubuntu-trusty main"</span> | sudo tee /etc/apt/sources.list.d/docker.list</div><div class="line">$ sudo apt-get update</div><div class="line">$ apt-cache policy docker-engine</div><div class="line">docker-engine:</div><div class="line">  Installed: (none)</div><div class="line">  Candidate: 1.12.3-0~trusty</div><div class="line">  Version table:</div><div class="line">     1.12.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.9.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.9.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.7.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.7.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.5.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div></pre></td></tr></table></figure>
+<p>对于以下版本：</p>
+<ul>
+<li>Ubuntu Xenial 16.04 (LTS)</li>
+<li>Ubuntu Wily 15.10</li>
+<li>Ubuntu Trusty 14.04 (LTS)</li>
+</ul>
+<p>推荐安装 <code>linux-image-extra-*</code> 内核包， 因为 <code>linux-image-extra-*</code> 包允许你使用 <code>aufs</code> 存储驱动.</p>
+<p>安装如下：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ sudo apt-get update</div><div class="line">sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual</div></pre></td></tr></table></figure>
+<p>安装 docker-engine：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ sudo apt-get update</div><div class="line">$ sudo apt-get install docker-engine</div><div class="line">$ sudo service docker start</div></pre></td></tr></table></figure>
+<h1 id="hello-world-测试一下-docker-运行情况"><a href="#hello-world-测试一下-docker-运行情况" class="headerlink" title="hello-world 测试一下 docker 运行情况"></a>hello-world 测试一下 docker 运行情况</h1><hr>
+<p>由于本地没有<code>hello-world</code> 这个image， docker会去远程搜索并拉取下来。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ sudo docker run hello-world</div><div class="line">Unable to find image <span class="string">'hello-world:latest'</span> locally</div><div class="line">latest: Pulling from library/hello-world</div><div class="line">c04b14da8d14: Pull complete</div><div class="line">Digest: sha256:0256e8a36e2070f7bf2d0b0763dbabdd67798512411de4cdcf9431a1feb60fd9</div><div class="line">Status: Downloaded newer image <span class="keyword">for</span> hello-world:latest</div><div class="line"></div><div class="line">Hello from Docker!</div><div class="line">This message shows that your installation appears to be working correctly.</div><div class="line"></div><div class="line">To generate this message, Docker took the following steps:</div><div class="line"> 1. The Docker client contacted the Docker daemon.</div><div class="line"> 2. The Docker daemon pulled the <span class="string">"hello-world"</span> image from the Docker Hub.</div><div class="line"> 3. The Docker daemon created a new container from that image <span class="built_in">which</span> runs the</div><div class="line">    executable that produces the output you are currently reading.</div><div class="line"> 4. The Docker daemon streamed that output to the Docker client, <span class="built_in">which</span> sent it</div><div class="line">    to your terminal.</div><div class="line"></div><div class="line">To try something more ambitious, you can run an Ubuntu container with:</div><div class="line"> $ docker run -it ubuntu bash</div><div class="line"></div><div class="line">Share images, automate workflows, and more with a free Docker Hub account:</div><div class="line"> https://hub.docker.com</div><div class="line"></div><div class="line">For more examples and ideas, visit:</div><div class="line"> https://docs.docker.com/engine/userguide/</div></pre></td></tr></table></figure>
+<p><code>Hello from Docker!
+This message shows that your installation appears to be working correctly.</code></p>
+<p>恭喜你， docker 正常工作。</p>
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
+<h1 id="docker-user"><a href="#docker-user" class="headerlink" title="docker user"></a>docker user</h1><blockquote>
+<p>docker daemon binds to a Unix socket instead of a TCP port. By default that Unix socket is owned by the user root and other users can access it with sudo. For this reason, docker daemon always runs as the root user.</p>
+</blockquote>
+<p>因为 docker daemon 绑定了unix socket 而不是 tcp socket, 而 Unix socket 一般被root所拥有，正因如此，docker daemon 总是以root身份运行。</p>
+<p>为了避免总是使用<code>sudo</code>来执行， 可以创建一个<code>docker</code>group， 当 docker daemon 启动时， 会使 Unix socket 的 read/writable 拥有权设为 <code>docker</code> 组.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ sudo groupadd docker</div><div class="line">$ sudo usermod -aG docker $USER</div><div class="line"></div><div class="line">Log out and log back in ？</div><div class="line">This ensures your user is running with the correct permissions.</div><div class="line"></div><div class="line">$ docker run hello-world</div></pre></td></tr></table></figure>
+<p>上面不用<code>sudo</code>来 run hello-world， 如果失败， 会有类似下面的提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Cannot connect to the Docker daemon. Is &apos;docker daemon&apos; running on this host?</div></pre></td></tr></table></figure>
+<h1 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h1><hr>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">移除 docker-engine 包：</div><div class="line"></div><div class="line">$ sudo apt-get purge docker-engine</div><div class="line"></div><div class="line">移除 docker-engine 包及无用依赖：</div><div class="line"></div><div class="line">$ sudo apt-get autoremove --purge docker-engine</div><div class="line"></div><div class="line">移除所有 images, containers, and volumes：</div><div class="line"></div><div class="line">$ rm -rf /var/lib/docker</div></pre></td></tr></table></figure>
+<h1 id="异常情况"><a href="#异常情况" class="headerlink" title="异常情况"></a>异常情况</h1><hr>
+<h2 id="异常：执行用户不在docker组"><a href="#异常：执行用户不在docker组" class="headerlink" title="异常：执行用户不在docker组"></a>异常：执行用户不在docker组</h2><p>如果不能run，提示<code>Cannot connect to the Docker daemon. Is the docker daemon running on this host</code>，可能是没有把当前用户加入docker组。</p>
+<p><code>sudo usermod -aG docker your-user</code><br><code>Log out and log back in</code></p>
+<p><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/#create-a-docker-group" target="_blank" rel="external">参考这里</a></p>
+<h2 id="异常：服务未启动"><a href="#异常：服务未启动" class="headerlink" title="异常：服务未启动"></a>异常：服务未启动</h2><blockquote>
+<p>docker run hello-world<br>docker: Cannot connect to the Docker daemon. Is the docker daemon running on this host?.<br>See ‘docker run –help’.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">sudo service docker start</div><div class="line">sudo docker run hello-world</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://docs.docker.com/linux/started/" target="_blank" rel="external">https://docs.docker.com/linux/started/</a><br><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/" target="_blank" rel="external">https://docs.docker.com/engine/installation/linux/ubuntulinux/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag">#docker</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/01/java/spring/spring-boot_config_order/" rel="next" title="spring配置加载顺序">
+                <i class="fa fa-chevron-left"></i> spring配置加载顺序
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/11/29/linux/solarized_colors/" rel="prev" title="github 上的配色项目 - solarized">
+                github 上的配色项目 - solarized <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/11/03/docker/docker_get_started/"
+           data-title="【docker】 get started - with ubuntu" data-url="http://niko2014.github.io/2015/11/03/docker/docker_get_started/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko" />
+          <p class="site-author-name" itemprop="name">niko</p>
+          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#docker-获取安装"><span class="nav-number">1.</span> <span class="nav-text">docker 获取安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hello-world-测试一下-docker-运行情况"><span class="nav-number">2.</span> <span class="nav-text">hello-world 测试一下 docker 运行情况</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他"><span class="nav-number">3.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#docker-user"><span class="nav-number">4.</span> <span class="nav-text">docker user</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卸载"><span class="nav-number">5.</span> <span class="nav-text">卸载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#异常情况"><span class="nav-number">6.</span> <span class="nav-text">异常情况</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#异常：执行用户不在docker组"><span class="nav-number">6.1.</span> <span class="nav-text">异常：执行用户不在docker组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常：服务未启动"><span class="nav-number">6.2.</span> <span class="nav-text">异常：服务未启动</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

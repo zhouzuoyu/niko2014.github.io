@@ -1,0 +1,832 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="java,docker," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="本文主要记录一下如何使用 docker 部署 java 的 webapp。
+建立 demo webapp
+这里为了方便， 使用spring-boot来搭建一个webapp。
+首先使用 maven 下载依赖：
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&amp;lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 docker 部署 java webapp">
+<meta property="og:url" content="http://niko2014.github.io/2015/12/23/docker/docker_deploy_java_boot/index.html">
+<meta property="og:site_name" content="niko zhang">
+<meta property="og:description" content="本文主要记录一下如何使用 docker 部署 java 的 webapp。
+建立 demo webapp
+这里为了方便， 使用spring-boot来搭建一个webapp。
+首先使用 maven 下载依赖：
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&amp;lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0">
+<meta property="og:updated_time" content="2016-11-14T03:25:47.580Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用 docker 部署 java webapp">
+<meta name="twitter:description" content="本文主要记录一下如何使用 docker 部署 java 的 webapp。
+建立 demo webapp
+这里为了方便， 使用spring-boot来搭建一个webapp。
+首先使用 maven 下载依赖：
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&amp;lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://niko2014.github.io/2015/12/23/docker/docker_deploy_java_boot/"/>
+
+
+  <title> 使用 docker 部署 java webapp | niko zhang </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">niko zhang</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用 docker 部署 java webapp
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-12-23T00:00:00+08:00" content="2015-12-23">
+              2015-12-23
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/23/docker/docker_deploy_java_boot/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/23/docker/docker_deploy_java_boot/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要记录一下如何使用 docker 部署 java 的 webapp。</p>
+<h1 id="建立-demo-webapp"><a href="#建立-demo-webapp" class="headerlink" title="建立 demo webapp"></a>建立 demo webapp</h1><hr>
+<p>这里为了方便， 使用spring-boot来搭建一个webapp。</p>
+<p>首先使用 maven 下载依赖：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.3.1.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.niko.spring.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>starter-web-docker<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>Spring Boot Starter<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">description</span>&gt;</span>Spring Boot Starter<span class="tag">&lt;/<span class="name">description</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://projects.spring.io/spring-boot/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line"></div><div class="line">	<span class="tag">&lt;<span class="name">organization</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">name</span>&gt;</span>Pivotal Software, Inc.<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://www.spring.io<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">organization</span>&gt;</span></div><div class="line"></div><div class="line">	<span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">main.basedir</span>&gt;</span>$&#123;basedir&#125;/../..<span class="tag">&lt;/<span class="name">main.basedir</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line"></div><div class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.10<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">                    <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">source</span>&gt;</span></div><div class="line">                    <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">target</span>&gt;</span></div><div class="line">                <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- Add Spring repositories --&gt;</span></div><div class="line">    <span class="comment">&lt;!-- (you don't need this if you are using a .RELEASE version) --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">repositories</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">repository</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>spring-snapshots<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo.spring.io/snapshot<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">snapshots</span>&gt;</span><span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span><span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">repository</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">repository</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>spring-milestones<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo.spring.io/milestone<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">repository</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">repositories</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">pluginRepositories</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">pluginRepository</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>spring-snapshots<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo.spring.io/snapshot<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">pluginRepository</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">pluginRepository</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">id</span>&gt;</span>spring-milestones<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://repo.spring.io/milestone<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">pluginRepository</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">pluginRepositories</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>然后编写 启动器 和 Controller：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">import</span> org.springframework.boot.SpringApplication;</div><div class="line"><span class="keyword">import</span> org.springframework.boot.autoconfigure.SpringBootApplication;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</div><div class="line"></div><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">home</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello Docker World"</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        SpringApplication.run(Application.class, args);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>构建包：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">mvn package</div></pre></td></tr></table></figure>
+<p>成功后， <code>target</code> 文件夹下面会有一个 <code>starter-web-docker-1.3.1.RELEASE.jar</code> 文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ ll ./target/</div><div class="line">total 15196</div><div class="line">drwxrwxr-x 8 niko niko     4096 Nov 13 17:13 ./</div><div class="line">drwxrwxr-x 5 niko niko     4096 Nov 13 17:12 ../</div><div class="line">drwxrwxr-x 3 niko niko     4096 Nov 13 17:12 classes/</div><div class="line">drwxrwxr-x 3 niko niko     4096 Nov 13 17:12 generated-sources/</div><div class="line">drwxrwxr-x 3 niko niko     4096 Nov 13 17:12 generated-test-sources/</div><div class="line">drwxrwxr-x 2 niko niko     4096 Nov 13 17:13 maven-archiver/</div><div class="line">drwxrwxr-x 3 niko niko     4096 Nov 13 17:13 maven-status/</div><div class="line">-rw-rw-r-- 1 niko niko 15521233 Nov 13 17:13 starter-web-docker-1.3.1.RELEASE.jar</div><div class="line">-rw-rw-r-- 1 niko niko     3594 Nov 13 17:13 starter-web-docker-1.3.1.RELEASE.jar.original</div><div class="line">drwxrwxr-x 2 niko niko     4096 Nov 13 17:12 test-classes/</div></pre></td></tr></table></figure>
+<h1 id="编写-Dockerfile"><a href="#编写-Dockerfile" class="headerlink" title="编写 Dockerfile"></a>编写 Dockerfile</h1><hr>
+<figure class="highlight docker"><table><tr><td class="code"><pre><div class="line"><span class="keyword">FROM</span> frolvlad/alpine-oraclejdk8:slim</div><div class="line"><span class="keyword">VOLUME</span> <span class="bash">/tmp</span></div><div class="line"><span class="keyword">ADD</span> <span class="bash">starter-web-docker-1.3.1.RELEASE.jar app.jar</span></div><div class="line"><span class="keyword">RUN</span> <span class="bash">sh -c <span class="string">'touch /app.jar'</span></span></div><div class="line"><span class="keyword">ENV</span> JAVA_OPTS=<span class="string">""</span></div><div class="line">ENTRYPOINT [ <span class="string">"sh"</span>, <span class="string">"-c"</span>, <span class="string">"java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar"</span> ]</div></pre></td></tr></table></figure>
+<h1 id="用-docker-maven-plugin-提高生产力"><a href="#用-docker-maven-plugin-提高生产力" class="headerlink" title="用 docker-maven-plugin 提高生产力"></a>用 docker-maven-plugin 提高生产力</h1><hr>
+<figure class="highlight html"><table><tr><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">docker.image.prefix</span>&gt;</span>springio<span class="tag">&lt;/<span class="name">docker.image.prefix</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.spotify<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>docker-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.4.11<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">imageName</span>&gt;</span>$&#123;docker.image.prefix&#125;/$&#123;project.artifactId&#125;<span class="tag">&lt;/<span class="name">imageName</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">dockerDirectory</span>&gt;</span>src/main/docker<span class="tag">&lt;/<span class="name">dockerDirectory</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">                    <span class="tag">&lt;<span class="name">resource</span>&gt;</span></div><div class="line">                        <span class="tag">&lt;<span class="name">targetPath</span>&gt;</span>/<span class="tag">&lt;/<span class="name">targetPath</span>&gt;</span></div><div class="line">                        <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.build.directory&#125;<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></div><div class="line">                        <span class="tag">&lt;<span class="name">include</span>&gt;</span>$&#123;project.build.finalName&#125;.jar<span class="tag">&lt;/<span class="name">include</span>&gt;</span></div><div class="line">                    <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></div><div class="line">                <span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></div></pre></td></tr></table></figure>
+<h1 id="构建-image"><a href="#构建-image" class="headerlink" title="构建 image"></a>构建 image</h1><hr>
+<p>现在开始构建 docker image.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ mvn package docker:build</div><div class="line">[INFO] Scanning for projects...</div><div class="line">[INFO]                                                                         </div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] Building Spring Boot Starter 1.3.1.RELEASE</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO]</div><div class="line">[INFO] --- docker-maven-plugin:0.4.11:build (default-cli) @ starter-web-docker-hello ---</div><div class="line">[INFO] Copying /home/niko/dev/code/java/MavenProj/OpenSources/spring/spring-boot/starter-web-docker/target/starter-web-docker-hello-1.3.1.RELEASE.jar -&gt; /home/niko/dev/code/java/MavenProj/OpenSources/spring/spring-boot/starter-web-docker/target/docker/starter-web-docker-hello-1.3.1.RELEASE.jar</div><div class="line">[INFO] Copying src/main/docker/Dockerfile -&gt; /home/niko/dev/code/java/MavenProj/OpenSources/spring/spring-boot/starter-web-docker/target/docker/Dockerfile</div><div class="line">[INFO] Building image springio/starter-web-docker-hello</div><div class="line">Step 1 : FROM frolvlad/alpine-oraclejdk8:slim</div><div class="line"> ---&gt; a290f8607aef</div><div class="line">Step 2 : VOLUME /tmp</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; c4ed57bbd8e3</div><div class="line">Step 3 : ADD starter-web-docker-hello-1.3.1.RELEASE.jar app.jar</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; 57c7382f828d</div><div class="line">Step 4 : RUN sh -c &apos;touch /app.jar&apos;</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; 37ee84639687</div><div class="line">Step 5 : ENV JAVA_OPTS &quot;&quot;</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; 3fd3017669ff</div><div class="line">Step 6 : ENTRYPOINT sh -c java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; e12ac1f796a2</div><div class="line">Successfully built e12ac1f796a2</div><div class="line">[INFO] Built springio/starter-web-docker-hello</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] BUILD SUCCESS</div><div class="line">[INFO] ------------------------------------------------------------------------</div><div class="line">[INFO] Total time: 2.745 s</div></pre></td></tr></table></figure>
+<h1 id="查看-image"><a href="#查看-image" class="headerlink" title="查看 image"></a>查看 image</h1><hr>
+<p>构建完成后， 可以查看主机上现有的 images ：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ docker images</div><div class="line">REPOSITORY                          TAG                 IMAGE ID            CREATED             SIZE</div><div class="line">springio/starter-web-docker-hello   latest              e12ac1f796a2        5 minutes ago       198.2 MB</div><div class="line">frolvlad/alpine-oraclejdk8          slim                a290f8607aef        2 weeks ago         167.2 MB</div><div class="line">hello-world                         latest              c54a2cc56cbb        4 months ago        1.848 kB</div></pre></td></tr></table></figure>
+<h1 id="启动-image"><a href="#启动-image" class="headerlink" title="启动 image"></a>启动 image</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ docker run -p 8080:8080 -t springio/starter-web-docker-hello:latest</div></pre></td></tr></table></figure>
+<p>说明：<br>-p 进行端口映射， 格式为 <code>主机端口:容器端口</code><br>-t 分配一个 pseudo-TTY</p>
+<h1 id="查看正在运行的-image"><a href="#查看正在运行的-image" class="headerlink" title="查看正在运行的 image"></a>查看正在运行的 image</h1><hr>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ docker ps</div><div class="line">CONTAINER ID        IMAGE                                      COMMAND                  CREATED              STATUS              PORTS                    NAMES</div><div class="line">b5154800fbeb        springio/starter-web-docker-hello:latest   &quot;sh -c &apos;java $JAVA_OP&quot;   About a minute ago   Up About a minute   0.0.0.0:8080-&gt;8080/tcp   ecstatic_ardinghelli</div></pre></td></tr></table></figure>
+<p>可以看到， <code>springio/starter-web-docker-hello:latest</code> 正在运行， 此时打开 <code>localhost:8080</code> 也可以看到 <code>Hello Docker World</code> 的页面消息了。</p>
+<h1 id="停止"><a href="#停止" class="headerlink" title="停止"></a>停止</h1><hr>
+<p>可以指定 CONTAINER ID 来停止运行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ docker stop b5154800fbeb</div><div class="line">b5154800fbeb</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://spring.io/guides/gs/spring-boot-docker/" target="_blank" rel="external">https://spring.io/guides/gs/spring-boot-docker/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+            <a href="/tags/docker/" rel="tag">#docker</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/22/java/zookeeper/zookeeper_prog_watcher-01/" rel="next" title="【zookeeper 编程】 - 处理状态变化">
+                <i class="fa fa-chevron-left"></i> 【zookeeper 编程】 - 处理状态变化
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/23/books/self_ctrl/self_ctrl_5/" rel="prev" title="【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？">
+                【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/12/23/docker/docker_deploy_java_boot/"
+           data-title="使用 docker 部署 java webapp" data-url="http://niko2014.github.io/2015/12/23/docker/docker_deploy_java_boot/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko" />
+          <p class="site-author-name" itemprop="name">niko</p>
+          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#建立-demo-webapp"><span class="nav-number">1.</span> <span class="nav-text">建立 demo webapp</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编写-Dockerfile"><span class="nav-number">2.</span> <span class="nav-text">编写 Dockerfile</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用-docker-maven-plugin-提高生产力"><span class="nav-number">3.</span> <span class="nav-text">用 docker-maven-plugin 提高生产力</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建-image"><span class="nav-number">4.</span> <span class="nav-text">构建 image</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看-image"><span class="nav-number">5.</span> <span class="nav-text">查看 image</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动-image"><span class="nav-number">6.</span> <span class="nav-text">启动 image</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看正在运行的-image"><span class="nav-number">7.</span> <span class="nav-text">查看正在运行的 image</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#停止"><span class="nav-number">8.</span> <span class="nav-text">停止</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
