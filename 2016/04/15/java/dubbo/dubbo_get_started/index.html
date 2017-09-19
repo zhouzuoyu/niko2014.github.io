@@ -1,0 +1,876 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="dubbo," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="dubbo 是阿里出品的服务框架, 好奇的童鞋肯定很想立马试用下 , 以下是 getting started 过程.
+构建核心模块
+git clone git@github.com:alibaba/dubbo.git
+这里选择使用 dubbo-2.4.11 版本:
+cd ~/dubbomvn clean install -Dmaven.test.skipcd dubbo/targetls
+但是,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dubbo - getting started">
+<meta property="og:url" content="http://www.nikoai.pw/2016/04/15/java/dubbo/dubbo_get_started/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="dubbo 是阿里出品的服务框架, 好奇的童鞋肯定很想立马试用下 , 以下是 getting started 过程.
+构建核心模块
+git clone git@github.com:alibaba/dubbo.git
+这里选择使用 dubbo-2.4.11 版本:
+cd ~/dubbomvn clean install -Dmaven.test.skipcd dubbo/targetls
+但是,">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/dubbo/dubbo-admin-01.png">
+<meta property="og:updated_time" content="2016-12-02T04:57:47.603Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dubbo - getting started">
+<meta name="twitter:description" content="dubbo 是阿里出品的服务框架, 好奇的童鞋肯定很想立马试用下 , 以下是 getting started 过程.
+构建核心模块
+git clone git@github.com:alibaba/dubbo.git
+这里选择使用 dubbo-2.4.11 版本:
+cd ~/dubbomvn clean install -Dmaven.test.skipcd dubbo/targetls
+但是,">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/java/dubbo/dubbo-admin-01.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2016/04/15/java/dubbo/dubbo_get_started/"/>
+
+
+  <title> dubbo - getting started | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                dubbo - getting started
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-15T00:00:00+08:00" content="2016-04-15">
+              2016-04-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/15/java/dubbo/dubbo_get_started/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/15/java/dubbo/dubbo_get_started/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>dubbo 是阿里出品的服务框架, 好奇的童鞋肯定很想立马试用下 , 以下是 getting started 过程.</p>
+<h1 id="构建核心模块"><a href="#构建核心模块" class="headerlink" title="构建核心模块"></a>构建核心模块</h1><hr>
+<p>git clone git@github.com:alibaba/dubbo.git</p>
+<p>这里选择使用 <code>dubbo-2.4.11</code> 版本:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">cd ~/dubbo</div><div class="line">mvn clean install -Dmaven.test.skip</div><div class="line">cd dubbo/target</div><div class="line">ls</div></pre></td></tr></table></figure>
+<p>但是, dubbo 项目活跃度没那么高了, 许多依赖都不能下载, 需要一个个手工寻找并安装.</p>
+<p>比如 <a href="https://github.com/alibaba/opensesame" target="_blank" rel="external">opensesame</a> , 这个是super POM, dubbo 依赖于这个POM, 可以手工 install.</p>
+<blockquote>
+<p>因为<code>code.alibabatech.com</code>站点停止服务了, 更多相关的issue和说明请戳这里:<br><a href="https://github.com/alibaba/dubbo/issues/22" target="_blank" rel="external">https://github.com/alibaba/dubbo/issues/22</a><br><a href="http://www.jianshu.com/p/0dde591f21d0/comments/45870" target="_blank" rel="external">http://www.jianshu.com/p/0dde591f21d0/comments/45870</a></p>
+</blockquote>
+<h1 id="构建-demo-模块"><a href="#构建-demo-模块" class="headerlink" title="构建 demo 模块"></a>构建 demo 模块</h1><hr>
+<p>构建demo :</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line"><span class="built_in">cd</span> /dubbo/dubbo-demo</div><div class="line">mvn clean install -Dmaven.test.skip</div></pre></td></tr></table></figure>
+<p>坑爹啊, 我的使用的是tag-2.4.11, 但是这个demo的parent版本仍旧是2.4.10, 社区的童鞋太粗心了 ?<br>这是个小问题, 把版本改回来就行了, 三个模块, 手改也行, 如果要装逼, 有 maven 插件可以帮你.</p>
+<p>接下来会使用一些 provider 和 comsumer 的 demo 服务进行测试, 这里先使用 <code>multicast</code> 的服务发现方式, 即 <code>dubbo.properties</code> 中使用以下配置:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dubbo.registry.address=multicast://224.5.6.7:1234</div></pre></td></tr></table></figure>
+<h2 id="dubbo-demo-provider"><a href="#dubbo-demo-provider" class="headerlink" title="dubbo-demo-provider"></a>dubbo-demo-provider</h2><hr>
+<p>build 成功后, 启动 dubbo-demo-provider:</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line"><span class="built_in">cd</span> dubbo-demo-provider/target/</div><div class="line">tar xf dubbo-demo-provider-2.4.11-assembly.tar.gz</div><div class="line"></div><div class="line"><span class="built_in">cd</span> dubbo-demo-provider-2.4.11/</div><div class="line">$ bin/start.sh</div><div class="line">Starting the demo-provider .....OK!</div><div class="line">PID: 15780</div><div class="line">STDOUT: logs/stdout.log</div></pre></td></tr></table></figure>
+<h2 id="dubbo-demo-consumer"><a href="#dubbo-demo-consumer" class="headerlink" title="dubbo-demo-consumer"></a>dubbo-demo-consumer</h2><hr>
+<p>启动 dubbo-demo-consumer:</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line"><span class="built_in">cd</span> dubbo-demo-consumer/target/</div><div class="line">tar xf dubbo-demo-consumer-2.4.11-assembly.tar.gz</div><div class="line"></div><div class="line">$ bin/start.sh</div><div class="line">Starting the demo-consumer ....OK!</div><div class="line">PID: 15958</div><div class="line">STDOUT: logs/stdout.log</div></pre></td></tr></table></figure>
+<p>启动之后, 可以看到成功的 <code>response form provider</code> 日志:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[10:32:20] Hello world0, response form provider: 192.168.156.1:20880</div><div class="line">[10:32:22] Hello world1, response form provider: 192.168.156.1:20880</div><div class="line">[10:32:24] Hello world2, response form provider: 192.168.156.1:20880</div><div class="line">[10:32:26] Hello world3, response form provider: 192.168.156.1:20880</div><div class="line">[10:32:28] Hello world4, response form provider: 192.168.156.1:20880</div><div class="line">[10:32:30] Hello world5, response form provider: 192.168.156.1:20880</div></pre></td></tr></table></figure>
+<p>dubbo-demo-provider 也收到了 consumer 的请求:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[10:30:40] Dubbo service server started!</div><div class="line">[10:32:18] Hello world0, request from consumer: /192.168.156.1:38019</div><div class="line">[10:32:20] Hello world0, request from consumer: /192.168.156.1:38019</div><div class="line">[10:32:22] Hello world1, request from consumer: /192.168.156.1:38019</div><div class="line">[10:32:24] Hello world2, request from consumer: /192.168.156.1:38019</div><div class="line">[10:32:26] Hello world3, request from consumer: /192.168.156.1:38019</div><div class="line">[10:32:28] Hello world4, request from consumer: /192.168.156.1:38019</div><div class="line">[10:32:30] Hello world5, request from consumer: /192.168.156.1:38019</div></pre></td></tr></table></figure>
+<h2 id="dubbo-monitor-simple"><a href="#dubbo-monitor-simple" class="headerlink" title="dubbo-monitor-simple"></a>dubbo-monitor-simple</h2><hr>
+<p>构建和启动 dubbo-monitor-simple ( 这个模块还是有相同的问题, 需要更新 parent 版本到 2.4.11 ) :</p>
+<p>构建前修改 jetty 端口, <code>vim src/main/assembly/conf/dubbo.properties</code>, 因为会跟后面的 dubbo-admin 端口重复 (运行在多台机器的话不需要) :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">dubbo.jetty.port=8090</div></pre></td></tr></table></figure>
+<p>构建启动:</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line"><span class="built_in">cd</span> <span class="variable">$DUBBO_HOME</span></div><div class="line"><span class="built_in">cd</span> dubbo-simple</div><div class="line">mvn clean install -Dmaven.test.skip</div><div class="line"><span class="built_in">cd</span> dubbo-monitor-simple/target/</div><div class="line"></div><div class="line">tar xf dubbo-monitor-simple-2.4.11-assembly.tar.gz</div><div class="line"><span class="built_in">cd</span> dubbo-monitor-simple-2.4.11/</div><div class="line">$ bin/start.sh</div><div class="line">Starting the simple-monitor .....OK!</div><div class="line">PID: 16313</div><div class="line">STDOUT: logs/stdout.log</div></pre></td></tr></table></figure>
+<p>然后访问<code>http://localhost:8090/</code>.</p>
+<h2 id="启动-dubbo-admin"><a href="#启动-dubbo-admin" class="headerlink" title="启动 dubbo-admin"></a>启动 dubbo-admin</h2><hr>
+<p>构建并启动:</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line"><span class="built_in">cd</span> <span class="variable">$DUBBO_HOME</span>/dubbo-admin</div><div class="line">mvn clean package</div><div class="line">mvn jetty:run</div></pre></td></tr></table></figure>
+<p>启动时, 发现如下错误 (完整的异常stack在后面附录) :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Error creating bean with name &apos;server&apos;: Error setting property values; nested exception is org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos;</div><div class="line">is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</div></pre></td></tr></table></figure>
+<p>解决方法参考这里的issue和博客:<br><a href="https://github.com/alibaba/dubbo/issues/50" target="_blank" rel="external">https://github.com/alibaba/dubbo/issues/50</a><br><a href="http://www.cnblogs.com/BensonHe/p/4135768.html" target="_blank" rel="external">http://www.cnblogs.com/BensonHe/p/4135768.html</a></p>
+<blockquote>
+<p>下面引用 <code>issues/50</code> 中 用户 stirp 的分享:</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">stirp commented on May 19, 2015</div><div class="line">我使用的是JDK 1.8.0_05, dubbo-admin版本是2.5.4-SNAPSHOT，也遇到了一样的问题。解决方案如@ddatsh ：</div><div class="line"></div><div class="line">1、webx的依赖改为3.1.6版；</div><div class="line"></div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;com.alibaba.citrus&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;citrus-webx-all&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;3.1.6&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">2、添加velocity的依赖，我用了1.7；</div><div class="line"></div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.apache.velocity&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;velocity&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;1.7&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">3、对依赖项dubbo添加exclusion，避免引入旧spring</div><div class="line"></div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;com.alibaba&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;dubbo&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;project.parent.version&#125;&lt;/version&gt;</div><div class="line">        &lt;exclusions&gt;</div><div class="line">            &lt;exclusion&gt;</div><div class="line">                &lt;groupId&gt;org.springframework&lt;/groupId&gt;</div><div class="line">                &lt;artifactId&gt;spring&lt;/artifactId&gt;</div><div class="line">            &lt;/exclusion&gt;</div><div class="line">        &lt;/exclusions&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">4、webx已有spring 3以上的依赖，因此注释掉dubbo-admin里面的spring依赖</div><div class="line"></div><div class="line">    &lt;!--&lt;dependency&gt;--&gt;</div><div class="line">        &lt;!--&lt;groupId&gt;org.springframework&lt;/groupId&gt;--&gt;</div><div class="line">        &lt;!--&lt;artifactId&gt;spring&lt;/artifactId&gt;--&gt;</div><div class="line">    &lt;!--&lt;/dependency&gt;--&gt;</div><div class="line">确定war包解压后lib目录没有spring 3 以下的依赖就行。然后运行正常了。</div></pre></td></tr></table></figure>
+<p>okay, 构建成功后重新运行 webapp, 发现 8080 已经被 dubbo-monitor-simple 使用了, 先停掉 dubbo-monitor-simple.</p>
+<p>然后访问<code>http://localhost:8080/</code>, 默认账号/密码: <code>root/root</code></p>
+<p>登录之后, 可以看到管理界面, dubbo 的功能还是很强大的 :</p>
+<p><img src="/images/java/dubbo/dubbo-admin-01.png" alt=""></p>
+<p>具体功能就不介绍了, 最好自己进去实际使用一下, 后面博客也会具体涉及到.</p>
+<h1 id="停止运行"><a href="#停止运行" class="headerlink" title="停止运行"></a>停止运行</h1><hr>
+<p>每个模块在bin目录下都有 start.sh 、 stop.sh、restart.sh 等脚本, 不过脚本中有一些问题, 比如执行 stop.sh 时, 不能停止服务, 提示没有找到 PID.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ERROR: The demo-provider does not started!</div></pre></td></tr></table></figure>
+<p>其实这个服务是在运行的, 查一下进程确实存在:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ps -ef | grep     demo-provider</div><div class="line"></div><div class="line">niko      9646  2636  0 00:30 pts/35   00:00:16 java -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -server -Xmx2g -Xms2g -Xmn256m -XX:PermSize=128m -Xss256k</div></pre></td></tr></table></figure>
+<p>只能debug一下脚本，<code>vim stop.sh</code>，发现有一行:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">PIDS=`ps -f | grep java | grep &quot;$CONF_DIR&quot; |awk &apos;&#123;print $2&#125;&apos;`</div></pre></td></tr></table></figure>
+<p>通过debug发现, 在脚本运行的时候, <code>ps -f | grep java | grep &quot;$CONF_DIR&quot; |awk &#39;{print $2}&#39;</code>并没有获取到PIDS, 只要换成 <code>ps -ef</code>就可以获取到PIDS了.</p>
+<blockquote>
+<p>注意： 这个脚本在 dubbo-container-api 模块，修改后需要重新 install。</p>
+</blockquote>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><hr>
+<p>可以发现, dubbo get started 起来不容易, 还是有许多问题要处理的, 但 dubbo 确实是一个优秀的服务框架, 不要灰心, 大家多交流分享一些问题和解决方法, 毕竟开源社区的力量是很强大的.</p>
+<h1 id="附录-admin-启动错误"><a href="#附录-admin-启动错误" class="headerlink" title="附录: admin 启动错误:"></a>附录: admin 启动错误:</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[ERROR] Failed startup of context org.mortbay.jetty.plugin.Jetty6PluginWebAppContext@489543a6&#123;/,/home/niko/dev/git_repos/github/dubbo/dubbo-admin/src/main/webapp&#125;</div><div class="line">org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;uriBrokerService&apos;: Cannot create inner bean &apos;(inner bean)&apos; of type [com.alibaba.citrus.service.uribroker.impl.URIBrokerServiceImpl$URIBrokerInfo] while setting bean property &apos;brokers&apos; with key [0]; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;(inner bean)#25&apos;: Cannot create inner bean &apos;server&apos; of type [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker] while setting constructor argument; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;server&apos;: Error setting property values; nested exception is org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos; is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveInnerBean(BeanDefinitionValueResolver.java:230)</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:122)</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveManagedList(BeanDefinitionValueResolver.java:287)</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:126)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1245)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1010)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:472)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory$1.run(AbstractAutowireCapableBeanFactory.java:409)</div><div class="line">	at java.security.AccessController.doPrivileged(Native Method)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:380)</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:264)</div><div class="line">	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:261)</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:185)</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:164)</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:429)</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:728)</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:380)</div><div class="line">	at org.springframework.web.context.ContextLoader.createWebApplicationContext(ContextLoader.java:255)</div><div class="line">	at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:199)</div><div class="line">	at com.alibaba.citrus.webx.context.WebxComponentsLoader.initWebApplicationContext(WebxComponentsLoader.java:117)</div><div class="line">	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:45)</div><div class="line">	at org.mortbay.jetty.handler.ContextHandler.startContext(ContextHandler.java:549)</div><div class="line">	at org.mortbay.jetty.servlet.Context.startContext(Context.java:136)</div><div class="line">	at org.mortbay.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1282)</div><div class="line">	at org.mortbay.jetty.handler.ContextHandler.doStart(ContextHandler.java:518)</div><div class="line">	at org.mortbay.jetty.webapp.WebAppContext.doStart(WebAppContext.java:499)</div><div class="line">	at org.mortbay.jetty.plugin.Jetty6PluginWebAppContext.doStart(Jetty6PluginWebAppContext.java:115)</div><div class="line">	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">	at org.mortbay.jetty.handler.HandlerCollection.doStart(HandlerCollection.java:152)</div><div class="line">	at org.mortbay.jetty.handler.ContextHandlerCollection.doStart(ContextHandlerCollection.java:156)</div><div class="line">	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">	at org.mortbay.jetty.handler.HandlerCollection.doStart(HandlerCollection.java:152)</div><div class="line">	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">	at org.mortbay.jetty.handler.HandlerWrapper.doStart(HandlerWrapper.java:130)</div><div class="line">	at org.mortbay.jetty.Server.doStart(Server.java:224)</div><div class="line">	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">	at org.mortbay.jetty.plugin.Jetty6PluginServer.start(Jetty6PluginServer.java:132)</div><div class="line">	at org.mortbay.jetty.plugin.AbstractJettyMojo.startJetty(AbstractJettyMojo.java:454)</div><div class="line">	at org.mortbay.jetty.plugin.AbstractJettyMojo.execute(AbstractJettyMojo.java:396)</div><div class="line">	at org.mortbay.jetty.plugin.AbstractJettyRunMojo.execute(AbstractJettyRunMojo.java:210)</div><div class="line">	at org.mortbay.jetty.plugin.Jetty6RunMojo.execute(Jetty6RunMojo.java:184)</div><div class="line">	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:134)</div><div class="line">	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:207)</div><div class="line">	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:153)</div><div class="line">	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:145)</div><div class="line">	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:116)</div><div class="line">	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:80)</div><div class="line">	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:51)</div><div class="line">	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:128)</div><div class="line">	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:307)</div><div class="line">	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:193)</div><div class="line">	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:106)</div><div class="line">	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:863)</div><div class="line">	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:288)</div><div class="line">	at org.apache.maven.cli.MavenCli.main(MavenCli.java:199)</div><div class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</div><div class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)</div><div class="line">	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</div><div class="line">	at java.lang.reflect.Method.invoke(Method.java:497)</div><div class="line">	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:289)</div><div class="line">	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:229)</div><div class="line">	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:415)</div><div class="line">	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:356)</div><div class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;(inner bean)#25&apos;: Cannot create inner bean &apos;server&apos; of type [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker] while setting constructor argument; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;server&apos;: Error setting property values; nested exception is org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos; is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveInnerBean(BeanDefinitionValueResolver.java:230)</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:117)</div><div class="line">	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:479)</div><div class="line">	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:162)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:925)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:835)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:440)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory$1.run(AbstractAutowireCapableBeanFactory.java:409)</div><div class="line">	at java.security.AccessController.doPrivileged(Native Method)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:380)</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveInnerBean(BeanDefinitionValueResolver.java:219)</div><div class="line">	... 63 more</div><div class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;server&apos;: Error setting property values; nested exception is org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos; is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1279)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1010)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:472)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory$1.run(AbstractAutowireCapableBeanFactory.java:409)</div><div class="line">	at java.security.AccessController.doPrivileged(Native Method)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:380)</div><div class="line">	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveInnerBean(BeanDefinitionValueResolver.java:219)</div><div class="line">	... 73 more</div><div class="line">Caused by: org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos; is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</div><div class="line">	at org.springframework.beans.BeanWrapperImpl.setPropertyValue(BeanWrapperImpl.java:801)</div><div class="line">	at org.springframework.beans.BeanWrapperImpl.setPropertyValue(BeanWrapperImpl.java:651)</div><div class="line">	at org.springframework.beans.AbstractPropertyAccessor.setPropertyValues(AbstractPropertyAccessor.java:78)</div><div class="line">	at org.springframework.beans.AbstractPropertyAccessor.setPropertyValues(AbstractPropertyAccessor.java:59)</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1276)</div><div class="line">	... 79 more</div><div class="line"></div><div class="line">    [ERROR] Nested in org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;uriBrokerService&apos;: Cannot create inner bean &apos;(inner bean)&apos; of type [com.alibaba.citrus.service.uribroker.impl.URIBrokerServiceImpl$URIBrokerInfo] while setting bean property &apos;brokers&apos; with key [0]; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;(inner bean)#25&apos;: Cannot create inner bean &apos;server&apos; of type [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker] while setting constructor argument; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;server&apos;: Error setting property values; nested exception is org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos; is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?:</div><div class="line">    org.springframework.beans.NotWritablePropertyException: Invalid property &apos;URIType&apos; of bean class [com.alibaba.citrus.service.uribroker.uri.GenericURIBroker]: Bean property &apos;URIType&apos; is not writable or has an invalid setter method. Does the parameter type of the setter match the return type of the getter?</div><div class="line">    	at org.springframework.beans.BeanWrapperImpl.setPropertyValue(BeanWrapperImpl.java:801)</div><div class="line">    	at org.springframework.beans.BeanWrapperImpl.setPropertyValue(BeanWrapperImpl.java:651)</div><div class="line">    	at org.springframework.beans.AbstractPropertyAccessor.setPropertyValues(AbstractPropertyAccessor.java:78)</div><div class="line">    	at org.springframework.beans.AbstractPropertyAccessor.setPropertyValues(AbstractPropertyAccessor.java:59)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1276)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1010)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:472)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory$1.run(AbstractAutowireCapableBeanFactory.java:409)</div><div class="line">    	at java.security.AccessController.doPrivileged(Native Method)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:380)</div><div class="line">    	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveInnerBean(BeanDefinitionValueResolver.java:219)</div><div class="line">    	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:117)</div><div class="line">    	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:479)</div><div class="line">    	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:162)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:925)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:835)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:440)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory$1.run(AbstractAutowireCapableBeanFactory.java:409)</div><div class="line">    	at java.security.AccessController.doPrivileged(Native Method)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:380)</div><div class="line">    	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveInnerBean(BeanDefinitionValueResolver.java:219)</div><div class="line">    	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:122)</div><div class="line">    	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveManagedList(BeanDefinitionValueResolver.java:287)</div><div class="line">    	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:126)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValues(AbstractAutowireCapableBeanFactory.java:1245)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1010)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:472)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory$1.run(AbstractAutowireCapableBeanFactory.java:409)</div><div class="line">    	at java.security.AccessController.doPrivileged(Native Method)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:380)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:264)</div><div class="line">    	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:261)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:185)</div><div class="line">    	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:164)</div><div class="line">    	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:429)</div><div class="line">    	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:728)</div><div class="line">    	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:380)</div><div class="line">    	at org.springframework.web.context.ContextLoader.createWebApplicationContext(ContextLoader.java:255)</div><div class="line">    	at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:199)</div><div class="line">    	at com.alibaba.citrus.webx.context.WebxComponentsLoader.initWebApplicationContext(WebxComponentsLoader.java:117)</div><div class="line">    	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:45)</div><div class="line">    	at org.mortbay.jetty.handler.ContextHandler.startContext(ContextHandler.java:549)</div><div class="line">    	at org.mortbay.jetty.servlet.Context.startContext(Context.java:136)</div><div class="line">    	at org.mortbay.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1282)</div><div class="line">    	at org.mortbay.jetty.handler.ContextHandler.doStart(ContextHandler.java:518)</div><div class="line">    	at org.mortbay.jetty.webapp.WebAppContext.doStart(WebAppContext.java:499)</div><div class="line">    	at org.mortbay.jetty.plugin.Jetty6PluginWebAppContext.doStart(Jetty6PluginWebAppContext.java:115)</div><div class="line">    	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">    	at org.mortbay.jetty.handler.HandlerCollection.doStart(HandlerCollection.java:152)</div><div class="line">    	at org.mortbay.jetty.handler.ContextHandlerCollection.doStart(ContextHandlerCollection.java:156)</div><div class="line">    	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">    	at org.mortbay.jetty.handler.HandlerCollection.doStart(HandlerCollection.java:152)</div><div class="line">    	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">    	at org.mortbay.jetty.handler.HandlerWrapper.doStart(HandlerWrapper.java:130)</div><div class="line">    	at org.mortbay.jetty.Server.doStart(Server.java:224)</div><div class="line">    	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)</div><div class="line">    	at org.mortbay.jetty.plugin.Jetty6PluginServer.start(Jetty6PluginServer.java:132)</div><div class="line">    	at org.mortbay.jetty.plugin.AbstractJettyMojo.startJetty(AbstractJettyMojo.java:454)</div><div class="line">    	at org.mortbay.jetty.plugin.AbstractJettyMojo.execute(AbstractJettyMojo.java:396)</div><div class="line">    	at org.mortbay.jetty.plugin.AbstractJettyRunMojo.execute(AbstractJettyRunMojo.java:210)</div><div class="line">    	at org.mortbay.jetty.plugin.Jetty6RunMojo.execute(Jetty6RunMojo.java:184)</div><div class="line">    	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:134)</div><div class="line">    	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:207)</div><div class="line">    	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:153)</div><div class="line">    	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:145)</div><div class="line">    	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:116)</div><div class="line">    	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:80)</div><div class="line">    	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:51)</div><div class="line">    	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:128)</div><div class="line">    	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:307)</div><div class="line">    	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:193)</div><div class="line">    	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:106)</div><div class="line">    	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:863)</div><div class="line">    	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:288)</div><div class="line">    	at org.apache.maven.cli.MavenCli.main(MavenCli.java:199)</div><div class="line">    	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</div><div class="line">    	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)</div><div class="line">    	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</div><div class="line">    	at java.lang.reflect.Method.invoke(Method.java:497)</div><div class="line">    	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:289)</div><div class="line">    	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:229)</div><div class="line">    	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:415)</div><div class="line">    	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:356)</div><div class="line">    [INFO] Started SelectChannelConnector@0.0.0.0:8080</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://dubbo.io/User+Guide-zh.htm" target="_blank" rel="external">http://dubbo.io/User+Guide-zh.htm</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dubbo/" rel="tag">#dubbo</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/07/java/concurrent/java_volatile/" rel="next" title="java的volatile浅解">
+                <i class="fa fa-chevron-left"></i> java的volatile浅解
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/22/java/spring/spring-runtime-modify-bean-attrs/" rel="prev" title="spring runtime 修改 bean 属性">
+                spring runtime 修改 bean 属性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/04/15/java/dubbo/dubbo_get_started/"
+           data-title="dubbo - getting started" data-url="http://www.nikoai.pw/2016/04/15/java/dubbo/dubbo_get_started/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#构建核心模块"><span class="nav-number">1.</span> <span class="nav-text">构建核心模块</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建-demo-模块"><span class="nav-number">2.</span> <span class="nav-text">构建 demo 模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dubbo-demo-provider"><span class="nav-number">2.1.</span> <span class="nav-text">dubbo-demo-provider</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dubbo-demo-consumer"><span class="nav-number">2.2.</span> <span class="nav-text">dubbo-demo-consumer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dubbo-monitor-simple"><span class="nav-number">2.3.</span> <span class="nav-text">dubbo-monitor-simple</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动-dubbo-admin"><span class="nav-number">2.4.</span> <span class="nav-text">启动 dubbo-admin</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#停止运行"><span class="nav-number">3.</span> <span class="nav-text">停止运行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">4.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#附录-admin-启动错误"><span class="nav-number">5.</span> <span class="nav-text">附录: admin 启动错误:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -90,15 +90,15 @@
 示例">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【spring】自我调用中transaction的常见问题">
-<meta property="og:url" content="http://niko2014.github.io/2016/01/05/java/spring/spring-transactional-aop/index.html">
-<meta property="og:site_name" content="niko zhang">
+<meta property="og:url" content="http://www.nikoai.pw/2016/01/05/java/spring/spring-transactional-aop/index.html">
+<meta property="og:site_name" content="保持简单">
 <meta property="og:description" content="起因
 最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。既然如此只好debug一下，接着很快便知道了。
 代码大概是这样的
 示例">
-<meta property="og:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_01.png">
-<meta property="og:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_03_self_invoke.png">
-<meta property="og:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_03_of_copy_service.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/spring-tx-aop/error_debug_01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/spring-tx-aop/error_debug_03_self_invoke.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/spring-tx-aop/error_debug_03_of_copy_service.png">
 <meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【spring】自我调用中transaction的常见问题">
@@ -106,7 +106,7 @@
 最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这种错误八成与事务处理不当有关。既然如此只好debug一下，接着很快便知道了。
 代码大概是这样的
 示例">
-<meta name="twitter:image" content="http://niko2014.github.io/images/spring-tx-aop/error_debug_01.png">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/spring-tx-aop/error_debug_01.png">
 
 
 
@@ -127,10 +127,10 @@
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/2016/01/05/java/spring/spring-transactional-aop/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/2016/01/05/java/spring/spring-transactional-aop/"/>
 
 
-  <title> 【spring】自我调用中transaction的常见问题 | niko zhang </title>
+  <title> 【spring】自我调用中transaction的常见问题 | 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -171,11 +171,11 @@
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -205,6 +205,14 @@
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -410,8 +418,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/" rel="next" title="【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？">
-                <i class="fa fa-chevron-left"></i> 【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
+              <a href="/2016/01/01/search/lucene/ir-index-search-intro/" rel="next" title="IR - 索引检索过程简述">
+                <i class="fa fa-chevron-left"></i> IR - 索引检索过程简述
               </a>
             
           </div>
@@ -447,7 +455,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/"
-           data-title="【spring】自我调用中transaction的常见问题" data-url="http://niko2014.github.io/2016/01/05/java/spring/spring-transactional-aop/">
+           data-title="【spring】自我调用中transaction的常见问题" data-url="http://www.nikoai.pw/2016/01/05/java/spring/spring-transactional-aop/">
       </div>
     
   </div>
@@ -485,14 +493,14 @@
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -509,7 +517,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -557,11 +565,11 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

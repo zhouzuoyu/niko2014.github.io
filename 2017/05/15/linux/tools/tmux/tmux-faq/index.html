@@ -1,0 +1,844 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="tmux," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="使用 vi modesetw -g mode-keys vi
+复制粘贴http://www.rushiagr.com/blog/2016/06/16/everything-you-need-to-know-about-tmux-copy-pasting/
+
+使用 tmux buffer
+
+增加配置:
+#bind P paste-buffer#bind-key -t vi-copy &amp;apos;v&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tmux FAQ">
+<meta property="og:url" content="http://www.nikoai.pw/2017/05/15/linux/tools/tmux/tmux-faq/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="使用 vi modesetw -g mode-keys vi
+复制粘贴http://www.rushiagr.com/blog/2016/06/16/everything-you-need-to-know-about-tmux-copy-pasting/
+
+使用 tmux buffer
+
+增加配置:
+#bind P paste-buffer#bind-key -t vi-copy &amp;apos;v&amp;">
+<meta property="og:updated_time" content="2017-06-29T03:12:26.053Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tmux FAQ">
+<meta name="twitter:description" content="使用 vi modesetw -g mode-keys vi
+复制粘贴http://www.rushiagr.com/blog/2016/06/16/everything-you-need-to-know-about-tmux-copy-pasting/
+
+使用 tmux buffer
+
+增加配置:
+#bind P paste-buffer#bind-key -t vi-copy &amp;apos;v&amp;">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2017/05/15/linux/tools/tmux/tmux-faq/"/>
+
+
+  <title> tmux FAQ | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                tmux FAQ
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-05-15T00:00:00+08:00" content="2017-05-15">
+              2017-05-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/15/linux/tools/tmux/tmux-faq/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/15/linux/tools/tmux/tmux-faq/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="使用-vi-mode"><a href="#使用-vi-mode" class="headerlink" title="使用 vi mode"></a>使用 vi mode</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">setw -g mode-keys vi</div></pre></td></tr></table></figure>
+<h1 id="复制粘贴"><a href="#复制粘贴" class="headerlink" title="复制粘贴"></a>复制粘贴</h1><p><a href="http://www.rushiagr.com/blog/2016/06/16/everything-you-need-to-know-about-tmux-copy-pasting/" target="_blank" rel="external">http://www.rushiagr.com/blog/2016/06/16/everything-you-need-to-know-about-tmux-copy-pasting/</a></p>
+<ol>
+<li>使用 tmux buffer</li>
+</ol>
+<p>增加配置:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#bind P paste-buffer</div><div class="line">#bind-key -t vi-copy &apos;v&apos; begin-selection</div><div class="line">bind-key -t vi-copy &apos;y&apos; copy-selection</div><div class="line">#bind-key -t vi-copy &apos;r&apos; rectangle-toggle</div></pre></td></tr></table></figure>
+<p>复制:<br><code>PREFIX + [</code> 进入选择模式,<br>space 键选择开始字符,<br>y 结束选择, 并 copy 到 tmux buffer</p>
+<p>粘贴:<br><code>PREFIX + ]</code></p>
+<ol>
+<li>使用系统粘贴板</li>
+</ol>
+<h1 id="关闭自动重命名"><a href="#关闭自动重命名" class="headerlink" title="关闭自动重命名."></a>关闭自动重命名.</h1><p><code>set-option -g allow-rename off</code></p>
+<h1 id="远程登录时-显示空间很小"><a href="#远程登录时-显示空间很小" class="headerlink" title="远程登录时, 显示空间很小"></a>远程登录时, 显示空间很小</h1><p>方法一:</p>
+<p>取消所有 client 的 attach 状态<br>tmux detach -a<br><code>tmux ls</code> , 检查是否都 detach 了, 如果还不行, 那么<br><code>ps -ef | grep tmux</code>, 找出还在 attach 某个 session 的 client, kill 之.</p>
+<p>方法二 (未验证) :</p>
+<p>使用以下设置, 那些点点就会被作为可用空间了. 可能是不同 client 的显示器不同导致.<br><code>set-window-option -g aggressive-resize</code></p>
+<p>参考:<br><a href="http://stackoverflow.com/questions/7814612/is-there-any-way-to-redraw-tmux-window-when-switching-smaller-monitor-to-bigger" target="_blank" rel="external">http://stackoverflow.com/questions/7814612/is-there-any-way-to-redraw-tmux-window-when-switching-smaller-monitor-to-bigger</a><br><a href="https://superuser.com/questions/880497/how-do-i-resize-the-usable-area-of-a-tmux-session" target="_blank" rel="external">https://superuser.com/questions/880497/how-do-i-resize-the-usable-area-of-a-tmux-session</a></p>
+<h1 id="ctrl-←-→-不能生效"><a href="#ctrl-←-→-不能生效" class="headerlink" title="ctrl + ( ← / → ) 不能生效"></a>ctrl + ( ← / → ) 不能生效</h1><p><a href="https://superuser.com/questions/360832/how-can-i-make-ctrlleft-right-keys-work-right-in-tmux" target="_blank" rel="external">https://superuser.com/questions/360832/how-can-i-make-ctrlleft-right-keys-work-right-in-tmux</a></p>
+<p>vim ~/.tmux.conf , 增加配置 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set-window-option -g xterm-keys on</div></pre></td></tr></table></figure>
+<p>当前生效:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">PREFIX + :set-window-option xterm-keys on</div></pre></td></tr></table></figure>
+<h1 id="修改-前缀-组合键-ctrl-b"><a href="#修改-前缀-组合键-ctrl-b" class="headerlink" title="修改 前缀 组合键 (ctrl + b)"></a>修改 前缀 组合键 (ctrl + b)</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 设置前缀键, 双引号表示字符串需要对 \ 进行转义 (\\)</div><div class="line">set-option -g prefix &apos;C-\&apos;</div></pre></td></tr></table></figure>
+<h1 id="关闭鼠标模式"><a href="#关闭鼠标模式" class="headerlink" title="关闭鼠标模式"></a>关闭鼠标模式</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set -g mode-mouse off</div></pre></td></tr></table></figure>
+<h1 id="延长-PREFIX-q-的显示时间"><a href="#延长-PREFIX-q-的显示时间" class="headerlink" title="延长 PREFIX + q 的显示时间"></a>延长 PREFIX + q 的显示时间</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 延长 pane indicators display time</div><div class="line">set -g display-panes-time 1000</div></pre></td></tr></table></figure>
+<h1 id="设置状态栏左侧"><a href="#设置状态栏左侧" class="headerlink" title="设置状态栏左侧"></a>设置状态栏左侧</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set -g status-left &quot;#[fg=green] A good book is your best friend. #[fg=brightblue]#(curl icanhazip.com) #[fg=yellow]#(ifconfig en0 | grep &apos;inet &apos; | awk &apos;&#123;print \&quot;en0 \&quot; $2&#125;&apos;) #(ifconfig en1 | grep &apos;inet &apos; | awk &apos;&#123;print \&quot;en1 \&quot; $2&#125;&apos;) #[fg=red]#(ifconfig tun0 | grep &apos;inet &apos; | awk &apos;&#123;print \&quot;vpn \&quot; $2&#125;&apos;) &quot;</div></pre></td></tr></table></figure>
+<h1 id="设置窗口格式文本"><a href="#设置窗口格式文本" class="headerlink" title="设置窗口格式文本"></a>设置窗口格式文本</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set -g window-status-format &quot;#[fg=white,bg=colour234] #I.#W&quot;</div></pre></td></tr></table></figure>
+<p>当前窗口 :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">set -g window-status-current-format &quot;#[fg=white]#[bg=blue,noreverse,bold] #I. #W #[fg=colour39,noreverse,bold] &quot;</div></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tmux/" rel="tag">#tmux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/" rel="next" title="calcite druid adapter 的分页死循环 bug 分析排查">
+                <i class="fa fa-chevron-left"></i> calcite druid adapter 的分页死循环 bug 分析排查
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/31/java/spring/spring_junit_test/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/05/15/linux/tools/tmux/tmux-faq/"
+           data-title="tmux FAQ" data-url="http://www.nikoai.pw/2017/05/15/linux/tools/tmux/tmux-faq/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用-vi-mode"><span class="nav-number">1.</span> <span class="nav-text">使用 vi mode</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#复制粘贴"><span class="nav-number">2.</span> <span class="nav-text">复制粘贴</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关闭自动重命名"><span class="nav-number">3.</span> <span class="nav-text">关闭自动重命名.</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#远程登录时-显示空间很小"><span class="nav-number">4.</span> <span class="nav-text">远程登录时, 显示空间很小</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ctrl-←-→-不能生效"><span class="nav-number">5.</span> <span class="nav-text">ctrl + ( ← / → ) 不能生效</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改-前缀-组合键-ctrl-b"><span class="nav-number">6.</span> <span class="nav-text">修改 前缀 组合键 (ctrl + b)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关闭鼠标模式"><span class="nav-number">7.</span> <span class="nav-text">关闭鼠标模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#延长-PREFIX-q-的显示时间"><span class="nav-number">8.</span> <span class="nav-text">延长 PREFIX + q 的显示时间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设置状态栏左侧"><span class="nav-number">9.</span> <span class="nav-text">设置状态栏左侧</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设置窗口格式文本"><span class="nav-number">10.</span> <span class="nav-text">设置窗口格式文本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">11.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

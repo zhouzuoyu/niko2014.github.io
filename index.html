@@ -84,15 +84,15 @@
 
 
 
-<meta name="description" content="去发现一个更大的世界！">
+<meta name="description" content="保持简单">
 <meta property="og:type" content="website">
-<meta property="og:title" content="niko zhang">
-<meta property="og:url" content="http://niko2014.github.io/index.html">
-<meta property="og:site_name" content="niko zhang">
-<meta property="og:description" content="去发现一个更大的世界！">
+<meta property="og:title" content="保持简单">
+<meta property="og:url" content="http://www.nikoai.pw/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="保持简单">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="niko zhang">
-<meta name="twitter:description" content="去发现一个更大的世界！">
+<meta name="twitter:title" content="保持简单">
+<meta name="twitter:description" content="保持简单">
 
 
 
@@ -113,10 +113,10 @@
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/"/>
 
 
-  <title> niko zhang </title>
+  <title> 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -159,11 +159,11 @@
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -193,6 +193,14 @@
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -258,6 +266,391 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/" itemprop="url">
+                  calcite druid adapter 的分页死循环 bug 分析排查
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-05T00:00:00+08:00" content="2017-04-05">
+              2017-04-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          问题描述
+前一阵子, 部署一个后台应用, 上线后发现内存泄露. jvm 内存分析和日志回查后发现, calcite druid adapter 有一个死循环, 这个死循环不断的进行 query 请求, 而 query sql 只是一个简单的 select 语句.
+依赖说明 :
+org.apache.
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/11/19/java/jvm/jvm_gc_collectors/" itemprop="url">
+                  JVM 常用的 GC 收集器
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-19T00:00:00+08:00" content="2016-11-19">
+              2016-11-19
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/19/java/jvm/jvm_gc_collectors/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/19/java/jvm/jvm_gc_collectors/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          这篇博客, 主要介绍 jvm 常见的 gc 收集器及其搭配. gc收集器, 是 gc 算法和策略的实现, 主要的 gc 算法已经在之前简单提到过（传送门） , 今天也会涉及到大部分. 接下来, 我们就看看有哪些常见的 gc 收集器.
+年轻代收集器
+Serial 复制收集器 :
+使用-XX:+UseS
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/19/java/jvm/jvm_gc_collectors/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/11/17/server/redis/redis_expire_mechanism/" itemprop="url">
+                  redis key 的过期机制
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-17T21:31:01+08:00" content="2016-11-17">
+              2016-11-17
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/17/server/redis/redis_expire_mechanism/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/17/server/redis/redis_expire_mechanism/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          今天有人问了我一个问题：redis 的 key 过期是怎么实现的。我用redis做了几个功能，竟然没有思考这个问题，该死。作为一个敏而好学的好童鞋，立马google和查文档。
+redis key 的过期机制
+翻了下文档：
+
+Redis keys are expired in two ways: a 
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/17/server/redis/redis_expire_mechanism/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
     
       
 
@@ -789,8 +1182,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
             
               
                 
-                <a class="post-title-link" href="/2016/11/08/others/hexo/hexo_rsync_deploy/" itemprop="url">
-                  使用 rsync deploy hexo 博客
+                <a class="post-title-link" href="/2017/08/31/java/spring/spring_junit_test/" itemprop="url">
+                  未命名
                 </a>
               
             
@@ -803,38 +1196,19 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-08T10:02:36+08:00" content="2016-11-08">
-              2016-11-08
+            <time itemprop="dateCreated" datetime="2017-08-31T10:01:45+08:00" content="2017-08-31">
+              2017-08-31
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/others/" itemprop="url" rel="index">
-                    <span itemprop="name">others</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/11/08/others/hexo/hexo_rsync_deploy/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/08/others/hexo/hexo_rsync_deploy/" itemprop="commentsCount"></span>
+                <a href="/2017/08/31/java/spring/spring_junit_test/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/31/java/spring/spring_junit_test/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -859,13 +1233,13 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
       
         
           
-          hexo 支持多种部署方式, 如 git repos/rsync/Heroku/FTPSync等, 如果博客使用 github pages 托管, 那么用 git repos 的方式部署最方便了, 如果是自己的vps, rsync是一种不错的方式.
-使用 hexo-deployer-rsync
-配置
+          #
+https://docs.spring.io/spring-batch/trunk/reference/html/testing.html
+xml@RunWith(SpringJUnit4ClassRunner.class)@ContextConfiguration(locations = { 
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/08/others/hexo/hexo_rsync_deploy/#more" rel="contents">
+            <a class="btn" href="/2017/08/31/java/spring/spring_junit_test/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -916,8 +1290,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
             
               
                 
-                <a class="post-title-link" href="/2016/11/08/others/hexo/hexo_cancel_collapsing/" itemprop="url">
-                  hexo 取消TOC的自动折叠
+                <a class="post-title-link" href="/2017/05/15/linux/tools/tmux/tmux-faq/" itemprop="url">
+                  tmux FAQ
                 </a>
               
             
@@ -930,8 +1304,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-08T10:02:36+08:00" content="2016-11-08">
-              2016-11-08
+            <time itemprop="dateCreated" datetime="2017-05-15T00:00:00+08:00" content="2017-05-15">
+              2017-05-15
             </time>
           </span>
 
@@ -944,8 +1318,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/others/" itemprop="url" rel="index">
-                    <span itemprop="name">others</span>
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
                   </a>
                 </span>
 
@@ -960,8 +1334,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/11/08/others/hexo/hexo_cancel_collapsing/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/08/others/hexo/hexo_cancel_collapsing/" itemprop="commentsCount"></span>
+                <a href="/2017/05/15/linux/tools/tmux/tmux-faq/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/15/linux/tools/tmux/tmux-faq/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -986,15 +1360,16 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
       
         
           
-          因为有bug, 今天更新了hexo-theme-next, 升级到 5.0.1 版本, 发现 TOC 文章目录老是会自动折叠, 翻了下文档, 没有找到相关设置, 算了反正是js和css, 自己动手还快一点.
-找到隐藏的css样式
-打开chrome的F12调试模式, 查看被隐藏的node, 如下:
+          使用 vi modesetw -g mode-keys vi
+复制粘贴http://www.rushiagr.com/blog/2016/06/16/everything-you-need-to-know-about-tmux-copy-pasting/
 
+使用 tmux buffer
 
+增加配置:
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/08/others/hexo/hexo_cancel_collapsing/#more" rel="contents">
+            <a class="btn" href="/2017/05/15/linux/tools/tmux/tmux-faq/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1045,8 +1420,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
             
               
                 
-                <a class="post-title-link" href="/2016/11/08/others/hexo/hexo_add_top-function/" itemprop="url">
-                  为 hexo 增加置顶功能
+                <a class="post-title-link" href="/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/" itemprop="url">
+                  druid.io - Not enough direct memory
                 </a>
               
             
@@ -1059,136 +1434,8 @@ CAS, 全称是Compare-and-swap, 是多线程同步的一种原子操作. 它把�
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-08T10:02:36+08:00" content="2016-11-08">
-              2016-11-08
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/others/" itemprop="url" rel="index">
-                    <span itemprop="name">others</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/11/08/others/hexo/hexo_add_top-function/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/08/others/hexo/hexo_add_top-function/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          
-
-hexo blog 没有提供置顶的功能, 但hexo作为一个优秀的开源项目, 代码架构和组织还是很清晰的, 有问题可以直接阅读或修改代码, 下面就通过修改代码来为hexo增加置顶功能.
-修改index页的生成代码 generator.jsvim $SITE_HOME/node_modules/h
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/08/others/hexo/hexo_add_top-function/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/11/07/java/opsrc/canal/canal_zookeeper_ha/" itemprop="url">
-                  canal 搭配 zookeeper 实现 HA
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-07T00:00:00+08:00" content="2016-11-07">
-              2016-11-07
+            <time itemprop="dateCreated" datetime="2017-03-24T00:00:00+08:00" content="2017-03-24">
+              2017-03-24
             </time>
           </span>
 
@@ -1217,8 +1464,8 @@ hexo blog 没有提供置顶的功能, 但hexo作为一个优秀的开源项目,
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/11/07/java/opsrc/canal/canal_zookeeper_ha/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/07/java/opsrc/canal/canal_zookeeper_ha/" itemprop="commentsCount"></span>
+                <a href="/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -1243,267 +1490,14 @@ hexo blog 没有提供置顶的功能, 但hexo作为一个优秀的开源项目,
       
         
           
-          canal 作为数据平台的一个重要环节, 若存在单点故障, 对整体后端的影响是非常大的. 实践和经验告诉我们, 关键重要的服务都要进行failover, 以保证系统的可用性. 下面就来介绍一下 canal 搭配 zookeeper 的 HA 方案.
-环境搭建
-下载并解压canal.deployer-
+          今天在新的机器上部署 druid , 起来后发现有 task 错误, 提示是 direct memory 不够.
+日志
+错误日志如下:
+2017-03-23T16:49:43,161 ERROR [main] io.druid.cli.CliPeon - Error when starting up
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/07/java/opsrc/canal/canal_zookeeper_ha/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/11/02/git/git-wrong-push/" itemprop="url">
-                  git 推错分支的处理
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-02T19:00:00+08:00" content="2016-11-02">
-              2016-11-02
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/11/02/git/git-wrong-push/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/02/git/git-wrong-push/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          人的状态总有低落的时候, 平时很谨慎的人也有可能出错, 在git使用时, 经常会有合并了错误分支并推送的情况. 这种情况如何处理呢 ?
-reset 毁尸灭迹法
-使用git reset来抹除刚才的stupid操作, 强制推送后不让别人”发现”. 但是前提是那个分支还没其他人推代码上去, 不然还是会被发
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/02/git/git-wrong-push/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/11/02/git/git-cherry-pick/" itemprop="url">
-                  git cherry-pick 使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-02T16:00:00+08:00" content="2016-11-02">
-              2016-11-02
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/11/02/git/git-cherry-pick/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/02/git/git-cherry-pick/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          工作中, 我们经常会需要从其他分支获取一些重要的修改, 但只是部分commit, 不能用merge, 这时cherry-pick就派上用场了.cherry-pick可以把其他分支的某些commit合并到当前分支, 具体使用和注意事项请看下面的实操.
-cherry-pick 实操
-假设有一个分支ori
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/02/git/git-cherry-pick/#more" rel="contents">
+            <a class="btn" href="/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1537,7 +1531,7 @@ cherry-pick 实操
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1571,14 +1565,14 @@ cherry-pick 实操
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1595,7 +1589,7 @@ cherry-pick 实操
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1632,11 +1626,11 @@ cherry-pick 实操
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

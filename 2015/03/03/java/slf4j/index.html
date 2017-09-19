@@ -88,20 +88,20 @@
 可能你还是要问， 为什么要使用slf4j呢？举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="slf4j 绑定机制浅析">
-<meta property="og:url" content="http://niko2014.github.io/2015/03/03/java/slf4j/index.html">
-<meta property="og:site_name" content="niko zhang">
+<meta property="og:url" content="http://www.nikoai.pw/2015/03/03/java/slf4j/index.html">
+<meta property="og:site_name" content="保持简单">
 <meta property="og:description" content="简介Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。
 可能你还是要问， 为什么要使用slf4j呢？举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。">
-<meta property="og:image" content="http://niko2014.github.io/images/slf4j-concrete-bindings.png">
-<meta property="og:image" content="http://niko2014.github.io/images/logback-jar.png">
-<meta property="og:image" content="http://niko2014.github.io/images/slf4j-log4j.png">
-<meta property="og:image" content="http://niko2014.github.io/images/slf4j_LoggerFactory_bind_called.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/slf4j-concrete-bindings.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/logback-jar.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/slf4j-log4j.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/slf4j_LoggerFactory_bind_called.png">
 <meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="slf4j 绑定机制浅析">
 <meta name="twitter:description" content="简介Simple Logging Facade for Java， 顾名思义，它是作为一个许多logging库（如log4j，logback，commons-logging等）的简单门面，提供一个简单统一的接口，从而使得最终用户能够很方便的使用和切换想要的logging实现。
 可能你还是要问， 为什么要使用slf4j呢？举个例子，如果你直接用log4j来写日志，你的代码里有100个地方是这样做的。">
-<meta name="twitter:image" content="http://niko2014.github.io/images/slf4j-concrete-bindings.png">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/slf4j-concrete-bindings.png">
 
 
 
@@ -122,10 +122,10 @@
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/2015/03/03/java/slf4j/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/2015/03/03/java/slf4j/"/>
 
 
-  <title> slf4j 绑定机制浅析 | niko zhang </title>
+  <title> slf4j 绑定机制浅析 | 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -166,11 +166,11 @@
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -200,6 +200,14 @@
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -427,8 +435,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/03/30/python/python_scrapy_get_started/" rel="prev" title="python scrapy 爬虫初体验">
-                python scrapy 爬虫初体验 <i class="fa fa-chevron-right"></i>
+              <a href="/2015/03/30/python/python_scrapy_get_started/" rel="prev" title="Python Scrapy 爬虫初体验">
+                Python Scrapy 爬虫初体验 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -456,7 +464,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2015/03/03/java/slf4j/"
-           data-title="slf4j 绑定机制浅析" data-url="http://niko2014.github.io/2015/03/03/java/slf4j/">
+           data-title="slf4j 绑定机制浅析" data-url="http://www.nikoai.pw/2015/03/03/java/slf4j/">
       </div>
     
   </div>
@@ -494,14 +502,14 @@
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -518,7 +526,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -566,11 +574,11 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

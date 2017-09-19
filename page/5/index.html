@@ -84,15 +84,15 @@
 
 
 
-<meta name="description" content="去发现一个更大的世界！">
+<meta name="description" content="保持简单">
 <meta property="og:type" content="website">
-<meta property="og:title" content="niko zhang">
-<meta property="og:url" content="http://niko2014.github.io/page/5/index.html">
-<meta property="og:site_name" content="niko zhang">
-<meta property="og:description" content="去发现一个更大的世界！">
+<meta property="og:title" content="保持简单">
+<meta property="og:url" content="http://www.nikoai.pw/page/5/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="保持简单">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="niko zhang">
-<meta name="twitter:description" content="去发现一个更大的世界！">
+<meta name="twitter:title" content="保持简单">
+<meta name="twitter:description" content="保持简单">
 
 
 
@@ -113,10 +113,10 @@
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/page/5/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/page/5/"/>
 
 
-  <title> niko zhang </title>
+  <title> 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -159,11 +159,11 @@
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -193,6 +193,14 @@
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -280,8 +288,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/01/05/java/spring/spring-transactional-aop/" itemprop="url">
-                  【spring】自我调用中transaction的常见问题
+                <a class="post-title-link" href="/2016/05/08/search/es/es-partial-update/" itemprop="url">
+                  【api】elasticsearch - 部分更新文档
                 </a>
               
             
@@ -294,8 +302,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-01-05T20:25:08+08:00" content="2016-01-05">
-              2016-01-05
+            <time itemprop="dateCreated" datetime="2016-05-08T00:00:00+08:00" content="2016-05-08">
+              2016-05-08
             </time>
           </span>
 
@@ -308,8 +316,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
                   </a>
                 </span>
 
@@ -324,8 +332,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/01/05/java/spring/spring-transactional-aop/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/05/java/spring/spring-transactional-aop/" itemprop="commentsCount"></span>
+                <a href="/2016/05/08/search/es/es-partial-update/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/08/search/es/es-partial-update/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -350,12 +358,12 @@
       
         
           
-          起因
-最近有个实习生开发了一个job，这个job提测之后，测试那边很快反映有数据异常，看了下log发现已有几条异常信息，但我惊讶的是有数据不一致的问题。我浏览了一下代码，并没有发现什么问题，发现都有用Transactional和rollback声明（当时脑子有点短路，一时没有看出来），但直觉告诉我这
+          document 的部分更新对于solr和elasticsearch， 一般来说我们可能会先获取document， 再更新某个field， 然后reindex这个document。因为document是不可变的， 不能够修改， 只能被替换。
+但其实很久之前我觉得， 这个操作对于客户端来说， 如果不考
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/01/05/java/spring/spring-transactional-aop/#more" rel="contents">
+            <a class="btn" href="/2016/05/08/search/es/es-partial-update/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,8 +414,8 @@
             
               
                 
-                <a class="post-title-link" href="/2015/12/30/books/self_ctrl/self_ctrl_6/" itemprop="url">
-                  【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
+                <a class="post-title-link" href="/2016/05/08/search/es/elastic-cluster-get-started/" itemprop="url">
+                  elasticsearch - 运行集群
                 </a>
               
             
@@ -420,8 +428,392 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-30T00:00:00+08:00" content="2015-12-30">
-              2015-12-30
+            <time itemprop="dateCreated" datetime="2016-05-08T00:00:00+08:00" content="2016-05-08">
+              2016-05-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/08/search/es/elastic-cluster-get-started/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/08/search/es/elastic-cluster-get-started/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          在生产环境中, 为了保证es的可用性, 需要一个failover的方案, es默认就支持集群模式, 下面就来试用一下 es 集群模式.
+配置集群
+首先要有三个 es 实例, 放在不同机器上, 假设三台机器分别叫node1/node2/node3, 分别修改各个 node 的 config/elast
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/08/search/es/elastic-cluster-get-started/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/07/search/es/es-shard-分片/" itemprop="url">
+                  elasticsearch - 分片的概念
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-07T00:00:00+08:00" content="2016-05-07">
+              2016-05-07
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/07/search/es/es-shard-分片/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/07/search/es/es-shard-分片/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          概念
+要理解分片是什么, 首先要理解其他的一些相关概念和关系.
+Cluster (集群)集群是一个或以上的 node 的集合, 集群有一个唯一的名称作为id (默认是elasticsearch), 一个只有通过集群名称才能加入. 所以, 要避免在不同环境使用相同的集群名称, 否则 node 可能会加
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/07/search/es/es-shard-分片/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/06/java/se/ThreadLocalRandom/" itemprop="url">
+                  ThreadLocalRandom - 为多线程而生
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-06T00:00:00+08:00" content="2016-05-06">
+              2016-05-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/06/java/se/ThreadLocalRandom/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/06/java/se/ThreadLocalRandom/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          今天要说的 ThreadLocalRandom 是Java7引入的随机数生成器, 在此之前我们生成随机数都是使用
+
+创建java.util.Random实例
+使用Math.random(), 其实内部也是创建了一个java.util.Random
+
+使用Random没有问题, 其seed使用Atom
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/06/java/se/ThreadLocalRandom/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/05/books/procrastination/procrastination-12/" itemprop="url">
+                  【书：拖延心理学】（12） 作战武器 - 明确目标和可行性的计划
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-05T00:00:00+08:00" content="2016-05-05">
+              2016-05-05
             </time>
           </span>
 
@@ -450,8 +842,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/30/books/self_ctrl/self_ctrl_6/" itemprop="commentsCount"></span>
+                <a href="/2016/05/05/books/procrastination/procrastination-12/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/05/books/procrastination/procrastination-12/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -478,11 +870,10 @@
           
           笔记
 
-
           
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/30/books/self_ctrl/self_ctrl_6/#more" rel="contents">
+            <a class="btn" href="/2016/05/05/books/procrastination/procrastination-12/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -533,8 +924,8 @@
             
               
                 
-                <a class="post-title-link" href="/2015/12/29/java/zookeeper/zookeeper-cluster/" itemprop="url">
-                  【zookeeper】 集群搭建和测试
+                <a class="post-title-link" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="url">
+                  Levenshtein 距离
                 </a>
               
             
@@ -547,8 +938,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-29T00:00:00+08:00" content="2015-12-29">
-              2015-12-29
+            <time itemprop="dateCreated" datetime="2016-05-04T00:00:00+08:00" content="2016-05-04">
+              2016-05-04
             </time>
           </span>
 
@@ -561,8 +952,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
                   </a>
                 </span>
 
@@ -577,8 +968,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/12/29/java/zookeeper/zookeeper-cluster/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/29/java/zookeeper/zookeeper-cluster/" itemprop="commentsCount"></span>
+                <a href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/04/cs/algo/Levenshtein_edit_distance/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -603,14 +994,13 @@
       
         
           
-          本文记录zookeeper集群的搭建过程及简单测试。
-配置
-zk1
-tickTime=2000dataDir=/foo/datadataLogDir=/foo/logsclientPort=2181initLimit=5syncLimit=2server.1=zk1:2888:3888server.
+          Levenshtein 距离什么是Levenshtein距离?Levenshtein距离是由俄罗斯科学家弗拉基米尔·莱文斯坦在1965年提出这个概念。
+
+Levenshtein距离(莱文斯坦距离), 是编辑距离（edit distance）的一种。指两个字串之间，由一个转成另一个所需的最少编辑操作次
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/29/java/zookeeper/zookeeper-cluster/#more" rel="contents">
+            <a class="btn" href="/2016/05/04/cs/algo/Levenshtein_edit_distance/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -661,8 +1051,8 @@ tickTime=2000dataDir=/foo/datadataLogDir=/foo/logsclientPort=2181initLimit=5sync
             
               
                 
-                <a class="post-title-link" href="/2015/12/26/git/git_cmd/" itemprop="url">
-                  git 常用命令清单
+                <a class="post-title-link" href="/2016/05/03/linux/tools/tmux/" itemprop="url">
+                  tmux cheatsheet
                 </a>
               
             
@@ -675,521 +1065,8 @@ tickTime=2000dataDir=/foo/datadataLogDir=/foo/logsclientPort=2181initLimit=5sync
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-26T00:00:00+08:00" content="2015-12-26">
-              2015-12-26
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/26/git/git_cmd/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/26/git/git_cmd/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          这个清单是基于常用 Git 命令清单 - 阮一峰的博客修改的， 加上了安装配置部分和一些demo例子，并补充了一些命令（不断更新）。
-常用 Git 命令清单
-我每天使用 Git ，但是很多命令记不住。　　一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。
-
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/26/git/git_cmd/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2015/12/23/books/self_ctrl/self_ctrl_5/" itemprop="url">
-                  【书：自控力】（五） 大脑的弥天大谎 为什么我们误把渴望当幸福？
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-23T00:00:00+08:00" content="2015-12-23">
-              2015-12-23
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/books/" itemprop="url" rel="index">
-                    <span itemprop="name">books</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/23/books/self_ctrl/self_ctrl_5/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/23/books/self_ctrl/self_ctrl_5/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          笔记
-
-##
-
-          
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/23/books/self_ctrl/self_ctrl_5/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2015/12/23/docker/docker_deploy_java_boot/" itemprop="url">
-                  使用 docker 部署 java webapp
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-23T00:00:00+08:00" content="2015-12-23">
-              2015-12-23
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/23/docker/docker_deploy_java_boot/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/23/docker/docker_deploy_java_boot/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          本文主要记录一下如何使用 docker 部署 java 的 webapp。
-建立 demo webapp
-这里为了方便， 使用spring-boot来搭建一个webapp。
-首先使用 maven 下载依赖：
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;&l
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/23/docker/docker_deploy_java_boot/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2015/12/22/java/zookeeper/zookeeper_prog_watcher-01/" itemprop="url">
-                  【zookeeper 编程】 - 处理状态变化
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-22T00:00:00+08:00" content="2015-12-22">
-              2015-12-22
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/22/java/zookeeper/zookeeper_prog_watcher-01/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/22/java/zookeeper/zookeeper_prog_watcher-01/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          下面通过一个示例演示, 如何监听一个node并接收和处理状态变更.
-监听和处理事件
-要实现监听, 首先需要实现Watcher接口:
-public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEvent wa
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/22/java/zookeeper/zookeeper_prog_watcher-01/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2015/12/20/linux/ten-cmd-linux-performance/" itemprop="url">
-                  【转】 如何用十条命令在一分钟内检查Linux服务器性能
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-20T00:00:00+08:00" content="2015-12-20">
-              2015-12-20
+            <time itemprop="dateCreated" datetime="2016-05-03T00:00:00+08:00" content="2016-05-03">
+              2016-05-03
             </time>
           </span>
 
@@ -1218,8 +1095,8 @@ public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEven
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/12/20/linux/ten-cmd-linux-performance/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/20/linux/ten-cmd-linux-performance/" itemprop="commentsCount"></span>
+                <a href="/2016/05/03/linux/tools/tmux/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/03/linux/tools/tmux/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -1244,12 +1121,14 @@ public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEven
       
         
           
-          概述通过执行以下命令，可以在1分钟内对系统资源使用情况有个大致的了解。
-其中一些命令需要安装sysstat包，有一些由procps包提供。这些命令的输出，有助于快速定位性能瓶颈，检查出所有资源（CPU、内存、磁盘IO等）的利用率（utilization）、饱和度（saturation）和错误（err
+          tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
+
+进入 tmux 命令模式
+要进行 tmux
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/20/linux/ten-cmd-linux-performance/#more" rel="contents">
+            <a class="btn" href="/2016/05/03/linux/tools/tmux/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1300,8 +1179,8 @@ public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEven
             
               
                 
-                <a class="post-title-link" href="/2015/12/19/linux/install/install_vmware_on_ubuntu/" itemprop="url">
-                  在ubuntu上安装vmware
+                <a class="post-title-link" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="url">
+                  deploy spring-boot as war file
                 </a>
               
             
@@ -1314,133 +1193,8 @@ public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEven
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-19T00:00:00+08:00" content="2015-12-19">
-              2015-12-19
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2015/12/19/linux/install/install_vmware_on_ubuntu/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/19/linux/install/install_vmware_on_ubuntu/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          install vmware on ubuntudownload VMware-Workstation-Full-10.0.6-2700073.x86_64.bundlechmod u+x ./VMware-Workstation-Full-10.0.6-2700073.x86_64.bundle.
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/19/linux/install/install_vmware_on_ubuntu/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2015/12/01/java/utils/java_dir_watchdog/" itemprop="url">
-                  java版目录watchdog
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2015-12-01T00:00:00+08:00" content="2015-12-01">
-              2015-12-01
+            <time itemprop="dateCreated" datetime="2016-05-02T00:00:00+08:00" content="2016-05-02">
+              2016-05-02
             </time>
           </span>
 
@@ -1469,8 +1223,8 @@ public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEven
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2015/12/01/java/utils/java_dir_watchdog/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/01/java/utils/java_dir_watchdog/" itemprop="commentsCount"></span>
+                <a href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -1495,13 +1249,266 @@ public interface Watcher &#123;    void process(org.apache.zookeeper.WatchedEven
       
         
           
-          工作中我们经常会用到监听目录的功能, 当目录中有文件增加删除等操作时, 执行某些任务. 如果是Java来写, 怎么做呢 ?
-实现方式实现这个功能, 我们要使用到WatchService和Path这两个东西, 首先创建一个WatchService:
-WatchService watcher = Fil
+          spring-boot 非常方便, 用来验证程序非常快速. 但如果基于spring-boot写了一个应用, 怎么部署呢 ?
+spring-boot 打包有两种, 一种继续使用jar, 使用内置的web容器; 另一种使用war, 部署到已有的web容器中.
+下面介绍war方式部署:
+pom.xml 修
           ...
 
           <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/01/java/utils/java_dir_watchdog/#more" rel="contents">
+            <a class="btn" href="/2016/05/02/java/spring/spring-boot/spring-boot-deploy-war/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/05/01/linux/practice/my_workspace_management/" itemprop="url">
+                  我的workspace管理之道
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-01T00:03:30+08:00" content="2016-05-01">
+              2016-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/01/linux/practice/my_workspace_management/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/linux/practice/my_workspace_management/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          最近我又调整了我的workspace 分类, 我一直觉得这个分类方法效率特别高, 几乎每认识一个新的工程师就安利他用, 今天”斗胆”写篇博客分享一下.
+workspace, 是指linux的的工作区, 自从我使用了workspace, 工作效率倍增, 开小差的情况也少了很多.
+为什么这么说呢? 因为
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/01/linux/practice/my_workspace_management/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="url">
+                  用tensorflow训练识别手写数字的CNN模型
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-29T13:03:30+08:00" content="2016-04-29">
+              2016-04-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/data-science/" itemprop="url" rel="index">
+                    <span itemprop="name">data science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          tensorflowtensorflow 是google出品的一个基于图计算开源机器学习库, 作为一个谷粉, 怎么可以不玩一下. tensorflow宣称具有高弹性、可移植性、对科研和生产应用友好、自动分化、最大化性能、多语言支持等特性。说那么多， 如果不试试， 怎么知道呢。Talk is chea
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/04/29/dtai/tensorflow/tensorflow_mnist_expert_create_model/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1535,7 +1542,7 @@ WatchService watcher = Fil
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1569,14 +1576,14 @@ WatchService watcher = Fil
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1593,7 +1600,7 @@ WatchService watcher = Fil
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1630,11 +1637,11 @@ WatchService watcher = Fil
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

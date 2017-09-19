@@ -1,0 +1,866 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="lucene,search," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="在搜索方面，lucene 可谓是大名鼎鼎，为什么使用 lucene 可以做到这么快的搜索， 首先我们要先来了解一下倒排索引。
+倒排索引
+lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排索引， 那什么是倒排索引呢 ？
+
+
+图片来自:  http://nlp.stanford.edu/
+
+如上图， 倒排索引， 顾名思义就是词 -&amp;gt; 文档作为一个反向(相对于文档 -&amp;gt; 词)的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IR - 索引创建过程概述">
+<meta property="og:url" content="http://www.nikoai.pw/2015/12/30/search/lucene/ir-index-create-intro/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="在搜索方面，lucene 可谓是大名鼎鼎，为什么使用 lucene 可以做到这么快的搜索， 首先我们要先来了解一下倒排索引。
+倒排索引
+lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排索引， 那什么是倒排索引呢 ？
+
+
+图片来自:  http://nlp.stanford.edu/
+
+如上图， 倒排索引， 顾名思义就是词 -&amp;gt; 文档作为一个反向(相对于文档 -&amp;gt; 词)的">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/lucene/lucene-inverted-index-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/lucene/lucene-inverted-index-02.png">
+<meta property="og:updated_time" content="2016-12-01T05:37:47.794Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IR - 索引创建过程概述">
+<meta name="twitter:description" content="在搜索方面，lucene 可谓是大名鼎鼎，为什么使用 lucene 可以做到这么快的搜索， 首先我们要先来了解一下倒排索引。
+倒排索引
+lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排索引， 那什么是倒排索引呢 ？
+
+
+图片来自:  http://nlp.stanford.edu/
+
+如上图， 倒排索引， 顾名思义就是词 -&amp;gt; 文档作为一个反向(相对于文档 -&amp;gt; 词)的">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/java/lucene/lucene-inverted-index-01.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2015/12/30/search/lucene/ir-index-create-intro/"/>
+
+
+  <title> IR - 索引创建过程概述 | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                IR - 索引创建过程概述
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-12-30T00:00:00+08:00" content="2015-12-30">
+              2015-12-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/30/search/lucene/ir-index-create-intro/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/30/search/lucene/ir-index-create-intro/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在搜索方面，lucene 可谓是大名鼎鼎，为什么使用 lucene 可以做到这么快的搜索， 首先我们要先来了解一下倒排索引。</p>
+<h1 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h1><hr>
+<p>lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排索引， 那什么是倒排索引呢 ？</p>
+<p><img src="/images/java/lucene/lucene-inverted-index-01.png" alt=""></p>
+<blockquote>
+<p>图片来自:  <a href="http://nlp.stanford.edu/IR-book/html/htmledition/an-example-information-retrieval-problem-1.html" target="_blank" rel="external">http://nlp.stanford.edu/</a></p>
+</blockquote>
+<p>如上图， 倒排索引， 顾名思义就是<code>词 -&gt; 文档</code>作为一个反向(相对于<code>文档 -&gt; 词</code>)的关系。可以看到, 左边有一个词典， 每个词指向一个文档链表， 称为 <code>posting list</code> ( 倒排表 )。</p>
+<p>虽然索引构建和写入可能会比读慢，但索引只要一次构建了，以后就可以多次使用了。</p>
+<h1 id="创建过程"><a href="#创建过程" class="headerlink" title="创建过程"></a>创建过程</h1><hr>
+<p>接下来开始索引文档。</p>
+<h2 id="准备要索引的文档"><a href="#准备要索引的文档" class="headerlink" title="准备要索引的文档"></a>准备要索引的文档</h2><hr>
+<p>假设有一些要被索引的文档，比如：</p>
+<p>文档一：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">They drove luxurious cars and lived in splendid houses with their beautiful wives.</div></pre></td></tr></table></figure>
+<p>文档二：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">As the carrier of the social culture and the art aesthetics, the Chinese ancient furniture has rich traditional culture connotation and shows different aesthetic ideology of different times.</div></pre></td></tr></table></figure>
+<h2 id="文档-gt-tokenizer-（分词组件）-gt-token"><a href="#文档-gt-tokenizer-（分词组件）-gt-token" class="headerlink" title="文档 -&gt; tokenizer （分词组件） -&gt; token"></a>文档 -&gt; tokenizer （分词组件） -&gt; token</h2><hr>
+<p>我们将文档传给 tokenizer （分词组件）， tokenizer 进行 tokenize 分词操作， 将文档分成一个个单词，去除标点符号和 stop word。<br>stop word 是指语言中普遍的词， 这些词没有什么特别的意义， 不足以成为文档的关键词，写入索引也会浪费空间，如 <code>a</code>、<code>the</code> 等。<br>这里针对是英文的 tokenizer， 中文 tokenizer 会有不同的分词方法和 stop word 集合。</p>
+<p>这一步 tokenizer 处理后的结果称为 token。</p>
+<h2 id="token-gt-Linguistic-Processor-gt-term"><a href="#token-gt-Linguistic-Processor-gt-term" class="headerlink" title="token -&gt; Linguistic Processor -&gt; term"></a>token -&gt; Linguistic Processor -&gt; term</h2><hr>
+<p>linguistic processor (语言处理组件) 主要对 token 进行语言上的处理， 比如英语：</p>
+<ul>
+<li>转为小写</li>
+<li><code>stemming</code> 词干提取，如“cars”到“car”等这样的操作</li>
+<li><code>lemmatization</code> 词形还原， 如“drove”到“drive”等这样的操作</li>
+</ul>
+<p>stemming 和 lemmatization 的不同之处在于：</p>
+<ul>
+<li>stemming 使用一些固定算法对词进行缩减， 如去除复数<code>s</code>、<code>tional -&gt; tion</code>等等</li>
+<li>lemmatization 是使用已保存的字典映射来进行转换，如一些非常规的过去式和过去分词：<code>written -&gt; write</code>、<code>are is am -&gt; be</code>等，需要保存在映射中。</li>
+</ul>
+<p>但 stemming 和 lemmatization 不是互斥关系， 有些词用两种方法都可以得到相同的结果。</p>
+<p>这一步 linguistic processor 处理之后的结果叫做 term。</p>
+<h2 id="term-gt-indexer"><a href="#term-gt-indexer" class="headerlink" title="term -&gt; indexer"></a>term -&gt; indexer</h2><hr>
+<p>现在我们可以把 term 和 其文档id 对应起来， 很明显，一个 term 可能对应多个文档， 把这些文档使用链表来串在一起， 就是我们的 Posting List，如上图所示。<br>当然，实际中存储除了文档id，还有 <code>Document Frequency</code>、<code>Frequency</code> 等信息， 这些在后面搜索的时候会用到，如下图：</p>
+<p><img src="/images/java/lucene/lucene-inverted-index-02.png" alt=""></p>
+<blockquote>
+<p>图片来自：<a href="http://horicky.blogspot.com/2013/02/text-processing-part-2-inverted-index.html" target="_blank" rel="external">http://horicky.blogspot.com/2013/02/text-processing-part-2-inverted-index.html</a></p>
+</blockquote>
+<p>Document Frequency（文档频次），表示有多少文档包含这个 term。<br>Term Frequency （词频率），表示此 term 在此文档中有多少个。</p>
+<h1 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h1><hr>
+<p>创建完索引后，接下来就可以进行搜索了，下一篇博客将简述索引搜索的过程。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://horicky.blogspot.com/2013/02/text-processing-part-2-inverted-index.html" target="_blank" rel="external">http://horicky.blogspot.com/2013/02/text-processing-part-2-inverted-index.html</a><br><a href="https://zh.wikipedia.org/wiki/%E8%AF%8D%E5%B9%B2%E6%8F%90%E5%8F%96" target="_blank" rel="external">https://zh.wikipedia.org/wiki/%E8%AF%8D%E5%B9%B2%E6%8F%90%E5%8F%96</a><br><a href="http://nlp.stanford.edu/IR-book/html/htmledition/an-example-information-retrieval-problem-1.html" target="_blank" rel="external">http://nlp.stanford.edu/IR-book/html/htmledition/an-example-information-retrieval-problem-1.html</a><br><a href="http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html" target="_blank" rel="external">http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html</a><br><a href="http://www.infotech.ac.cn/CN/article/downloadArticleFile.do?attachType=PDF&amp;id=3533" target="_blank" rel="external">http://www.infotech.ac.cn/CN/article/downloadArticleFile.do?attachType=PDF&amp;id=3533</a><br><a href="http://udn.yyuap.com/doc/mastering-elasticsearch/chapter-1/112_README.html" target="_blank" rel="external">http://udn.yyuap.com/doc/mastering-elasticsearch/chapter-1/112_README.html</a><br><a href="http://www.ideaeng.com/stemming-lemmatization-0601" target="_blank" rel="external">http://www.ideaeng.com/stemming-lemmatization-0601</a><br><a href="http://www.zmonster.me/2016/01/21/lemmatization-survey.html" target="_blank" rel="external">http://www.zmonster.me/2016/01/21/lemmatization-survey.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/lucene/" rel="tag">#lucene</a>
+          
+            <a href="/tags/search/" rel="tag">#search</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/29/java/zookeeper/zookeeper-cluster/" rel="next" title="【zookeeper】 集群搭建和测试">
+                <i class="fa fa-chevron-left"></i> 【zookeeper】 集群搭建和测试
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/" rel="prev" title="【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？">
+                【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/12/30/search/lucene/ir-index-create-intro/"
+           data-title="IR - 索引创建过程概述" data-url="http://www.nikoai.pw/2015/12/30/search/lucene/ir-index-create-intro/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#倒排索引"><span class="nav-number">1.</span> <span class="nav-text">倒排索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建过程"><span class="nav-number">2.</span> <span class="nav-text">创建过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备要索引的文档"><span class="nav-number">2.1.</span> <span class="nav-text">准备要索引的文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文档-gt-tokenizer-（分词组件）-gt-token"><span class="nav-number">2.2.</span> <span class="nav-text">文档 -> tokenizer （分词组件） -> token</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#token-gt-Linguistic-Processor-gt-term"><span class="nav-number">2.3.</span> <span class="nav-text">token -> Linguistic Processor -> term</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#term-gt-indexer"><span class="nav-number">2.4.</span> <span class="nav-text">term -> indexer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Next"><span class="nav-number">3.</span> <span class="nav-text">Next</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

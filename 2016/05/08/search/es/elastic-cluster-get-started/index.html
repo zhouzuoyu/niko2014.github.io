@@ -1,0 +1,853 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="elasticsearch,search," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="在生产环境中, 为了保证es的可用性, 需要一个failover的方案, es默认就支持集群模式, 下面就来试用一下 es 集群模式.
+配置集群
+首先要有三个 es 实例, 放在不同机器上, 假设三台机器分别叫node1/node2/node3, 分别修改各个 node 的 config/elasticsearch.yml, 设置如下:
+node1:
+# 集群名称 每个node的应该一致clust">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch - 运行集群">
+<meta property="og:url" content="http://www.nikoai.pw/2016/05/08/search/es/elastic-cluster-get-started/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="在生产环境中, 为了保证es的可用性, 需要一个failover的方案, es默认就支持集群模式, 下面就来试用一下 es 集群模式.
+配置集群
+首先要有三个 es 实例, 放在不同机器上, 假设三台机器分别叫node1/node2/node3, 分别修改各个 node 的 config/elasticsearch.yml, 设置如下:
+node1:
+# 集群名称 每个node的应该一致clust">
+<meta property="og:updated_time" content="2016-11-28T06:30:51.924Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="elasticsearch - 运行集群">
+<meta name="twitter:description" content="在生产环境中, 为了保证es的可用性, 需要一个failover的方案, es默认就支持集群模式, 下面就来试用一下 es 集群模式.
+配置集群
+首先要有三个 es 实例, 放在不同机器上, 假设三台机器分别叫node1/node2/node3, 分别修改各个 node 的 config/elasticsearch.yml, 设置如下:
+node1:
+# 集群名称 每个node的应该一致clust">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2016/05/08/search/es/elastic-cluster-get-started/"/>
+
+
+  <title> elasticsearch - 运行集群 | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                elasticsearch - 运行集群
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-08T00:00:00+08:00" content="2016-05-08">
+              2016-05-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/08/search/es/elastic-cluster-get-started/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/08/search/es/elastic-cluster-get-started/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在生产环境中, 为了保证es的可用性, 需要一个failover的方案, es默认就支持集群模式, 下面就来试用一下 es 集群模式.</p>
+<h1 id="配置集群"><a href="#配置集群" class="headerlink" title="配置集群"></a>配置集群</h1><hr>
+<p>首先要有三个 es 实例, 放在不同机器上, 假设三台机器分别叫node1/node2/node3, 分别修改各个 node 的 config/elasticsearch.yml, 设置如下:</p>
+<p>node1:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 集群名称 每个node的应该一致</div><div class="line">cluster.name: niko-elasticsearch</div><div class="line"># node名称</div><div class="line">node.name: niko-node1</div><div class="line">#</div><div class="line">discovery.zen.ping.unicast.hosts: [&quot;10.2.10.209:9300&quot;, &quot;10.2.10.210:9300&quot;, &quot;10.2.10.211:9300&quot;]</div></pre></td></tr></table></figure>
+<p>node2:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 集群名称 每个node的应该一致</div><div class="line">cluster.name: niko-elasticsearch</div><div class="line"># node名称</div><div class="line">node.name: niko-node2</div><div class="line">#</div><div class="line">discovery.zen.ping.unicast.hosts: [&quot;10.2.10.209:9300&quot;, &quot;10.2.10.210:9300&quot;, &quot;10.2.10.211:9300&quot;]</div></pre></td></tr></table></figure>
+<p>node3:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># 集群名称 每个node的应该一致</div><div class="line">cluster.name: niko-elasticsearch</div><div class="line"># node名称</div><div class="line">node.name: niko-node3</div><div class="line">#</div><div class="line">discovery.zen.ping.unicast.hosts: [&quot;10.2.10.209:9300&quot;, &quot;10.2.10.210:9300&quot;, &quot;10.2.10.211:9300&quot;]</div></pre></td></tr></table></figure>
+<h1 id="启动集群"><a href="#启动集群" class="headerlink" title="启动集群"></a>启动集群</h1><hr>
+<h2 id="启动node1"><a href="#启动node1" class="headerlink" title="启动node1"></a>启动node1</h2><hr>
+<figure class="highlight plain"><figcaption><span>bin/elasticsearch</span></figcaption><table><tr><td class="code"><pre><div class="line">[2016-05-08 21:55:12,053][INFO ][node                     ] [niko-node1] version[1.7.5], pid[2632], build[00f95f4/2016-02-02T09:55:30Z]</div><div class="line">[2016-05-08 21:55:12,054][INFO ][node                     ] [niko-node1] initializing ...</div><div class="line">[2016-05-08 21:55:12,164][INFO ][plugins                  ] [niko-node1] loaded [], sites []</div><div class="line">[2016-05-08 21:55:12,210][INFO ][env                      ] [niko-node1] using [1] data paths, mounts [[/ (/dev/sda1)]], net usable_space [86.8gb], net total_space [96.3gb], types [ext4]</div><div class="line">[2016-05-08 21:55:16,339][INFO ][node                     ] [niko-node1] initialized</div><div class="line">[2016-05-08 21:55:16,339][INFO ][node                     ] [niko-node1] starting ...</div><div class="line">[2016-05-08 21:55:16,567][INFO ][transport                ] [niko-node1] bound_address &#123;inet[/0:0:0:0:0:0:0:0:9300]&#125;, publish_address &#123;inet[/10.2.10.209:9300]&#125;</div><div class="line">[2016-05-08 21:55:16,644][INFO ][discovery                ] [niko-node1] niko-elasticsearch/iZzjAHGURxW3orWute-PtQ</div><div class="line">[2016-05-08 21:55:20,463][INFO ][cluster.service          ] [niko-node1] new_master [niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]], reason: zen-disco-join (elected_as_master)</div><div class="line">[2016-05-08 21:55:20,506][INFO ][http                     ] [niko-node1] bound_address &#123;inet[/0:0:0:0:0:0:0:0:9200]&#125;, publish_address &#123;inet[/10.2.10.209:9200]&#125;</div><div class="line">[2016-05-08 21:55:20,506][INFO ][node                     ] [niko-node1] started</div><div class="line">[2016-05-08 21:55:20,516][INFO ][gateway                  ] [niko-node1] recovered [0] indices into cluster_state</div></pre></td></tr></table></figure>
+<h2 id="启动node2"><a href="#启动node2" class="headerlink" title="启动node2"></a>启动node2</h2><hr>
+<p>log of node2:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ bin/elasticsearch</div><div class="line">[2016-05-08 21:55:32,314][INFO ][node                     ] [niko-node2] version[1.7.5], pid[2409], build[00f95f4/2016-02-02T09:55:30Z]</div><div class="line">[2016-05-08 21:55:32,320][INFO ][node                     ] [niko-node2] initializing ...</div><div class="line">[2016-05-08 21:55:32,486][INFO ][plugins                  ] [niko-node2] loaded [], sites []</div><div class="line">[2016-05-08 21:55:32,542][INFO ][env                      ] [niko-node2] using [1] data paths, mounts [[/ (/dev/sda1)]], net usable_space [86.8gb], net total_space [96.3gb], types [ext4]</div><div class="line">[2016-05-08 21:55:36,886][INFO ][node                     ] [niko-node2] initialized</div><div class="line">[2016-05-08 21:55:36,887][INFO ][node                     ] [niko-node2] starting ...</div><div class="line">[2016-05-08 21:55:37,119][INFO ][transport                ] [niko-node2] bound_address &#123;inet[/0:0:0:0:0:0:0:0:9300]&#125;, publish_address &#123;inet[/10.2.10.210:9300]&#125;</div><div class="line">[2016-05-08 21:55:37,141][INFO ][discovery                ] [niko-node2] niko-elasticsearch/7Fc97mnTTZGEWiLZgm4WmA</div><div class="line">[2016-05-08 21:55:40,239][INFO ][cluster.service          ] [niko-node2] detected_master [niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]], added &#123;[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]],&#125;, reason: zen-disco-receive(from master [[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]]])</div><div class="line">[2016-05-08 21:55:40,290][INFO ][http                     ] [niko-node2] bound_address &#123;inet[/0:0:0:0:0:0:0:0:9200]&#125;, publish_address &#123;inet[/10.2.10.210:9200]&#125;</div><div class="line">[2016-05-08 21:55:40,293][INFO ][node                     ] [niko-node2] started</div></pre></td></tr></table></figure>
+<p>log of node1:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[2016-05-08 21:55:40,144][INFO ][cluster.service          ] [niko-node1] added &#123;[niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]],&#125;, reason: zen-disco-receive(join from node[[niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]]])</div></pre></td></tr></table></figure>
+<h2 id="启动node3"><a href="#启动node3" class="headerlink" title="启动node3:"></a>启动node3:</h2><hr>
+<p>log of node3:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ bin/elasticsearch</div><div class="line">[2016-05-08 21:57:31,672][INFO ][node                     ] [niko-node3] version[1.7.5], pid[2431], build[00f95f4/2016-02-02T09:55:30Z]</div><div class="line">[2016-05-08 21:57:31,676][INFO ][node                     ] [niko-node3] initializing ...</div><div class="line">[2016-05-08 21:57:31,857][INFO ][plugins                  ] [niko-node3] loaded [], sites []</div><div class="line">[2016-05-08 21:57:31,912][INFO ][env                      ] [niko-node3] using [1] data paths, mounts [[/ (/dev/sda1)]], net usable_space [86.8gb], net total_space [96.3gb], types [ext4]</div><div class="line">[2016-05-08 21:57:36,632][INFO ][node                     ] [niko-node3] initialized</div><div class="line">[2016-05-08 21:57:36,633][INFO ][node                     ] [niko-node3] starting ...</div><div class="line">[2016-05-08 21:57:36,843][INFO ][transport                ] [niko-node3] bound_address &#123;inet[/0:0:0:0:0:0:0:0:9300]&#125;, publish_address &#123;inet[/10.2.10.211:9300]&#125;</div><div class="line">[2016-05-08 21:57:36,913][INFO ][discovery                ] [niko-node3] niko-elasticsearch/UzK8fUZJRs-mrOWKJnxHBQ</div><div class="line">[2016-05-08 21:57:40,062][INFO ][cluster.service          ] [niko-node3] detected_master [niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]], added &#123;[niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]],[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]],&#125;, reason: zen-disco-receive(from master [[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]]])</div><div class="line">[2016-05-08 21:57:40,109][INFO ][http                     ] [niko-node3] bound_address &#123;inet[/0:0:0:0:0:0:0:0:9200]&#125;, publish_address &#123;inet[/10.2.10.211:9200]&#125;</div><div class="line">[2016-05-08 21:57:40,110][INFO ][node                     ] [niko-node3] started</div></pre></td></tr></table></figure>
+<p>log of node1:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[2016-05-08 21:57:40,004][INFO ][cluster.service          ] [niko-node1] added &#123;[niko-node3][UzK8fUZJRs-mrOWKJnxHBQ][ubuntu][inet[/10.2.10.211:9300]],&#125;, reason: zen-disco-receive(join from node[[niko-node3][UzK8fUZJRs-mrOWKJnxHBQ][ubuntu][inet[/10.2.10.211:9300]]])</div></pre></td></tr></table></figure>
+<p>log of node2:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[2016-05-08 21:57:40,081][INFO ][cluster.service          ] [niko-node2] added &#123;[niko-node3][UzK8fUZJRs-mrOWKJnxHBQ][ubuntu][inet[/10.2.10.211:9300]],&#125;, reason: zen-disco-receive(from master [[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]]])</div></pre></td></tr></table></figure>
+<h1 id="查看集群"><a href="#查看集群" class="headerlink" title="查看集群"></a>查看集群</h1><hr>
+<p><code>curl http://10.2.10.209:9200/_nodes/process?pretty</code> :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;cluster_name&quot; : &quot;niko-elasticsearch&quot;,</div><div class="line">  &quot;nodes&quot; : &#123;</div><div class="line">    &quot;iZzjAHGURxW3orWute-PtQ&quot; : &#123;</div><div class="line">      &quot;name&quot; : &quot;niko-node1&quot;,</div><div class="line">      &quot;transport_address&quot; : &quot;inet[/10.2.10.209:9300]&quot;,</div><div class="line">      &quot;host&quot; : &quot;ubuntu&quot;,</div><div class="line">      &quot;ip&quot; : &quot;127.0.1.1&quot;,</div><div class="line">      &quot;version&quot; : &quot;1.7.5&quot;,</div><div class="line">      &quot;build&quot; : &quot;00f95f4&quot;,</div><div class="line">      &quot;http_address&quot; : &quot;inet[/10.2.10.209:9200]&quot;,</div><div class="line">      &quot;process&quot; : &#123;</div><div class="line">        &quot;refresh_interval_in_millis&quot; : 1000,</div><div class="line">        &quot;id&quot; : 2632,</div><div class="line">        &quot;max_file_descriptors&quot; : 65536,</div><div class="line">        &quot;mlockall&quot; : false</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    &quot;7Fc97mnTTZGEWiLZgm4WmA&quot; : &#123;</div><div class="line">      &quot;name&quot; : &quot;niko-node2&quot;,</div><div class="line">      &quot;transport_address&quot; : &quot;inet[/10.2.10.210:9300]&quot;,</div><div class="line">      &quot;host&quot; : &quot;ubuntu&quot;,</div><div class="line">      &quot;ip&quot; : &quot;127.0.1.1&quot;,</div><div class="line">      &quot;version&quot; : &quot;1.7.5&quot;,</div><div class="line">      &quot;build&quot; : &quot;00f95f4&quot;,</div><div class="line">      &quot;http_address&quot; : &quot;inet[/10.2.10.210:9200]&quot;,</div><div class="line">      &quot;process&quot; : &#123;</div><div class="line">        &quot;refresh_interval_in_millis&quot; : 1000,</div><div class="line">        &quot;id&quot; : 2409,</div><div class="line">        &quot;max_file_descriptors&quot; : 65536,</div><div class="line">        &quot;mlockall&quot; : false</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    &quot;UzK8fUZJRs-mrOWKJnxHBQ&quot; : &#123;</div><div class="line">      &quot;name&quot; : &quot;niko-node3&quot;,</div><div class="line">      &quot;transport_address&quot; : &quot;inet[/10.2.10.211:9300]&quot;,</div><div class="line">      &quot;host&quot; : &quot;ubuntu&quot;,</div><div class="line">      &quot;ip&quot; : &quot;127.0.1.1&quot;,</div><div class="line">      &quot;version&quot; : &quot;1.7.5&quot;,</div><div class="line">      &quot;build&quot; : &quot;00f95f4&quot;,</div><div class="line">      &quot;http_address&quot; : &quot;inet[/10.2.10.211:9200]&quot;,</div><div class="line">      &quot;process&quot; : &#123;</div><div class="line">        &quot;refresh_interval_in_millis&quot; : 1000,</div><div class="line">        &quot;id&quot; : 2431,</div><div class="line">        &quot;max_file_descriptors&quot; : 65536,</div><div class="line">        &quot;mlockall&quot; : false</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="宕机测试-node1"><a href="#宕机测试-node1" class="headerlink" title="宕机测试 (node1)"></a>宕机测试 (node1)</h1><hr>
+<p>由上可知, 集群的 masetr 是 niko-node1, 现在关闭它, 然后查看其他 node 的变化:</p>
+<p>log of node2:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[2016-05-08 22:04:55,748][INFO ][discovery.zen            ] [niko-node2] master_left [[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]]], reason [shut_down]</div><div class="line">[2016-05-08 22:04:55,750][WARN ][discovery.zen            ] [niko-node2] master left (reason = shut_down), current nodes: &#123;[niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]],[niko-node3][UzK8fUZJRs-mrOWKJnxHBQ][ubuntu][inet[/10.2.10.211:9300]],&#125;</div><div class="line">[2016-05-08 22:04:55,752][INFO ][cluster.service          ] [niko-node2] removed &#123;[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]],&#125;, reason: zen-disco-master_failed ([niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]])</div><div class="line">[2016-05-08 22:04:58,791][INFO ][cluster.service          ] [niko-node2] new_master [niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]], reason: zen-disco-join (elected_as_master)</div></pre></td></tr></table></figure>
+<p>log of node3:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">[2016-05-08 22:04:55,721][INFO ][discovery.zen            ] [niko-node3] master_left [[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]]], reason [shut_down]</div><div class="line">[2016-05-08 22:04:55,726][WARN ][discovery.zen            ] [niko-node3] master left (reason = shut_down), current nodes: &#123;[niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]],[niko-node3][UzK8fUZJRs-mrOWKJnxHBQ][ubuntu][inet[/10.2.10.211:9300]],&#125;</div><div class="line">[2016-05-08 22:04:55,727][INFO ][cluster.service          ] [niko-node3] removed &#123;[niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]],&#125;, reason: zen-disco-master_failed ([niko-node1][iZzjAHGURxW3orWute-PtQ][ubuntu][inet[/10.2.10.209:9300]])</div><div class="line">[2016-05-08 22:04:58,789][INFO ][cluster.service          ] [niko-node3] detected_master [niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]], reason: zen-disco-receive(from master [[niko-node2][7Fc97mnTTZGEWiLZgm4WmA][ubuntu][inet[/10.2.10.210:9300]]])</div></pre></td></tr></table></figure>
+<p>从上可知, node2 被选举为新的 master.</p>
+<h1 id="脑裂问题"><a href="#脑裂问题" class="headerlink" title="脑裂问题"></a>脑裂问题</h1><hr>
+<p>接着上面, 因为集群中只有两个 node 了, 这时如果这两个 node 之间的连接中断, 那么它们都会认为对方已经 down 了, 然后选举自己为 master, 从而导致有两个 master, 带来了数据不一致的问题.</p>
+<p>为了解决这个问题, 需要修改一个设置:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line"># Set to ensure a node sees N other master eligible nodes to be considered</div><div class="line"># operational within the cluster. This should be set to a quorum/majority of</div><div class="line"># the master-eligible nodes in the cluster.</div><div class="line">#</div><div class="line">#discovery.zen.minimum_master_nodes: 1</div></pre></td></tr></table></figure>
+<p>设置为最小需要2个:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">discovery.zen.minimum_master_nodes: 2</div></pre></td></tr></table></figure>
+<h1 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h1><hr>
+<p>至于集群的工作原理将会在接下来的博客中介绍 ~~ </p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-production-elasticsearch-cluster-on-ubuntu-14-04" target="_blank" rel="external">https://www.digitalocean.com/community/tutorials/how-to-set-up-a-production-elasticsearch-cluster-on-ubuntu-14-04</a><br><a href="http://www.wklken.me/posts/2016/06/29/deploy-es.html" target="_blank" rel="external">http://www.wklken.me/posts/2016/06/29/deploy-es.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/elasticsearch/" rel="tag">#elasticsearch</a>
+          
+            <a href="/tags/search/" rel="tag">#search</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/07/search/es/es-shard-分片/" rel="next" title="elasticsearch - 分片的概念">
+                <i class="fa fa-chevron-left"></i> elasticsearch - 分片的概念
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/08/search/es/es-partial-update/" rel="prev" title="【api】elasticsearch - 部分更新文档">
+                【api】elasticsearch - 部分更新文档 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/05/08/search/es/elastic-cluster-get-started/"
+           data-title="elasticsearch - 运行集群" data-url="http://www.nikoai.pw/2016/05/08/search/es/elastic-cluster-get-started/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置集群"><span class="nav-number">1.</span> <span class="nav-text">配置集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动集群"><span class="nav-number">2.</span> <span class="nav-text">启动集群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#启动node1"><span class="nav-number">2.1.</span> <span class="nav-text">启动node1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动node2"><span class="nav-number">2.2.</span> <span class="nav-text">启动node2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动node3"><span class="nav-number">2.3.</span> <span class="nav-text">启动node3:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看集群"><span class="nav-number">3.</span> <span class="nav-text">查看集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#宕机测试-node1"><span class="nav-number">4.</span> <span class="nav-text">宕机测试 (node1)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#脑裂问题"><span class="nav-number">5.</span> <span class="nav-text">脑裂问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Next"><span class="nav-number">6.</span> <span class="nav-text">Next</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

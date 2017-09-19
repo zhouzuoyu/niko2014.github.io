@@ -89,20 +89,20 @@
 從Windows NT開始，微軟導入了「NTFS」這個格式，自此取代了長久以來一直使用的FAT╱FAT32，一直到XP所使用的NTFS 5.X版本以來，硬碟分割區都是從第63個扇區開始（請注意這裡的扇區指的是傳統硬碟喔，不過XP並不會認SSD，所以一律都是以此方式來分割），也就是會保留5">
 <meta property="og:type" content="article">
 <meta property="og:title" content="linux下ssd的4k对齐和trim">
-<meta property="og:url" content="http://niko2014.github.io/2016/03/28/linux/tools/ssd_4k_trim/index.html">
-<meta property="og:site_name" content="niko zhang">
+<meta property="og:url" content="http://www.nikoai.pw/2016/03/28/linux/tools/ssd_4k_trim/index.html">
+<meta property="og:site_name" content="保持简单">
 <meta property="og:description" content="4K 对齐为什么要4k对齐呢?主要是为了提高性能和延长寿命, 尤其是运行在window系统和NTFS格式的.
 
 從Windows NT開始，微軟導入了「NTFS」這個格式，自此取代了長久以來一直使用的FAT╱FAT32，一直到XP所使用的NTFS 5.X版本以來，硬碟分割區都是從第63個扇區開始（請注意這裡的扇區指的是傳統硬碟喔，不過XP並不會認SSD，所以一律都是以此方式來分割），也就是會保留5">
-<meta property="og:image" content="http://niko2014.github.io/images/linux/kha7bnwQpeg5sBhVVLPA_unaligned.png">
-<meta property="og:image" content="http://niko2014.github.io/images/linux/pVxPJVszQR2MpN0SMBuj_aligned.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/linux/kha7bnwQpeg5sBhVVLPA_unaligned.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/linux/pVxPJVszQR2MpN0SMBuj_aligned.png">
 <meta property="og:updated_time" content="2016-09-18T00:55:24.437Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux下ssd的4k对齐和trim">
 <meta name="twitter:description" content="4K 对齐为什么要4k对齐呢?主要是为了提高性能和延长寿命, 尤其是运行在window系统和NTFS格式的.
 
 從Windows NT開始，微軟導入了「NTFS」這個格式，自此取代了長久以來一直使用的FAT╱FAT32，一直到XP所使用的NTFS 5.X版本以來，硬碟分割區都是從第63個扇區開始（請注意這裡的扇區指的是傳統硬碟喔，不過XP並不會認SSD，所以一律都是以此方式來分割），也就是會保留5">
-<meta name="twitter:image" content="http://niko2014.github.io/images/linux/kha7bnwQpeg5sBhVVLPA_unaligned.png">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/linux/kha7bnwQpeg5sBhVVLPA_unaligned.png">
 
 
 
@@ -123,10 +123,10 @@
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/2016/03/28/linux/tools/ssd_4k_trim/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/2016/03/28/linux/tools/ssd_4k_trim/"/>
 
 
-  <title> linux下ssd的4k对齐和trim | niko zhang </title>
+  <title> linux下ssd的4k对齐和trim | 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -167,11 +167,11 @@
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -201,6 +201,14 @@
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -463,7 +471,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/03/28/linux/tools/ssd_4k_trim/"
-           data-title="linux下ssd的4k对齐和trim" data-url="http://niko2014.github.io/2016/03/28/linux/tools/ssd_4k_trim/">
+           data-title="linux下ssd的4k对齐和trim" data-url="http://www.nikoai.pw/2016/03/28/linux/tools/ssd_4k_trim/">
       </div>
     
   </div>
@@ -501,14 +509,14 @@
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -525,7 +533,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -573,11 +581,11 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

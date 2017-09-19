@@ -90,13 +90,13 @@ docker 获取安装
 首先查看 ubuntu 发行版本号">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【docker】 get started - with ubuntu">
-<meta property="og:url" content="http://niko2014.github.io/2015/11/03/docker/docker_get_started/index.html">
-<meta property="og:site_name" content="niko zhang">
+<meta property="og:url" content="http://www.nikoai.pw/2015/11/03/docker/docker_get_started/index.html">
+<meta property="og:site_name" content="保持简单">
 <meta property="og:description" content="docker 是什么？docker 起初是dotCloud公司的一个业余项目， 是基于Go和LXC实现的一个轻量级的操作系统虚拟化方案。他可以实现更快的交付部署、更高效的虚拟化、更耿丹的迁移拓展和管理等，具体的在后面会慢慢体会到。首先我们先要把 docker 装到你的机子上，下面以 ubuntu 为例：
 docker 获取安装
 最新的安装说明， 请查阅 官方文档
 首先查看 ubuntu 发行版本号">
-<meta property="og:updated_time" content="2016-11-14T03:25:47.580Z">
+<meta property="og:updated_time" content="2017-02-06T06:11:34.240Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【docker】 get started - with ubuntu">
 <meta name="twitter:description" content="docker 是什么？docker 起初是dotCloud公司的一个业余项目， 是基于Go和LXC实现的一个轻量级的操作系统虚拟化方案。他可以实现更快的交付部署、更高效的虚拟化、更耿丹的迁移拓展和管理等，具体的在后面会慢慢体会到。首先我们先要把 docker 装到你的机子上，下面以 ubuntu 为例：
@@ -123,10 +123,10 @@ docker 获取安装
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/2015/11/03/docker/docker_get_started/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/2015/11/03/docker/docker_get_started/"/>
 
 
-  <title> 【docker】 get started - with ubuntu | niko zhang </title>
+  <title> 【docker】 get started - with ubuntu | 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -167,11 +167,11 @@ docker 获取安装
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -201,6 +201,14 @@ docker 获取安装
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -368,7 +376,7 @@ docker 获取安装
 <li>Xenial 16.04 (LTS)    deb <a href="https://apt.dockerproject.org/repo" target="_blank" rel="external">https://apt.dockerproject.org/repo</a> ubuntu-xenial main</li>
 </ul>
 <p>选择后， 写入 docker.list：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><div class="line">$ <span class="built_in">echo</span> <span class="string">"deb https://apt.dockerproject.org/repo ubuntu-trusty main"</span> | sudo tee /etc/apt/sources.list.d/docker.list</div><div class="line">$ sudo apt-get update</div><div class="line">$ apt-cache policy docker-engine</div><div class="line">docker-engine:</div><div class="line">  Installed: (none)</div><div class="line">  Candidate: 1.12.3-0~trusty</div><div class="line">  Version table:</div><div class="line">     1.12.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.9.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.9.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.7.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.7.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.5.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">$ echo &quot;deb https://apt.dockerproject.org/repo ubuntu-trusty main&quot; | sudo tee /etc/apt/sources.list.d/docker.list</div><div class="line">$ sudo apt-get update</div><div class="line">$ apt-cache policy docker-engine</div><div class="line">docker-engine:</div><div class="line">  Installed: (none)</div><div class="line">  Candidate: 1.12.3-0~trusty</div><div class="line">  Version table:</div><div class="line">     1.12.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.12.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.11.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.10.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.9.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.9.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.3-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.8.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.7.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.7.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.2-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.1-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.6.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div><div class="line">     1.5.0-0~trusty 0</div><div class="line">        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages</div></pre></td></tr></table></figure>
 <p>对于以下版本：</p>
 <ul>
 <li>Ubuntu Xenial 16.04 (LTS)</li>
@@ -387,7 +395,8 @@ docker 获取安装
 This message shows that your installation appears to be working correctly.</code></p>
 <p>恭喜你， docker 正常工作。</p>
 <h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
-<h1 id="docker-user"><a href="#docker-user" class="headerlink" title="docker user"></a>docker user</h1><blockquote>
+<h1 id="docker-user"><a href="#docker-user" class="headerlink" title="docker user"></a>docker user</h1><hr>
+<blockquote>
 <p>docker daemon binds to a Unix socket instead of a TCP port. By default that Unix socket is owned by the user root and other users can access it with sudo. For this reason, docker daemon always runs as the root user.</p>
 </blockquote>
 <p>因为 docker daemon 绑定了unix socket 而不是 tcp socket, 而 Unix socket 一般被root所拥有，正因如此，docker daemon 总是以root身份运行。</p>
@@ -446,8 +455,8 @@ This message shows that your installation appears to be working correctly.</code
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/11/29/linux/solarized_colors/" rel="prev" title="github 上的配色项目 - solarized">
-                github 上的配色项目 - solarized <i class="fa fa-chevron-right"></i>
+              <a href="/2015/11/29/linux/solarized_colors/" rel="prev" title="github 上的 vim 配色项目 - solarized">
+                github 上的 vim 配色项目 - solarized <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -475,7 +484,7 @@ This message shows that your installation appears to be working correctly.</code
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2015/11/03/docker/docker_get_started/"
-           data-title="【docker】 get started - with ubuntu" data-url="http://niko2014.github.io/2015/11/03/docker/docker_get_started/">
+           data-title="【docker】 get started - with ubuntu" data-url="http://www.nikoai.pw/2015/11/03/docker/docker_get_started/">
       </div>
     
   </div>
@@ -513,14 +522,14 @@ This message shows that your installation appears to be working correctly.</code
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -537,7 +546,7 @@ This message shows that your installation appears to be working correctly.</code
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -585,11 +594,11 @@ This message shows that your installation appears to be working correctly.</code
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

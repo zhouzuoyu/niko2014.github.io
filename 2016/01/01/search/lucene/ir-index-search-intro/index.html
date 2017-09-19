@@ -1,0 +1,862 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="lucene,search," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="上次我们简单了解了lucene索引的构建过程，这次再来了解一下索引检索的过程。开始 !
+输入查询语句
+经常使用搜索引擎的童鞋应该都知道，搜索时有一些操作符，比如 google Search operators，有一些简单的语法。这里讨论底层和简单一点的，比如输入 kafka AND java NOT scala，表示要查找一个包含 kafka 和 java 但不包括 scala 的文档。
+查询语句">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IR - 索引检索过程简述">
+<meta property="og:url" content="http://www.nikoai.pw/2016/01/01/search/lucene/ir-index-search-intro/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="上次我们简单了解了lucene索引的构建过程，这次再来了解一下索引检索的过程。开始 !
+输入查询语句
+经常使用搜索引擎的童鞋应该都知道，搜索时有一些操作符，比如 google Search operators，有一些简单的语法。这里讨论底层和简单一点的，比如输入 kafka AND java NOT scala，表示要查找一个包含 kafka 和 java 但不包括 scala 的文档。
+查询语句">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/lucene/lucene-search-grammar-tree-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/lucene/lucene-weight-td-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/lucene/term-sentence-vector-space-model-02.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/java/lucene/lucene-score-qd-01.png">
+<meta property="og:updated_time" content="2016-12-01T05:48:43.006Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IR - 索引检索过程简述">
+<meta name="twitter:description" content="上次我们简单了解了lucene索引的构建过程，这次再来了解一下索引检索的过程。开始 !
+输入查询语句
+经常使用搜索引擎的童鞋应该都知道，搜索时有一些操作符，比如 google Search operators，有一些简单的语法。这里讨论底层和简单一点的，比如输入 kafka AND java NOT scala，表示要查找一个包含 kafka 和 java 但不包括 scala 的文档。
+查询语句">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/java/lucene/lucene-search-grammar-tree-01.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2016/01/01/search/lucene/ir-index-search-intro/"/>
+
+
+  <title> IR - 索引检索过程简述 | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                IR - 索引检索过程简述
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-01-01T00:00:00+08:00" content="2016-01-01">
+              2016-01-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/search/" itemprop="url" rel="index">
+                    <span itemprop="name">search</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/01/01/search/lucene/ir-index-search-intro/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/01/search/lucene/ir-index-search-intro/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上次我们简单了解了lucene索引的构建过程，这次再来了解一下索引检索的过程。开始 !</p>
+<h1 id="输入查询语句"><a href="#输入查询语句" class="headerlink" title="输入查询语句"></a>输入查询语句</h1><hr>
+<p>经常使用搜索引擎的童鞋应该都知道，搜索时有一些操作符，比如 <a href="https://support.google.com/websearch/answer/2466433?hl=en" target="_blank" rel="external">google Search operators</a>，有一些简单的语法。这里讨论底层和简单一点的，比如输入 <code>kafka AND java NOT scala</code>，表示要查找一个包含 kafka 和 java 但不包括 scala 的文档。</p>
+<h1 id="查询语句的词法分析-语法分析-语言处理。"><a href="#查询语句的词法分析-语法分析-语言处理。" class="headerlink" title="查询语句的词法分析/语法分析/语言处理。"></a>查询语句的词法分析/语法分析/语言处理。</h1><hr>
+<p>对输入的查询语句进行:</p>
+<ul>
+<li><p>词法分析：识别关键字和搜索单词</p>
+</li>
+<li><p>语法分析：根据语法规则将查询语句转化成语法树，比如前面的 <code>kafka AND java NOT scala</code> 的语法树为：</p>
+<p><img src="/images/java/lucene/lucene-search-grammar-tree-01.png" alt=""></p>
+</li>
+<li><p>语言处理：这一步骤和前一篇博客的语言处理操作一样，<a href="/2015/12/30/search/lucene/ir-index-create-intro/">传送</a>。</p>
+</li>
+</ul>
+<p>这时我们得到一颗经过语言处理的语法树.</p>
+<h1 id="从索引中搜索符合语法树的-document"><a href="#从索引中搜索符合语法树的-document" class="headerlink" title="从索引中搜索符合语法树的 document"></a>从索引中搜索符合语法树的 document</h1><hr>
+<p>接着正面的例子, 这里我们需要:</p>
+<ul>
+<li>找出包含 <code>kafka</code> 、<code>java</code>、<code>scala</code> 的文档链表，</li>
+<li>然后对<code>kafka</code> 和 <code>java</code> 的链表进行交集合并，</li>
+<li>接着把处理后的链表和 <code>scala</code> 文档链表进行减操作，排除掉 <code>scala</code> 的文档链表</li>
+</ul>
+<p>最终得到我们想要的文档链表。</p>
+<h1 id="文档和查询语句的相关性排序"><a href="#文档和查询语句的相关性排序" class="headerlink" title="文档和查询语句的相关性排序"></a>文档和查询语句的相关性排序</h1><hr>
+<p>这里主要解决查询语句和文档间的相关性判断问题，如果把查询语句当做是一个小文档，那么问题就变成如何判断文档间的相似度。方法是首先我们找出不同 terms 是对这些文档的重要性，然后使用向量空间模型判断文档之间的相似度。</p>
+<h2 id="1-计算词的权重-term-weight"><a href="#1-计算词的权重-term-weight" class="headerlink" title="1. 计算词的权重 (term weight)"></a>1. 计算词的权重 (term weight)</h2><p>计算词的权重(term weight)，是用来衡量 term 对文档的重要性的一种手段。用 term weight 来表示 term 在某文档中的重要程度，越重要的 term 其 weight 越大。</p>
+<p>词的权重 (term weight) 有两个参数，<a href="/2015/12/30/search/lucene/ir-index-create-intro/">前一篇博客结尾</a>我们提到了 tf 和 df：</p>
+<ul>
+<li>tf, 对于某个文档来说, tf 越大, term weight 越高.</li>
+<li>df, 对于多个文档来说, df 越大, term weight 越低.</li>
+</ul>
+<p>term weight 的简单计算公式如下：</p>
+<p><img src="/images/java/lucene/lucene-weight-td-01.png" alt=""></p>
+<blockquote>
+<p>图片来自： <a href="http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html" target="_blank" rel="external">http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html</a></p>
+</blockquote>
+<p>更详细的介绍可以查看斯坦福的 information retrieval 文档: <a href="http://nlp.stanford.edu/IR-book/html/htmledition/tf-idf-weighting-1.html" target="_blank" rel="external">Tf-idf weighting</a> 和 <a href="http://nlp.stanford.edu/IR-book/html/htmledition/inverse-document-frequency-1.html" target="_blank" rel="external">Inverse document frequency</a>.</p>
+<h2 id="2-向量空间模型-Vector-Space-Model"><a href="#2-向量空间模型-Vector-Space-Model" class="headerlink" title="2. 向量空间模型 (Vector Space Model)"></a>2. 向量空间模型 (Vector Space Model)</h2><hr>
+<p>从 terms 之间的 weight 得到文档相关性, 我们可以使用向量空间模型的算法 (Vector Space Model):</p>
+<p><img src="/images/java/lucene/term-sentence-vector-space-model-02.png" alt=""></p>
+<blockquote>
+<p>图片来自： <a href="http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html" target="_blank" rel="external">http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html</a></p>
+</blockquote>
+<p>如上图, 我们把 query 也当做是一个文档, weight 向量对应着 term 向量, 如果 document 和 query 的terms 维度不同, 取并集; 如果文档不含某个 term , weight 则为0.</p>
+<p>为了得到相关性的评分, 需要计算 document 和 query 向量的夹角, 公式如下：</p>
+<p><img src="/images/java/lucene/lucene-score-qd-01.png" alt=""></p>
+<p>这样, 当我们计算得出的夹角越小时, cos(q, d)值越大, 表示相关性就越高, 然后根据这个评分按序返回相关的文档.</p>
+<h1 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h1><hr>
+<p>以上只是一个简单的 IR 搜索过程的基本原理, 在现实使用中, 评分会比这个复杂得多, 针对不同的应用和场景有着不同的实现和变化, 以后也会介绍到这些不同的评分模型 ~</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="http://nlp.stanford.edu/IR-book/html/htmledition/irbook.html" target="_blank" rel="external">斯坦福 - 信息检索</a><br><a href="http://www.slideshare.net/jitinpillai1/vector-spaces-50642309" target="_blank" rel="external">Vector spaces - SlideShare</a><br><a href="http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html" target="_blank" rel="external">http://www.cnblogs.com/forfuture1978/archive/2010/06/13/1757479.html</a><br><a href="https://support.google.com/websearch/answer/2466433?hl=en" target="_blank" rel="external">https://support.google.com/websearch/answer/2466433?hl=en</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/lucene/" rel="tag">#lucene</a>
+          
+            <a href="/tags/search/" rel="tag">#search</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/30/books/self_ctrl/self_ctrl_6/" rel="next" title="【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？">
+                <i class="fa fa-chevron-left"></i> 【书：自控力】（六） 低落的情绪 为何使人屈服于诱惑？
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/05/java/spring/spring-transactional-aop/" rel="prev" title="【spring】自我调用中transaction的常见问题">
+                【spring】自我调用中transaction的常见问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/01/01/search/lucene/ir-index-search-intro/"
+           data-title="IR - 索引检索过程简述" data-url="http://www.nikoai.pw/2016/01/01/search/lucene/ir-index-search-intro/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#输入查询语句"><span class="nav-number">1.</span> <span class="nav-text">输入查询语句</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查询语句的词法分析-语法分析-语言处理。"><span class="nav-number">2.</span> <span class="nav-text">查询语句的词法分析/语法分析/语言处理。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#从索引中搜索符合语法树的-document"><span class="nav-number">3.</span> <span class="nav-text">从索引中搜索符合语法树的 document</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文档和查询语句的相关性排序"><span class="nav-number">4.</span> <span class="nav-text">文档和查询语句的相关性排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-计算词的权重-term-weight"><span class="nav-number">4.1.</span> <span class="nav-text">1. 计算词的权重 (term weight)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-向量空间模型-Vector-Space-Model"><span class="nav-number">4.2.</span> <span class="nav-text">2. 向量空间模型 (Vector Space Model)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Next"><span class="nav-number">5.</span> <span class="nav-text">Next</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -89,22 +89,22 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
 首先回顾一下大学的基础知识：数据库的锁，是事务在某个数据对象（">
 <meta property="og:type" content="article">
 <meta property="og:title" content="锁之MySQL和JPA">
-<meta property="og:url" content="http://niko2014.github.io/2015/10/12/java/lock__mysql_jpa/index.html">
-<meta property="og:site_name" content="niko zhang">
+<meta property="og:url" content="http://www.nikoai.pw/2015/10/12/java/lock__mysql_jpa/index.html">
+<meta property="og:site_name" content="保持简单">
 <meta property="og:description" content="今天今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。
 MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）
 首先回顾一下大学的基础知识：数据库的锁，是事务在某个数据对象（">
-<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_02.png">
-<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_04.png">
-<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_03.png">
-<meta property="og:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/mysql_x_lock_demo_02.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/mysql_x_lock_demo_04.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/mysql_x_lock_demo_03.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/mysql_x_lock_demo_01.png">
 <meta property="og:updated_time" content="2016-05-30T03:05:52.780Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="锁之MySQL和JPA">
 <meta name="twitter:description" content="今天今天做了一个订单状态数据修改的需求，主要工作点是要避免并发修改导致数据的错误不一致，当前这个模块的技术栈，需要用到MySQL行级锁和JPA的锁规范。
 MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多冲突，因为他只要锁住一行，而不是一张表。（MySQL的行级锁需要使用INNODB引擎来支持，MyISAM引擎只支持表级锁）
 首先回顾一下大学的基础知识：数据库的锁，是事务在某个数据对象（">
-<meta name="twitter:image" content="http://niko2014.github.io/images/mysql_x_lock_demo_02.png">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/mysql_x_lock_demo_02.png">
 
 
 
@@ -125,10 +125,10 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/2015/10/12/java/lock__mysql_jpa/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/2015/10/12/java/lock__mysql_jpa/"/>
 
 
-  <title> 锁之MySQL和JPA | niko zhang </title>
+  <title> 锁之MySQL和JPA | 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -169,11 +169,11 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -203,6 +203,14 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -412,8 +420,8 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/01/java/jvm/jvm_gc_algo_introduce/" rel="next" title="JVM 常用GC算法简介">
-                <i class="fa fa-chevron-left"></i> JVM 常用GC算法简介
+              <a href="/2015/10/02/java/jvm/gc_root/" rel="next" title="jvm 的 gc roots 有哪些 ?">
+                <i class="fa fa-chevron-left"></i> jvm 的 gc roots 有哪些 ?
               </a>
             
           </div>
@@ -449,7 +457,7 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2015/10/12/java/lock__mysql_jpa/"
-           data-title="锁之MySQL和JPA" data-url="http://niko2014.github.io/2015/10/12/java/lock__mysql_jpa/">
+           data-title="锁之MySQL和JPA" data-url="http://www.nikoai.pw/2015/10/12/java/lock__mysql_jpa/">
       </div>
     
   </div>
@@ -487,14 +495,14 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -511,7 +519,7 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -559,11 +567,11 @@ MySQL 行级锁行级锁是粒度比较小的一种锁，它可以减少许多�
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

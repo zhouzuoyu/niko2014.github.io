@@ -1,0 +1,860 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="druid.io,calcite," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="问题描述
+前一阵子, 部署一个后台应用, 上线后发现内存泄露. jvm 内存分析和日志回查后发现, calcite druid adapter 有一个死循环, 这个死循环不断的进行 query 请求, 而 query sql 只是一个简单的 select 语句.
+依赖说明 :
+org.apache.calcite:calcite-druid:1.11.0 和 druid-0.9.1 .
+sql
+S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="calcite druid adapter 的分页死循环 bug 分析排查">
+<meta property="og:url" content="http://www.nikoai.pw/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="问题描述
+前一阵子, 部署一个后台应用, 上线后发现内存泄露. jvm 内存分析和日志回查后发现, calcite druid adapter 有一个死循环, 这个死循环不断的进行 query 请求, 而 query sql 只是一个简单的 select 语句.
+依赖说明 :
+org.apache.calcite:calcite-druid:1.11.0 和 druid-0.9.1 .
+sql
+S">
+<meta property="og:updated_time" content="2017-04-05T13:29:05.098Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="calcite druid adapter 的分页死循环 bug 分析排查">
+<meta name="twitter:description" content="问题描述
+前一阵子, 部署一个后台应用, 上线后发现内存泄露. jvm 内存分析和日志回查后发现, calcite druid adapter 有一个死循环, 这个死循环不断的进行 query 请求, 而 query sql 只是一个简单的 select 语句.
+依赖说明 :
+org.apache.calcite:calcite-druid:1.11.0 和 druid-0.9.1 .
+sql
+S">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/"/>
+
+
+  <title> calcite druid adapter 的分页死循环 bug 分析排查 | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                calcite druid adapter 的分页死循环 bug 分析排查
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-05T00:00:00+08:00" content="2017-04-05">
+              2017-04-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><hr>
+<p>前一阵子, 部署一个后台应用, 上线后发现内存泄露. jvm 内存分析和日志回查后发现, calcite druid adapter 有一个死循环, 这个死循环不断的进行 query 请求, 而 query sql 只是一个简单的 select 语句.</p>
+<h2 id="依赖说明"><a href="#依赖说明" class="headerlink" title="依赖说明 :"></a>依赖说明 :</h2><hr>
+<p><code>org.apache.calcite:calcite-druid:1.11.0</code> 和 <code>druid-0.9.1</code> .</p>
+<h2 id="sql"><a href="#sql" class="headerlink" title="sql"></a>sql</h2><hr>
+<figure class="highlight sql"><table><tr><td class="code"><pre><div class="line"><span class="keyword">SELECT</span>   *   <span class="keyword">FROM</span> <span class="string">"alert_message"</span>  <span class="keyword">WHERE</span>  <span class="string">"time"</span> &gt;= <span class="string">'1970-01-01 00:00:00'</span> <span class="keyword">AND</span> <span class="string">"time"</span> &lt;= <span class="string">'2017-04-05 10:00:39'</span>  <span class="keyword">AND</span> <span class="string">"host_id"</span>  = <span class="string">'xxx'</span></div></pre></td></tr></table></figure>
+<h2 id="问题定位"><a href="#问题定位" class="headerlink" title="问题定位"></a>问题定位</h2><hr>
+<p>一开始我怀疑是 calcite-druid-adapter 的 bug, 于是我开始分析源码.</p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><hr>
+<p>首先要找到为什么会重复发送 query, 或是什么条件或场景导致. 因此, 我们先可以定位发请求的代码位置.</p>
+<h2 id="发起-rest-请求的位置"><a href="#发起-rest-请求的位置" class="headerlink" title="发起 rest 请求的位置"></a>发起 rest 请求的位置</h2><hr>
+<p>在我敏锐的眼睛扫描下, 找到了 <code>DruidConnectionImpl</code> 的 <code>request</code> 方法:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">org.apache.calcite.adapter.druid.DruidConnectionImpl#request - (org/apache/calcite/adapter/druid/DruidConnectionImpl.java:94)</div><div class="line">|- org.apache.calcite.adapter.druid.DruidQuery.DruidQueryNode#run</div></pre></td></tr></table></figure>
+<p>他被 <code>DruidQueryNode</code> 的 <code>run</code> 方法调用, 如下:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">  <span class="keyword">final</span> List&lt;ColumnMetaData.Rep&gt; fieldTypes = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">  <span class="keyword">for</span> (RelDataTypeField field : query.getRowType().getFieldList()) &#123;</div><div class="line">    fieldTypes.add(getPrimitive(field));</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">final</span> DruidConnectionImpl connection =</div><div class="line">      <span class="keyword">new</span> DruidConnectionImpl(query.druidTable.schema.url,</div><div class="line">          query.druidTable.schema.coordinatorUrl);</div><div class="line">  <span class="keyword">final</span> <span class="keyword">boolean</span> limitQuery = containsLimit(querySpec);</div><div class="line">  <span class="keyword">final</span> DruidConnectionImpl.Page page = <span class="keyword">new</span> DruidConnectionImpl.Page();</div><div class="line">  do &#123;</div><div class="line">    <span class="keyword">final</span> String queryString =</div><div class="line">        querySpec.getQueryString(page.pagingIdentifier, page.offset);</div><div class="line">    connection.request(querySpec.queryType, queryString, sink,</div><div class="line">        querySpec.fieldNames, fieldTypes, page);</div><div class="line">  &#125; <span class="keyword">while</span> (!limitQuery</div><div class="line">      &amp;&amp; page.pagingIdentifier != <span class="keyword">null</span></div><div class="line">      &amp;&amp; page.totalRowCount &gt; <span class="number">0</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中, while 就是死循环的位置了, 那么什么时候 while 循环才会停止呢 ? 三个条件</p>
+<h3 id="limitQuery-为-true"><a href="#limitQuery-为-true" class="headerlink" title="limitQuery 为 true"></a><code>limitQuery</code> 为 true</h3><hr>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">final</span> <span class="keyword">boolean</span> limitQuery = containsLimit(querySpec);</div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">containsLimit</span><span class="params">(QuerySpec querySpec)</span> </span>&#123;</div><div class="line">      <span class="keyword">return</span> querySpec.queryString.contains(<span class="string">"\"context\":&#123;\""</span></div><div class="line">          + DRUID_QUERY_FETCH + <span class="string">"\":true"</span>);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>就是说如果请求 json 包含了 <code>&quot;context&quot;:{&quot;druid.query.fetch&quot;:false}</code> , 那么,  limitQuery 将会为 true.<br>那么 fetch 又是在哪里设置呢 ?</p>
+<p>druid 文档并没有发现 <code>druid.query.fetch</code>, 只有一个简单描述:</p>
+<blockquote>
+<p>context    An additional JSON Object which can be used to specify certain flags.</p>
+</blockquote>
+<p>fetch 设置在这一行代码 <code>org/apache/calcite/adapter/druid/DruidQuery.java:395</code> , 因为不是导致死循环的原因, 因此不在赘述.</p>
+<h3 id="page-pagingIdentifier"><a href="#page-pagingIdentifier" class="headerlink" title="page.pagingIdentifier"></a>page.pagingIdentifier</h3><hr>
+<p>如果 <code>page.pagingIdentifier</code> = null, 那么循环将会停止.</p>
+<p>druid 查询的结果解析方法 parse() <code>org.apache.calcite.adapter.druid.DruidConnectionImpl#parse</code> 中:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parse</span><span class="params">(QueryType queryType, InputStream in, Sink sink,</span></span></div><div class="line">  List&lt;String&gt; fieldNames, List&lt;ColumnMetaData.Rep&gt; fieldTypes, Page page) &#123;</div><div class="line">      <span class="comment">// ...</span></div><div class="line">      <span class="keyword">case</span> SELECT:</div><div class="line">          <span class="keyword">if</span> (parser.nextToken() == JsonToken.START_ARRAY</div><div class="line">              &amp;&amp; parser.nextToken() == JsonToken.START_OBJECT) &#123;</div><div class="line">            page.pagingIdentifier = <span class="keyword">null</span>;</div><div class="line">            page.offset = -<span class="number">1</span>;</div><div class="line">            page.totalRowCount = <span class="number">0</span>;</div><div class="line">            expectScalarField(parser, DEFAULT_RESPONSE_TIMESTAMP_COLUMN);</div><div class="line">            <span class="keyword">if</span> (parser.nextToken() == JsonToken.FIELD_NAME</div><div class="line">                &amp;&amp; parser.getCurrentName().equals(<span class="string">"result"</span>)</div><div class="line">                &amp;&amp; parser.nextToken() == JsonToken.START_OBJECT) &#123;</div><div class="line">              <span class="keyword">if</span> (parser.nextToken() == JsonToken.FIELD_NAME</div><div class="line">                  &amp;&amp; parser.getCurrentName().equals(<span class="string">"pagingIdentifiers"</span>)</div><div class="line">                  &amp;&amp; parser.nextToken() == JsonToken.START_OBJECT) &#123;</div><div class="line">                JsonToken token = parser.nextToken();</div><div class="line">                <span class="keyword">while</span> (parser.getCurrentToken() == JsonToken.FIELD_NAME) &#123;</div><div class="line">                  page.pagingIdentifier = parser.getCurrentName();</div><div class="line">                  <span class="keyword">if</span> (parser.nextToken() == JsonToken.VALUE_NUMBER_INT) &#123;</div><div class="line">                    page.offset = parser.getIntValue();</div><div class="line">                  &#125;</div><div class="line">                  token = parser.nextToken();</div><div class="line">                &#125;</div><div class="line">                expect(token, JsonToken.END_OBJECT);</div><div class="line">              &#125;</div><div class="line">              <span class="keyword">if</span> (parser.nextToken() == JsonToken.FIELD_NAME</div><div class="line">                  &amp;&amp; parser.getCurrentName().equals(<span class="string">"events"</span>)</div><div class="line">                  &amp;&amp; parser.nextToken() == JsonToken.START_ARRAY) &#123;</div><div class="line">                <span class="keyword">while</span> (parser.nextToken() == JsonToken.START_OBJECT) &#123;</div><div class="line">                  expectScalarField(parser, <span class="string">"segmentId"</span>);</div><div class="line">                  expectScalarField(parser, <span class="string">"offset"</span>);</div><div class="line">                  <span class="keyword">if</span> (parser.nextToken() == JsonToken.FIELD_NAME</div><div class="line">                      &amp;&amp; parser.getCurrentName().equals(<span class="string">"event"</span>)</div><div class="line">                      &amp;&amp; parser.nextToken() == JsonToken.START_OBJECT) &#123;</div><div class="line">                    parseFields(fieldNames, fieldTypes, posTimestampField, rowBuilder, parser);</div><div class="line">                    sink.send(rowBuilder.build());</div><div class="line">                    rowBuilder.reset();</div><div class="line">                    page.totalRowCount += <span class="number">1</span>;</div><div class="line">                  &#125;</div><div class="line">                  expect(parser, JsonToken.END_OBJECT);</div><div class="line">                &#125;</div><div class="line">                parser.nextToken();</div><div class="line">              &#125;</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">          <span class="keyword">break</span>;</div><div class="line">       <span class="comment">// ...</span></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>其中, 在 response 的 <code>pagingIdentifiers</code> 中, 如果有下一页, 则设置给 <code>page.pagingIdentifier</code>.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><div class="line"><span class="keyword">if</span> (parser.nextToken() == JsonToken.FIELD_NAME</div><div class="line">                &amp;&amp; parser.getCurrentName().equals(<span class="string">"pagingIdentifiers"</span>)</div><div class="line">                &amp;&amp; parser.nextToken() == JsonToken.START_OBJECT) &#123;</div><div class="line">      JsonToken token = parser.nextToken();</div><div class="line">      <span class="keyword">while</span> (parser.getCurrentToken() == JsonToken.FIELD_NAME) &#123;</div><div class="line">        page.pagingIdentifier = parser.getCurrentName();</div><div class="line">        <span class="keyword">if</span> (parser.nextToken() == JsonToken.VALUE_NUMBER_INT) &#123;</div><div class="line">          page.offset = parser.getIntValue();</div><div class="line">        &#125;</div><div class="line">        token = parser.nextToken();</div><div class="line">      &#125;</div><div class="line">      expect(token, JsonToken.END_OBJECT);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>测试发现, page.pagingIdentifier 总是不为 null, 因此导致死循环.</p>
+<p>于是, 我仔细分析 druid 的 query 和 response, 发现:</p>
+<p>query json 1:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;<span class="attr">"queryType"</span>:<span class="string">"select"</span>,<span class="attr">"dataSource"</span>:<span class="string">"system_alerts_01"</span>,<span class="attr">"descending"</span>:<span class="literal">false</span>,<span class="attr">"intervals"</span>:[<span class="string">"1970-01-01T00:00:00.000Z/2017-04-05T10:00:39.001Z"</span>],<span class="attr">"filter"</span>:&#123;<span class="attr">"type"</span>:<span class="string">"selector"</span>,<span class="attr">"dimension"</span>:<span class="string">"host_id"</span>,<span class="attr">"value"</span>:<span class="string">"fadf4b05-c78c-5aa4-a5b3-82b618bd395b"</span>&#125;,<span class="attr">"dimensions"</span>:[<span class="string">"host_id"</span>,<span class="string">"threshold_metric_name"</span>,<span class="string">"type"</span>,<span class="string">"threshold_compare"</span>,<span class="string">"threshold_last_time"</span>],<span class="attr">"metrics"</span>:[<span class="string">"alert_value"</span>,<span class="string">"threshold_value"</span>,<span class="string">"threshold_duration"</span>,<span class="string">"alert_time"</span>],<span class="attr">"granularity"</span>:<span class="string">"all"</span>,<span class="attr">"pagingSpec"</span>:&#123;<span class="attr">"pagingIdentifiers"</span>:&#123;<span class="attr">"system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z_1"</span>:<span class="number">0</span>&#125;,<span class="attr">"threshold"</span>:<span class="number">16384</span>,<span class="attr">"fromNext"</span>:<span class="literal">true</span>&#125;,<span class="attr">"context"</span>:&#123;<span class="attr">"druid.query.fetch"</span>:<span class="literal">false</span>&#125;&#125;</div></pre></td></tr></table></figure>
+<p>query json 2:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><div class="line">&#123;<span class="attr">"queryType"</span>:<span class="string">"select"</span>,<span class="attr">"dataSource"</span>:<span class="string">"system_alerts_01"</span>,<span class="attr">"descending"</span>:<span class="literal">false</span>,<span class="attr">"intervals"</span>:[<span class="string">"1970-01-01T00:00:00.000Z/2017-04-05T09:51:13.001Z"</span>],<span class="attr">"filter"</span>:&#123;<span class="attr">"type"</span>:<span class="string">"selector"</span>,<span class="attr">"dimension"</span>:<span class="string">"host_id"</span>,<span class="attr">"value"</span>:<span class="string">"fadf4b05-c78c-5aa4-a5b3-82b618bd395b"</span>&#125;,<span class="attr">"dimensions"</span>:[<span class="string">"host_id"</span>,<span class="string">"threshold_metric_name"</span>,<span class="string">"type"</span>,<span class="string">"threshold_compare"</span>,<span class="string">"threshold_last_time"</span>],<span class="attr">"metrics"</span>:[<span class="string">"alert_value"</span>,<span class="string">"threshold_value"</span>,<span class="string">"threshold_duration"</span>,<span class="string">"alert_time"</span>],<span class="attr">"granularity"</span>:<span class="string">"all"</span>,<span class="attr">"pagingSpec"</span>:&#123;<span class="attr">"pagingIdentifiers"</span>:&#123;<span class="attr">"system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T09:51:13.001Z_2017-04-05T09:10:11.149Z_2"</span>:<span class="number">0</span>&#125;,<span class="attr">"threshold"</span>:<span class="number">16384</span>,<span class="attr">"fromNext"</span>:<span class="literal">true</span>&#125;,<span class="attr">"context"</span>:&#123;<span class="attr">"druid.query.fetch"</span>:<span class="literal">false</span>&#125;&#125;</div></pre></td></tr></table></figure>
+<p>以上两个请求, 发现一直在交替发送. 只是 <code>2017-04-05T09:10:11.149Z_1</code> 和 <code>2017-04-05T09:10:11.149Z_2</code> 不同.</p>
+<p>这时再结合源码, 就可以知道为何出现这种情况.</p>
+<h2 id="罪魁祸首"><a href="#罪魁祸首" class="headerlink" title="罪魁祸首"></a>罪魁祸首</h2><hr>
+<p>是的, 这是 druid 的问题.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&#123;&quot;queryType&quot;:&quot;select&quot;,&quot;dataSource&quot;:&quot;system_alerts_01&quot;,&quot;descending&quot;:false,&quot;intervals&quot;:[&quot;1970-01-01T00:00:00.000Z/2017-04-05T10:00:39.001Z&quot;],&quot;filter&quot;:&#123;&quot;type&quot;:&quot;selector&quot;,&quot;dimension&quot;:&quot;host_id&quot;,&quot;value&quot;:&quot;xxx&quot;&#125;,&quot;dimensions&quot;:[&quot;host_id&quot;,&quot;threshold_metric_name&quot;,&quot;type&quot;,&quot;threshold_compare&quot;,&quot;threshold_last_time&quot;],&quot;metrics&quot;:[&quot;alert_value&quot;,&quot;threshold_value&quot;,&quot;threshold_duration&quot;,&quot;alert_time&quot;],&quot;granularity&quot;:&quot;all&quot;,&quot;pagingSpec&quot;:&#123;&quot;pagingIdentifiers&quot;:&#123;&quot;system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z_2&quot;:0&#125;,&quot;threshold&quot;:16384,&quot;fromNext&quot;:true&#125;,&quot;context&quot;:&#123;&quot;druid.query.fetch&quot;:false&#125;&#125;</div><div class="line"></div><div class="line"></div><div class="line">Response: [ &#123;</div><div class="line">  &quot;timestamp&quot; : &quot;2017-04-05T09:10:11.000Z&quot;,</div><div class="line">  &quot;result&quot; : &#123;</div><div class="line">    &quot;pagingIdentifiers&quot; : &#123;</div><div class="line">      &quot;system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z&quot; : 0,</div><div class="line">      &quot;system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z_1&quot; : 0</div><div class="line">    &#125;,</div></pre></td></tr></table></figure>
+<p>请求 pagingIdentifiers 是 <code>_2017-04-05T09:10:11.149Z_2</code> 的 segment :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">&quot;pagingSpec&quot;:&#123;&quot;pagingIdentifiers&quot;:&#123;&quot;system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z_2&quot;:0&#125;,&quot;threshold&quot;:16384,&quot;fromNext&quot;:true&#125;,&quot;context&quot;:&#123;&quot;druid.query.fetch&quot;:false&#125;&#125;</div></pre></td></tr></table></figure>
+<p>response 返回却是前面的 <code>2017-04-05T09:10:11.149Z</code> 和 <code>2017-04-05T09:10:11.149Z_1</code> 两个 segment :</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Response: [ &#123;</div><div class="line">  &quot;timestamp&quot; : &quot;2017-04-05T09:10:11.000Z&quot;,</div><div class="line">  &quot;result&quot; : &#123;</div><div class="line">    &quot;pagingIdentifiers&quot; : &#123;</div><div class="line">      &quot;system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z&quot; : 0,</div><div class="line">      &quot;system_alerts_01_2017-04-05T09:00:00.000Z_2017-04-05T10:00:00.000Z_2017-04-05T09:10:11.149Z_1&quot; : 0</div><div class="line">    &#125;,</div></pre></td></tr></table></figure>
+<h3 id="github-上的-druid-相关-issue"><a href="#github-上的-druid-相关-issue" class="headerlink" title="github 上的 druid 相关 issue"></a>github 上的 druid 相关 issue</h3><hr>
+<p><a href="https://github.com/druid-io/druid/pull/2480" target="_blank" rel="external">https://github.com/druid-io/druid/pull/2480</a><br><a href="https://github.com/druid-io/druid/issues/3618" target="_blank" rel="external">https://github.com/druid-io/druid/issues/3618</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/druid-io/" rel="tag">#druid.io</a>
+          
+            <a href="/tags/calcite/" rel="tag">#calcite</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/" rel="next" title="druid.io - Not enough direct memory">
+                <i class="fa fa-chevron-left"></i> druid.io - Not enough direct memory
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/15/linux/tools/tmux/tmux-faq/" rel="prev" title="tmux FAQ">
+                tmux FAQ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/"
+           data-title="calcite druid adapter 的分页死循环 bug 分析排查" data-url="http://www.nikoai.pw/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖说明"><span class="nav-number">1.1.</span> <span class="nav-text">依赖说明 :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sql"><span class="nav-number">1.2.</span> <span class="nav-text">sql</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题定位"><span class="nav-number">1.3.</span> <span class="nav-text">问题定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析"><span class="nav-number">1.4.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发起-rest-请求的位置"><span class="nav-number">1.5.</span> <span class="nav-text">发起 rest 请求的位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#limitQuery-为-true"><span class="nav-number">1.5.1.</span> <span class="nav-text">limitQuery 为 true</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#page-pagingIdentifier"><span class="nav-number">1.5.2.</span> <span class="nav-text">page.pagingIdentifier</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#罪魁祸首"><span class="nav-number">1.6.</span> <span class="nav-text">罪魁祸首</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#github-上的-druid-相关-issue"><span class="nav-number">1.6.1.</span> <span class="nav-text">github 上的 druid 相关 issue</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">2.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

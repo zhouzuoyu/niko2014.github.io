@@ -86,25 +86,28 @@
 
 <meta name="description" content="tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
 
-tmux session
-使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach).">
+进入 tmux 命令模式
+要进行 tmux 的操作, 需要先按下 PREFIX 命令, 默认是 ctrl + b.
+tmux session">
 <meta property="og:type" content="article">
 <meta property="og:title" content="tmux cheatsheet">
-<meta property="og:url" content="http://niko2014.github.io/2016/05/03/linux/tools/tmux/index.html">
-<meta property="og:site_name" content="niko zhang">
+<meta property="og:url" content="http://www.nikoai.pw/2016/05/03/linux/tools/tmux/index.html">
+<meta property="og:site_name" content="保持简单">
 <meta property="og:description" content="tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
 
-tmux session
-使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach).">
-<meta property="og:image" content="http://niko2014.github.io/images/linux/tmux_preview-01.png">
-<meta property="og:updated_time" content="2016-10-25T03:13:46.737Z">
+进入 tmux 命令模式
+要进行 tmux 的操作, 需要先按下 PREFIX 命令, 默认是 ctrl + b.
+tmux session">
+<meta property="og:image" content="http://www.nikoai.pw/images/linux/tmux_preview-01.png">
+<meta property="og:updated_time" content="2017-07-27T17:01:40.824Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tmux cheatsheet">
 <meta name="twitter:description" content="tmux是一个终端的terminal multiplexer, 用来切换多个terminal, 和之前博客提到的terminator比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.
 
-tmux session
-使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach).">
-<meta name="twitter:image" content="http://niko2014.github.io/images/linux/tmux_preview-01.png">
+进入 tmux 命令模式
+要进行 tmux 的操作, 需要先按下 PREFIX 命令, 默认是 ctrl + b.
+tmux session">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/linux/tmux_preview-01.png">
 
 
 
@@ -125,10 +128,10 @@ tmux session
 
 
 
-  <link rel="canonical" href="http://niko2014.github.io/2016/05/03/linux/tools/tmux/"/>
+  <link rel="canonical" href="http://www.nikoai.pw/2016/05/03/linux/tools/tmux/"/>
 
 
-  <title> tmux cheatsheet | niko zhang </title>
+  <title> tmux cheatsheet | 保持简单 </title>
 </head>
 
 <body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
@@ -169,11 +172,11 @@ tmux session
   <div class="custom-logo-site-title">
     <a href="/"  class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <span class="site-title">niko zhang</span>
+      <span class="site-title">保持简单</span>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
-  <p class="site-subtitle">去发现一个更大的世界 ！</p>
+  <p class="site-subtitle">简单是最难的事</p>
 </div>
 
 <div class="site-nav-toggle">
@@ -203,6 +206,14 @@ tmux session
           <a href="/categories" rel="section">
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
           </a>
         </li>
       
@@ -357,31 +368,54 @@ tmux session
       
         <p><code>tmux</code>是一个终端的terminal <code>multiplexer</code>, 用来切换多个terminal, 和之前博客提到的<code>terminator</code>比较, 可以发现, tmux更适合在纯文字终端中使用(比如ssh登录远程服务器), 还具有session等强大的功能特性.</p>
 <p><img src="/images/linux/tmux_preview-01.png" alt=""></p>
+<h1 id="进入-tmux-命令模式"><a href="#进入-tmux-命令模式" class="headerlink" title="进入 tmux 命令模式"></a>进入 tmux 命令模式</h1><hr>
+<p>要进行 tmux 的操作, 需要先按下 <code>PREFIX</code> 命令, 默认是 <code>ctrl + b</code>.</p>
 <h1 id="tmux-session"><a href="#tmux-session" class="headerlink" title="tmux session"></a><code>tmux</code> session</h1><hr>
 <p>使用tmux, 需要打开一个session, 只要这个session没有被关闭, 下次可以重新使用(attach). 比如远程连接断开, 下次再连上服务器时, 原先tmux打开的环境都仍保留着.</p>
-<ul>
-<li><p>start new session:<br><code>tmux new -s myname</code></p>
-</li>
-<li><p>list sessions:<br><code>tmux ls</code></p>
-</li>
-<li><p>attach:<br><code>tmux a</code></p>
-</li>
-<li><p>attach to named:<br><code>tmux a -t myname</code></p>
-</li>
-<li><p><strong>detach</strong><br><code>ctrl + b, d</code></p>
-</li>
-<li><p>切换session<br>如果在tmux中, 想要切换到其他session, 可以这样:</p>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tmux new -s myname</code></td>
+<td>start new session</td>
+</tr>
+<tr>
+<td><code>tmux ls</code></td>
+<td>list sessions</td>
+</tr>
+<tr>
+<td><code>tmux a</code></td>
+<td>attach</td>
+</tr>
+<tr>
+<td><code>tmux a -t myname</code></td>
+<td>attach to named</td>
+</tr>
+<tr>
+<td><code>ctrl + b, d</code></td>
+<td><strong>detach</strong></td>
+</tr>
+<tr>
+<td><code>ctrl + b, D</code></td>
+<td><strong>detach 其他 client的 tmux 连接</strong></td>
+</tr>
+<tr>
+<td><code>ctrl + b, 输入 $</code></td>
+<td>命名当前session</td>
+</tr>
+</tbody>
+</table>
+<h2 id="切换session"><a href="#切换session" class="headerlink" title="切换session"></a>切换session</h2><p>如果在tmux中, 想要切换到其他session, 可以这样:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">s</div><div class="line"># 这时会出现session列表, 使用方向键和Enter进行选择即可</div></pre></td></tr></table></figure>
-</li>
-<li><p>命名当前session</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">$</div><div class="line"># 这时可以修改当前的session名称</div></pre></td></tr></table></figure>
-</li>
-<li><p>新建一个session</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:new</div></pre></td></tr></table></figure>
-</li>
-</ul>
+<h1 id="新建一个session"><a href="#新建一个session" class="headerlink" title="新建一个session"></a>新建一个session</h1><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:new</div></pre></td></tr></table></figure>
+<h1 id="kill-掉-session"><a href="#kill-掉-session" class="headerlink" title="kill 掉 session"></a>kill 掉 session</h1><p>tmux kill-session -t name</p>
 <h1 id="pane"><a href="#pane" class="headerlink" title="pane"></a>pane</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<p>以下命令都需要先按下 PREFIX :</p>
 <table>
 <thead>
 <tr>
@@ -403,22 +437,46 @@ tmux session
 <td>panes切换:</td>
 </tr>
 <tr>
+<td>按住 PREFIX + o</td>
+<td>旋转 layout</td>
+</tr>
+<tr>
 <td>x</td>
 <td>关闭当前pane</td>
 </tr>
 <tr>
 <td>q</td>
-<td>显示 pane number</td>
+<td>显示 pane number , 显示的时候可以按下对应的 pane 号码, 从而 focus 到某个 pane</td>
 </tr>
 <tr>
 <td>空格</td>
 <td>切换不同的layout</td>
 </tr>
 <tr>
-<td></td>
+<td><code>[</code></td>
+<td>翻页</td>
+</tr>
+<tr>
+<td>{</td>
+<td>移动当前 pane 到左边</td>
+</tr>
+<tr>
+<td>}</td>
+<td>移动当前 pane 到右边</td>
+</tr>
+<tr>
+<td>z</td>
+<td>toggle pane zoom, 把当前 pane 最大化</td>
+</tr>
+<tr>
+<td>方向键</td>
+<td>选择 pane, 有时间限制</td>
 </tr>
 </tbody>
 </table>
+<h2 id="选择某个-pane"><a href="#选择某个-pane" class="headerlink" title="选择某个 pane"></a>选择某个 pane</h2><p>未测试:<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">ctrl + b</div><div class="line">:bind-key / display-panes \; select-pane -t :.</div></pre></td></tr></table></figure></p>
+<h2 id="pane-layout"><a href="#pane-layout" class="headerlink" title="pane layout"></a>pane layout</h2><p><a href="https://unix.stackexchange.com/questions/32986/how-do-i-equally-balance-tmux1-split-panes" target="_blank" rel="external">https://unix.stackexchange.com/questions/32986/how-do-i-equally-balance-tmux1-split-panes</a></p>
+<p>等分:<br>select-layout even-vertical<br>select-layout even-horizontal</p>
 <h1 id="window"><a href="#window" class="headerlink" title="window"></a>window</h1><hr>
 <p>以下命令都需要先按下<code>ctrl + b</code>:</p>
 <table>
@@ -454,6 +512,10 @@ tmux session
 <td>移动窗口 (使用序号)</td>
 </tr>
 <tr>
+<td>:swap-window</td>
+<td>交换窗口,  <code>-s 3 -t 1</code>, 或者<code>-t 0</code>使用当前窗口</td>
+</tr>
+<tr>
 <td>w</td>
 <td>list window</td>
 </tr>
@@ -467,6 +529,14 @@ tmux session
 </tr>
 </tbody>
 </table>
+<h2 id="window-排序"><a href="#window-排序" class="headerlink" title="window 排序"></a>window 排序</h2><p><a href="https://superuser.com/questions/343572/how-do-i-reorder-tmux-windows" target="_blank" rel="external">https://superuser.com/questions/343572/how-do-i-reorder-tmux-windows</a></p>
+<p>Pressing Ctrl+Shift+Left (will move the current window to the left. Similarly right. No need to use the modifier (C-b).<br><figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">bind-key -n S-Left swap-window -t -1</div><div class="line">bind-key -n S-Right swap-window -t +1</div></pre></td></tr></table></figure></p>
+<p><code>-n</code> 表示不用 PREFIX .</p>
+<p>somebody use:</p>
+<p>bind-key -n C-H swap-window -t -1</p>
+<h2 id="window-移到到其他-session"><a href="#window-移到到其他-session" class="headerlink" title="window 移到到其他 session"></a>window 移到到其他 session</h2><p><a href="https://stackoverflow.com/questions/3094946/move-window-between-tmux-clients" target="_blank" rel="external">https://stackoverflow.com/questions/3094946/move-window-between-tmux-clients</a></p>
+<p>So, supposing you have an ‘chat’ session with an ‘irc’ window and want to move it to the ‘other_session’ session you can do (in the tmux prompt):</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">move-window -s chat:irc -t other_session</div><div class="line">move-window -s 1 -t other_session</div></pre></td></tr></table></figure>
 <h1 id="window-pane间操作"><a href="#window-pane间操作" class="headerlink" title="window/pane间操作"></a>window/pane间操作</h1><hr>
 <p>以下命令都需要先按下<code>ctrl + b</code>:</p>
 <table>
@@ -488,7 +558,7 @@ tmux session
 </tbody>
 </table>
 <h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><hr>
-<p>以下命令都需要先按下<code>ctrl + b</code>:</p>
+<p>以下命令都需要先按下 PREFIX :</p>
 <table>
 <thead>
 <tr>
@@ -511,8 +581,9 @@ tmux session
 </tr>
 </tbody>
 </table>
+<p><a href="https://gist.github.com/spicycode/1229612" target="_blank" rel="external">https://gist.github.com/spicycode/1229612</a></p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
-<p><a href="https://gist.github.com/henrik/1967800" target="_blank" rel="external">https://gist.github.com/henrik/1967800</a></p>
+<p><a href="https://gist.github.com/icyleaf/667ddfc0646b21f5f53379688bf7f669" target="_blank" rel="external">tmux shortcuts &amp; cheatsheet</a><br><a href="https://gist.github.com/andreyvit/2921703" target="_blank" rel="external">https://gist.github.com/andreyvit/2921703</a><br><a href="https://gist.github.com/henrik/1967800" target="_blank" rel="external">https://gist.github.com/henrik/1967800</a><br><a href="https://gist.github.com/MohamedAlaa/2961058" target="_blank" rel="external">https://gist.github.com/MohamedAlaa/2961058</a><br><a href="https://github.com/gpakosz/.tmux/blob/master/.tmux.conf" target="_blank" rel="external">https://github.com/gpakosz/.tmux/blob/master/.tmux.conf</a></p>
 
       
     </div>
@@ -581,7 +652,7 @@ tmux session
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/05/03/linux/tools/tmux/"
-           data-title="tmux cheatsheet" data-url="http://niko2014.github.io/2016/05/03/linux/tools/tmux/">
+           data-title="tmux cheatsheet" data-url="http://www.nikoai.pw/2016/05/03/linux/tools/tmux/">
       </div>
     
   </div>
@@ -619,14 +690,14 @@ tmux session
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/uploads/avatar.jpg"
-               alt="niko" />
-          <p class="site-author-name" itemprop="name">niko</p>
-          <p class="site-description motion-element" itemprop="description">去发现一个更大的世界！</p>
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">68</span>
+              <span class="site-state-item-count">97</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -643,7 +714,7 @@ tmux session
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">138</span>
+                <span class="site-state-item-count">147</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -672,7 +743,7 @@ tmux session
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#tmux-session"><span class="nav-number">1.</span> <span class="nav-text">tmux session</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pane"><span class="nav-number">2.</span> <span class="nav-text">pane</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#window"><span class="nav-number">3.</span> <span class="nav-text">window</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#window-pane间操作"><span class="nav-number">4.</span> <span class="nav-text">window/pane间操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他"><span class="nav-number">5.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#进入-tmux-命令模式"><span class="nav-number">1.</span> <span class="nav-text">进入 tmux 命令模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tmux-session"><span class="nav-number">2.</span> <span class="nav-text">tmux session</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#切换session"><span class="nav-number">2.1.</span> <span class="nav-text">切换session</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#新建一个session"><span class="nav-number">3.</span> <span class="nav-text">新建一个session</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#kill-掉-session"><span class="nav-number">4.</span> <span class="nav-text">kill 掉 session</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pane"><span class="nav-number">5.</span> <span class="nav-text">pane</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#选择某个-pane"><span class="nav-number">5.1.</span> <span class="nav-text">选择某个 pane</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pane-layout"><span class="nav-number">5.2.</span> <span class="nav-text">pane layout</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#window"><span class="nav-number">6.</span> <span class="nav-text">window</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#window-排序"><span class="nav-number">6.1.</span> <span class="nav-text">window 排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#window-移到到其他-session"><span class="nav-number">6.2.</span> <span class="nav-text">window 移到到其他 session</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#window-pane间操作"><span class="nav-number">7.</span> <span class="nav-text">window/pane间操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他"><span class="nav-number">8.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
           </div>
         </section>
@@ -691,11 +762,11 @@ tmux session
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2016</span>
+  <span itemprop="copyrightYear">2017</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">niko</span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
 </div>
 
 <div class="powered-by">

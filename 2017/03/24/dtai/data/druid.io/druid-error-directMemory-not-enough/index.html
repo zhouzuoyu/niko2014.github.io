@@ -1,0 +1,817 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="druid.io,OLAP," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="今天在新的机器上部署 druid , 起来后发现有 task 错误, 提示是 direct memory 不够.
+日志
+错误日志如下:
+2017-03-23T16:49:43,161 ERROR [main] io.druid.cli.CliPeon - Error when starting up.  Failing.com.google.inject.ProvisionException: G">
+<meta property="og:type" content="article">
+<meta property="og:title" content="druid.io - Not enough direct memory">
+<meta property="og:url" content="http://www.nikoai.pw/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="今天在新的机器上部署 druid , 起来后发现有 task 错误, 提示是 direct memory 不够.
+日志
+错误日志如下:
+2017-03-23T16:49:43,161 ERROR [main] io.druid.cli.CliPeon - Error when starting up.  Failing.com.google.inject.ProvisionException: G">
+<meta property="og:updated_time" content="2017-03-25T17:44:09.726Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="druid.io - Not enough direct memory">
+<meta name="twitter:description" content="今天在新的机器上部署 druid , 起来后发现有 task 错误, 提示是 direct memory 不够.
+日志
+错误日志如下:
+2017-03-23T16:49:43,161 ERROR [main] io.druid.cli.CliPeon - Error when starting up.  Failing.com.google.inject.ProvisionException: G">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/"/>
+
+
+  <title> druid.io - Not enough direct memory | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                druid.io - Not enough direct memory
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-03-24T00:00:00+08:00" content="2017-03-24">
+              2017-03-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天在新的机器上部署 druid , 起来后发现有 task 错误, 提示是 direct memory 不够.</p>
+<h1 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h1><hr>
+<p>错误日志如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">2017-03-23T16:49:43,161 ERROR [main] io.druid.cli.CliPeon - Error when starting up.  Failing.</div><div class="line">com.google.inject.ProvisionException: Guice provision errors:</div><div class="line"></div><div class="line">1) Not enough direct memory.  Please adjust -XX:MaxDirectMemorySize, druid.processing.buffer.sizeBytes, or druid.processing.numThreads: maxDirectMemory[1,908,932,608], memoryNeeded[2,684,354,560] = druid.processing.buffer.sizeBytes[536,870,912] * ( druid.processing.numThreads[4] + 1 )</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  while locating io.druid.collections.StupidPool&lt;java.nio.ByteBuffer&gt; annotated with @io.druid.guice.annotations.Global()</div><div class="line">    for parameter 1 at io.druid.query.groupby.GroupByQueryEngine.&lt;init&gt;(GroupByQueryEngine.java:79)</div><div class="line">  at io.druid.guice.QueryRunnerFactoryModule.configure(QueryRunnerFactoryModule.java:85)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryEngine</div><div class="line">    for parameter 0 at io.druid.query.groupby.GroupByQueryRunnerFactory.&lt;init&gt;(GroupByQueryRunnerFactory.java:64)</div><div class="line">  at io.druid.guice.QueryRunnerFactoryModule.configure(QueryRunnerFactoryModule.java:82)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryRunnerFactory</div><div class="line">  while locating io.druid.query.QueryRunnerFactory annotated with @com.google.inject.multibindings.Element(setName=,uniqueId=28, type=MAPBINDER)</div><div class="line">  at io.druid.guice.DruidBinders.queryRunnerFactoryBinder(DruidBinders.java:38)</div><div class="line">  while locating java.util.Map&lt;java.lang.Class&lt;? extends io.druid.query.Query&gt;, io.druid.query.QueryRunnerFactory&gt;</div><div class="line">    for parameter 0 at io.druid.query.DefaultQueryRunnerFactoryConglomerate.&lt;init&gt;(DefaultQueryRunnerFactoryConglomerate.java:36)</div><div class="line">  while locating io.druid.query.DefaultQueryRunnerFactoryConglomerate</div><div class="line">  at io.druid.guice.StorageNodeModule.configure(StorageNodeModule.java:55)</div><div class="line">  while locating io.druid.query.QueryRunnerFactoryConglomerate</div><div class="line">    for parameter 9 at io.druid.indexing.common.TaskToolboxFactory.&lt;init&gt;(TaskToolboxFactory.java:95)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:153)</div><div class="line">  while locating io.druid.indexing.common.TaskToolboxFactory</div><div class="line">    for parameter 0 at io.druid.indexing.overlord.ThreadPoolTaskRunner.&lt;init&gt;(ThreadPoolTaskRunner.java:96)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:180)</div><div class="line">  while locating io.druid.indexing.overlord.ThreadPoolTaskRunner</div><div class="line">  while locating io.druid.indexing.overlord.TaskRunner</div><div class="line">    for parameter 3 at io.druid.indexing.worker.executor.ExecutorLifecycle.&lt;init&gt;(ExecutorLifecycle.java:78)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:170)</div><div class="line">  while locating io.druid.indexing.worker.executor.ExecutorLifecycle</div><div class="line"></div><div class="line">2) Not enough direct memory.  Please adjust -XX:MaxDirectMemorySize, druid.processing.buffer.sizeBytes, or druid.processing.numThreads: maxDirectMemory[1,908,932,608], memoryNeeded[2,684,354,560] = druid.processing.buffer.sizeBytes[536,870,912] * ( druid.processing.numThreads[4] + 1 )</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  while locating io.druid.collections.StupidPool&lt;java.nio.ByteBuffer&gt; annotated with @io.druid.guice.annotations.Global()</div><div class="line">    for parameter 1 at io.druid.query.groupby.GroupByQueryEngine.&lt;init&gt;(GroupByQueryEngine.java:79)</div><div class="line">  at io.druid.guice.QueryRunnerFactoryModule.configure(QueryRunnerFactoryModule.java:85)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryEngine</div><div class="line">    for parameter 2 at io.druid.query.groupby.GroupByQueryQueryToolChest.&lt;init&gt;(GroupByQueryQueryToolChest.java:113)</div><div class="line">  at io.druid.guice.QueryToolChestModule.configure(QueryToolChestModule.java:74)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryQueryToolChest</div><div class="line">    for parameter 3 at io.druid.query.groupby.GroupByQueryRunnerFactory.&lt;init&gt;(GroupByQueryRunnerFactory.java:64)</div><div class="line">  at io.druid.guice.QueryRunnerFactoryModule.configure(QueryRunnerFactoryModule.java:82)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryRunnerFactory</div><div class="line">  while locating io.druid.query.QueryRunnerFactory annotated with @com.google.inject.multibindings.Element(setName=,uniqueId=28, type=MAPBINDER)</div><div class="line">  at io.druid.guice.DruidBinders.queryRunnerFactoryBinder(DruidBinders.java:38)</div><div class="line">  while locating java.util.Map&lt;java.lang.Class&lt;? extends io.druid.query.Query&gt;, io.druid.query.QueryRunnerFactory&gt;</div><div class="line">    for parameter 0 at io.druid.query.DefaultQueryRunnerFactoryConglomerate.&lt;init&gt;(DefaultQueryRunnerFactoryConglomerate.java:36)</div><div class="line">  while locating io.druid.query.DefaultQueryRunnerFactoryConglomerate</div><div class="line">  at io.druid.guice.StorageNodeModule.configure(StorageNodeModule.java:55)</div><div class="line">  while locating io.druid.query.QueryRunnerFactoryConglomerate</div><div class="line">    for parameter 9 at io.druid.indexing.common.TaskToolboxFactory.&lt;init&gt;(TaskToolboxFactory.java:95)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:153)</div><div class="line">  while locating io.druid.indexing.common.TaskToolboxFactory</div><div class="line">    for parameter 0 at io.druid.indexing.overlord.ThreadPoolTaskRunner.&lt;init&gt;(ThreadPoolTaskRunner.java:96)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:180)</div><div class="line">  while locating io.druid.indexing.overlord.ThreadPoolTaskRunner</div><div class="line">  while locating io.druid.indexing.overlord.TaskRunner</div><div class="line">    for parameter 3 at io.druid.indexing.worker.executor.ExecutorLifecycle.&lt;init&gt;(ExecutorLifecycle.java:78)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:170)</div><div class="line">  while locating io.druid.indexing.worker.executor.ExecutorLifecycle</div><div class="line"></div><div class="line">3) Not enough direct memory.  Please adjust -XX:MaxDirectMemorySize, druid.processing.buffer.sizeBytes, or druid.processing.numThreads: maxDirectMemory[1,908,932,608], memoryNeeded[2,684,354,560] = druid.processing.buffer.sizeBytes[536,870,912] * ( druid.processing.numThreads[4] + 1 )</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  while locating io.druid.collections.StupidPool&lt;java.nio.ByteBuffer&gt; annotated with @io.druid.guice.annotations.Global()</div><div class="line">    for parameter 3 at io.druid.query.groupby.GroupByQueryQueryToolChest.&lt;init&gt;(GroupByQueryQueryToolChest.java:113)</div><div class="line">  at io.druid.guice.QueryToolChestModule.configure(QueryToolChestModule.java:74)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryQueryToolChest</div><div class="line">    for parameter 3 at io.druid.query.groupby.GroupByQueryRunnerFactory.&lt;init&gt;(GroupByQueryRunnerFactory.java:64)</div><div class="line">  at io.druid.guice.QueryRunnerFactoryModule.configure(QueryRunnerFactoryModule.java:82)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryRunnerFactory</div><div class="line">  while locating io.druid.query.QueryRunnerFactory annotated with @com.google.inject.multibindings.Element(setName=,uniqueId=28, type=MAPBINDER)</div><div class="line">  at io.druid.guice.DruidBinders.queryRunnerFactoryBinder(DruidBinders.java:38)</div><div class="line">  while locating java.util.Map&lt;java.lang.Class&lt;? extends io.druid.query.Query&gt;, io.druid.query.QueryRunnerFactory&gt;</div><div class="line">    for parameter 0 at io.druid.query.DefaultQueryRunnerFactoryConglomerate.&lt;init&gt;(DefaultQueryRunnerFactoryConglomerate.java:36)</div><div class="line">  while locating io.druid.query.DefaultQueryRunnerFactoryConglomerate</div><div class="line">  at io.druid.guice.StorageNodeModule.configure(StorageNodeModule.java:55)</div><div class="line">  while locating io.druid.query.QueryRunnerFactoryConglomerate</div><div class="line">    for parameter 9 at io.druid.indexing.common.TaskToolboxFactory.&lt;init&gt;(TaskToolboxFactory.java:95)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:153)</div><div class="line">  while locating io.druid.indexing.common.TaskToolboxFactory</div><div class="line">    for parameter 0 at io.druid.indexing.overlord.ThreadPoolTaskRunner.&lt;init&gt;(ThreadPoolTaskRunner.java:96)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:180)</div><div class="line">  while locating io.druid.indexing.overlord.ThreadPoolTaskRunner</div><div class="line">  while locating io.druid.indexing.overlord.TaskRunner</div><div class="line">    for parameter 3 at io.druid.indexing.worker.executor.ExecutorLifecycle.&lt;init&gt;(ExecutorLifecycle.java:78)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:170)</div><div class="line">  while locating io.druid.indexing.worker.executor.ExecutorLifecycle</div><div class="line"></div><div class="line">4) Not enough direct memory.  Please adjust -XX:MaxDirectMemorySize, druid.processing.buffer.sizeBytes, or druid.processing.numThreads: maxDirectMemory[1,908,932,608], memoryNeeded[2,684,354,560] = druid.processing.buffer.sizeBytes[536,870,912] * ( druid.processing.numThreads[4] + 1 )</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  at io.druid.guice.DruidProcessingModule.getIntermediateResultsPool(DruidProcessingModule.java:108)</div><div class="line">  while locating io.druid.collections.StupidPool&lt;java.nio.ByteBuffer&gt; annotated with @io.druid.guice.annotations.Global()</div><div class="line">    for parameter 4 at io.druid.query.groupby.GroupByQueryRunnerFactory.&lt;init&gt;(GroupByQueryRunnerFactory.java:64)</div><div class="line">  at io.druid.guice.QueryRunnerFactoryModule.configure(QueryRunnerFactoryModule.java:82)</div><div class="line">  while locating io.druid.query.groupby.GroupByQueryRunnerFactory</div><div class="line">  while locating io.druid.query.QueryRunnerFactory annotated with @com.google.inject.multibindings.Element(setName=,uniqueId=28, type=MAPBINDER)</div><div class="line">  at io.druid.guice.DruidBinders.queryRunnerFactoryBinder(DruidBinders.java:38)</div><div class="line">  while locating java.util.Map&lt;java.lang.Class&lt;? extends io.druid.query.Query&gt;, io.druid.query.QueryRunnerFactory&gt;</div><div class="line">    for parameter 0 at io.druid.query.DefaultQueryRunnerFactoryConglomerate.&lt;init&gt;(DefaultQueryRunnerFactoryConglomerate.java:36)</div><div class="line">  while locating io.druid.query.DefaultQueryRunnerFactoryConglomerate</div><div class="line">  at io.druid.guice.StorageNodeModule.configure(StorageNodeModule.java:55)</div><div class="line">  while locating io.druid.query.QueryRunnerFactoryConglomerate</div><div class="line">    for parameter 9 at io.druid.indexing.common.TaskToolboxFactory.&lt;init&gt;(TaskToolboxFactory.java:95)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:153)</div><div class="line">  while locating io.druid.indexing.common.TaskToolboxFactory</div><div class="line">    for parameter 0 at io.druid.indexing.overlord.ThreadPoolTaskRunner.&lt;init&gt;(ThreadPoolTaskRunner.java:96)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:180)</div><div class="line">  while locating io.druid.indexing.overlord.ThreadPoolTaskRunner</div><div class="line">  while locating io.druid.indexing.overlord.TaskRunner</div><div class="line">    for parameter 3 at io.druid.indexing.worker.executor.ExecutorLifecycle.&lt;init&gt;(ExecutorLifecycle.java:78)</div><div class="line">  at io.druid.cli.CliPeon$1.configure(CliPeon.java:170)</div><div class="line">  while locating io.druid.indexing.worker.executor.ExecutorLifecycle</div><div class="line"></div><div class="line">4 errors</div><div class="line">	at com.google.inject.internal.InjectorImpl$3.get(InjectorImpl.java:1014) ~[guice-4.0-beta.jar:?]</div><div class="line">	at com.google.inject.internal.InjectorImpl.getInstance(InjectorImpl.java:1036) ~[guice-4.0-beta.jar:?]</div><div class="line">	at io.druid.guice.LifecycleModule$2.start(LifecycleModule.java:153) ~[druid-api-0.9.1.1.jar:0.9.1.1]</div><div class="line">	at io.druid.cli.GuiceRunnable.initLifecycle(GuiceRunnable.java:91) [druid-services-0.9.1.1.jar:0.9.1.1]</div><div class="line">	at io.druid.cli.CliPeon.run(CliPeon.java:274) [druid-services-0.9.1.1.jar:0.9.1.1]</div><div class="line">	at io.druid.cli.Main.main(Main.java:105) [druid-services-0.9.1.1.jar:0.9.1.1]</div></pre></td></tr></table></figure>
+<p>如上日志所示, 当前需要 <code>memoryNeeded[2,684,354,560]</code> 的 direct memory, 但是当前只有 <code>maxDirectMemory[1,908,932,608]</code> 这么多.<br>因为 memoryNeeded 的值是这么计算出来的: <code>druid.processing.buffer.sizeBytes * ( druid.processing.numThreads + 1 )</code>,<br>因此可以调整 <code>-XX:MaxDirectMemorySize</code>, <code>druid.processing.buffer.sizeBytes</code>, or <code>druid.processing.numThreads</code> 这三者之一.</p>
+<h2 id="druid-processing-的-buffer-和-numThreads-设置"><a href="#druid-processing-的-buffer-和-numThreads-设置" class="headerlink" title="druid.processing 的 buffer 和 numThreads 设置"></a><code>druid.processing</code> 的 buffer 和 numThreads 设置</h2><hr>
+<p><code>druid.processing.buffer.sizeBytes</code> 设置是在 <code>middleManager/runtime.properties:15:druid.processing.buffer.sizeBytes=</code><br><code>druid.processing.numThreads</code> 设置是在 <code>middleManager/runtime.properties:16:druid.processing.numThreads=</code></p>
+<p>具体的值要根据 <code>-XX:MaxDirectMemorySize</code> 来选择设置, 计算后不能超过 <code>-XX:MaxDirectMemorySize</code>, 而默认的 <code>-XX:MaxDirectMemorySize</code> 值, 可以参考这篇博文 : <a href="https://dzone.com/articles/default-hotspot-maximum-direct-memory-size" target="_blank" rel="external">Default HotSpot Maximum Direct Memory Size - DZone Java</a>.</p>
+<h2 id="XX-MaxDirectMemorySize"><a href="#XX-MaxDirectMemorySize" class="headerlink" title="-XX:MaxDirectMemorySize"></a><code>-XX:MaxDirectMemorySize</code></h2><hr>
+<p>如果的确有需求, <code>druid.processing.buffer.sizeBytes</code> 和 <code>druid.processing.numThreads</code> 都需要保留, 那么只有改 <code>-XX:MaxDirectMemorySize</code> 了,<br>可以把设置加到这个地方 <code>druid/middleManager/runtime.properties:8:druid.indexer.runner.javaOpts=</code>.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/druid-io/" rel="tag">#druid.io</a>
+          
+            <a href="/tags/OLAP/" rel="tag">#OLAP</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/11/cs/engineering/conway_law_01/" rel="next" title="康威定律 - Conway’s law 简介">
+                <i class="fa fa-chevron-left"></i> 康威定律 - Conway’s law 简介
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/" rel="prev" title="calcite druid adapter 的分页死循环 bug 分析排查">
+                calcite druid adapter 的分页死循环 bug 分析排查 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/"
+           data-title="druid.io - Not enough direct memory" data-url="http://www.nikoai.pw/2017/03/24/dtai/data/druid.io/druid-error-directMemory-not-enough/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#日志"><span class="nav-number">1.</span> <span class="nav-text">日志</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#druid-processing-的-buffer-和-numThreads-设置"><span class="nav-number">1.1.</span> <span class="nav-text">druid.processing 的 buffer 和 numThreads 设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XX-MaxDirectMemorySize"><span class="nav-number">1.2.</span> <span class="nav-text">-XX:MaxDirectMemorySize</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">2.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

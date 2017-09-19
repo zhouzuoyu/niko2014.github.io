@@ -1,0 +1,919 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="raft," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="Raft 是一种一致性算法, 和 Paxos 的功能一样, 但相比 Paxos 容易理解很多. Raft 将一致性问题分解成了几个部分: Leader Election, Log Replication, Safety，Cluster membership changes. Raft 采用了一种更强的 leader 机制来减少要考虑的状态数量，支持集群成员可以动态改变.
+一些定义和前提
+在理解 R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raft 一致性算法精要简述和理解（一）">
+<meta property="og:url" content="http://www.nikoai.pw/2016/11/30/cs/algo/raft-algo-1/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="Raft 是一种一致性算法, 和 Paxos 的功能一样, 但相比 Paxos 容易理解很多. Raft 将一致性问题分解成了几个部分: Leader Election, Log Replication, Safety，Cluster membership changes. Raft 采用了一种更强的 leader 机制来减少要考虑的状态数量，支持集群成员可以动态改变.
+一些定义和前提
+在理解 R">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-state-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/RequestVote-RPC-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/AppendEntries-RPC-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-rules-for-nodes.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft-state-change-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft-log-copy-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft-leader-comeout-cluster-statue-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft-network-partitions-split-brain-02.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-safety-commit-old-term-logs-01.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-safety-commit-old-term-logs-02.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-safety-commit-old-term-logs-03.png">
+<meta property="og:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-safety-commit-old-term-logs-04.png">
+<meta property="og:updated_time" content="2016-12-12T00:05:35.989Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Raft 一致性算法精要简述和理解（一）">
+<meta name="twitter:description" content="Raft 是一种一致性算法, 和 Paxos 的功能一样, 但相比 Paxos 容易理解很多. Raft 将一致性问题分解成了几个部分: Leader Election, Log Replication, Safety，Cluster membership changes. Raft 采用了一种更强的 leader 机制来减少要考虑的状态数量，支持集群成员可以动态改变.
+一些定义和前提
+在理解 R">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/cs/algo/raft/raft-state-01.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2016/11/30/cs/algo/raft-algo-1/"/>
+
+
+  <title> Raft 一致性算法精要简述和理解（一） | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Raft 一致性算法精要简述和理解（一）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-30T00:00:00+08:00" content="2016-11-30">
+              2016-11-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/cs/" itemprop="url" rel="index">
+                    <span itemprop="name">cs</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/30/cs/algo/raft-algo-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/30/cs/algo/raft-algo-1/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Raft 是一种一致性算法, 和 Paxos 的功能一样, 但相比 Paxos 容易理解很多. Raft 将一致性问题分解成了几个部分: Leader Election, Log Replication, Safety，Cluster membership changes. Raft 采用了一种更强的 leader 机制来减少要考虑的状态数量，支持集群成员可以动态改变.</p>
+<h1 id="一些定义和前提"><a href="#一些定义和前提" class="headerlink" title="一些定义和前提"></a>一些定义和前提</h1><hr>
+<p>在理解 Raft 算法之前，需要准备一些知识和定义，这里将会介绍。为了更快的理解，可以一边阅读 Raft 的内容，一边查阅这些规则和定义。</p>
+<h2 id="node-状态"><a href="#node-状态" class="headerlink" title="node 状态"></a>node 状态</h2><hr>
+<p><img src="/images/cs/algo/raft/raft-state-01.png" alt=""></p>
+<h2 id="RPC-消息"><a href="#RPC-消息" class="headerlink" title="RPC 消息"></a>RPC 消息</h2><hr>
+<p>下面是来自论文中的定义：</p>
+<p><img src="/images/cs/algo/raft/RequestVote-RPC-01.png" alt="RequestVote RPC"></p>
+<p><img src="/images/cs/algo/raft/AppendEntries-RPC-01.png" alt="AppendEntries RPC"></p>
+<h2 id="node-要遵守的规则"><a href="#node-要遵守的规则" class="headerlink" title="node 要遵守的规则"></a>node 要遵守的规则</h2><hr>
+<p><img src="/images/cs/algo/raft/raft-rules-for-nodes.png" alt=""></p>
+<h2 id="raft-任何时候都要保证的特性："><a href="#raft-任何时候都要保证的特性：" class="headerlink" title="raft 任何时候都要保证的特性："></a>raft 任何时候都要保证的特性：</h2><hr>
+<table>
+<thead>
+<tr>
+<th>特性 （properties）</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Election Safety</td>
+<td>特定 term 最多只会有一个 leader （<code>5.2 节</code>）</td>
+</tr>
+<tr>
+<td>Leader Append-Only</td>
+<td>leader 只会追加，绝不删除或者覆盖自己的日志（<code>5.3 节</code>）</td>
+</tr>
+<tr>
+<td>Log Matching</td>
+<td>若两个日志在某个 index 的 entry 上有相同的 term，那么这个日志从头到该 index 都是完全相同的 （<code>5.3 节</code>）</td>
+</tr>
+<tr>
+<td>Leader Completeness Property</td>
+<td>若一个 log entry 在某个 term 被提交成功了，那么后面任期的 leader 都会包含该 log entry（<code>5.4 节</code>）</td>
+</tr>
+<tr>
+<td>State Machine Safety</td>
+<td>如果一个 node 已经 apply 了一个某 index 的 log entry 到状态机，那么其他 node 不会提交一个不同的 log entry<code>（5.4.3 节）</code></td>
+</tr>
+</tbody>
+</table>
+<p>Raft 是如何保证这些特性的， 看完接下来的工作过程就可以理解了。</p>
+<h1 id="Leader-Election"><a href="#Leader-Election" class="headerlink" title="Leader Election"></a>Leader Election</h1><hr>
+<p>开始介绍 raft 一致性算法， 首先要先了解 Leader Election。Raft 定义了 node 的三种状态（身份）：leader，follower，candidate。</p>
+<p><img src="/images/cs/algo/raft-state-change-01.png" alt=""></p>
+<p>如上图， 所有的 node 都是以 follower 状态开始, Raft 使用两个 timeout 来控制选举.<br>第一个是 election timeout, 这个值是 follwer 变成 candidate 前等待的时间, 当 election timeout 到来时, follwer 将成为 candidate, 并开启一个新的选举 term.<br>假设有多个 node: NodeA、NodeB、NodeC，而 timeout 分别是 200ms、190ms、180ms。那么 NodeC 将首先 timeout, 自增 term value（初始 term 为 0），重置 election timeout，投票给自己：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">Node C</div><div class="line">Term: 1</div><div class="line">Vote Count: 1</div></pre></td></tr></table></figure>
+<p>接着发送 <code>RequestVote RPC</code> 消息给其他 nodes 来给自己投票，如果消息接收者还没有在这个选举 term 进行过投票， 则进行以下投票相关的判断和操作：</p>
+<ul>
+<li>首先判断 term 是否小于 currentTerm ，是则返回 false ；</li>
+<li>若 votedFor 为空或为 candidateId，并且该 candidate 的日志和自己一样新，那就投票给他，并重置自己的 election timeout。</li>
+</ul>
+<p>只要某个 candidate 获得大部分的选票， 他将成为 leader， 接着 leader 开始发送 <code>AppendEntries RPC</code> 心跳消息给他的 follower, 不断维持自己的身份并阻止新的领导人产生。这个心跳发送也有一个超时时间，称为 <code>heartbeat timeout</code> .</p>
+<p>对于 candidate 投票的结果， 有 3 种情况:</p>
+<ol>
+<li>自己成为 leader；</li>
+<li>其他 candidate 成为 leader；<br>在 candidate 等待投票时， 他也可能收到其他 node 的 <code>AppendEntries RPC</code>（表示该 node 声明自己是 leader）：<br>如果这个 node 的 term value <code>大于等于</code>当前 candidate 的 term value， 那么 candidate 将承认该 node 的 leader 身份，并切换到 follower 状态。<br>若这个 node 的 term value <code>小于</code>当前 candidate 的 term value，那么 candidate 将拒绝承认这个 <code>AppendEntries RPC</code> ，继续保持自己的 candidate 身份。</li>
+<li>多个 candidate 获得的选票不足以达到大多数（比如两个 candidate 获得同样数目的选票）， 此时选举无效，他们都会 timeout，然后将通过增加 term value 来开始新一轮的选举。然而，这种情况可能无限重复发生（称为 <code>split votes</code> ），一直选举失败无果。所以，我们需要有一些机制，防止这种情况。Raft 是采用随机 election timeout 来减少<code>split votes</code>发生的可能性，这个随机值是 150ms 到 300ms。</li>
+</ol>
+<h1 id="Log-Replication"><a href="#Log-Replication" class="headerlink" title="Log Replication"></a>Log Replication</h1><hr>
+<p>一旦有一个 leader 被选举出来， 接着就需要去 replicate 所有的变更到所有的 nodes。这个是通过 <code>AppendEntries RPC</code> 消息（心跳）来完成。</p>
+<p>若此时客户端发送一个变更修改到 leader，leader 会将变更发往他的 followers，当<code>大多数</code>的 follower 收到后，这个变更将被 leader commit，接着会发送一个 response 回客户端。</p>
+<p>log replication 和 commit 状态如下图所示，不同颜色表示不同 term，每个 log entry 都有一个对应的 index。</p>
+<p><img src="/images/cs/algo/raft-log-copy-01.png" alt=""></p>
+<p>而真实的 leader 选举出来时的 cluster 情况可能是这样的：</p>
+<p><img src="/images/cs/algo/raft-leader-comeout-cluster-statue-01.png" alt=""></p>
+<p>如上，followers 可能缺少一些日志（如ab），可能有未提交的日志（如cd），也可能两种情况同时存在（如ef），这就存在一致性的问题了。</p>
+<p>那么在 Raft 算法中，leader 如何处理这种不一致的情况呢？</p>
+<blockquote>
+<p>In Raft, the leader handles inconsistencies by forcing<br>the followers’ logs to duplicate its own. This means that<br>conflicting entries in follower logs will be overwritten<br>with entries from the leader’s log</p>
+</blockquote>
+<p>可知在 Raft 中，leader 强制 follower 复制 leader 的 logs，这意味着冲突的 log entries 将被 leader 覆盖。</p>
+<h2 id="Network-Partitions-问题"><a href="#Network-Partitions-问题" class="headerlink" title="Network Partitions 问题"></a>Network Partitions 问题</h2><hr>
+<p>当遇到 network partitions （网络割裂）（脑裂） 的一致性问题时， Raft 也可以正常工作：</p>
+<p><img src="/images/cs/algo/raft-network-partitions-split-brain-02.png" alt=""></p>
+<blockquote>
+<p>图片来源：<a href="http://thesecretlivesofdata.com/raft/#replication" target="_blank" rel="external">http://thesecretlivesofdata.com/raft/#replication</a></p>
+</blockquote>
+<p>如上，当客户端（绿色）分别发送请求到两个分区时，下面的分区 leader log entry 不能提交，因为不能复制到大多数的 nodes, 而上面的分区 leader 可以提交日志.</p>
+<p>网络恢复时，网络分区合并，NodeB 将碰到了更高的 term，进而降级为 follower，并回滚 uncommitted log entries ，接收 leader 的 log entries，最终达成一致。</p>
+<h1 id="Safety"><a href="#Safety" class="headerlink" title="Safety"></a>Safety</h1><hr>
+<p>前面介绍了选举过程，但其中还有一些问题。</p>
+<h2 id="raft-如何保证领导人完全特性（Leader-Completeness-Property）"><a href="#raft-如何保证领导人完全特性（Leader-Completeness-Property）" class="headerlink" title="raft 如何保证领导人完全特性（Leader Completeness Property）"></a><strong>raft 如何保证领导人完全特性（Leader Completeness Property）</strong></h2><p>Raft 的关键措施：</p>
+<ul>
+<li>log entries 只有被复制到 majority of nodes，才能进行 commit；</li>
+<li>follower 不会投票给 logs 比自己旧的 candidate</li>
+</ul>
+<p>即是 candidate 想要赢得选举，就必须得到这就保证了新的 majority of nodes 的支持，也意味这 candidate 需要包含了 all committed log entries，因此赢得选举的 leader 一定会有 committed log entries，这就保证了 <code>Leader Completeness Property</code>。</p>
+<p>那么投票时 logs 的新旧如何对比？<br>通过比较它们最后一个 entries 的 index 和 term，若 term 不同，那么 later term 的 node 比较新；若 term 相同，那么 log 更长的 node 比较新。</p>
+<h2 id="commit-之前-term-的-log"><a href="#commit-之前-term-的-log" class="headerlink" title="commit 之前 term 的 log"></a><strong>commit 之前 term 的 log</strong></h2><p>接着 <code>Log replication</code> 的部分，这里继续讨论更复杂的情况。</p>
+<p><img src="/images/cs/algo/raft/raft-safety-commit-old-term-logs-01.png" alt=""></p>
+<p>如上图，粗框的表示 leader，在（a）中，S1 为 leader，复制了 [index2，term2] 给 S2；<br>接着，在（b）中，S1 crash，S5 选举为 leader；</p>
+<p>此时，S5会将 [index2，term3] 复制给其他 nodes，[index2，term2] 将被覆盖，如下：</p>
+<p><img src="/images/cs/algo/raft/raft-safety-commit-old-term-logs-02.png" alt=""></p>
+<p>不过，在（b）时，若 S5 crash，S1 恢复，那么 S1 将继续复制 [index2，term2]，然后提交，如下：</p>
+<p><img src="/images/cs/algo/raft/raft-safety-commit-old-term-logs-03.png" alt=""></p>
+<p>如果提交成功，如下：</p>
+<p><img src="/images/cs/algo/raft/raft-safety-commit-old-term-logs-04.png" alt=""></p>
+<p>那么，即便 S1 又 crash 掉，S5 也不能赢得选举了，因为 S5 不可能获得 majority 的票数。</p>
+<h2 id="安全性证明"><a href="#安全性证明" class="headerlink" title="安全性证明"></a>安全性证明</h2><p>关于安全性证明，主要采用反证法，有兴趣的参考论文的 <code>5.4.3 Safety argument</code>。</p>
+<h1 id="Next"><a href="#Next" class="headerlink" title="Next"></a>Next</h1><hr>
+<p>今天太困了，明天还要上班，raft 还有一些内容，下一篇继续吧。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://ramcloud.stanford.edu/wiki/download/attachments/11370504/raft.pdf" target="_blank" rel="external">raft paper - In Search of an Understandable Consensus Algorithm - Diego Ongaro and John Ousterhout</a><br><a href="https://raft.github.io/raft.pdf" target="_blank" rel="external">online raft paper</a><br><a href="http://thesecretlivesofdata.com/raft/" target="_blank" rel="external">可视化演示</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/raft/" rel="tag">#raft</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/20/java/spring/src/spring-ioc-init-01/" rel="next" title="spring IoC 容器实现（1） - 初始化过程">
+                <i class="fa fa-chevron-left"></i> spring IoC 容器实现（1） - 初始化过程
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/01/cs/algo/raft-alog-2/" rel="prev" title="Raft 一致性算法精要简述和理解（二）">
+                Raft 一致性算法精要简述和理解（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/11/30/cs/algo/raft-algo-1/"
+           data-title="Raft 一致性算法精要简述和理解（一）" data-url="http://www.nikoai.pw/2016/11/30/cs/algo/raft-algo-1/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一些定义和前提"><span class="nav-number">1.</span> <span class="nav-text">一些定义和前提</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#node-状态"><span class="nav-number">1.1.</span> <span class="nav-text">node 状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RPC-消息"><span class="nav-number">1.2.</span> <span class="nav-text">RPC 消息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#node-要遵守的规则"><span class="nav-number">1.3.</span> <span class="nav-text">node 要遵守的规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#raft-任何时候都要保证的特性："><span class="nav-number">1.4.</span> <span class="nav-text">raft 任何时候都要保证的特性：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Leader-Election"><span class="nav-number">2.</span> <span class="nav-text">Leader Election</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Log-Replication"><span class="nav-number">3.</span> <span class="nav-text">Log Replication</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Network-Partitions-问题"><span class="nav-number">3.1.</span> <span class="nav-text">Network Partitions 问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Safety"><span class="nav-number">4.</span> <span class="nav-text">Safety</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#raft-如何保证领导人完全特性（Leader-Completeness-Property）"><span class="nav-number">4.1.</span> <span class="nav-text">raft 如何保证领导人完全特性（Leader Completeness Property）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#commit-之前-term-的-log"><span class="nav-number">4.2.</span> <span class="nav-text">commit 之前 term 的 log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全性证明"><span class="nav-number">4.3.</span> <span class="nav-text">安全性证明</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Next"><span class="nav-number">5.</span> <span class="nav-text">Next</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
