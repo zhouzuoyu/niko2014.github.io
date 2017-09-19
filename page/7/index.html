@@ -288,132 +288,6 @@
             
               
                 
-                <a class="post-title-link" href="/2016/02/11/linux/shadowsocks_share/" itemprop="url">
-                  共享 shadowsocks
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-02-11T00:00:00+08:00" content="2016-02-11">
-              2016-02-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/02/11/linux/shadowsocks_share/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/11/linux/shadowsocks_share/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          如果你的shadowsocks是从pip下载的python脚本，则默认是绑定监听lo网卡的（socks5），若是想分享给其他人（ UI妹子⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄ ）上网用，可能就不行，需要做一些操作。对外暴露一个端口，然后把这个端口的请求转发到lo网卡。
-方法一：使用polipopolipo
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/02/11/linux/shadowsocks_share/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/2016/02/01/linux/install/install_nvidia_gpu_drive_on_ubuntu/" itemprop="url">
                   ubuntu安装nvidia显卡驱动
                 </a>
@@ -1533,6 +1407,134 @@ lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2015/12/29/java/zookeeper/zookeeper-cluster/" itemprop="url">
+                  【zookeeper】 集群搭建和测试
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-12-29T00:00:00+08:00" content="2015-12-29">
+              2015-12-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/12/29/java/zookeeper/zookeeper-cluster/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/29/java/zookeeper/zookeeper-cluster/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          本文记录zookeeper集群的搭建过程及简单测试。
+配置
+zk1
+tickTime=2000dataDir=/foo/datadataLogDir=/foo/logsclientPort=2181initLimit=5syncLimit=2server.1=zk1:2888:3888server.
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/12/29/java/zookeeper/zookeeper-cluster/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
   </section>
 
   
@@ -1578,7 +1580,7 @@ lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-count">96</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1586,7 +1588,7 @@ lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-count">49</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1595,7 +1597,7 @@ lucene 全文索引的搜索速度很快， 关键数据结构就是这个倒排
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">147</span>
+                <span class="site-state-item-count">141</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
