@@ -1,0 +1,859 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="HBase,bigdata," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="HBase 核心概念和过程这篇博客将介绍一下 HBase 架构上的一些组件和概念.
+首先看核心的架构图:
+
+( 图片来自 https://mapr.com/blog/in-depth-look-hbase-architecture/ )
+HBase 会依赖 Zookeeper 和 HDFS, HBase 通过 Zookeeper 来感知和管理不同节点的 servers, 而 HDFS 被用来存放">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase 结构和概念">
+<meta property="og:url" content="http://www.nikoai.pw/2017/05/01/dtai/data/hbase_concept/index.html">
+<meta property="og:site_name" content="保持简单">
+<meta property="og:description" content="HBase 核心概念和过程这篇博客将介绍一下 HBase 架构上的一些组件和概念.
+首先看核心的架构图:
+
+( 图片来自 https://mapr.com/blog/in-depth-look-hbase-architecture/ )
+HBase 会依赖 Zookeeper 和 HDFS, HBase 通过 Zookeeper 来感知和管理不同节点的 servers, 而 HDFS 被用来存放">
+<meta property="og:image" content="http://www.nikoai.pw/images/bigdata/hbase/HBaseArchitecture-Blog-Fig1.png">
+<meta property="og:updated_time" content="2017-10-01T18:20:30.933Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HBase 结构和概念">
+<meta name="twitter:description" content="HBase 核心概念和过程这篇博客将介绍一下 HBase 架构上的一些组件和概念.
+首先看核心的架构图:
+
+( 图片来自 https://mapr.com/blog/in-depth-look-hbase-architecture/ )
+HBase 会依赖 Zookeeper 和 HDFS, HBase 通过 Zookeeper 来感知和管理不同节点的 servers, 而 HDFS 被用来存放">
+<meta name="twitter:image" content="http://www.nikoai.pw/images/bigdata/hbase/HBaseArchitecture-Blog-Fig1.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.nikoai.pw/2017/05/01/dtai/data/hbase_concept/"/>
+
+
+  <title> HBase 结构和概念 | 保持简单 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c4a2e0d0f7d88e69bc22f35fd12b1f3f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">保持简单</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">简单是最难的事</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            日程
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                HBase 结构和概念
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-05-01T00:00:00+08:00" content="2017-05-01">
+              2017-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/data-science/" itemprop="url" rel="index">
+                    <span itemprop="name">data science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/01/dtai/data/hbase_concept/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/01/dtai/data/hbase_concept/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-核心概念和过程"><a href="#HBase-核心概念和过程" class="headerlink" title="HBase 核心概念和过程"></a>HBase 核心概念和过程</h1><p>这篇博客将介绍一下 HBase 架构上的一些组件和概念.</p>
+<p>首先看核心的架构图:</p>
+<p><img src="/images/bigdata/hbase/HBaseArchitecture-Blog-Fig1.png" alt=""></p>
+<p>( 图片来自 <a href="https://mapr.com/blog/in-depth-look-hbase-architecture/" target="_blank" rel="external">https://mapr.com/blog/in-depth-look-hbase-architecture/</a> )</p>
+<p>HBase 会依赖 Zookeeper 和 HDFS, HBase 通过 Zookeeper 来感知和管理不同节点的 servers, 而 HDFS 被用来存放 HBase 的数据.<br>下面就来看看 HBase 内部核心组件及其如何工作.</p>
+<h1 id="核心组件"><a href="#核心组件" class="headerlink" title="核心组件"></a>核心组件</h1><h2 id="HMaster"><a href="#HMaster" class="headerlink" title="HMaster"></a>HMaster</h2><p>首先是 HMaster, 它主要负责 Region 分配, DDL (create, delete tables) 等操作, 比如:</p>
+<ul>
+<li>恢复和负载均衡的 Region 重分配</li>
+<li>监控 Region Server 的状态</li>
+<li>创建/删除/更新 Table</li>
+</ul>
+<h2 id="Region"><a href="#Region" class="headerlink" title="Region"></a>Region</h2><p>HBase 是通过 row key 的范围将记录划分成多个 Regions, 以实现水平切分数据, 每个 Region 是被托管在 Region server 上.</p>
+<h2 id="RegionServer"><a href="#RegionServer" class="headerlink" title="RegionServer"></a>RegionServer</h2><p>管理了多个 Regions, 提供数据读写服务.<br>一个 table 可被水平切分为 多个 Region, 一个 Region 包含了在 start key 和 end key 之间连续有序的 rows.<br>每个 Region 的大小是由 TODO 来设置.<br>一个 Region server 可以提供 1000 个 Region 的服务.</p>
+<p><strong>RegionServer 主要由以下组成:</strong></p>
+<h3 id="1-WAL"><a href="#1-WAL" class="headerlink" title="1 WAL"></a>1 WAL</h3><p>预写日志, 分布式 FS 上的文件, 作用是宕机后恢复数据, 恢复未持久化到磁盘的数据.</p>
+<h3 id="2-BlockCache"><a href="#2-BlockCache" class="headerlink" title="2 BlockCache"></a>2 BlockCache</h3><p>读缓存, 存储频繁访问的数据, 当满了的时候会淘汰 LRU 数据.</p>
+<h3 id="3-Memstore"><a href="#3-Memstore" class="headerlink" title="3 Memstore"></a>3 Memstore</h3><p>内存中的写缓存, 存储排好序的 key-value. 在一个 Region 中, 一个 column family 对应 一个 MemStore.</p>
+<h3 id="4-HFile"><a href="#4-HFile" class="headerlink" title="4 HFile"></a>4 HFile</h3><p>当一个 MemStore 写满之后, 会被 flush 成一个新的 HFile 到 HDFS 上.</p>
+<h2 id="META-table"><a href="#META-table" class="headerlink" title="META table"></a>META table</h2><p>META table 维护了集群中的所有 Regions 的位置信息, 可以通过 key 找到其所在的 Region 位置, 类 B-Tree 实现.</p>
+<h1 id="核心过程"><a href="#核心过程" class="headerlink" title="核心过程"></a>核心过程</h1><h2 id="HBase-初次读写"><a href="#HBase-初次读写" class="headerlink" title="HBase 初次读写"></a>HBase 初次读写</h2><p>首先第一步就是寻找 Region Server 的位置.</p>
+<ol>
+<li><p>首先 <code>.META</code> 的位置信息是被保存在 zookeeper 中, 因此客户端先要从 zookeeper 获取载有 meta table 的 Region Servers.</p>
+</li>
+<li><p>客户端查询 .META , 可以得到要访问的 row key 对应哪些 Region Servers, 客户端会将这些信息和 META 表位置等信息一起缓存起来.</p>
+</li>
+<li><p>从相应的 Region server 进行交互操作行数据.</p>
+</li>
+</ol>
+<h2 id="HBase-写请求-在-Region-Server-中"><a href="#HBase-写请求-在-Region-Server-中" class="headerlink" title="HBase 写请求 (在 Region Server 中)"></a>HBase 写请求 (在 Region Server 中)</h2><ol>
+<li>当 Region Server 收到 Put 请求, 首先会把更新追加到 WAL (  write-ahead log )</li>
+<li>WAL 写入后, 更新也会被放在 MemStore , 然后把结果返回客户端</li>
+</ol>
+<h2 id="HBase-读请求-在-Region-Server-中"><a href="#HBase-读请求-在-Region-Server-中" class="headerlink" title="HBase 读请求 (在 Region Server 中)"></a>HBase 读请求 (在 Region Server 中)</h2><ol>
+<li>First, the scanner looks for the Row cells in the Block cache</li>
+</ol>
+<p>首先从 BlockCache 读取 row cells, 因为这里是读缓存</p>
+<ol>
+<li><p>然后在 MemStore 中查找, 因为写缓存包含了最近写的缓存.</p>
+</li>
+<li><p>如果前两步都没有找到, 将会使用 BlockCache 中的 indexes 和 bloom filters 来加载可能包含目录 row cells 的 HFile 到内存中.</p>
+</li>
+</ol>
+<h2 id="Regions-Compact"><a href="#Regions-Compact" class="headerlink" title="Regions Compact"></a>Regions Compact</h2><p>compact 分为几种: Minor Compact 和 Major Compact .</p>
+<h2 id="Minor-Compact"><a href="#Minor-Compact" class="headerlink" title="Minor Compact"></a>Minor Compact</h2><p>HBase 会自动选择小的 HFile , 将他们进行合并成一个大的 HFile , 通过 merge sort , 目的是减少 Hfile 的文件数.</p>
+<h2 id="Major-Compact"><a href="#Major-Compact" class="headerlink" title="Major Compact"></a>Major Compact</h2><p>Major Compact 会将一个 Region 中的所有 HFile 进行合并且重写每个 Column Family 到相应的一个 HFile 中.<br>在这个过程中, 会丢弃已删除和已过期的 cell , 这个提高了读性能, 但是这个过程需要大量的磁盘 IO 和 网络传输开销( 写放大 ).<br>因此通常是在周末或者晚上等业务低峰期进行.</p>
+<h2 id="Region-Split"><a href="#Region-Split" class="headerlink" title="Region Split"></a>Region Split</h2><p>当 Region 达到 <code>hbase.hregion.max.filesize</code> 限制时, 将触发 Region 的 split , 这个 split 操作会上报给 HMaster.<br>为了负载均衡, HMaster 可能会将一些 Region 移到其他 Region Server 上去. 这时因为 HFile 仍在旧的 Region Server 中, 而造成数据非本地的问题, 知道下一次的 Major Compact.</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><hr>
+<p><a href="https://mapr.com/blog/in-depth-look-hbase-architecture/" target="_blank" rel="external">https://mapr.com/blog/in-depth-look-hbase-architecture/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag">#HBase</a>
+          
+            <a href="/tags/bigdata/" rel="tag">#bigdata</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/05/dtai/data/druid.io/calcite-druid-sql-errors-dead-loop-paging/" rel="next" title="calcite druid adapter 的分页死循环 bug 分析排查">
+                <i class="fa fa-chevron-left"></i> calcite druid adapter 的分页死循环 bug 分析排查
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/15/linux/tools/tmux/tmux-faq/" rel="prev" title="tmux FAQ">
+                tmux FAQ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/05/01/dtai/data/hbase_concept/"
+           data-title="HBase 结构和概念" data-url="http://www.nikoai.pw/2017/05/01/dtai/data/hbase_concept/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="niko chueng" />
+          <p class="site-author-name" itemprop="name">niko chueng</p>
+          <p class="site-description motion-element" itemprop="description">保持简单</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">143</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-核心概念和过程"><span class="nav-number">1.</span> <span class="nav-text">HBase 核心概念和过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心组件"><span class="nav-number">2.</span> <span class="nav-text">核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HMaster"><span class="nav-number">2.1.</span> <span class="nav-text">HMaster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Region"><span class="nav-number">2.2.</span> <span class="nav-text">Region</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RegionServer"><span class="nav-number">2.3.</span> <span class="nav-text">RegionServer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-WAL"><span class="nav-number">2.3.1.</span> <span class="nav-text">1 WAL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-BlockCache"><span class="nav-number">2.3.2.</span> <span class="nav-text">2 BlockCache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Memstore"><span class="nav-number">2.3.3.</span> <span class="nav-text">3 Memstore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-HFile"><span class="nav-number">2.3.4.</span> <span class="nav-text">4 HFile</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#META-table"><span class="nav-number">2.4.</span> <span class="nav-text">META table</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心过程"><span class="nav-number">3.</span> <span class="nav-text">核心过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase-初次读写"><span class="nav-number">3.1.</span> <span class="nav-text">HBase 初次读写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase-写请求-在-Region-Server-中"><span class="nav-number">3.2.</span> <span class="nav-text">HBase 写请求 (在 Region Server 中)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase-读请求-在-Region-Server-中"><span class="nav-number">3.3.</span> <span class="nav-text">HBase 读请求 (在 Region Server 中)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Regions-Compact"><span class="nav-number">3.4.</span> <span class="nav-text">Regions Compact</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Minor-Compact"><span class="nav-number">3.5.</span> <span class="nav-text">Minor Compact</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Major-Compact"><span class="nav-number">3.6.</span> <span class="nav-text">Major Compact</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Region-Split"><span class="nav-number">3.7.</span> <span class="nav-text">Region Split</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">niko chueng</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"niko2014"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = decodeURIComponent(data.url);
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
